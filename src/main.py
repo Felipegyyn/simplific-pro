@@ -69,11 +69,25 @@ def create_admin_user():
 
     admin = User.query.filter_by(email=admin_email).first()
     if not admin:
-        admin = User(email=admin_email, is_admin=True, first_login=False)
-        admin.set_password(admin_password)
+        # --- ESTA É A PARTE CORRIGIDA ---
+        # Criamos o admin com todos os campos necessários, usando 'profile'
+        hashed_password = bcrypt.generate_password_hash(admin_password).decode('utf-8')
+        admin = User(
+            name='Admin',
+            email=admin_email,
+            whatsapp='00000000000',
+            password_hash=hashed_password,
+            profile='admin',
+            status='active',
+            first_login=False
+        )
+        # ---------------------------------
+        
         db.session.add(admin)
         db.session.commit()
         print(f"Admin user created: {admin_email}")
+    else:
+        print(f"Admin user {admin_email} already exists.")
 
 # Função para criar categorias padrão
 @app.cli.command("create-categories")
