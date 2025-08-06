@@ -76,6 +76,7 @@ def create_admin_user():
         print(f"Admin user created: {admin_email}")
 
 # Função para criar categorias padrão
+@app.cli.command("create-categories")
 def create_default_categories():
     """Create default categories for admin user"""
     try:
@@ -136,17 +137,17 @@ scheduler.start()
 #if os.getenv('FLASK_SKIP_SETUP') != '1':
 with app.app_context():
     #create_admin_user()
-    create_default_categories()
+    #create_default_categories()
 
 # Configuração do Flask-Mail
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't']
-app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False').lower() in ['true', '1', 't']
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = ('Simplific Pro', os.getenv('MAIL_USERNAME')) # Nome que aparecerá para o cliente
-app.config['MAIL_DEBUG'] = True # Ativa o log detalhado de depuração
+    app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+    app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't']
+    app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL', 'False').lower() in ['true', '1', 't']
+    app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    app.config['MAIL_DEFAULT_SENDER'] = ('Simplific Pro', os.getenv('MAIL_USERNAME')) # Nome que aparecerá para o cliente
+    app.config['MAIL_DEBUG'] = True # Ativa o log detalhado de depuração
 
 mail.init_app(app)
 
