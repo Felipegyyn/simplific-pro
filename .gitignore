@@ -1,0 +1,9 @@
+# Ambiente Virtual
+venv/
+__pycache__/
+
+# Arquivos de Ambiente
+.env
+
+# Arquivos do S.O.
+.DS_Store

@@ -1,0 +1,74 @@
+from flask_mail import Message
+from src.extensions import mail
+from src.services.whatsapp_service import send_whatsapp_message, send_whatsapp_template, template_sids
+from flask import render_template # Para usar templates HTML no futuro
+
+def _send_welcome_email(user_credentials):
+    """Envia o e-mail de boas-vindas com os dados de acesso."""
+    try:
+        # Cria a mensagem de e-mail
+        msg = Message(
+            subject="Bem-vindo ao Simplific Pro! Seus dados de acesso chegaram.",
+            recipients=[user_credentials['email']]
+        )
+        # Corpo do e-mail em texto simples (podemos usar HTML no futuro)
+        msg.body = (
+            f"Olá, {user_credentials['name']}!\n\n"
+            f"Sua jornada para uma vida financeira mais organizada começa agora. Seja muito bem-vindo(a) ao Simplific Pro!\n\n"
+            f"Aqui estão seus dados para o primeiro acesso:\n"
+            f"Login: {user_credentials['email']}\n"
+            f"Senha Provisória: {user_credentials['password']}\n\n"
+            f"Acesse o Simplific.Ai no número - +55 11 51991373  .\n\n"
+            f"Recomendamos que você altere sua senha no primeiro login.\n\n"
+            f"Atenciosamente,\n"
+            f"Equipe Simplific Pro"
+        )
+
+        mail.send(msg)
+        print(f"✅ E-mail de boas-vindas enviado para {user_credentials['email']}.")
+        return True
+    except Exception as e:
+        print(f"ERRO CRÍTICO ao enviar e-mail de boas-vindas: {e}")
+        return False
+
+# Em src/services/notification_service.py
+# Substitua a função inteira por esta versão
+
+def _send_welcome_whatsapp(user_credentials):
+    """Envia a mensagem de boas-vindas via WhatsApp usando um Template."""
+    whatsapp_number_twilio = f"whatsapp:{user_credentials['whatsapp']}"
+
+    # Busca o ID (SID) do nosso template de boas-vindas
+    welcome_template_sid = template_sids.get('welcome_simplific')
+    if not welcome_template_sid:
+        print("ERRO: Template SID para 'welcome_simplific' não encontrado.")
+        return False
+
+    # Chama a função com os parâmetros corretos
+    resultado = send_whatsapp_template(
+        to=whatsapp_number_twilio,
+        template_sid=welcome_template_sid, # <-- Parâmetro corrigido
+        content_variables={
+            "1": user_credentials['name'],
+            "2": user_credentials['email'],
+            "3": user_credentials['password']
+        }
+    )
+
+    if resultado.get('status') == 'success':
+        print(f"✅ WhatsApp de boas-vindas enviado para {user_credentials['whatsapp']}.")
+        return True
+    else:
+        print(f"ERRO ao enviar WhatsApp de boas-vindas: {resultado.get('message')}")
+        return False
+
+def send_welcome_credentials(user_credentials):
+    """
+    Função principal da Central. Orquestra o envio por ambos os canais.
+    """
+    print(f"Iniciando envio de credenciais para o usuário: {user_credentials['name']}")
+    # Envia por ambos os canais
+    email_sent = _send_welcome_email(user_credentials)
+    whatsapp_sent = _send_welcome_whatsapp(user_credentials)
+
+    return email_sent and whatsapp_sent
