@@ -60,17 +60,8 @@ app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
 
 # Adicione esta linha logo acima da sua função
+
 @app.cli.command("create-admin")
-def create_admin_user():
-    # O resto da sua função continua igual...
-    admin_email = 'felipegyyn@gmail.com'
-    admin_password = 'sua_senha_segura_aqui' # Lembre-se de usar uma senha segura
-    admin = User.query.filter_by(email=admin_email).first()
-    if not admin:
-        # ... e assim por diante
-
-
-# Função para criar admin user
 def create_admin_user():
     """Create default admin user if it doesn't exist"""
     admin_email = 'felipegyyn@gmail.com'
