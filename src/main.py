@@ -21,6 +21,7 @@ from src.extensions import mail, db
 from src.routes.webhooks import webhooks_bp
 from src.routes.credit_cards import credit_cards_bp
 from src.routes.schedule import schedule_bp
+from flask_bcrypt import Bcrypt
 from src.routes.investments import investments_bp
 from src.routes.extended_simple import extended_bp
 from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
@@ -33,6 +34,8 @@ app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+bcrypt = Bcrypt(app)
 
 db.init_app(app)
 mail.init_app(app)
