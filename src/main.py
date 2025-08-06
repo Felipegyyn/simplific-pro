@@ -59,6 +59,17 @@ app.register_blueprint(reports_bp, url_prefix='/api') # <-- ADICIONE ESTA LINHA 
 app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
 
+# Adicione esta linha logo acima da sua função
+@app.cli.command("create-admin")
+def create_admin_user():
+    # O resto da sua função continua igual...
+    admin_email = 'felipegyyn@gmail.com'
+    admin_password = 'sua_senha_segura_aqui' # Lembre-se de usar uma senha segura
+    admin = User.query.filter_by(email=admin_email).first()
+    if not admin:
+        # ... e assim por diante
+
+
 # Função para criar admin user
 def create_admin_user():
     """Create default admin user if it doesn't exist"""
@@ -133,7 +144,7 @@ scheduler.start()
 # Execução condicional para evitar conflito com migrações
 #if os.getenv('FLASK_SKIP_SETUP') != '1':
 with app.app_context():
-    create_admin_user()
+    #create_admin_user()
     create_default_categories()
 
 # Configuração do Flask-Mail
