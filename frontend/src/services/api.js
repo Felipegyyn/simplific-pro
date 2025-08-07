@@ -69,11 +69,8 @@ class ApiService {
       }
 
       const data = await response.json();
-
       this.setToken(data.access_token, data.refresh_token || this.refreshToken);
-
       this.processQueue(null, this.token);
-
       console.log('Token renovado com sucesso');
       return this.token;
 
@@ -100,70 +97,64 @@ class ApiService {
   }
 
   getHeaders(method = 'GET') {
-  const headers = {};
+    const headers = {};
 
-  if (method !== 'DELETE') {
-    headers['Content-Type'] = 'application/json';
+    if (method !== 'DELETE') {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    return headers;
   }
-
-  if (this.token) {
-    headers['Authorization'] = `Bearer ${this.token}`;
-  }
-
-  return headers;
-}
-
 
   async request(endpoint, options = {}) {
-  const url = `${API_BASE_URL}${endpoint}`;
-  const method = options.method || 'GET';
-const config = {
-  headers: this.getHeaders(method),
-  ...options,
-};
+    const url = `${API_BASE_URL}${endpoint}`;
+    const method = options.method || 'GET';
+    const config = {
+      headers: this.getHeaders(method),
+      ...options,
+    };
 
+    try {
+      const response = await fetch(url, config);
 
-  try {
-    const response = await fetch(url, config);
-
-    if (response.status === 401 && !options._retry) {
-      try {
-        await this.silentRefreshToken();
-        return this.request(endpoint, { ...options, _retry: true });
-      } catch (refreshError) {
-        this.logout();
-        throw new Error('Sessão expirada. Faça login novamente.');
-      }
-    }
-
-    // 👉 Verificar status 204 (No Content)
-    if (response.status === 204) {
-      return null; // Sem conteúdo, sucesso
-    }
-
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro na requisição');
+      if (response.status === 401 && !options._retry) {
+        try {
+          await this.silentRefreshToken();
+          // Recria o cabeçalho com o novo token
+          const newConfig = { ...config, headers: this.getHeaders(method) };
+          return this.request(endpoint, { ...newConfig, _retry: true });
+        } catch (refreshError) {
+          this.logout();
+          throw new Error('Sessão expirada. Faça login novamente.');
+        }
       }
 
-      return data;
-    } else {
-      // 👉 Caso a resposta não seja JSON, mas também não seja erro (ex: texto simples)
-      if (!response.ok) {
-        throw new Error('Erro na requisição');
+      if (response.status === 204) {
+        return null;
       }
 
-      return null;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Erro na requisição');
+        }
+        return data;
+      } else {
+        if (!response.ok) {
+          throw new Error('Erro na requisição');
+        }
+        return null;
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
     }
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
   }
-}
-
 
   async get(endpoint) {
     return this.request(endpoint, { method: 'GET' });
@@ -183,46 +174,28 @@ const config = {
     });
   }
 
-async delete(endpoint) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: 'DELETE',
-    headers: this.getHeaders(),
-  });
+  async delete(endpoint) {
+    return this.request(endpoint, { method: 'DELETE' });
+  }
 
-  // Se for sucesso (incluindo 204 No Content), encerra sem erro
-  if (response.ok || response.status === 204) return null;
+  // Autenticação
+  async login(email, password) {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-  // Tenta extrair mensagem de erro, se houver
-  let errorMessage = 'Erro ao excluir';
+    if (!response.ok) {
+      throw new Error('Falha no login');
+    }
 
-  try {
     const data = await response.json();
-    errorMessage = data.error || errorMessage;
-  } catch (_) {
-    // ignora JSON vazio
+    this.setToken(data.access_token, data.refresh_token);
+    localStorage.setItem('simplific_user', JSON.stringify(data.user));
+    this.checkTokenValidity();
+    return data;
   }
-
-  throw new Error(errorMessage);
-}
-// Autenticação
-async login(email, password) {
-  // AQUI ESTÁ A CORREÇÃO: Adicionamos /api/ na URL
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Falha no login');
-  }
-
-  const data = await response.json();
-  this.setToken(data.access_token, data.refresh_token);
-  localStorage.setItem('simplific_user', JSON.stringify(data.user));
-  this.checkTokenValidity();
-  return data;
-}
 
   async logout() {
     this.token = null;
@@ -241,117 +214,117 @@ async login(email, password) {
   }
 
   async getCurrentUser() {
-     return this.request('/profile'); // <-- Alteração aqui
+    return this.request('/api/profile');
   }
 
   // Planejamento
   async getPlannings() {
-    return this.get('/planning');
+    return this.get('/api/planning');
   }
 
   async createPlanning(planningData) {
-    return this.post('/planning', planningData);
+    return this.post('/api/planning', planningData);
   }
 
   async updatePlanning(planningId, planningData) {
-    return this.put(`/planning/${planningId}`, planningData);
+    return this.put(`/api/planning/${planningId}`, planningData);
   }
 
   async deletePlanning(planningId) {
-    return this.delete(`/planning/${planningId}`);
+    return this.delete(`/api/planning/${planningId}`);
   }
 
   // Transações
   async getTransactions() {
-    return this.get('/transactions');
+    return this.get('/api/transactions');
   }
 
   async createTransaction(transactionData) {
-    return this.post('/transactions', transactionData);
+    return this.post('/api/transactions', transactionData);
   }
 
   async updateTransaction(transactionId, transactionData) {
-    return this.put(`/transactions/${transactionId}`, transactionData);
+    return this.put(`/api/transactions/${transactionId}`, transactionData);
   }
 
   async deleteTransaction(transactionId) {
-    return this.delete(`/transactions/${transactionId}`);
+    return this.delete(`/api/transactions/${transactionId}`);
   }
 
   // Cartões de Crédito
   async getCreditCards() {
-    return this.get('/credit-cards');
+    return this.get('/api/credit-cards');
   }
 
   async createCreditCard(cardData) {
-    return this.post('/credit-cards', cardData);
+    return this.post('/api/credit-cards', cardData);
   }
 
   async updateCreditCard(cardId, cardData) {
-    return this.put(`/credit-cards/${cardId}`, cardData);
+    return this.put(`/api/credit-cards/${cardId}`, cardData);
   }
 
   async deleteCreditCard(cardId) {
-    return this.delete(`/credit-cards/${cardId}`);
+    return this.delete(`/api/credit-cards/${cardId}`);
   }
 
   async getCreditCardTransactions(cardId) {
-    return this.get(`/credit-cards/${cardId}/transactions`);
+    return this.get(`/api/credit-cards/${cardId}/transactions`);
   }
 
   async createCreditCardTransaction(cardId, transactionData) {
-    return this.post(`/credit-cards/${cardId}/transactions`, transactionData);
+    return this.post(`/api/credit-cards/${cardId}/transactions`, transactionData);
   }
 
   // Metas
   async getGoals() {
-    return this.get('/goals');
+    return this.get('/api/goals');
   }
 
   async createGoal(goalData) {
-    return this.post('/goals', goalData);
+    return this.post('/api/goals', goalData);
   }
 
   async updateGoal(goalId, goalData) {
-    return this.put(`/goals/${goalId}`, goalData);
+    return this.put(`/api/goals/${goalId}`, goalData);
   }
 
   async deleteGoal(goalId) {
-    return this.delete(`/goals/${goalId}`);
+    return this.delete(`/api/goals/${goalId}`);
   }
 
   // Investimentos
   async getInvestments() {
-    return this.get('/investments');
+    return this.get('/api/investments');
   }
 
   async createInvestment(investmentData) {
-    return this.post('/investments', investmentData);
+    return this.post('/api/investments', investmentData);
   }
 
   async updateInvestment(investmentId, investmentData) {
-    return this.put(`/investments/${investmentId}`, investmentData);
+    return this.put(`/api/investments/${investmentId}`, investmentData);
   }
 
   async deleteInvestment(investmentId) {
-    return this.delete(`/investments/${investmentId}`);
+    return this.delete(`/api/investments/${investmentId}`);
   }
 
   // Agenda
   async getScheduleEvents() {
-    return this.get('/schedule');
+    return this.get('/api/schedule');
   }
 
   async createScheduleEvent(eventData) {
-    return this.post('/schedule', eventData);
+    return this.post('/api/schedule', eventData);
   }
 
   async updateScheduleEvent(eventId, eventData) {
-    return this.put(`/schedule/${eventId}`, eventData);
+    return this.put(`/api/schedule/${eventId}`, eventData);
   }
 
   async deleteScheduleEvent(eventId) {
-    return this.delete(`/schedule/${eventId}`);
+    return this.delete(`/api/schedule/${eventId}`);
   }
 }
 
