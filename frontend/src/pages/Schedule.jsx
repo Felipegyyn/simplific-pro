@@ -56,7 +56,7 @@ const Schedule = ({ user, onLogout }) => {
     try {
       setLoading(true);
       // ▼▼▼ CORREÇÃO 1: LER A RESPOSTA DIRETAMENTE ▼▼▼
-      const eventosCarregados = await apiService.get('/schedule') || [];
+      const eventosCarregados = await apiService.get('/api/schedule') || [];
       setEventos(eventosCarregados);
 
       // 🔔 WhatsApp automático para eventos de pagamento próximos
@@ -89,7 +89,7 @@ const Schedule = ({ user, onLogout }) => {
   const criarEvento = async (dadosEvento) => {
     try {
       // Usamos a resposta da API diretamente, sem checar 'response.success'
-      await apiService.post('/schedule', dadosEvento);
+      await apiService.post('/api/schedule', dadosEvento);
       await loadEventos(); // Recarregar lista
       setIsModalOpen(false); // Fechar modal
       setFormData({
@@ -112,7 +112,7 @@ const Schedule = ({ user, onLogout }) => {
   const marcarConcluido = async (id) => {
     try {
       // Ativa a chamada para a nova rota PUT que criamos no backend
-      await apiService.put(`/schedule/${id}`, { status: 'concluido' });
+      await apiService.put(`/api/schedule/${id}`, { status: 'concluido' });
       // Recarrega a lista de eventos para atualizar a tela
       await loadEventos();
     } catch (error) {
@@ -125,7 +125,7 @@ const Schedule = ({ user, onLogout }) => {
   const excluirEvento = async (id) => {
     if (confirm('Tem certeza que deseja excluir este evento?')) {
       try {
-        await apiService.delete(`/schedule/${id}`);
+        await apiService.delete(`/api/schedule/${id}`);
         await loadEventos();
       } catch (error) {
         console.error('Erro ao excluir evento:', error);
@@ -167,7 +167,7 @@ const Schedule = ({ user, onLogout }) => {
         ...editFormData,
         amount: editFormData.amount ? parseFloat(editFormData.amount) : null
       };
-      await apiService.put(`/schedule/${editingEvent.id}`, payload);
+      await apiService.put(`/api/schedule/${editingEvent.id}`, payload);
       setIsEditModalOpen(false);
       await loadEventos();
     } catch (error) {
