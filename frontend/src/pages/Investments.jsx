@@ -61,7 +61,7 @@ const [analysisData, setAnalysisData] = useState(null);
   const loadInvestimentos = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get('/investments');
+      const response = await apiService.get('/api/investments');
       setInvestimentos(response || []);
     } catch (error) {
       console.error('Erro ao carregar investimentos:', error);
@@ -73,7 +73,7 @@ const [analysisData, setAnalysisData] = useState(null);
 
 const loadAnalysisData = async () => {
     try {
-      const response = await apiService.get('/investments/analysis');
+      const response = await apiService.get('/api/investments/analysis');
       setAnalysisData(response || null);
     } catch (error) {
       console.error('Erro ao carregar dados de análise:', error);
@@ -99,7 +99,7 @@ useEffect(() => {
     const loadEvolutionData = async () => {
       if (!performanceYear) return;
       try {
-        const response = await apiService.get(`/investments/portfolio-evolution?year=${performanceYear}`);
+        const response = await apiService.get(`/api/investments/portfolio-evolution?year=${performanceYear}`);
         setEvolucaoData(response || []);
       } catch (error) {
         console.error('Erro ao carregar evolução da carteira:', error);
@@ -112,7 +112,7 @@ useEffect(() => {
 
   const criarInvestimento = async (dadosInvestimento) => {
     try {
-      await apiService.post('/investments', dadosInvestimento);
+      await apiService.post('/api/investments', dadosInvestimento);
       alert('✅ Investimento adicionado com sucesso!');
       await loadInvestimentos();
       setIsModalOpen(false);
@@ -135,7 +135,7 @@ useEffect(() => {
   const excluirInvestimento = async (id) => {
     if (confirm('Tem certeza que deseja excluir este investimento?')) {
       try {
-        await apiService.delete(`/investments/${id}`);
+        await apiService.delete(`/api/investments/${id}`);
         await loadInvestimentos();
       } catch (error) {
         console.error('Erro ao excluir investimento:', error);
@@ -186,7 +186,7 @@ useEffect(() => {
 
     try {
       // Faz a chamada PUT para a API
-      await apiService.put(`/investments/${editingInvestment.id}`, payload);
+      await apiService.put(`/api/investments/${editingInvestment.id}`, payload);
       alert('✅ Investimento atualizado com sucesso!');
       
       // Fecha o modal e recarrega os dados
