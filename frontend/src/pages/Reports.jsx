@@ -73,7 +73,7 @@ const Reports = ({ user, onLogout }) => {
     if (activeTab === 'investments') {
       try {
         // AGORA USA o estado 'investmentYear' para a chamada
-        const response = await apiService.get(`/reports/investment-performance?year=${investmentYear}`);
+        const response = await apiService.get(`/api/reports/investment-performance?year=${investmentYear}`);
         setInvestmentChartData(response || []);
       } catch (error) {
         console.error("Erro ao carregar dados de performance de investimentos:", error);
@@ -89,7 +89,7 @@ useEffect(() => {
     const loadGoalsData = async () => {
       if (activeTab === 'goals') {
         try {
-          const response = await apiService.get('/reports/goals-summary');
+          const response = await apiService.get('/api/reports/goals-summary');
           setGoalsReportData(response || { summary: {}, goalsList: [] });
         } catch (error) {
           console.error("Erro ao carregar dados do relatório de metas:", error);
@@ -113,7 +113,7 @@ useEffect(() => {
     try {
       setReportData(prev => ({ ...prev, loading: true }));
 
-      const response = await apiService.get('/reports/overview', {
+      const response = await apiService.get('/api/reports/overview', {
         params: filters
       });
 
