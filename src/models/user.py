@@ -1,7 +1,7 @@
 from datetime import datetime
 # Importe a werkzeug.security para hashing de senha
-from werkzeug.security import generate_password_hash, check_password_hash
 from src.models.db import db
+from src.main import bcrypt
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -22,14 +22,14 @@ class User(db.Model):
 
     def set_password(self, password):
         """Hash and set password"""
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
         """Check if provided password matches hash"""
         # Adiciona uma verificação para garantir que o hash não está vazio
         if not self.password_hash:
             return False
-        return check_password_hash(self.password_hash, password)
+        return bcrypt.check_password_hash(self.password_hash, password)
 
     def to_dict(self):
         return {
