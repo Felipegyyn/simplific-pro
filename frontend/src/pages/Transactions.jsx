@@ -80,7 +80,7 @@ const adicionarCategoria = async (novaCategoria) => {
 
 console.log('✅ Dados enviados para API:', categoriaData);
 
-await apiService.post('/categories', categoriaData);
+await apiService.post('/api/categories', categoriaData);
 
 
     await loadCategorias(); // 🔄 Atualiza lista a partir do backend
@@ -113,7 +113,7 @@ await apiService.post('/categories', categoriaData);
 const loadTransacoes = async () => {
   try {
     setLoading(true);
-    const response = await apiService.get('/transactions');
+    const response = await apiService.get('/api/transactions');
     console.log('Retorno da API:', response);
 
     let lista = [];
@@ -142,7 +142,7 @@ const loadTransacoes = async () => {
   const loadCategorias = async () => {
   try {
     setCategoriasLoading(true); // Início do carregamento
-    const response = await apiService.get('/categories');
+    const response = await apiService.get('/api/categories');
     console.log('🔍 Resposta completa da API:', response);
     setCategorias(response || []);
     console.log('Categorias carregadas:', response);
@@ -165,7 +165,7 @@ const carregarCategoriasAntesDeAbrir = async () => {
   const criarTransacao = async (dadosTransacao) => {
   try {
     // Correção: criar a transação no backend
-    await apiService.post('/transactions', dadosTransacao);
+    await apiService.post('/api/transactions', dadosTransacao);
     await loadTransacoes(); // Depois de criar, recarregar
     eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
     setIsModalOpen(false); // Fechar modal
@@ -187,7 +187,7 @@ const carregarCategoriasAntesDeAbrir = async () => {
   // Função para confirmar transação
   const confirmarTransacao = async (id) => {
   try {
-    await apiService.post(`/transactions/${id}/confirm`);
+    await apiService.post(`/api/transactions/${id}/confirm`);
     await loadTransacoes();
     eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
     alert('Transação confirmada com sucesso!');
@@ -201,7 +201,7 @@ const carregarCategoriasAntesDeAbrir = async () => {
   // Função para editar transação
   const editarTransacao = async (id, dados) => {
     try {
-      const response = await apiService.put(`/transactions/${id}`, dados);
+      const response = await apiService.put(`/api/transactions/${id}`, dados);
       if (response.success) {
         await loadTransacoes();
         eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
@@ -234,7 +234,7 @@ const carregarCategoriasAntesDeAbrir = async () => {
   const excluirTransacao = async (id) => {
     if (confirm('Tem certeza que deseja excluir esta transação?')) {
       try {
-        await apiService.delete(`/transactions/${id}`);
+        await apiService.delete(`/api/transactions/${id}`);
         await loadTransacoes(); // Recarregar lista
         eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
       } catch (error) {
