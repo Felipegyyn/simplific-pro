@@ -64,7 +64,7 @@ const HomeBroker = () => {
     const fetchMarketData = async () => {
       try {
         setLoading(true);
-        const response = await apiService.get('/investments/market-data');
+        const response = await apiService.get('/api/investments/market-data');
         setMarketData(response);
         setMainChartData(response.ibovespa); // <--- ADICIONE ESTA LINHA
       } catch (error) {
@@ -84,7 +84,7 @@ const HomeBroker = () => {
     try {
       // Mostra um feedback de carregamento no gráfico (opcional, mas bom)
       setMainChartData(null); 
-      const response = await apiService.get(`/investments/ticker-details/${searchTerm}`);
+      const response = await apiService.get(`/api/investments/ticker-details/${searchTerm}`);
       setMainChartData(response);
     } catch (error) {
       console.error("Erro ao buscar ativo:", error);
