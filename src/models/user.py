@@ -1,7 +1,7 @@
 from datetime import datetime
 # Importe a werkzeug.security para hashing de senha
 from src.models.db import db
-from src.main import bcrypt
+from src.extensions import bcrypt
 
 class User(db.Model):
     __tablename__ = 'users'

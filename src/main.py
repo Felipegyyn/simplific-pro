@@ -17,11 +17,10 @@ from src.models.extended_modules import CreditCard, CreditCardTransaction
 from src.routes.user import user_bp
 from src.routes.financial import financial_bp
 from src.routes.goals import goals_bp
-from src.extensions import mail, db
+from src.extensions import mail, db, bcrypt
 from src.routes.webhooks import webhooks_bp
 from src.routes.credit_cards import credit_cards_bp
 from src.routes.schedule import schedule_bp
-from flask_bcrypt import Bcrypt
 from src.routes.investments import investments_bp
 from src.routes.extended_simple import extended_bp
 from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
@@ -45,10 +44,10 @@ CORS(
     supports_credentials=True
 )
 
-bcrypt = Bcrypt(app)
 
 db.init_app(app)
 mail.init_app(app)
+bcrypt.init_app(app)
 
 migrate = Migrate(app, db)
 
