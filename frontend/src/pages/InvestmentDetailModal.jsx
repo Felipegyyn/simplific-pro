@@ -22,10 +22,10 @@ const InvestmentDetailModal = ({ isOpen, onClose, investmentId, onUpdate }) => {
       if (!investmentId) return;
       setLoading(true);
       try {
-        const investmentData = await apiService.get(`/investments/${investmentId}`);
+        const investmentData = await apiService.get(`/api/investments/${investmentId}`);
         setInvestment(investmentData);
         
-        const historyData = await apiService.get(`/investments/${investmentId}/transactions`);
+        const historyData = await apiService.get(`/api/investments/${investmentId}/transactions`);
         setHistory(historyData || []);
 
         // Pega os dados da projeção diretamente da API
@@ -54,7 +54,7 @@ const InvestmentDetailModal = ({ isOpen, onClose, investmentId, onUpdate }) => {
       return;
     }
     try {
-      await apiService.post(`/investments/${investmentId}/sell`, {
+      await apiService.post(`/api/investments/${investmentId}/sell`, {
         value: sellValue,
         observations: sellFormData.observations
       });
