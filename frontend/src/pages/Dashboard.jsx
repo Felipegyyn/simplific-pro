@@ -786,4 +786,5 @@ const Dashboard = ({ user, onLogout }) => {
   );
 };
 
-export default Dashboa
+// LINHA CORRIGIDA
+export default Dashboard;
