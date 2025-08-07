@@ -5,7 +5,7 @@ load_dotenv()
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
@@ -147,6 +147,13 @@ def test():
 def test_identity():
     user_id = get_jwt_identity()
     return jsonify({'user_id': user_id})
+
+@app.after_request
+def after_request(response):
+    # Garante que as requisições OPTIONS sempre retornem OK
+    if request.method == 'OPTIONS':
+        response.status_code = 200
+    return response
 
 
 scheduler = BackgroundScheduler(daemon=True)
