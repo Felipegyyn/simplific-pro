@@ -1,3 +1,5 @@
+// Este é o conteúdo completo e corrigido para o seu arquivo api.jsx
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 class ApiService {
@@ -96,25 +98,20 @@ class ApiService {
     this.failedQueue = [];
   }
 
-  getHeaders(method = 'GET') {
-    const headers = {};
-
-    if (method !== 'DELETE') {
-      headers['Content-Type'] = 'application/json';
-    }
-
+  getHeaders() {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
-
     return headers;
   }
 
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    const method = options.method || 'GET';
     const config = {
-      headers: this.getHeaders(method),
+      headers: this.getHeaders(),
       ...options,
     };
 
@@ -124,7 +121,7 @@ class ApiService {
       if (response.status === 401 && !options._retry) {
         try {
           await this.silentRefreshToken();
-          const newConfig = { ...config, headers: this.getHeaders(method) };
+          const newConfig = { ...config, headers: this.getHeaders() };
           return this.request(endpoint, { ...newConfig, _retry: true });
         } catch (refreshError) {
           this.logout();
@@ -136,20 +133,12 @@ class ApiService {
         return null;
       }
 
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || data.error || 'Erro na requisição');
-        }
-        return data;
-      } else {
-        if (!response.ok) {
-          const textError = await response.text();
-          throw new Error(textError || 'Erro na requisição');
-        }
-        return null;
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Erro na requisição');
       }
+      return data;
+
     } catch (error) {
       console.error('API Error:', error);
       throw error;
@@ -187,7 +176,8 @@ class ApiService {
     });
 
     if (!response.ok) {
-      throw new Error('Falha no login');
+      const errorData = await response.json().catch(() => ({ message: 'Credenciais inválidas' }));
+      throw new Error(errorData.message);
     }
 
     const data = await response.json();
@@ -292,6 +282,25 @@ class ApiService {
   async deleteGoal(goalId) {
     return this.delete(`/api/goals/${goalId}`);
   }
+  
+  // Categorias
+  async getCategories() {
+      return this.get('/api/categories');
+  }
+
+  // Reports
+  async getDashboardSummary(year, month) {
+      return this.get(`/api/reports/dashboard_summary?year=${year}&month=${month}`);
+  }
+
+  async getPlannedVsRealized(year, type, categoryId = null) {
+      let endpoint = `/api/reports/planned_vs_realized?year=${year}&type=${type}`;
+      if (categoryId) {
+          endpoint += `&category_id=${categoryId}`;
+      }
+      return this.get(endpoint);
+  }
+
 
   // Investimentos
   async getInvestments() {
