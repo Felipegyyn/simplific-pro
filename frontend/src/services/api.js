@@ -56,7 +56,7 @@ class ApiService {
     this.isRefreshing = true;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,28 +204,25 @@ async delete(endpoint) {
 
   throw new Error(errorMessage);
 }
-  // Autenticação
-  async login(email, password) {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+// Autenticação
+async login(email, password) {
+  // AQUI ESTÁ A CORREÇÃO: Adicionamos /api/ na URL
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
 
-    if (!response.ok) {
-      throw new Error('Falha no login');
-    }
-
-    const data = await response.json();
-
-    this.setToken(data.access_token, data.refresh_token);
-
-    localStorage.setItem('simplific_user', JSON.stringify(data.user));
-
-    this.checkTokenValidity();
-
-    return data;
+  if (!response.ok) {
+    throw new Error('Falha no login');
   }
+
+  const data = await response.json();
+  this.setToken(data.access_token, data.refresh_token);
+  localStorage.setItem('simplific_user', JSON.stringify(data.user));
+  this.checkTokenValidity();
+  return data;
+}
 
   async logout() {
     this.token = null;
