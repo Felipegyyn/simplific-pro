@@ -54,7 +54,7 @@ const Goals = ({ user, onLogout }) => {
   const loadMetas = async () => {
   try {
     setLoading(true);
-    const response = await apiService.get('/goals');
+    const response = await apiService.get('/api/goals');
     setMetas(response || []); // <-- CORREÇÃO AQUI
   } catch (error) {
     console.error('Erro ao carregar metas:', error);
@@ -68,7 +68,7 @@ const Goals = ({ user, onLogout }) => {
   const criarMeta = async (dadosMeta) => {
   try {
     // Não precisa mais checar response.success, pois o erro já cairá no catch.
-    await apiService.post('/goals', dadosMeta);
+    await apiService.post('/api/goals', dadosMeta);
     
     await loadMetas(); // Recarregar lista
     setIsModalOpen(false); // Fechar modal
@@ -95,7 +95,7 @@ const Goals = ({ user, onLogout }) => {
   const excluirMeta = async (id) => {
     if (confirm('Tem certeza que deseja excluir esta meta?')) {
       try {
-        await apiService.delete(`/goals/${id}`);
+        await apiService.delete(`/api/goals/${id}`);
         await loadMetas(); // Recarregar lista
       } catch (error) {
         console.error('Erro ao excluir meta:', error);
@@ -113,7 +113,7 @@ const adicionarValor = async (id, valor) => {
   try {
     // 1. Chama a nova rota POST específica para contribuições.
     // 2. Envia apenas o valor a ser adicionado no corpo da requisição.
-    await apiService.post(`/goals/${id}/contribute`, { amount: parseFloat(valor) });
+    await apiService.post(`/api/goals/${id}/contribute`, { amount: parseFloat(valor) });
     
     // 3. Se a chamada for bem-sucedida, recarrega os dados e avisa o usuário.
     await loadMetas();
@@ -130,7 +130,7 @@ const adicionarValor = async (id, valor) => {
   // Função para editar meta
   const editarMeta = async (id, dados) => {
   try {
-    await apiService.put(`/goals/${id}`, dados);
+    await apiService.put(`/api/goals/${id}`, dados);
     
     // Se a linha acima não deu erro, então teve sucesso.
     await loadMetas();
