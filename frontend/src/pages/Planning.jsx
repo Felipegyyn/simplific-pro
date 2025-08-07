@@ -88,10 +88,9 @@ const [graficoSaida, setGraficoSaida] = useState([]);
     if (filtroAnoVisaoGeral) queryParams.append('ano', filtroAnoVisaoGeral);
     if (filtroTipoVisaoGeral) queryParams.append('type', filtroTipoVisaoGeral);
 
-    const planos = await apiService.get(`/planning?${queryParams.toString()}`);
-    const transacoesResponse = await apiService.get(`/transactions?${queryParams.toString()}`);
-
-    const categoriasResponse = await apiService.get('/categories');
+    const planos = await apiService.get(`/api/planning?${queryParams.toString()}`);
+    const transacoesResponse = await apiService.get(`/api/transactions?${queryParams.toString()}`);
+    const categoriasResponse = await apiService.get('/api/categories');
   
     setCategories(categoriasResponse); 
 
@@ -180,7 +179,7 @@ setGraficoSaida(saidaFormatada);
     try {
       // 1. Chamar a rota correta no backend (PUT)
       // Esta rota já cuida de criar a transação E atualizar o status do planejamento.
-      await apiService.put(`/planning/${id}/confirm`, { status: 'confirmed' });
+      await apiService.put(`/api/planning/${id}/confirm`, { status: 'confirmed' });
 
       // 2. Mostrar mensagem de sucesso
       alert("Planejamento confirmado com sucesso! Lançamento criado.");
@@ -195,11 +194,7 @@ setGraficoSaida(saidaFormatada);
     }
   };
 
-
-
-
-
-  const loadPlanejamentos = async () => {
+const loadPlanejamentos = async () => {
   try {
     setLoading(true);
     const params = new URLSearchParams();
@@ -211,14 +206,10 @@ setGraficoSaida(saidaFormatada);
 
     const query = params.toString() ? `?${params.toString()}` : '';
 
-    const response = await fetch(`http://localhost:5000/api/planning${query}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("simplific_token")}`
-      }
-    });
+    // CORREÇÃO AQUI: Usando o apiService
+    const response = await apiService.get(`/api/planning${query}`);
 
-    const data = await response.json();
-    setPlanejamentos(data.plannings || []);
+    setPlanejamentos(response.plannings || []);
   } catch (error) {
     console.error('Erro ao carregar planejamentos:', error);
   } finally {
@@ -246,7 +237,7 @@ const calcularResumo = (planejamentos, transacoes) => {
 
 const loadCategories = async () => {
   try {
-    const categoriasResponse = await apiService.get('/categories');
+    const categoriasResponse = await apiService.get('/api/categories');
     const categoriasData = categoriasResponse.categories || categoriasResponse || [];
     setCategories(categoriasData);
   } catch (error) {
@@ -259,7 +250,7 @@ const loadCategories = async () => {
   // Função para editar planejamento
   const editarPlanejamento = async (id, dados) => {
     try {
-      const response = await apiService.put(`/planning/${id}`, dados);
+      const response = await apiService.put(`/api/planning/${id}`, dados);
       if (response.success) {
         await loadPlanejamentos();
         setIsEditModalOpen(false);
@@ -273,24 +264,14 @@ const loadCategories = async () => {
   };
 
   // Função para excluir planejamento
-  const excluirPlanejamento = async (id) => {
+const excluirPlanejamento = async (id) => {
   if (!window.confirm('Tem certeza que deseja excluir este planejamento?')) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/api/planning/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("simplific_token")}`
-      }
-    });
-
-    if (response.status === 204) {
-      await loadPlanejamentos();
-      alert('Planejamento excluído com sucesso!');
-    } else {
-      const data = await response.json();
-      throw new Error(data?.error || 'Erro inesperado');
-    }
+    // CORREÇÃO AQUI: Usando o apiService
+    await apiService.delete(`/api/planning/${id}`);
+    await loadPlanejamentos();
+    alert('Planejamento excluído com sucesso!');
   } catch (error) {
     console.error('Erro ao excluir planejamento:', error);
     alert('Erro ao excluir planejamento. Tente novamente.');
@@ -326,10 +307,7 @@ const loadCategories = async () => {
   observations: formData.observations,
   recurrence_period: parseInt(formData.recurrence_period) || 1
 };
-
- 
-
-const response = await apiService.post('/planning', payload);
+const response = await apiService.post('/api/planning', payload);
 
 await loadPlanejamentos(); // Recarregar lista
 setIsModalOpen(false);
@@ -393,8 +371,8 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
     try {
       // Busca os dados necessários
       const [planosResponse, transacoesResponse] = await Promise.all([
-        apiService.get('/planning'),
-        apiService.get('/transactions')
+        apiService.get('/api/planning'),
+        apiService.get('/api/transactions')
       ]);
 
       // Garante que temos arrays para trabalhar
@@ -448,7 +426,7 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
 const handleCreateCategory = async (e) => {
   e.preventDefault();
   try {
-    await apiService.post('/categories', {
+    await apiService.post('/api/categories', {
       name: newCategory.name,
       type: newCategory.type
     });
