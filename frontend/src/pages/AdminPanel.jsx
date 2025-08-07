@@ -69,7 +69,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await apiService.get('/admin/users');
+      const response = await apiService.get('/api/admin/users');
       setUsuarios(response || []);
     } catch (error) {
       console.error("Erro ao buscar usuários:", error);
@@ -101,7 +101,7 @@ const AdminPanel = ({ user, onLogout }) => {
     }
 
     try {
-      await apiService.post('/admin/users', novoUsuario);
+      await apiService.post('/api/admin/users', novoUsuario);
       alert('Usuário criado com sucesso!');
       setIsModalOpen(false); // Fecha o modal
       setNovoUsuario({ name: '', email: '', whatsapp: '', profile: '', password: '' }); // Limpa o formulário
@@ -116,7 +116,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const excluirUsuario = async (usuario) => {
     if (confirm(`Tem certeza que deseja excluir o usuário ${usuario.name}?`)) {
       try {
-        await apiService.delete(`/admin/users/${usuario.id}`);
+        await apiService.delete(`/api/admin/users/${usuario.id}`);
         alert('Usuário excluído com sucesso!');
         fetchUsers();
       } catch (error) {
