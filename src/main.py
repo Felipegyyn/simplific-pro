@@ -35,9 +35,9 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-# Configuração do CORS para permitir requisições do frontend
+# Bloco CORRIGIDO
 CORS(app, resources={
-    r"/api/*": {
+    r"/*": {  # <--- CORREÇÃO: Aplica a todas as rotas
         "origins": [
             "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
             "http://localhost:3000" 
