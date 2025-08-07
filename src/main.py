@@ -52,11 +52,6 @@ mail.init_app(app)
 
 migrate = Migrate(app, db)
 
-# Enable CORS
-CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}},
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
-
 # Initialize JWT
 jwt = JWTManager(app)
 
