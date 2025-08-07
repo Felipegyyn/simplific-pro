@@ -25,7 +25,7 @@ const Settings = () => {
 
   const handleSave = async () => {
     try {
-      await apiService.put('/profile', { name, whatsapp });
+      await apiService.put('/api/profile', { name, whatsapp });
       setFeedback('Dados salvos com sucesso!');
     } catch (error) {
       setFeedback('Erro ao salvar os dados.');
