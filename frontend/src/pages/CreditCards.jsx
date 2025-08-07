@@ -67,7 +67,7 @@ const CreditCards = ({ user, onLogout }) => {
 const loadCartoes = async () => {
   try {
     setLoading(true);
-    const rawCartoes = await apiService.get('/credit-cards'); // Correção aqui
+    const rawCartoes = await apiService.get('/api/credit-cards');
     console.log('Resposta da API:', rawCartoes);
 
   const cartoesFormatados = Array.isArray(rawCartoes) ? rawCartoes.map((cartao) => ({
@@ -96,7 +96,7 @@ const loadCartoes = async () => {
   // Função para criar novo cartão
 const criarCartao = async (dadosCartao) => {
   try {
-    const response = await apiService.post('/credit-cards', dadosCartao);
+    const response = await apiService.post('/api/credit-cards', dadosCartao);
     if (response.status === 201 && response.data) {
   await loadCartoes();
   setIsModalOpen(false);
@@ -126,7 +126,7 @@ const criarCartao = async (dadosCartao) => {
 const lancarGastoCartao = async (cartaoId, dadosGasto) => {
 try {
 
-const response = await apiService.post(`/credit-cards/${cartaoId}/transactions`, dadosGasto);
+const response = await apiService.post(`/api/credit-cards/${cartaoId}/transactions`, dadosGasto);
 
 // Se a API retorna direto o objeto da transação, então isso já é sucesso
 if (response && response.category_id && response.value) {
@@ -157,7 +157,7 @@ return false;
     try {
       // 2. Criar a transação de despesa (APENAS UMA VEZ)
       console.log('Criando transação de pagamento...');
-      await apiService.post('/transactions', {
+      await apiService.post('/api/transactions', {
         description: `Pagamento da fatura - ${fatura.cartao_nome} final ${fatura.last_digits}`,
         type: 'saida',
         category_id: 5, // Use um ID de categoria que exista, como "Pagamento de Fatura"
@@ -171,7 +171,7 @@ return false;
       console.log(`Atualizando status da fatura para o cartão ID: ${fatura.cartao_id}`);
       // ATENÇÃO: Verifique se a rota no seu backend é realmente '/credit-cards/${fatura.cartao_id}/pay-bill'
       // Se for diferente, ajuste a linha abaixo.
-      await apiService.put(`/credit-cards/${fatura.cartao_id}/pay-bill`);
+      await apiService.put(`/api/credit-cards/${fatura.cartao_id}/pay-bill`);
       console.log('Status da fatura atualizado com sucesso.');
 
       // 4. Recarregar os dados para refletir as mudanças na tela
@@ -198,7 +198,7 @@ const excluirCartao = async (cardId) => {
   if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
 
   try {
-  await apiService.delete(`/credit-cards/${cardId}`);
+  await apiService.delete(`/api/credit-cards/${cardId}`);
   alert('Cartão excluído!');
   loadCartoes(); // ou recarregar os cartões
 } catch (error) {
@@ -283,7 +283,7 @@ const handleUpdateCard = async (e) => {
     };
     
     // 2. Chama a API com o método PUT para o endpoint que criamos
-    await apiService.put(`/credit-cards/${editingCard.id}`, payload);
+    await apiService.put(`/api/credit-cards/${editingCard.id}`, payload);
 
     // 3. Se a chamada for bem-sucedida, continua o fluxo
     alert('✅ Cartão atualizado com sucesso!');
@@ -306,13 +306,13 @@ const handleUpdateCard = async (e) => {
 
 const carregarFaturas = async (listaDeCartoes) => { 
   try {
-    const respostaFaturas = await apiService.get('/faturas');
+    const respostaFaturas = await apiService.get('/api/faturas');
 
     // Usamos Promise.all para buscar as transações de todas as faturas em paralelo, o que é mais rápido.
     const faturasComTransacoes = await Promise.all(
       respostaFaturas.map(async (fatura) => {
         // Para cada fatura, busca apenas as transações que pertencem a ela
-        const transacoesDaFatura = await apiService.get(`/faturas/${fatura.id}/transactions`);
+        const transacoesDaFatura = await apiService.get(`/api/faturas/${fatura.id}/transactions`);
         
         // Em CreditCards.jsx, dentro de carregarFaturas()
 
