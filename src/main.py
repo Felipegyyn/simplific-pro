@@ -35,15 +35,15 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-# Bloco CORRIGIDO
-CORS(app, resources={
-    r"/*": {  # <--- CORREÇÃO: Aplica a todas as rotas
-        "origins": [
-            "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
-            "http://localhost:3000" 
-        ]
-    }
-})
+# Bloco Final e Simplificado
+CORS(
+    app,
+    origins=[
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000"
+    ],
+    supports_credentials=True
+)
 
 bcrypt = Bcrypt(app)
 
