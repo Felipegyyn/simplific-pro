@@ -124,7 +124,6 @@ class ApiService {
       if (response.status === 401 && !options._retry) {
         try {
           await this.silentRefreshToken();
-          // Recria o cabeçalho com o novo token
           const newConfig = { ...config, headers: this.getHeaders(method) };
           return this.request(endpoint, { ...newConfig, _retry: true });
         } catch (refreshError) {
@@ -141,12 +140,13 @@ class ApiService {
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.error || 'Erro na requisição');
+          throw new Error(data.message || data.error || 'Erro na requisição');
         }
         return data;
       } else {
         if (!response.ok) {
-          throw new Error('Erro na requisição');
+          const textError = await response.text();
+          throw new Error(textError || 'Erro na requisição');
         }
         return null;
       }
