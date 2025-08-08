@@ -113,14 +113,14 @@ const HomeBroker = () => {
   const ibovColor = ibovespa.change_percent >= 0 ? 'text-green-600' : 'text-red-600';
 
   return (
-    <div className="p-1">
+    <div className="p-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Coluna Principal (2/3 da tela) */}
         <div className="lg:col-span-2 space-y-6">
   <Card>
     <CardContent className="p-4">
       {/* O div abaixo agora contém toda a lógica da área do gráfico */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
         {/* Bloco de informações do Ativo (agora dinâmico) */}
         <div className='flex-1'>
           {/* Lógica de Carregamento e Exibição do Gráfico Principal */}
@@ -147,7 +147,7 @@ const HomeBroker = () => {
         </div>
 
         {/* Formulário de Busca */}
-        <div className="relative w-1/3">
+        <div className="relative w-full sm:w-1/3">
           <form onSubmit={handleSearch}>
             <Input 
               placeholder="Ativo ou índice" 
@@ -202,7 +202,7 @@ const HomeBroker = () => {
   </Card>
 
   {/* As listas de Maiores Altas e Baixas continuam iguais */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
     <MoversList title="✅ Maiores altas" data={top_gainers} colorClass="text-green-600" />
     <MoversList title="🔻 Maiores baixas" data={top_losers} colorClass="text-red-600" />
   </div>
