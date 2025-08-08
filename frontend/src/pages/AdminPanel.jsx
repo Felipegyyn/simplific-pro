@@ -179,14 +179,14 @@ const AdminPanel = ({ user, onLogout }) => {
         </div>
       </header>
 
-      <main className="px-4 py-6 sm:px-6">
+      <main className="p-4 sm:p-6">
         {/* ▼▼▼ ADICIONE O TÍTULO E OS CARDS AQUI ▼▼▼ */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Visão Geral</h2>
         <p className="text-gray-600 dark:text-gray-300">Estatísticas principais do sistema</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
@@ -290,14 +290,14 @@ const AdminPanel = ({ user, onLogout }) => {
               {loading ? <p>Carregando usuários...</p> : usuarios.map((u) => (
                 <Card key={u.id}>
                   <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col sm:flex-row justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-lg font-semibold dark:text-gray-100">{u.name}</h3>
                           {getPerfilBadge(u.profile)}
                         </div>
                          <p className="text-gray-600 dark:text-gray-400 mb-3">{u.email}</p>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="font-medium text-gray-600">Último Login</p>
                             <p>{formatarData(u.last_login)}</p>
@@ -308,7 +308,7 @@ const AdminPanel = ({ user, onLogout }) => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex space-x-2 ml-4">
+                      <div className="flex space-x-2 self-start sm:self-center mt-4 sm:mt-0 sm:ml-4">
                         {/* Botões de editar e status podem ser implementados no futuro */}
                         <Button variant="outline" size="sm" onClick={() => excluirUsuario(u)}>
                           <Trash2 className="h-4 w-4" />
@@ -335,7 +335,7 @@ const AdminPanel = ({ user, onLogout }) => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="nome_sistema">Nome do Sistema</Label>
                         <Input id="nome_sistema" value={configuracoes.nome_sistema} readOnly />
@@ -440,7 +440,7 @@ const AdminPanel = ({ user, onLogout }) => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="text-center p-4 bg-green-50 rounded-lg dark:bg-green-900/50">
                         <p className="text-sm text-gray-600">Status</p>
                         <p className="text-lg font-bold text-green-600">Conectado</p>
