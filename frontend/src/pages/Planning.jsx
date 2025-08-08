@@ -521,7 +521,7 @@ useEffect(() => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
         
@@ -553,7 +553,7 @@ useEffect(() => {
       </header>
 
       {/* Main Content */}
-        <div className="px-4 py-6 sm:px-0">
+        <div className="py-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Planejamento Financeiro</h2>
             <p className="text-gray-600 dark:text-gray-400">Gerencie seus planejamentos e orçamentos</p>
@@ -599,7 +599,7 @@ useEffect(() => {
             <option value="saida">Saída</option>
         </select>
     </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center">
@@ -666,7 +666,7 @@ useEffect(() => {
                 </Card>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
 
   {/* Gráfico de Rosca - Entradas (profissional) */}
 <div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 rounded-lg shadow p-4">
@@ -896,7 +896,7 @@ useEffect(() => {
                   </DialogContent>
                 </Dialog>
               </div>
-              <div className="flex flex-wrap gap-4 items-end mb-4">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end mb-4">
   <div>
     <Label className="block mb-1">Categoria</Label>
     <select
@@ -978,7 +978,7 @@ useEffect(() => {
                         )}
                         </div>
 
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                           {plan.status !== 'confirmed' && (
                           <Button 
                           variant="outline" 
