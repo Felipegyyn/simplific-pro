@@ -162,7 +162,7 @@ useEffect(() => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-slate-900">
+    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-slate-900">
       {/* Header */}
      <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700 print:hidden">
           <div className="flex justify-between items-center h-16">
@@ -194,7 +194,7 @@ useEffect(() => {
 
       {/* Main Content */}
       
-        <div className="px-4 py-6 sm:px-0">
+        <div>
 
           {/* Header com Filtros */}
           <div className="mb-8 print:hidden">
@@ -216,7 +216,7 @@ useEffect(() => {
             {/* Filtros */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                   <div>
                     <Label htmlFor="period">Período</Label>
                     <Select value={filters.period} onValueChange={(value) => handleFilterChange('period', value)}>
@@ -293,7 +293,7 @@ useEffect(() => {
         <div ref={reportRef}></div>
 
           {/* Resumo Executivo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -356,7 +356,7 @@ useEffect(() => {
 
           {/* Tabs de Relatórios */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5 print:hidden">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 print:hidden">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="cashflow">Fluxo de Caixa</TabsTrigger>
               <TabsTrigger value="categories">Categorias</TabsTrigger>
@@ -497,7 +497,7 @@ useEffect(() => {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <Card>
                 <CardContent className="p-6">
                   <div className="text-center">
@@ -660,7 +660,7 @@ useEffect(() => {
             {/* ▼▼▼ SUBSTITUA TODO O BLOCO DA ABA "Metas" POR ESTE ▼▼▼ */}
 <TabsContent value="goals" className="space-y-6">
   {/* Cards de Resumo das Metas */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
     <Card>
       <CardContent className="p-6 text-center">
         <Target className="h-10 w-10 text-blue-600 mx-auto mb-2" />
