@@ -399,14 +399,14 @@ const Dashboard = ({ user, onLogout }) => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-slate-900">
+    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-slate-900">
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
             <h1 className="text-xl font-bold text-green-800 dark:text-green-400">Simplific Pro</h1>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <Dialog open={isNotificationCenterOpen} onOpenChange={setIsNotificationCenterOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="relative">
@@ -433,7 +433,7 @@ const Dashboard = ({ user, onLogout }) => {
               </DialogContent>
             </Dialog>
             
-            <span className="text-sm text-gray-600 dark:text-slate-300">
+            <span className="hidden sm:inline text-sm text-gray-600 dark:text-slate-300">
               Seja bem-vindo - <strong>{user?.name || 'Usuário'}</strong>
             </span>
             <Button
@@ -449,7 +449,7 @@ const Dashboard = ({ user, onLogout }) => {
         </div>
       </header>
 
-      <div className="mb-6 flex gap-4 items-center mt-6">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium dark:text-slate-200">Filtrar por:</span>
           <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
@@ -484,7 +484,7 @@ const Dashboard = ({ user, onLogout }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -564,7 +564,7 @@ const Dashboard = ({ user, onLogout }) => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
