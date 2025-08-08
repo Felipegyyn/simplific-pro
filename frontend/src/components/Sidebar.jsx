@@ -39,7 +39,7 @@ const visibleModules = modules.filter(module => {
 
   return (
     // Fundo, borda e texto principal
-    <div className={`relative flex flex-col bg-white dark:bg-slate-800 h-screen p-4 border-r dark:border-slate-700 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}>
+    <div className={`hidden md:flex relative flex-col bg-white dark:bg-slate-800 h-screen p-4 border-r dark:border-slate-700 transition-all duration-300 ease-in-out ${isOpen ? 'w-64' : 'w-20'}`}>
       {/* Botão de expandir/recolher */}
       <button 
         onClick={() => setIsOpen(!isOpen)} 
