@@ -251,7 +251,7 @@ const handleSubmit = (e) => {
     return `${day}/${month}/${year}`;
   };
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-6">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
         
@@ -284,14 +284,14 @@ const handleSubmit = (e) => {
 
       {/* Main Content */}
       
-        <div className="px-4 py-6 sm:px-0">
+        <div>
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Metas Financeiras</h2>
             <p className="text-gray-600 dark:text-gray-400">Defina e acompanhe seus objetivos financeiros</p>
           </div>
 
           {/* Cards de Resumo */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
@@ -350,7 +350,7 @@ const handleSubmit = (e) => {
           </div>
 
           <Tabs defaultValue="ativas" className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
               <TabsList className="grid w-full sm:w-auto grid-cols-3">
                 <TabsTrigger value="ativas">Ativas ({metasAtivas.length})</TabsTrigger>
                 <TabsTrigger value="concluidas">Concluídas ({metasConcluidas.length})</TabsTrigger>
@@ -517,7 +517,7 @@ const handleSubmit = (e) => {
                 {getStatusBadge('ativa')}
               </div>
               <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">{meta.description}</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 
                 {/* Detalhe: Categoria */}
                 <div>
