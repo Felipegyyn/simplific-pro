@@ -117,7 +117,7 @@ return (
               {/* Projeção de Crescimento */}
               <div>
                 <h4 className="font-semibold mb-2 text-lg">Projeção de Crescimento</h4>
-                <div className="border rounded-lg p-3 text-center h-80">
+                <div className="border rounded-lg p-3 text-center h-64 sm:h-80">
                   {projectionData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={projectionData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
