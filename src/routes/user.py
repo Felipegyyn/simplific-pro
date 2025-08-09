@@ -170,7 +170,7 @@ def delete_user(user_id):
     admin_id = get_jwt_identity()
     admin = User.query.get(admin_id)
     
-    if not admin or not admin.is_admin:
+    if not admin or admin.profile != 'admin':
         return jsonify({'error': 'Acesso negado'}), 403
     
     user = User.query.get_or_404(user_id)

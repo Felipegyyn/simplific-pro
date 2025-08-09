@@ -4,6 +4,18 @@ import os
 import google.generativeai as genai
 from datetime import datetime
 
+# Pega a chave da API do ambiente do Render
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
+# Configura a biblioteca Gemini com a chave
+# Esta linha força a autenticação para todas as funcionalidades
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    print("AVISO CRÍTICO: A chave da API do Gemini não foi encontrada no ambiente.")
+
+# O resto do seu código (a definição da classe GeminiService, etc.) continua abaixo...
+
 # Carrega a chave da API do Gemini a partir do arquivo .env
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
@@ -60,6 +72,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - Se o usuário for irônico, seja irônico e "Debochado". Informe os dados de forma descontraída e debochada. 
     - Sempre que for dar uma sugestão relacioda às finanças e aos gostos, sugira que o usuário entre na planatforma e faça um planejamento para ter controle. 
     - Nunca sugira ao usuário baixar um aplicativo de controle de gastos, pois a plataforma que ele está se comunicando 'Simplific' já é um aplicativo de controle. 
+    - Você precisa reconhecer o usuário, deve associar as funções e reponder sempre de acordo com o número do whatsapp que está logado.
 
     # CONTEXTO FINANCEIRO ATUAL DE {nome_usuario}
     - Data de hoje: {datetime.now().strftime('%d/%m/%Y')}
