@@ -26,7 +26,7 @@ def send_whatsapp_template(to, template_sid, content_variables):
 
     try:
         message = client.messages.create(
-            messaging_service_sid='MG862ba0c2eed7eac7c32d914591873145',
+            messaging_service_sid='MG0cb0fe1e4cb5252f4fcad89e42d9d589',
             to=to,
             content_sid=template_sid,
             content_variables=json.dumps(content_variables)
