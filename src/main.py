@@ -38,7 +38,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 CORS(
     app,
     origins=[
-        "https://https://simplificpro.com",
+        "https://simplificpro.com",
         "https://www.simplificpro.com",
         "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
         "http://localhost:3000"
