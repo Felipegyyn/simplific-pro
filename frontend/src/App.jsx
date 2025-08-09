@@ -17,6 +17,7 @@ import Settings from './pages/Settings'; // <-- ADICIONE ESTA LINHA
 import MainLayout from './components/MainLayout'; 
 import { Outlet } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext'; 
+import HomePage from './pages/HomePage';
 
 // Serviços
 import notificationService from './services/notifications';
@@ -143,7 +144,7 @@ return (
 
             <Route 
                 path="/" 
-                element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
+                element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}  
             />
         </Routes>
          </ThemeProvider> {/* <-- ADICIONE A TAG DE FECHAMENTO AQUI */}

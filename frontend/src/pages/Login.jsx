@@ -109,7 +109,7 @@ const Login = ({ onLogin }) => {
               $implific Pro
             </CardTitle>
             <p className="text-gray-600">
-              Planeje, controle e $simpific
+              Planeje, controle e $impific
             </p>
           </CardHeader>
         
