@@ -25,7 +25,7 @@ const HomePage = () => {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Cor dos caracteres
-      ctx.fillStyle = '#00FF41'; // Verde Matrix
+      ctx.fillStyle = '#315A43'; // Verde Matrix
       ctx.font = '15pt monospace';
 
       for (let i = 0; i < drops.length; i++) {
