@@ -11,6 +11,9 @@ MONETIZZE_SECRET_KEY = os.getenv('MONETIZZE_SECRET_KEY')
 
 @webhooks_bp.route('/monetizze', methods=['POST'])
 def monetizze_webhook():
+    # ADICIONE ESTAS DUAS LINHAS EXATAMENTE AQUI
+    print("---------- CABEÇALHOS RECEBIDOS DA MONETIZZE ----------")
+    print(request.headers)
     """
     Este é o nosso "Portão de Entrada". Ele recebe os dados da Monetizze
     após uma venda ser aprovada.
