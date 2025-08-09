@@ -38,7 +38,7 @@ def monetizze_webhook():
     comprador = dados_completos.get('comprador', {})
     nome = comprador.get('nome')
     email = comprador.get('email')
-    whatsapp = comprador.get('celular')
+    whatsapp = comprador.get('telefone')
 
     # --- CHAMADA PARA A FÁBRICA DE USUÁRIOS ---
     success, result = create_user_from_purchase(nome, email, whatsapp)
