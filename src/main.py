@@ -34,17 +34,6 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-# Bloco Final e Simplificado
-CORS(
-    app,
-    origins=[
-        "https://https://www.simplificpro.com",
-        "https://www.simplificpro.com",
-        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
-        "http://localhost:3000"
-    ],
-    supports_credentials=True
-)
 
 
 db.init_app(app)
@@ -67,6 +56,19 @@ app.register_blueprint(extended_bp, url_prefix='/api')
 app.register_blueprint(reports_bp, url_prefix='/api') # <-- ADICIONE ESTA LINHA PARA REPOSRTS
 app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
+
+
+# Bloco Final e Simplificado
+CORS(
+    app,
+    origins=[
+        "https://https://www.simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000"
+    ],
+    supports_credentials=True
+)
 
 # Adicione esta linha logo acima da sua função
 
