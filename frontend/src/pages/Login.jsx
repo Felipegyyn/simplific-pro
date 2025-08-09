@@ -106,10 +106,10 @@ const Login = ({ onLogin }) => {
               <img src={logo} alt="Simplific Pro" className="h-16 w-auto" />
             </div>
             <CardTitle className="text-2xl font-bold text-green-800">
-              Simplific Pro
+              $implific Pro
             </CardTitle>
             <p className="text-gray-600">
-              Sistema de Planejamento Financeiro
+              Planeje, controle e $simpific
             </p>
           </CardHeader>
         
