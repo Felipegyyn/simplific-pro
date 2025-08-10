@@ -3,7 +3,6 @@ from flask import Blueprint, request
 from src.models.user import User
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
-import locale
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
 from src.services.transacoes_service import buscar_transacoes_por_status
@@ -18,6 +17,18 @@ from twilio.twiml.messaging_response import MessagingResponse
 import re
 from datetime import date, timedelta, datetime
 from collections import defaultdict
+
+def format_currency_brl(value):
+    """
+    Formata um número como moeda brasileira (R$), de forma independente do locale do sistema.
+    Ex: 1234.5 -> 'R$ 1.234,50'
+    """
+    if value is None:
+        value = 0
+    # Formata o número com 2 casas decimais, usando vírgula como separador decimal
+    # e ponto como separador de milhar.
+    formatted_value = "{:,.2f}".format(value).replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"R$ {formatted_value}"
 
 # --- NOSSOS SERVIÇOS ---
 from src.services.ai_assessor_service import get_ai_response # <-- O NOVO CÉREBRO
