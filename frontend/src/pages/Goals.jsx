@@ -493,7 +493,7 @@ const handleSubmit = (e) => {
     
     {/* Coluna da Imagem (só aparece se a URL existir) */}
     {meta.image_url && (
-      <div className="md:w-1/4 flex-shrink-0 bg-slate-800">
+      <div className="md:w-1/5 flex-shrink-0 bg-slate-800">
         <img
           src={meta.image_url}
           alt={meta.name}
@@ -505,7 +505,7 @@ const handleSubmit = (e) => {
     )}
 
     {/* Coluna dos Detalhes */}
-    <div className={`flex-1 ${meta.image_url ? 'md:w-3/4' : 'w-full'}`}>
+    <div className={`flex-1 ${meta.image_url ? 'md:w-4/5' : 'w-full'}`}>
       <CardContent className="p-6 h-full flex flex-col justify-between">
         <div>
           <div className="flex justify-between items-start mb-4">
