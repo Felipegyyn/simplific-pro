@@ -383,7 +383,6 @@ const saldoLiquido = totalReceitas - totalDespesas;
                 Voltar
               </Button>
               <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Lançamentos</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600 dark:text-gray-300">
