@@ -6,18 +6,17 @@ from src.models.extended import Investment
 import os
 import google.generativeai as genai
 
-# Ferramenta de formatação de moeda
-import locale
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-except locale.Error:
-    pass # Se o locale não estiver disponível, a função terá um fallback
-
 def format_currency_brl(value):
-    try:
-        return locale.currency(value or 0, grouping=True, symbol='R$')
-    except (NameError, locale.Error):
-        return "R$ " + f'{(value or 0):,.2f}'.replace(',', 'v').replace('.', ',').replace('v', '.')
+    """
+    Formata um número como moeda brasileira (R$), de forma independente do locale do sistema.
+    Ex: 1234.5 -> 'R$ 1.234,50'
+    """
+    if value is None:
+        value = 0
+    # Formata o número com 2 casas decimais, usando vírgula como separador decimal
+    # e ponto como separador de milhar.
+    formatted_value = "{:,.2f}".format(value).replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"R$ {formatted_value}"
 
 # --- Bloco de Configuração do Gemini para Tradução ---
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
