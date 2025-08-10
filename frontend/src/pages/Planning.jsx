@@ -521,7 +521,7 @@ useEffect(() => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
         
@@ -552,7 +552,7 @@ useEffect(() => {
       </header>
 
       {/* Main Content */}
-        <div className="py-6">
+        <div className="p-4 sm:p-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Planejamento Financeiro</h2>
             <p className="text-gray-600 dark:text-gray-400">Gerencie seus planejamentos e orçamentos</p>
@@ -563,7 +563,7 @@ useEffect(() => {
           onValueChange={(v) => setAbaAtiva(v)}
           className="space-y-6"
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
               <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
               <TabsTrigger value="planejamentos">Planejamentos</TabsTrigger>
               <TabsTrigger value="orcamento">Orçamento por Categoria</TabsTrigger>
@@ -1006,7 +1006,7 @@ useEffect(() => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                         <div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">Valor Total</p>
                           <p className="text-xl font-bold text-blue-600 dark:text-blue-400">R$ {plan.total_amount.toLocaleString()}</p>

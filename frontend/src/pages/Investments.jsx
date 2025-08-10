@@ -353,7 +353,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
                       
                         <div className="flex justify-between items-center h-16">
@@ -382,7 +382,7 @@ useEffect(() => {
                         </div>
                       
                     </header>
-        <div className="py-6">
+        <div className="p-4 sm:p-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Carteira de Investimentos</h2>
             <p className="text-gray-600 dark:text-gray-400">Acompanhe seus investimentos e rentabilidade</p>
@@ -671,7 +671,7 @@ useEffect(() => {
                             <h3 className="text-lg font-semibold dark:text-slate-100">{inv.name}</h3>
                             {getTipoBadge(inv.type)}
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <p className="font-medium text-gray-600 dark:text-slate-400">Valor Investido</p>
                               <p className="text-blue-600 font-bold">R$ {(inv.initial_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
