@@ -3,6 +3,8 @@ from flask import Blueprint, request
 from src.models.user import User
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
+import locale
+from src.services.transacoes_service import format_currency_brl
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
 from src.services.transacoes_service import buscar_transacoes_por_status
@@ -18,18 +20,6 @@ import re
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 
-def format_currency_brl(value):
-    """
-    Formata um número como moeda brasileira (R$), de forma independente do locale do sistema.
-    Ex: 1234.5 -> 'R$ 1.234,50'
-    """
-    if value is None:
-        value = 0
-    # Formata o número com 2 casas decimais, usando vírgula como separador decimal
-    # e ponto como separador de milhar.
-    formatted_value = "{:,.2f}".format(value).replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"R$ {formatted_value}"
-
 # --- NOSSOS SERVIÇOS ---
 from src.services.ai_assessor_service import get_ai_response # <-- O NOVO CÉREBRO
 from src.services.whatsapp_service import user_sessions, remover_sessao
@@ -43,14 +33,6 @@ from src.services.transacoes_service import (
 from src.services.categorias_service import buscar_categorias
 
 whatsapp_bp = Blueprint('whatsapp', __name__)
-
-# Em src/routes/routes_whatsapp.py, logo após a linha do Blueprint
-
-# Tenta configurar o locale para o padrão brasileiro para formatação de moeda
-try:
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-except locale.Error:
-    print("AVISO: Locale pt_BR.UTF-8 não encontrado. Usando formatação manual.")
 
 # --------------------------------------------------------------------------
 # FUNÇÃO PRINCIPAL DO WEBHOOK - PONTO DE ENTRADA
@@ -744,21 +726,6 @@ def calcular_intervalo_datas(periodo_texto):
         return inicio_mes_passado, fim_mes_passado
     
     raise ValueError("Período de tempo não reconhecido.")
-
-# Em src/routes/routes_whatsapp.py
-
-def format_currency_brl(value):
-    """
-    Formata um número para o padrão de moeda brasileiro (R$ 1.234,56).
-    """
-    try:
-        # Usa a função de formatação do locale, que é a forma correta
-        return locale.currency(value, grouping=True)
-    except (NameError, locale.Error):
-        # Fallback manual caso o locale não funcione
-        return "R$ " + f'{value:,.2f}'.replace(',', 'v').replace('.', ',').replace('v', '.')
-
-# Em src/routes/routes_whatsapp.py
 
 def formatar_resumo_transacoes(transacoes, periodo_texto, tipo_consulta):
     """
