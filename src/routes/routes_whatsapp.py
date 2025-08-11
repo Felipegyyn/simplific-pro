@@ -43,20 +43,6 @@ whatsapp_bp = Blueprint('whatsapp', __name__)
 # --------------------------------------------------------------------------
 # FUNÇÃO PRINCIPAL DO WEBHOOK - PONTO DE ENTRADA
 # --------------------------------------------------------------------------
-@whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
-def receive_message():
-    """
-    Esta função é o coração do webhook. Ela recebe todas as mensagens do WhatsApp.
-    Na nova arquitetura, sua única função é identificar o usuário e passar
-    a mensagem para o orquestrador de IA.
-    """
-    incoming_msg = request.values.get('Body', '').strip()
-    media_url = request.values.get('MediaUrl0', None)
-    from_number = request.values.get('From', '')
-    
-    numero_normalizado = normalizar_numero(from_number)
-    usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
-
 # Dentro de src/routes/routes_whatsapp.py
 
 @whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
