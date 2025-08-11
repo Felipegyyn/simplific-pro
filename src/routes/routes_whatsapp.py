@@ -64,7 +64,18 @@ def receive_message():
     # Se o usuário existe, TODA interação vai para o novo assessor.
     # A lógica de sessões e histórico agora é gerenciada dentro de tratar_nova_interacao.
     else:
-        resposta = tratar_nova_interacao(incoming_msg, media_url, from_number, usuario)
+        # --- ESTA É A CORREÇÃO CRUCIAL ---
+        sessao = user_sessions.get(from_number, {})
+        contexto = sessao.get('contexto')
+
+        # Se existe um contexto, significa que estamos no meio de uma conversa.
+        if contexto:
+            # A mensagem (ex: "1") é enviada para a função que sabe lidar com respostas numéricas.
+            resposta = tratar_resposta_numerica(incoming_msg, from_number, usuario.id)
+        else
+            # Se não há contexto, é uma nova conversa, então chamamos a IA.
+            resposta = tratar_nova_interacao(incoming_msg, media_url, from_number, usuario)
+        # --- FIM DA CORREÇÃO ---
 
     resp = MessagingResponse()
     resp.message(resposta)
