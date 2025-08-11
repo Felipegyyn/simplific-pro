@@ -282,7 +282,7 @@ const Schedule = ({ user, onLogout }) => {
           </div>
 
           {/* Cards de Resumo */}
-          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
                   <Calendar className="h-8 w-8 text-blue-600 dark:text-blue-400" />

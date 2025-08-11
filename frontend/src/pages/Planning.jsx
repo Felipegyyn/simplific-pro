@@ -1151,7 +1151,7 @@ useEffect(() => {
 
               </div>
 
-              <div className="grid gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {orcamentos.map((orc, index) => (
                   <Card key={index}>
                     <CardContent className="p-6">
