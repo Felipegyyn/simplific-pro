@@ -168,7 +168,6 @@ const AdminPanel = ({ user, onLogout }) => {
               <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
             </Button>
             <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-            <h1 className="bg-white dark:bg-slate-800 dark:border-slate-700 shadow-sm border-b">Painel Administrativo</h1>
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600 dark:text-gray-300">Bem-vindo, {user.name}</span>
@@ -286,7 +285,7 @@ const AdminPanel = ({ user, onLogout }) => {
               </Dialog>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {loading ? <p>Carregando usuários...</p> : usuarios.map((u) => (
                 <Card key={u.id}>
                   <CardContent className="p-6">
