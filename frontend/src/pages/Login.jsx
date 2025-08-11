@@ -11,8 +11,8 @@ import apiService from '../services/api';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
-    email: 'Digite o e-mail de acesso',
-    password: 'Digite a senha'
+    email:placeholder="Digite o e-mail cadastrado",
+    password:placeholder="Digite o e-mail cadastrado"
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
