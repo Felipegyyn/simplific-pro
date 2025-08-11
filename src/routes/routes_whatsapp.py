@@ -57,12 +57,24 @@ def receive_message():
     numero_normalizado = normalizar_numero(from_number)
     usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
 
+# Dentro de src/routes/routes_whatsapp.py
+
+@whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
+def receive_message():
+    """
+    Esta função é o coração do webhook. Ela agora atua como um "roteador":
+    - Se houver uma conversa em andamento (contexto), ela a continua.
+    - Se não, ela inicia uma nova conversa com a IA.
+    """
+    incoming_msg = request.values.get('Body', '').strip()
+    media_url = request.values.get('MediaUrl0', None)
+    from_number = request.values.get('From', '')
+
+    numero_normalizado = normalizar_numero(from_number)
+    usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
+
     if not usuario:
         resposta = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
-    
-    # --- NOVA LÓGICA SIMPLIFICADA ---
-    # Se o usuário existe, TODA interação vai para o novo assessor.
-    # A lógica de sessões e histórico agora é gerenciada dentro de tratar_nova_interacao.
     else:
         # --- ESTA É A CORREÇÃO CRUCIAL ---
         sessao = user_sessions.get(from_number, {})
@@ -72,7 +84,7 @@ def receive_message():
         if contexto:
             # A mensagem (ex: "1") é enviada para a função que sabe lidar com respostas numéricas.
             resposta = tratar_resposta_numerica(incoming_msg, from_number, usuario.id)
-        else
+        else:
             # Se não há contexto, é uma nova conversa, então chamamos a IA.
             resposta = tratar_nova_interacao(incoming_msg, media_url, from_number, usuario)
         # --- FIM DA CORREÇÃO ---
