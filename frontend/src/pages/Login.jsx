@@ -79,7 +79,7 @@ const Login = ({ onLogin }) => {
 
     try {
       // Chama a rota do backend que já existe
-      await apiService.post('/change-password', {
+      await apiService.post('/api/auth/change-password', {
         current_password: tempPassword,
         new_password: newPassword
       });
