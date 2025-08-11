@@ -660,7 +660,7 @@ useEffect(() => {
               {/* ========================================================== */}
               {/* PASSO 4: ATUALIZAR A EXIBIÇÃO DOS CARDS INDIVIDUAIS */}
               {/* ========================================================== */}
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {investimentosCalculados.map((inv) => (
                   <Card key={inv.id}>
                     <CardContent className="p-6">
