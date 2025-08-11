@@ -638,7 +638,7 @@ const carregarFaturas = async (listaDeCartoes) => {
               </div>
             
 
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {Array.isArray(cartoes) && cartoes.map((cartao) => (
   <Card key={cartao.id} className="overflow-hidden">
     <CardContent className="p-6">
