@@ -11,4 +11,4 @@ echo "Creating admin user..."
 flask create-admin
 
 echo "Starting Gunicorn server..."
-gunicorn --workers 1 --threads 4 src.main:app
+gunicorn src.main:app
