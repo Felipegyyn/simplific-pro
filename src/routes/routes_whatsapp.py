@@ -101,7 +101,8 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
             resposta_final = resultado_acao
 
     historico_chat.append({"role": "model", "content": resposta_final})
-    user_sessions[from_number] = {'chat_history': historico_chat}
+    sessao['chat_history'] = historico_chat
+    user_sessions[from_number] = sessao
 
     return resposta_final
 
