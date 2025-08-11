@@ -673,7 +673,7 @@ const carregarFaturas = async (listaDeCartoes) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4 text-center sm:text-left">
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mb-4 text-center sm:text-left">
         <div>
           <p className="text-sm text-gray-600  dark:text-slate-400">Limite Total</p>
           <p className="text-lg font-bold text-blue-600 dark:text-blue-400">R$ {cartao.limite.toLocaleString()}</p>
