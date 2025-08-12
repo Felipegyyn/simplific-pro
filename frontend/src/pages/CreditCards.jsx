@@ -73,7 +73,7 @@ const loadCartoes = async () => {
   const cartoesFormatados = Array.isArray(rawCartoes) ? rawCartoes.map((cartao) => ({
   id: cartao.id,
   nome: cartao.name,
-  numero: '**** **** **** ' + Math.floor(1000 + Math.random() * 9000),
+  numero: '**** **** **** ' + (cartao.card_number ? cartao.card_number.slice(-4) : '0000'),
   bandeira: cartao.brand,
   limite: cartao.limit,
   usado: cartao.limit - cartao.available_limit, // Cálculo correto
