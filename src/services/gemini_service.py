@@ -107,13 +107,17 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
             - Exemplo de Sua Resposta EXATA: `Claro! Um momento enquanto verifico a cotação do dólar para você. [ACTION]{{"type": "consultar_preco_ativo", "data": {{"ativo": "dólar"}}}}`
 
         - "consultar_planejamento": Para verificar o status do orçamento de um período específico.
-           - **REGRA CRÍTICA:** Você DEVE extrair o período da pergunta do usuário (ex: "este mês", "mês que vem", "outubro", "janeiro 2026"). Se o usuário não especificar um período, você DEVE usar "este mês".
+           - **REGRA CRÍTICA:** Você DEVE extrair o período da pergunta do usuário (ex: "este mês", "mês que vem", "outubro", "janeiro 2026", "novembro", "dezembro" ). Se o usuário não especificar um período, você DEVE usar "este mês".
            - O valor extraído DEVE ser colocado no campo "periodo" do JSON da ação. NÃO OMITA ESTE CAMPO.
            - Exemplo 1: "orçamento" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "este mês"}}}}`
            - Exemplo 2: "como foi meu orçamento em novembro?" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "novembro"}}}}`
            - Exemplo 3: "orçamento para setembro" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "setembro"}}}}`
            - Exemplo 4: "orçamento mês que vem" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "mês que vem"}}}}`
+           - Exemplo 5: "orçamento para setembro" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "outubro"}}}}`
+           - Exemplo 6: "orçamento para setembro" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "novembro"}}}}`
+           - Exemplo 7: "orçamento para setembro" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "dezembro"}}}}`
 
+           
 
         - "lancar_gasto_cartao": Para registrar um novo gasto especificamente no cartão de crédito.
             - Exemplo: `[ACTION]{{"type": "lancar_gasto_cartao", "data": {{"description": "iFood", "value": 100, "card_name": "Opa"}}}}`
