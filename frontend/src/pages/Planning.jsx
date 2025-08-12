@@ -1240,7 +1240,7 @@ useEffect(() => {
       <SelectTrigger>
         <SelectValue placeholder="Selecione a categoria" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-[250px] overflow-y-auto">
         {/* Este filtro extra garante que só apareçam categorias do tipo selecionado (entrada/saída) */}
         {categories
           .filter(cat => cat.type === formData.type)
