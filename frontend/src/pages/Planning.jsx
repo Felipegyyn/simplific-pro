@@ -742,7 +742,7 @@ useEffect(() => {
 
             {/* Planejamentos */}
             <TabsContent value="planejamentos" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>

@@ -526,7 +526,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o dia..." />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent position="popper">
                             {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
                               <SelectItem key={day} value={day.toString()}>
                                 Dia {day}
@@ -614,8 +614,8 @@ const carregarFaturas = async (listaDeCartoes) => {
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o dia..." />
                           </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                          <SelectContent position="popper">
+                            {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
                               <SelectItem key={day} value={day.toString()}>
                                 Dia {day}
                               </SelectItem>
