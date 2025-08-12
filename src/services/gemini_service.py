@@ -106,8 +106,11 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
             - Exemplo de Pergunta do Usuário: "qual o preço do dólar?"
             - Exemplo de Sua Resposta EXATA: `Claro! Um momento enquanto verifico a cotação do dólar para você. [ACTION]{{"type": "consultar_preco_ativo", "data": {{"ativo": "dólar"}}}}`
 
-        - "consultar_planejamento": Para verificar o status do orçamento. Ex: `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "este mês"}}}}`
-        - Você deve consutar o planejamento/orçamento com base no período escolhido pelo usuário. Você deve responder com base nas informações disponíveis no módulo "planning"
+        - "consultar_planejamento": Para verificar o status do orçamento de um período específico.
+        - Extraia o período da pergunta do usuário (ex: "este mês", "mês que vem", "outubro", "janeiro 2026").
+        - Exemplo 1: "orçamento este mês" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "este mês"}}}}`
+        - Exemplo 2: "como foi meu orçamento em novembro?" -> `[ACTION]{{"type": "consultar_planejamento", "data": {{"periodo": "novembro"}}}}`
+
 
         - "lancar_gasto_cartao": Para registrar um novo gasto especificamente no cartão de crédito.
             - Exemplo: `[ACTION]{{"type": "lancar_gasto_cartao", "data": {{"description": "iFood", "value": 100, "card_name": "Opa"}}}}`

@@ -1,5 +1,7 @@
 # routes_whatsapp.py
 from flask import Blueprint, request
+import dateparser # <-- ADICIONE AQUI
+import calendar   # <-- ADICIONE AQUI
 from src.models.user import User
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
@@ -707,35 +709,43 @@ def formatar_resumo_metas(metas):
         )
     return resposta
 
+
+
 # --------------------------------------------------------------------------
 # FUNÇÕES AUXILIARES
 # --------------------------------------------------------------------------
+
+def extrair_data_alvo(mensagem_usuario):
+    """
+    Analisa a mensagem do usuário para encontrar uma referência de data.
+    Se não encontrar, retorna a data de hoje.
+    """
+    # Configurações para entender português e preferir datas futuras se for ambíguo
+    data_extraida = dateparser.parse(mensagem_usuario, languages=['pt'], settings={'PREFER_DATES_FROM': 'future'})
+
+    if data_extraida:
+        return data_extraida.date()
+    else:
+        # Se não entender nada, retorna o dia de hoje como padrão
+        return date.today()
+
+# A função calcular_intervalo_datas virá logo abaixo
+
+
+# DENTRO DE src/routes/routes_whatsapp.py
+
 def calcular_intervalo_datas(periodo_texto):
     """
-    Converte uma string de período (ex: "esta semana") em datas de início e fim.
+    Converte uma string de período (ex: "outubro", "mês passado") em datas de início e fim do mês correspondente.
     """
-    hoje = date.today()
-    if periodo_texto == "hoje":
-        return hoje, hoje
-    if periodo_texto == "ontem":
-        ontem = hoje - timedelta(days=1)
-        return ontem, ontem
-    if periodo_texto == "esta semana":
-        inicio_semana = hoje - timedelta(days=hoje.weekday())
-        return inicio_semana, hoje
-    if periodo_texto == "semana passada":
-        fim_semana_passada = hoje - timedelta(days=hoje.weekday() + 1)
-        inicio_semana_passada = fim_semana_passada - timedelta(days=6)
-        return inicio_semana_passada, fim_semana_passada
-    if periodo_texto == "este mês":
-        inicio_mes = hoje.replace(day=1)
-        return inicio_mes, hoje
-    if periodo_texto == "mês passado":
-        fim_mes_passado = hoje.replace(day=1) - timedelta(days=1)
-        inicio_mes_passado = fim_mes_passado.replace(day=1)
-        return inicio_mes_passado, fim_mes_passado
-    
-    raise ValueError("Período de tempo não reconhecido.")
+    # Usa nossa nova função inteligente para "traduzir" o texto para uma data
+    data_alvo = extrair_data_alvo(periodo_texto)
+
+    # Com a data em mãos, calculamos o primeiro e o último dia do mês dela
+    primeiro_dia_mes = data_alvo.replace(day=1)
+    ultimo_dia_mes = data_alvo.replace(day=calendar.monthrange(data_alvo.year, data_alvo.month)[1])
+
+    return primeiro_dia_mes, ultimo_dia_mes
 
 def formatar_resumo_transacoes(transacoes, periodo_texto, tipo_consulta):
     """
