@@ -7,6 +7,7 @@ from src.services.schedule_service import criar_evento_agenda, buscar_resumo_age
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
 from src.services.transacoes_service import format_currency_brl
+from src.services.transcription_service import transcrever_audio_de_url # <-- ADICIONE ESTA LINHA
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
 from src.services.transacoes_service import buscar_transacoes_por_status
@@ -36,55 +37,70 @@ from src.services.categorias_service import buscar_categorias
 
 whatsapp_bp = Blueprint('whatsapp', __name__)
 
-# --------------------------------------------------------------------------
-# FUNÇÃO PRINCIPAL DO WEBHOOK - PONTO DE ENTRADA
-# --------------------------------------------------------------------------
-# Em src/routes/whatsapp_routes.py
-# Substitua a função receive_message inteira por esta versão
-
-# --------------------------------------------------------------------------
-# FUNÇÃO PRINCIPAL DO WEBHOOK - PONTO DE ENTRADA
-# --------------------------------------------------------------------------
 # Dentro de src/routes/routes_whatsapp.py
 
 @whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
 def receive_message():
     """
     Esta função é o coração do webhook. Ela agora atua como um "roteador":
+    - VERIFICA SE A MENSAGEM É UM ÁUDIO E A TRANSCREVE.
     - Se houver uma conversa em andamento (contexto), ela a continua.
     - Se não, ela inicia uma nova conversa com a IA.
     """
-    incoming_msg = request.values.get('Body', '').strip()
+    incoming_msg_text = request.values.get('Body', '').strip()
     media_url = request.values.get('MediaUrl0', None)
+    media_type = request.values.get('MediaContentType0', '') # Pega o tipo da mídia
     from_number = request.values.get('From', '')
+    
+    # Variável que será usada pelo resto da lógica
+    mensagem_processada = incoming_msg_text
 
+    # --- NOVA LÓGICA DE ÁUDIO ---
+    if media_url and 'audio' in media_type:
+        print(f"Mídia de áudio detectada: {media_url}")
+        texto_transcrito = transcrever_audio_de_url(media_url)
+        if texto_transcrito:
+            mensagem_processada = texto_transcrito
+        else:
+            # Se a transcrição falhar ou retornar vazia, envia uma mensagem de erro.
+            resp = MessagingResponse()
+            resp.message("Não consegui entender o que você disse no áudio. Pode tentar de novo ou digitar? 🤔")
+            return str(resp)
+    # --- FIM DA LÓGICA DE ÁUDIO ---
+
+    # Se não houver texto nem áudio, não faz nada.
+    if not mensagem_processada:
+        return str(MessagingResponse())
+
+    # O resto da função continua exatamente como era, mas usando "mensagem_processada"
     numero_normalizado = normalizar_numero(from_number)
     usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
 
     if not usuario:
         resposta = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
     else:
-        # --- ESTA É A CORREÇÃO CRUCIAL ---
         sessao = user_sessions.get(from_number, {})
         contexto = sessao.get('contexto')
 
-        # Se existe um contexto, significa que estamos no meio de uma conversa.
         if contexto:
-            # A mensagem (ex: "1") é enviada para a função que sabe lidar com respostas numéricas.
-            resposta = tratar_resposta_numerica(incoming_msg, from_number, usuario.id)
+            resposta = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
         else:
-            # Se não há contexto, é uma nova conversa, então chamamos a IA.
-            resposta = tratar_nova_interacao(incoming_msg, media_url, from_number, usuario)
-        # --- FIM DA CORREÇÃO ---
+            # Passamos a mensagem processada (que pode ser o texto original ou o transcrito)
+            resposta = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
 
     resp = MessagingResponse()
     resp.message(resposta)
     return str(resp)
 
 # --------------------------------------------------------------------------
+# FUNÇÃO PRINCIPAL DO WEBHOOK - PONTO DE ENTRADA
+# --------------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------------
 # ORQUESTRADOR PRINCIPAL DA IA
 # --------------------------------------------------------------------------
-# Em src/routes/whatsapp_routes.py
+
 
 def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     sessao = user_sessions.get(from_number, {})
