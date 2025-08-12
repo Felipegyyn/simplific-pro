@@ -284,19 +284,33 @@ def executar_acao_simplific(user_id, acao, from_number):
             return "Ação de agendamento executada."
 
         elif tipo_acao == 'consultar_planejamento':
-            periodo_texto = dados_acao.get('periodo', 'este mês')
+            # 1. Pega o período que o Gemini extraiu, ou usa 'este mês' como padrão.
+            periodo_texto_gemini = dados_acao.get('periodo', 'este mês')
 
-            # Calcula as datas com base no texto (ex: "este mês")
             try:
-                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto)
+                # 2. Calcula as datas de início e fim.
+                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto_gemini)
+
+                # 3. (A MELHORIA) Cria um texto descritivo baseado na data REAL calculada.
+                # Isso garante que a resposta esteja sempre certa, independente do texto do Gemini.
+                try:
+                    # Tenta usar a biblioteca 'locale' para o nome do mês em português.
+                    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+                    periodo_descritivo = data_inicio.strftime("para %B de %Y").capitalize()
+                except Exception:
+                    # Se 'locale' falhar no servidor (comum), usa uma lista manual. É mais garantido.
+                    meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+                    periodo_descritivo = f"para {meses[data_inicio.month - 1]} de {data_inicio.year}"
+            
             except ValueError as e:
                 return str(e)
-            
-            # Chama o serviço para buscar os dados do Orçado vs. Realizado
+
+            # 4. Busca os dados do planejamento no banco.
             resumo_planejamento = buscar_resumo_planejamento(user_id, data_inicio, data_fim)
-            # Chama a função que já existe para formatar a resposta para o usuário
-            return formatar_resumo_planejamento(resumo_planejamento, periodo_texto)
-            
+
+            # 5. Formata a resposta usando nosso novo texto descritivo e inteligente.
+            return formatar_resumo_planejamento(resumo_planejamento, periodo_descritivo)
+   
         elif tipo_acao == 'consultar_preco_ativo':
             # A indentação correta começa aqui
             nome_ativo = dados_acao.get('ativo')
