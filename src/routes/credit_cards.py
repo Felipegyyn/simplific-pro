@@ -44,7 +44,25 @@ credit_cards_bp = Blueprint('credit_cards', __name__)
 def get_credit_cards():
     user_id = get_jwt_identity()
     cards = CreditCard.query.filter_by(user_id=user_id, is_active=True).all()
-    return jsonify([card.to_dict() for card in cards])
+
+    # Lista para armazenar os dados dos cartões para a resposta
+    cards_list = []
+    for card in cards:
+        card_data = {
+            "id": card.id,
+            "name": card.name,
+            "brand": card.brand,
+            "limit": card.limit,
+            "available_limit": card.available_limit,
+            "due_day": card.due_day,
+
+            # --- AJUSTE PRINCIPAL ADICIONADO AQUI ---
+            # Criamos um novo campo "last_digits" com os 4 últimos dígitos
+            "last_digits": card.card_number[-4:] if card.card_number else "0000"
+        }
+        cards_list.append(card_data)
+
+    return jsonify(cards_list)
 
 @credit_cards_bp.route('/credit-cards', methods=['POST'])
 @jwt_required()
