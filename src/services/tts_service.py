@@ -58,7 +58,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         # Experimente também 'A', 'B' (masculina) e 'D' (masculina) para ver qual agrada mais.
         voice = texttospeech.VoiceSelectionParams(
             language_code="pt-BR",
-            name="pt-BR-Studio-B" 
+            name="pt-BR-Wavenet-D" 
         )
 
         audio_config = texttospeech.AudioConfig(
