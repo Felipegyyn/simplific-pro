@@ -1,5 +1,4 @@
-# src/services/transcription_service.py
-
+import os # <-- ADICIONE ESTA IMPORTAÇÃO
 import requests
 from google.cloud import speech
 
@@ -9,35 +8,35 @@ def transcrever_audio_de_url(audio_url: str) -> str:
     """
     print(f"Iniciando transcrição para a URL: {audio_url}")
 
+    # --- INÍCIO DA CORREÇÃO ---
+    # Carrega as credenciais da Twilio a partir das variáveis de ambiente
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+    # --- FIM DA CORREÇÃO ---
+
     try:
-        # 1. Baixar o conteúdo do áudio em memória
-        # A Twilio envia áudios em formato ogg/opus, que o Google Speech-to-Text suporta
-        response = requests.get(audio_url)
-        response.raise_for_status()  # Gera um erro se o download falhar
+        # 1. Baixar o conteúdo do áudio em memória, AGORA COM AUTENTICAÇÃO
+        # O parâmetro 'auth' envia o SID e o Token para a Twilio
+        response = requests.get(audio_url, auth=(account_sid, auth_token))
+        response.raise_for_status()
         audio_content = response.content
-        print("Download do áudio concluído.")
+        print("Download do áudio concluído com sucesso.")
 
-        # 2. Configurar o cliente da API Speech-to-Text
+        # O resto da função continua exatamente igual...
         client = speech.SpeechClient()
-
-        # 3. Preparar o áudio e a configuração da transcrição
         audio = speech.RecognitionAudio(content=audio_content)
         
         config = speech.RecognitionConfig(
-            # O codec 'OPUS' é o padrão para áudios do WhatsApp via Twilio
-            # O sample_rate_hertz de 16000 é também padrão para o codec OPUS
             encoding=speech.RecognitionConfig.AudioEncoding.OGG_OPUS,
             sample_rate_hertz=16000,
-            language_code="pt-BR",  # Especifica o idioma para maior precisão
-            model="default" # Modelo padrão é ótimo para conversas gerais
+            language_code="pt-BR",
+            model="default"
         )
 
-        # 4. Chamar a API para realizar a transcrição
         print("Enviando áudio para a API do Google Speech-to-Text...")
         response = client.recognize(config=config, audio=audio)
         print("Resposta da API recebida.")
 
-        # 5. Extrair e retornar o texto transcrito
         if response.results:
             transcricao = response.results[0].alternatives[0].transcript
             print(f"Texto transcrito: '{transcricao}'")
