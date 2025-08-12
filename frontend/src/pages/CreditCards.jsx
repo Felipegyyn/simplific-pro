@@ -592,6 +592,8 @@ const carregarFaturas = async (listaDeCartoes) => {
                             placeholder="**** **** **** 1234"
                             maxLength="19"
                             required
+                            readOnly // <-- ADICIONE ESTA LINHA
+                            className="bg-gray-100 dark:bg-slate-800 cursor-not-allowed" // Opcional: melhora o visual
                           />
                         </div>
                         <div>
