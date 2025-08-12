@@ -156,6 +156,17 @@ def after_request(response):
         response.status_code = 200
     return response
 
+# --- ROTA PARA SERVIR OS ÁUDIOS GERADOS ---
+@app.route('/audio/<filename>')
+def serve_audio(filename):
+    """
+    Esta rota serve os arquivos de áudio da pasta temp_audio.
+    O Twilio usará esta URL para pegar o áudio e enviar ao usuário.
+    """
+    # Define o caminho para o diretório de áudios temporários
+    audio_directory = os.path.join(os.path.dirname(__file__), 'src', 'temp_audio')
+    return send_from_directory(audio_directory, filename)
+
 
 scheduler = BackgroundScheduler(daemon=True)
 # Roda a verificação de lembretes todos os dias às 8:00 da manhã (horário do servidor)

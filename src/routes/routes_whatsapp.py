@@ -1,9 +1,11 @@
 # routes_whatsapp.py
 from flask import Blueprint, request
+import os # <-- ADICIONE
 import dateparser # <-- ADICIONE AQUI
 import calendar   # <-- ADICIONE AQUI
 from src.models.user import User
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
+from src.services.tts_service import texto_para_audio # <-- ADICIONE
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
 from src.services.transacoes_service import format_currency_brl
@@ -42,54 +44,67 @@ whatsapp_bp = Blueprint('whatsapp', __name__)
 @whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
 def receive_message():
     """
-    Esta função é o coração do webhook. Ela agora atua como um "roteador":
-    - VERIFICA SE A MENSAGEM É UM ÁUDIO E A TRANSCREVE.
-    - Se houver uma conversa em andamento (contexto), ela a continua.
-    - Se não, ela inicia uma nova conversa com a IA.
+    Função coração do webhook. Agora com a lógica para "espelhar" o formato da mensagem.
     """
     incoming_msg_text = request.values.get('Body', '').strip()
     media_url = request.values.get('MediaUrl0', None)
-    media_type = request.values.get('MediaContentType0', '') # Pega o tipo da mídia
+    media_type = request.values.get('MediaContentType0', '')
     from_number = request.values.get('From', '')
-    
-    # Variável que será usada pelo resto da lógica
+
+    # --- LÓGICA DE DECISÃO DE FORMATO ---
+    # 1. Determinamos se a mensagem original foi um áudio.
+    is_incoming_audio = media_url and 'audio' in media_type
     mensagem_processada = incoming_msg_text
 
-    # --- NOVA LÓGICA DE ÁUDIO ---
-    if media_url and 'audio' in media_type:
-        print(f"Mídia de áudio detectada: {media_url}")
+    if is_incoming_audio:
         texto_transcrito = transcrever_audio_de_url(media_url)
         if texto_transcrito:
             mensagem_processada = texto_transcrito
         else:
-            # Se a transcrição falhar ou retornar vazia, envia uma mensagem de erro.
             resp = MessagingResponse()
             resp.message("Não consegui entender o que você disse no áudio. Pode tentar de novo ou digitar? 🤔")
             return str(resp)
-    # --- FIM DA LÓGICA DE ÁUDIO ---
 
-    # Se não houver texto nem áudio, não faz nada.
     if not mensagem_processada:
         return str(MessagingResponse())
 
-    # O resto da função continua exatamente como era, mas usando "mensagem_processada"
     numero_normalizado = normalizar_numero(from_number)
     usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
 
+    resposta_em_texto = "" # Variável para guardar a resposta final em texto
+
     if not usuario:
-        resposta = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
+        resposta_em_texto = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
     else:
         sessao = user_sessions.get(from_number, {})
         contexto = sessao.get('contexto')
 
         if contexto:
-            resposta = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
+            resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
         else:
-            # Passamos a mensagem processada (que pode ser o texto original ou o transcrito)
-            resposta = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
+            resposta_em_texto = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
 
+    # --- ORQUESTRADOR DE RESPOSTA (TEXTO OU ÁUDIO) ---
+    # 2. Com a resposta em texto em mãos, decidimos como enviá-la.
     resp = MessagingResponse()
-    resp.message(resposta)
+
+    if is_incoming_audio:
+        # Se a mensagem original VEIO como áudio, a resposta VAI como áudio.
+        print("Gerando resposta em áudio...")
+        nome_arquivo = texto_para_audio(resposta_em_texto)
+        if nome_arquivo:
+            base_url = os.getenv('BASE_URL')
+            url_publica = f"{base_url}/audio/{nome_arquivo}"
+            print(f"Enviando áudio via TwiML: {url_publica}")
+            resp.message().media(url_publica)
+        else:
+            # Fallback para texto se a geração de áudio falhar
+            resp.message("Tive um problema para gerar o áudio, mas aqui está a resposta em texto: " + resposta_em_texto)
+    else:
+        # Se a mensagem original VEIO como texto, a resposta VAI como texto.
+        print("Enviando resposta em texto via TwiML.")
+        resp.message(resposta_em_texto)
+
     return str(resp)
 
 
