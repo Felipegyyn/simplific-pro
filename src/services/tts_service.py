@@ -35,7 +35,7 @@ def preparar_texto_para_ssml(texto: str) -> str:
     texto_limpo = texto_limpo.replace('?', '<break time="700ms"/>')
 
     # 4. Envolve o texto final nas tags SSML necessárias
-    ssml = f"<speak>{texto_limpo}</speak>"
+    ssml = f'<speak><prosody rate="1.15">{texto_limpo}</prosody></speak>'
     
     return ssml
 
@@ -58,7 +58,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         # Experimente também 'A', 'B' (masculina) e 'D' (masculina) para ver qual agrada mais.
         voice = texttospeech.VoiceSelectionParams(
             language_code="pt-BR",
-            name="pt-BR-Wavenet-C" 
+            name="pt-BR-Studio-B" 
         )
 
         audio_config = texttospeech.AudioConfig(
