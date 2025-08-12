@@ -573,31 +573,33 @@ useEffect(() => {
             <TabsContent value="visao-geral" className="space-y-6">
               {/* Cards de Resumo */}
 
-              <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ano</label>
-                 <select
-                  value={filtroAnoVisaoGeral}
-                  onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
-                  className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-                  >
-                {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
-                <option key={ano} value={ano}>{ano}</option>
-                ))}
-                </select>
-              </div>
-                {/* ▼▼▼ NOVO FILTRO DE TIPO ▼▼▼ */}
-    <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
-        <select
-            value={filtroTipoVisaoGeral}
-            onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
-            className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-        >
-            <option value="">Todos</option>
-            <option value="entrada">Entrada</option>
-            <option value="saida">Saída</option>
-        </select>
-    </div>
+              <div className="flex flex-col sm:flex-row gap-4 mb-6">
+  <div className="mb-0"> {/* Removido mb-4 daqui */}
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ano</label>
+    <select
+      value={filtroAnoVisaoGeral}
+      onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
+      className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+    >
+      {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
+        <option key={ano} value={ano}>{ano}</option>
+      ))}
+    </select>
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
+    <select
+      value={filtroTipoVisaoGeral}
+      onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
+      className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+    >
+      <option value="">Todos</option>
+      <option value="entrada">Entrada</option>
+      <option value="saida">Saída</option>
+    </select>
+  </div>
+</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                   <CardContent className="p-6">
@@ -740,7 +742,7 @@ useEffect(() => {
 
             {/* Planejamentos */}
             <TabsContent value="planejamentos" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>
@@ -1006,7 +1008,7 @@ useEffect(() => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         <div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">Valor Total</p>
                           <p className="text-xl font-bold text-blue-600 dark:text-blue-400">R$ {plan.total_amount.toLocaleString()}</p>
@@ -1158,7 +1160,7 @@ useEffect(() => {
                       <div className="flex justify-between items-center mb-4">
                       <h3 className="text-lg font-semibold dark:text-gray-100">{orc.categoria}</h3>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">Orçado</p>
                           <p className="text-lg font-bold text-blue-600 dark:text-blue-400">R$ {orc.orcado.toLocaleString()}</p>

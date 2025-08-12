@@ -682,14 +682,14 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                   <div className="space-y-4">
                     {(Array.isArray(transacoesFiltradas) ? transacoesFiltradas : []).map((transacao) => (transacao && (
                       <div key={transacao.id} className="border dark:border-slate-800 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-slate-800/50">
-                        <div className="flex justify-between items-start">
+                        <div className="flex flex-col sm:flex-row justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <h3 className="font-semibold dark:text-slate-100">{transacao.description}</h3>
                               {getTipoBadge(transacao.type)}
                               {getStatusBadge(transacao.status)}
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-slate-400">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 gap-x-2 text-sm text-gray-600 dark:text-slate-400">
                               <div>
                                 <p className="font-medium">Categoria</p>
                                 <p>{transacao.category || 'Sem categoria'}</p>
@@ -706,7 +706,7 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
 </div>
                             </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-4 sm:mt-0 sm:ml-4">
+                          <div className="flex flex-row sm:flex-col md:flex-row justify-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
                             {transacao.status === 'pendente' && (
                               <Button 
                                 variant="outline" 
