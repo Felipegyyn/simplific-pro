@@ -432,19 +432,18 @@ const Schedule = ({ user, onLogout }) => {
         <SelectTrigger>
           <SelectValue placeholder="Selecione..." />
         </SelectTrigger>
-        <SelectContent className="max-h-[250px] overflow-y-auto">
-             {(Array.isArray(categorias) ? categorias : [])
-          .filter((cat) => {
-          console.log('Tipo selecionado:', formData.type === 'income' ? 'entrada' : 'saida');
-          return cat?.type === (formData.type === 'income' ? 'entrada' : 'saida');
-        })
-          .map((cat, index) => (
-            <SelectItem key={index} value={cat.name}>
-              {cat.name}
-            </SelectItem>
-        ))}
-            </SelectContent>
-          </Select>
+        <SelectContent>
+          <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+          <SelectItem value="Moradia">Moradia</SelectItem>
+          <SelectItem value="Investimentos">Investimentos</SelectItem>
+          <SelectItem value="Consultoria">Consultoria</SelectItem>
+          <SelectItem value="Planejamento">Planejamento</SelectItem>
+          <SelectItem value="Saúde">Saúde</SelectItem>
+          <SelectItem value="Educação">Educação</SelectItem>
+          <SelectItem value="Outros">Outros</SelectItem>
+        </SelectContent>
+        
+      </Select>
     </div>
   </div>
 
