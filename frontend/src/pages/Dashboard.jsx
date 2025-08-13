@@ -754,7 +754,7 @@ const Dashboard = ({ user, onLogout }) => {
                     <SelectTrigger className="w-36 h-8 text-xs">
                       <SelectValue placeholder="Categoria..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[250px] overflow-y-auto">
                       <SelectItem value="all">Todas</SelectItem> 
                       {categories
                         .filter(cat => cat.type === pvrTypeFilter)
