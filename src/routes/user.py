@@ -5,6 +5,7 @@ from flask_jwt_extended import (
 )
 from datetime import datetime, timedelta
 from src.models.user import User, db
+from src.extensions import bcrypt # <-- LINHA ADICIONADA
 
 user_bp = Blueprint('user', __name__)
 
