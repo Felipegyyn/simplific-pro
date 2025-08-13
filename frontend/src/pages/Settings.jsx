@@ -15,6 +15,7 @@ const Settings = () => {
   
   // 2. Usa o hook para pegar o tema atual e a função para trocá-lo
   const { theme, toggleTheme } = useTheme(); 
+  const [responseFormat, setResponseFormat] = useState('text'); // 'text' é o padrão inicial
 
   useEffect(() => {
     // Busca os dados do usuário ao carregar a página
