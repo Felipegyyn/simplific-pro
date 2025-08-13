@@ -2,8 +2,9 @@
 from datetime import date, timedelta, datetime
 from src.models.extended import ScheduleEvent
 from src.models.user import User
-# Importa a nossa nova ferramenta de envio de mensagens
 from src.services.whatsapp_service import send_whatsapp_message 
+# Importe a nossa função de formatação de moeda para usar aqui também
+from src.services.transacoes_service import format_currency_brl
 
 def check_and_send_reminders(app):
     """
@@ -21,7 +22,20 @@ def check_and_send_reminders(app):
         for evento in eventos_de_hoje:
             usuario = User.query.get(evento.user_id)
             if usuario and usuario.whatsapp:
-                mensagem = f"🔔 *Lembrete para hoje:* {evento.title} às {evento.time}!"
+                
+                # --- LÓGICA DE MENSAGEM INTELIGENTE (INÍCIO) ---
+                mensagem_base = f"🔔 *Lembrete para hoje:* {evento.title}"
+                if evento.time:
+                    mensagem_base += f" às {evento.time}"
+                
+                # Se for um pagamento e tiver valor, adiciona o valor à mensagem
+                if evento.type == 'pagamento' and evento.value:
+                    valor_formatado = format_currency_brl(evento.value)
+                    mensagem = f"{mensagem_base} no valor de *{valor_formatado}*!"
+                else:
+                    mensagem = f"{mensagem_base}!"
+                # --- LÓGICA DE MENSAGEM INTELIGENTE (FIM) ---
+                
                 print(f"Enviando lembrete de HOJE para {usuario.whatsapp}: {mensagem}")
                 send_whatsapp_message(f'whatsapp:{usuario.whatsapp}', mensagem)
 
@@ -30,7 +44,19 @@ def check_and_send_reminders(app):
         for evento in eventos_de_amanha:
             usuario = User.query.get(evento.user_id)
             if usuario and usuario.whatsapp:
-                mensagem = f"🗓️ *Lembrete para amanhã:* {evento.title} às {evento.time}."
+
+                # --- LÓGICA DE MENSAGEM INTELIGENTE (INÍCIO) ---
+                mensagem_base = f"🗓️ *Lembrete para amanhã:* {evento.title}"
+                if evento.time:
+                    mensagem_base += f" às {evento.time}"
+
+                if evento.type == 'pagamento' and evento.value:
+                    valor_formatado = format_currency_brl(evento.value)
+                    mensagem = f"{mensagem_base} no valor de *{valor_formatado}*."
+                else:
+                    mensagem = f"{mensagem_base}."
+                # --- LÓGICA DE MENSAGEM INTELIGENTE (FIM) ---
+
                 print(f"Enviando lembrete de AMANHÃ para {usuario.whatsapp}: {mensagem}")
                 send_whatsapp_message(f'whatsapp:{usuario.whatsapp}', mensagem)
 
