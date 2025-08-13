@@ -1,3 +1,5 @@
+import apiService from './apiService'; // Verifique se o caminho está correto
+
 // Sistema de Notificações Push
 class NotificationService {
   constructor() {
@@ -196,29 +198,28 @@ class NotificationService {
     }, 30000);
   }
 
-  // Verificar pagamentos próximos do vencimento
-  async checkUpcomingPayments() {
-    try {
-      // Simular dados - em produção viria da API
-      const upcomingPayments = [
-        {
-          id: 1,
-          description: 'Cartão Nubank',
-          amount: 2800,
-          due_date: '2024-06-25',
-          daysUntilDue: this.calculateDaysUntil('2024-06-25')
+// DEPOIS:
+async checkUpcomingPayments() {
+  try {
+    const events = await apiService.get('/api/schedule'); // Chama a API de agenda
+    events.forEach(event => {
+      // Verifica se é um pagamento e se está próximo do vencimento
+      if (event.type === 'pagamento') {
+        const daysUntilDue = this.calculateDaysUntil(event.date);
+        if (daysUntilDue <= 3 && daysUntilDue >= 0) {
+          this.notifyPaymentDue({
+            id: event.id,
+            description: event.title,
+            amount: event.value || 0,
+            daysUntilDue: daysUntilDue
+          });
         }
-      ];
-
-      upcomingPayments.forEach(payment => {
-        if (payment.daysUntilDue <= 3 && payment.daysUntilDue >= 0) {
-          this.notifyPaymentDue(payment);
-        }
-      });
-    } catch (error) {
-      console.error('Erro ao verificar pagamentos:', error);
-    }
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao verificar pagamentos:', error);
   }
+}
 
   // Verificar progresso das metas
   async checkGoalProgress() {
@@ -244,28 +245,31 @@ class NotificationService {
     }
   }
 
-  // Verificar limites de orçamento
-  async checkBudgetLimits() {
-    try {
-      // Simular dados - em produção viria da API
-      const budgets = [
-        {
-          category: 'Alimentação',
-          limit: 1500,
-          spent: 1350,
-          spent_percentage: 90
-        }
-      ];
+  // ANTES:
+// async checkBudgetLimits() {
+//   try {
+//     const budgets = [ /* ... dados simulados ... */ ];
+//     // ...
+//   }
+// }
 
-      budgets.forEach(budget => {
-        if (budget.spent_percentage >= 80) {
-          this.notifyBudgetAlert(budget);
-        }
-      });
-    } catch (error) {
-      console.error('Erro ao verificar orçamentos:', error);
-    }
+// DEPOIS:
+async checkBudgetLimits() {
+  try {
+    // Esta rota precisa retornar o progresso do orçamento por categoria
+    const budgetStatus = await apiService.get('/api/reports/budget-status'); // Você pode precisar criar essa rota
+    budgetStatus.forEach(budget => {
+      if (budget.progress_percentage >= 80) {
+        this.notifyBudgetAlert({
+          category: budget.category_name,
+          spent_percentage: budget.progress_percentage
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Erro ao verificar orçamentos:', error);
   }
+}
 
   // Calcular dias até uma data
   calculateDaysUntil(dateString) {
