@@ -1,4 +1,4 @@
-import apiService from './apiService'; // Verifique se o caminho está correto
+import apiService from '../services/api';
 
 // Sistema de Notificações Push
 class NotificationService {
