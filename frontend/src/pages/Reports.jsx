@@ -253,24 +253,6 @@ useEffect(() => {
                       </div>
                     </>
                   )}
-
-                  <div>
-                    <Label htmlFor="category">Categoria</Label>
-                    <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas</SelectItem>
-                        <SelectItem value="alimentacao">Alimentação</SelectItem>
-                        <SelectItem value="transporte">Transporte</SelectItem>
-                        <SelectItem value="moradia">Moradia</SelectItem>
-                        <SelectItem value="lazer">Lazer</SelectItem>
-                        <SelectItem value="saude">Saúde</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   <div>
                     <Label htmlFor="type">Tipo</Label>
                     <Select value={filters.type} onValueChange={(value) => handleFilterChange('type', value)}>
