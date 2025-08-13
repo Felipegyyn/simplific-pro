@@ -55,7 +55,18 @@ const Login = ({ onLogin }) => {
       }
     } catch (error) {
       console.error('Erro ao fazer login:', error);
-      setError('Erro ao fazer login. Verifique suas credenciais.');
+
+      // Lógica inteligente para tratar a mensagem de erro específica do backend
+      if (error.response && error.response.status === 403) {
+      // Se o erro for 403 (Proibido), usa a mensagem do servidor (ex: "Conta inativa")
+        setError(error.response.data.error);
+      } 
+      else {
+        // Para outros erros (ex: 401, senha errada), usa uma mensagem genérica
+        setError('Email ou senha inválidos. Verifique suas credenciais.');
+      }
+
+     
     } finally {
       setLoading(false);
     }

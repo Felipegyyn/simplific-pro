@@ -813,7 +813,7 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                     <SelectTrigger>
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[250px] overflow-y-auto">
                     {(Array.isArray(categorias) ? categorias : [])
   .filter((cat) => cat.type === editFormData.type === 'income' ? 'entrada' : 'saida')
   .map((cat, index) => (
