@@ -88,9 +88,11 @@ def receive_message():
     # 2. Com a resposta em texto em mãos, decidimos como enviá-la.
     resp = MessagingResponse()
 
-    if is_incoming_audio:
-        # Se a mensagem original VEIO como áudio, a resposta VAI como áudio.
-        print("Gerando resposta em áudio...")
+    # DECISÃO: A resposta será em áudio SE...
+    # 1. A mensagem original VEIO como áudio (contexto manda), OU
+    # 2. A preferência do usuário no banco de dados está marcada como 'audio'.
+    if is_incoming_audio or (usuario and usuario.preferred_response_format == 'audio'):
+        print("Decisão: Gerar resposta em áudio.")
         nome_arquivo = texto_para_audio(resposta_em_texto)
         if nome_arquivo:
             base_url = os.getenv('BASE_URL')
@@ -100,13 +102,13 @@ def receive_message():
         else:
             # Fallback para texto se a geração de áudio falhar
             resp.message("Tive um problema para gerar o áudio, mas aqui está a resposta em texto: " + resposta_em_texto)
+    
     else:
-        # Se a mensagem original VEIO como texto, a resposta VAI como texto.
-        print("Enviando resposta em texto via TwiML.")
+        # Caso contrário, a resposta VAI como texto.
+        print("Decisão: Enviar resposta em texto.")
         resp.message(resposta_em_texto)
 
     return str(resp)
-
 
 # --------------------------------------------------------------------------
 # ORQUESTRADOR PRINCIPAL DA IA

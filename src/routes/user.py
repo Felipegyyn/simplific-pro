@@ -74,36 +74,32 @@ def get_current_user():
 
 # === PROFILE ===
 
-@user_bp.route('/change-password', methods=['POST', 'OPTIONS'])
+@user_bp.route('/auth/change-password', methods=['POST']) # <-- CORREÇÃO 1: A URL agora está correta
 @jwt_required()
 def change_password():
-    if request.method == 'OPTIONS':
-        return '', 200
-
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     
     if not user:
         return jsonify({'error': 'Usuário não encontrado'}), 404
     
+    # CORREÇÃO 2: Lógica ajustada para o primeiro login.
+    # Removemos a verificação da "senha atual", que não faz sentido aqui.
     data = request.json
-    current_password = data.get('current_password')
     new_password = data.get('new_password')
     
-    if not current_password or not new_password:
-        return jsonify({'error': 'Senha atual e nova senha são obrigatórias'}), 400
+    if not new_password or len(new_password) < 6:
+        return jsonify({'error': 'A nova senha é obrigatória e deve ter pelo menos 6 caracteres'}), 400
     
-    if not user.check_password(current_password):
-        return jsonify({'error': 'Senha atual incorreta'}), 401
+    # Atualiza a senha do usuário com o novo hash
+    user.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
     
-    if len(new_password) < 6:
-        return jsonify({'error': 'Nova senha deve ter pelo menos 6 caracteres'}), 400
-    
-    user.set_password(new_password)
+    # MUITO IMPORTANTE: Marca que o primeiro login foi concluído
     user.first_login = False
+    
     db.session.commit()
     
-    return jsonify({'message': 'Senha alterada com sucesso'})
+    return jsonify({'message': 'Senha alterada com sucesso!'}), 200
 
 
 # === ADMIN ROUTES ===
@@ -192,11 +188,7 @@ def test_identity():
     user_id = get_jwt_identity()
     return jsonify({'user_id': user_id})
 
-# Em src/routes/user.py, adicione este código ao final do arquivo
 
-# Em src/routes/user.py
-
-# SUBSTITUA AS DUAS FUNÇÕES ANTIGAS POR ESTA:
 @user_bp.route('/profile', methods=['GET', 'PUT', 'OPTIONS'])
 @jwt_required()
 def manage_profile():
@@ -228,6 +220,27 @@ def manage_profile():
         db.session.commit()
 
         return jsonify(user.to_dict())
+
+# ▼▼▼ COLE TODO ESTE BLOCO NO FINAL DO ARQUIVO ▼▼▼
+@user_bp.route('/user/preference', methods=['PUT'])
+@jwt_required()
+def update_user_preference():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+    data = request.json
+    new_format = data.get('response_format')
+
+    if new_format not in ['text', 'audio']:
+        return jsonify({"error": "Formato inválido. Use 'text' ou 'audio'."}), 400
+
+    user.preferred_response_format = new_format
+    db.session.commit()
+
+    return jsonify({"message": "Preferência atualizada com sucesso", "new_format": new_format}), 200
+
 
 
 

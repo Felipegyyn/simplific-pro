@@ -20,8 +20,27 @@ const Settings = () => {
     apiService.getCurrentUser().then(user => {
       setName(user.name || '');
       setWhatsapp(user.whatsapp || '');
+      setResponseFormat(user.preferred_response_format || 'text'); // Carrega a preferência salva
     });
   }, []);
+
+  // ▼▼▼ COLE ESTA NOVA FUNÇÃO ABAIXO DO SEU useEffect ▼▼▼
+  const handlePreferenceChange = async (newFormat) => {
+    // Atualiza a tela imediatamente para uma experiência mais fluida
+    setResponseFormat(newFormat);
+    try {
+      // Envia a alteração para a nossa nova rota na API
+      await apiService.put('/api/user/preference', {
+        response_format: newFormat
+      });
+      // Poderíamos adicionar um feedback de sucesso aqui se quiséssemos
+    } catch (error) {
+      console.error('Erro ao salvar preferência:', error);
+      // Em caso de erro, poderíamos reverter o estado e mostrar um alerta
+      alert('Não foi possível salvar sua escolha. Tente novamente.');
+    }
+  };
+  // ▲▲▲ FIM DA NOVA FUNÇÃO ▲▲▲
 
   const handleSave = async () => {
     try {
@@ -74,6 +93,34 @@ const Settings = () => {
           </div>
         </CardContent>
       </Card>
+      {/* ▼▼▼ COLE TODO ESTE NOVO CARD AQUI ▼▼▼ */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Preferências do Assistente</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <Label className="text-base">Respostas no WhatsApp</Label>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Escolha como você prefere receber as respostas do assistente Simplific.
+          </p>
+          <RadioGroup
+            value={responseFormat}
+            onValueChange={handlePreferenceChange}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="text" id="r_text" />
+              <Label htmlFor="r_text">Receber por Texto</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="audio" id="r_audio" />
+              <Label htmlFor="r_audio">Receber por Áudio</Label>
+            </div>
+          </RadioGroup>
+        </div>
+      </CardContent>
+    </Card>
+    {/* ▲▲▲ FIM DO NOVO CARD ▲▲▲ */}
     </div>
   );
 };

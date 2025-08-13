@@ -16,6 +16,7 @@ class User(db.Model):
     first_login = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
+    preferred_response_format = db.Column(db.String(10), nullable=False, default='text')
 
     def __repr__(self):
         return f'<User {self.email}>'
