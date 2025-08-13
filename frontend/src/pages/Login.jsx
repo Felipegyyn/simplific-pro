@@ -63,7 +63,7 @@ const Login = ({ onLogin }) => {
       } 
       else {
         // Para outros erros (ex: 401, senha errada), usa uma mensagem genérica
-        setError('Email ou senha inválidos. Verifique suas credenciais.');
+        setError('Verifique a inatividade. E-mail ou senha inválidos. Verifique as credenciais ou contate o suporte.');
       }
       return; // <-- ADICIONE ESTA LINHA CRÍTICA
 
