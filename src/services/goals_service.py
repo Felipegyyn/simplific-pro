@@ -42,7 +42,7 @@ def add_value_to_goal(user_id, goal_id, value):
         user_id=user_id,
         description=f"Aplicação na meta: {goal.name}",
         type='saida',
-        category_id=4, # Ajuste este ID se necessário
+        category_id=19, # Ajuste este ID se necessário
         value=value_float,
         status='confirmada',
         date=date.today(),

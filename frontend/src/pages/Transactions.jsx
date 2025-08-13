@@ -570,7 +570,7 @@ const saldoLiquido = totalReceitas - totalDespesas;
     <SelectTrigger>
       <SelectValue placeholder="Selecione..." />
     </SelectTrigger>
-    <SelectContent>
+    <SelectContent className="max-h-[250px] overflow-y-auto">
      {(Array.isArray(categorias) ? categorias : [])
   .filter((cat) => {
   console.log('Tipo selecionado:', formData.type === 'income' ? 'entrada' : 'saida');
