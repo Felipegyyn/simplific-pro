@@ -75,6 +75,11 @@ def receive_message():
 
     if not usuario:
         resposta_em_texto = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
+    
+    # ▼▼▼ ADICIONE ESTE BLOCO "elif" AQUI ▼▼▼
+    elif usuario.status != 'ativo':
+        resposta_em_texto = "Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte."
+        
     else:
         sessao = user_sessions.get(from_number, {})
         contexto = sessao.get('contexto')
