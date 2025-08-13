@@ -50,7 +50,15 @@ def login():
     if user.status != 'ativo':
          jsonify({'error': 'Esta conta de usuário está inativa ou bloqueada.'}), 403
     
-    
+    if not user or not user.check_password(password):
+        return jsonify({'error': 'Email ou senha inválidos'}), 401
+
+    # ▼▼▼ AJUSTE CRÍTICO E DEFINITIVO AQUI ▼▼▼
+    # Verificamos o status ANTES de criar os tokens e dar o OK.
+    if user.status != 'ativo':
+        # Se o usuário não estiver ativo, barramos o login aqui.
+        return jsonify({'error': 'Sua conta está inativa. Entre em contato com o suporte.'}), 403 # Retorna 403 Proibido
+
     # Update last login
     user.last_login = datetime.utcnow()
     db.session.commit()
