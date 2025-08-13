@@ -12,6 +12,10 @@ user_bp = Blueprint('user', __name__)
 def active_user_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        # Pula a verificação para requisições OPTIONS (preflight de CORS)
+        if request.method == 'OPTIONS':
+            return fn(*args, **kwargs)
+
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
         if user and user.status == 'ativo':
