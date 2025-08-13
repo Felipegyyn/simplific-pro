@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
 from src.models.extended_modules import CreditCard, Fatura # <-- ADICIONE 'Fatura'
 from src.models.extended_modules import CreditCardTransaction
+from src.routes.user import active_user_required
 from src.models.extended_modules import CreditCard
 from src.services.credit_card_service import process_card_payment
 from datetime import datetime, date, timedelta
@@ -41,6 +42,7 @@ credit_cards_bp = Blueprint('credit_cards', __name__)
 
 @credit_cards_bp.route('/credit-cards', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_credit_cards():
     user_id = get_jwt_identity()
     cards = CreditCard.query.filter_by(user_id=user_id, is_active=True).all()
@@ -66,6 +68,7 @@ def get_credit_cards():
 
 @credit_cards_bp.route('/credit-cards', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_credit_card():
     user_id = get_jwt_identity()
     data = request.json
@@ -98,6 +101,7 @@ def create_credit_card():
 
 @credit_cards_bp.route('/credit-cards/<int:card_id>', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_credit_card(card_id):
     user_id = get_jwt_identity()
     
@@ -127,6 +131,7 @@ def update_credit_card(card_id):
 
 @credit_cards_bp.route('/credit-cards/<int:card_id>', methods=['DELETE'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_credit_card(card_id):
     user_id = get_jwt_identity()
     card = CreditCard.query.filter_by(id=card_id, user_id=user_id).first()
@@ -142,6 +147,7 @@ def delete_credit_card(card_id):
 
 @credit_cards_bp.route('/credit-cards/<int:card_id>/pay-bill', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def pay_credit_card_bill(card_id):
     user_id = get_jwt_identity()
 
@@ -173,6 +179,7 @@ def pay_credit_card_bill(card_id):
 
 @credit_cards_bp.route('/faturas', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def criar_fatura():
     from src.models.extended_modules import Fatura
 
@@ -200,6 +207,7 @@ def criar_fatura():
 
 @credit_cards_bp.route('/faturas', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def listar_faturas():
     from src.models.extended_modules import Fatura, CreditCard
     from datetime import date
@@ -248,6 +256,7 @@ def listar_faturas():
 
 @credit_cards_bp.route('/credit-cards/<int:card_id>/transactions', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_credit_card_transaction(card_id):
     user_id = get_jwt_identity()
     data = request.json
@@ -345,6 +354,7 @@ def create_credit_card_transaction(card_id):
 # ▼▼▼ ADICIONE ESTA NOVA ROTA NO FINAL DO ARQUIVO ▼▼▼
 @credit_cards_bp.route('/faturas/<int:fatura_id>/transactions', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_fatura_transactions(fatura_id):
     user_id = get_jwt_identity()
     

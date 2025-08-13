@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from src.routes.user import active_user_required
 from datetime import datetime
 from src.models.db import db
 from src.models.extended import ScheduleEvent
@@ -8,6 +9,7 @@ schedule_bp = Blueprint('schedule', __name__)
 
 @schedule_bp.route('/schedule', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_schedule_events():
     user_id = get_jwt_identity()
     events = ScheduleEvent.query.filter_by(user_id=user_id).all()
@@ -17,6 +19,7 @@ def get_schedule_events():
 
 @schedule_bp.route('/schedule', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_schedule_event():
     user_id = get_jwt_identity()
     data = request.json
@@ -63,6 +66,7 @@ def create_schedule_event():
 # ▼▼▼ SUBSTITUA A FUNÇÃO update_schedule_event PELA VERSÃO ABAIXO ▼▼▼
 @schedule_bp.route('/schedule/<int:event_id>', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_schedule_event(event_id):
     user_id = get_jwt_identity()
     event = ScheduleEvent.query.filter_by(id=event_id, user_id=user_id).first()
@@ -100,6 +104,7 @@ def update_schedule_event(event_id):
 
 @schedule_bp.route('/schedule/<int:event_id>', methods=['DELETE'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_schedule_event(event_id):
     user_id = get_jwt_identity()
     event = ScheduleEvent.query.filter_by(id=event_id, user_id=user_id).first()

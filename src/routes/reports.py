@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
+from src.routes.user import active_user_required
 from src.models.db import db
 from src.models.financial import Transaction, Category, Planning
 from src.models.extended_modules import CreditCard, CreditCardTransaction
@@ -32,6 +33,7 @@ def get_date_range_from_period(period_filter):
 
 @reports_bp.route('/reports/overview', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_overview_report():
     user_id = get_jwt_identity()
 
@@ -147,6 +149,7 @@ def get_overview_report():
 
 @reports_bp.route('/reports/investment-performance', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investment_performance_report():
     """
     Endpoint dedicado para o relatório avançado de investimentos.
@@ -250,6 +253,7 @@ def get_investment_performance_report():
 
 @reports_bp.route('/reports/goals-summary', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_goals_report():
     """
     Endpoint para fornecer um resumo e a lista de todas as metas do usuário.

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.extended import Investment, InvestmentTransaction
+from src.routes.user import active_user_required
 from src.models.db import db
 from sqlalchemy import func, case
 from datetime import datetime, timedelta # <-- ADICIONE O TIMEDELTA
@@ -118,6 +119,7 @@ def get_historical_stock_price(ticker, purchase_date):
 # Rota para buscar todos os investimentos (versão dinâmica com yfinance)
 @investments_bp.route('/investments', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investments():
     user_id = get_jwt_identity()
     investments = Investment.query.filter_by(user_id=user_id).all()
@@ -141,6 +143,7 @@ def get_investments():
 
 @investments_bp.route('/investments/<int:investment_id>', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investment_by_id(investment_id):
     user_id = get_jwt_identity()
     
@@ -186,6 +189,7 @@ def get_investment_by_id(investment_id):
 
 @investments_bp.route('/investments/<int:investment_id>/transactions', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investment_transactions(investment_id):
     user_id = get_jwt_identity()
 
@@ -204,6 +208,7 @@ def get_investment_transactions(investment_id):
 
 @investments_bp.route('/investments/<int:investment_id>/sell', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def sell_investment(investment_id):
     """
     Processa o resgate/venda de um investimento.
@@ -280,6 +285,7 @@ def sell_investment(investment_id):
 # Rota para criar um novo investimento (versão com cálculo de quantidade)
 @investments_bp.route('/investments', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_investment():
     user_id = get_jwt_identity()
     data = request.json
@@ -342,6 +348,7 @@ def create_investment():
 # Rota para atualizar um investimento (versão corrigida e flexível)
 @investments_bp.route('/investments/<int:investment_id>', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_investment(investment_id):
     user_id = get_jwt_identity()
     investment = Investment.query.filter_by(id=investment_id, user_id=user_id).first()
@@ -375,6 +382,7 @@ def update_investment(investment_id):
 # Rota para deletar um investimento (já estava ok)
 @investments_bp.route('/investments/<int:investment_id>', methods=['DELETE'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_investment(investment_id):
     user_id = get_jwt_identity()
     investment = Investment.query.filter_by(id=investment_id, user_id=user_id).first()
@@ -391,6 +399,7 @@ def delete_investment(investment_id):
 
 @investments_bp.route('/investments/analysis', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investment_analysis():
     """
     Endpoint para fornecer dados agregados para a aba de Análise.
@@ -437,6 +446,7 @@ def get_investment_analysis():
 # ▼▼▼ SUBSTITUA TODA A FUNÇÃO ANTERIOR POR ESTA ▼▼▼
 @investments_bp.route('/investments/portfolio-evolution', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_portfolio_evolution():
     # --- Interceptador para a requisição preflight de CORS ---
     if request.method == 'OPTIONS':
@@ -523,6 +533,7 @@ def fetch_multiple_tickers_info(tickers):
 
 @investments_bp.route('/investments/market-data', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_market_data():
     """
     Endpoint para buscar todos os dados necessários para a tela Home Broker.
@@ -622,6 +633,7 @@ def get_market_data():
 
 @investments_bp.route('/investments/ticker-details/<string:ticker_symbol>', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_ticker_details(ticker_symbol):
     """
     Busca os detalhes e o histórico de um ticker específico para o gráfico principal.

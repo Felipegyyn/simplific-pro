@@ -2,6 +2,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required
 from datetime import datetime, timedelta
+from src.routes.user import active_user_required
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, case
 from sqlalchemy import cast
@@ -13,6 +14,7 @@ financial_bp = Blueprint('financial', __name__)
 # Categories routes
 @financial_bp.route('/categories', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_categories():
     if request.method == 'OPTIONS':
         return '', 200
@@ -24,6 +26,7 @@ def get_categories():
 
 @financial_bp.route('/categories', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_category():
     user_id = get_jwt_identity()
     data = request.json
@@ -55,6 +58,7 @@ def create_category():
 # Planning routes
 @financial_bp.route('/planning', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_planning():
     user_id = get_jwt_identity()
 
@@ -117,6 +121,7 @@ def get_planning():
 
 @financial_bp.route('/planning', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_planning():
     user_id = get_jwt_identity()
     data = request.json
@@ -187,6 +192,7 @@ def create_planning():
 
 @financial_bp.route('/planning/<int:planning_id>', methods=['DELETE'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_planning(planning_id):
     user_id = get_jwt_identity()
     planning = Planning.query.filter_by(id=planning_id, user_id=user_id).first()
@@ -201,6 +207,7 @@ def delete_planning(planning_id):
 
 @financial_bp.route('/planning/<int:planning_id>', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_planning(planning_id):
     user_id = get_jwt_identity()
     planning = Planning.query.filter_by(id=planning_id, user_id=user_id).first()
@@ -225,6 +232,7 @@ def update_planning(planning_id):
 
 @financial_bp.route('/planning/<int:planning_id>/confirm', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def confirm_planning(planning_id):
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -264,6 +272,7 @@ def confirm_planning(planning_id):
 
 @financial_bp.route('/planning/<int:planning_id>', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_planning_by_id(planning_id):
     user_id = get_jwt_identity()
     planning = Planning.query.filter_by(id=planning_id, user_id=user_id).first()
@@ -278,6 +287,7 @@ def get_planning_by_id(planning_id):
 
 @financial_bp.route('/planning/<int:planning_id>/to-transaction', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def planning_to_transaction(planning_id):
     user_id = get_jwt_identity()
     planning = Planning.query.filter_by(id=planning_id, user_id=user_id).first()
@@ -306,6 +316,7 @@ def planning_to_transaction(planning_id):
 # Transactions routes
 @financial_bp.route('/transactions', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_transactions():
     user_id = get_jwt_identity()
     ano = request.args.get('ano')
@@ -373,6 +384,7 @@ def get_transactions():
 
 @financial_bp.route('/transactions', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_transaction():
     user_id = get_jwt_identity()
     data = request.json
@@ -498,6 +510,7 @@ def update_transaction(transaction_id):
 
 @financial_bp.route('/transactions/<int:transaction_id>/pay', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def pay_transaction(transaction_id):
     user_id = get_jwt_identity()
     transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
@@ -566,6 +579,7 @@ from sqlalchemy import func, extract
 
 @financial_bp.route('/reports/planned_vs_realized', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_planned_vs_realized_report():
     user_id = get_jwt_identity()
 
@@ -625,6 +639,7 @@ def get_planned_vs_realized_report():
 
 @financial_bp.route('/reports/dashboard_summary', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_dashboard_summary():
     user_id = get_jwt_identity()
 

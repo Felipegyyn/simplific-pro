@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
+from src.routes.user import active_user_required
 from src.services.goals_service import add_value_to_goal
 from src.models.db import db
 from src.models.extended import Goal
@@ -9,6 +10,7 @@ goals_bp = Blueprint('goals', __name__)
 
 @goals_bp.route('/goals', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_goals():
     user_id = get_jwt_identity()
     goals = Goal.query.filter_by(user_id=user_id).all()
@@ -16,6 +18,7 @@ def get_goals():
 
 @goals_bp.route('/goals', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_goal():
     user_id = get_jwt_identity()
     data = request.json
@@ -63,6 +66,7 @@ def create_goal():
 
 @goals_bp.route('/goals/<int:goal_id>', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_goal(goal_id):
     user_id = get_jwt_identity()
     
@@ -108,6 +112,7 @@ def update_goal(goal_id):
 # ▼▼▼ ADICIONE ESTA NOVA ROTA ABAIXO ▼▼▼
 @goals_bp.route('/goals/<int:goal_id>/contribute', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def contribute_to_goal(goal_id):
     """
     Rota específica para adicionar um valor a uma meta.
@@ -133,6 +138,7 @@ def contribute_to_goal(goal_id):
 
 @goals_bp.route('/goals/<int:goal_id>', methods=['DELETE'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_goal(goal_id):
     user_id = get_jwt_identity()
     goal = Goal.query.filter_by(id=goal_id, user_id=user_id).first()

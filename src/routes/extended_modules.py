@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import User
 from src.models.db import db
 from src.models.financial import Category
+from src.routes.user import active_user_required
 from src.models.extended_modules import CreditCard, CreditCardTransaction, Goal, GoalContribution, Investment, ScheduleItem
 from datetime import datetime, date, time
 from dateutil.relativedelta import relativedelta
@@ -13,6 +14,7 @@ extended_bp = Blueprint('extended', __name__)
 
 @extended_bp.route('/api/credit-cards', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_credit_cards():
     try:
         user_id = get_jwt_identity()
@@ -23,6 +25,7 @@ def get_credit_cards():
 
 @extended_bp.route('/api/credit-cards', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_credit_card():
     try:
         user_id = get_jwt_identity()
@@ -57,6 +60,7 @@ def create_credit_card():
 
 @extended_bp.route('/api/credit-cards/<int:card_id>/balance', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_card_balance(card_id):
     try:
         user_id = get_jwt_identity()
@@ -91,6 +95,7 @@ def get_card_balance(card_id):
 
 @extended_bp.route('/api/goals', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_goals():
     try:
         user_id = get_jwt_identity()
@@ -109,6 +114,7 @@ def get_goals():
 
 @extended_bp.route('/api/goals', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_goal():
     try:
         user_id = get_jwt_identity()
@@ -143,6 +149,7 @@ def create_goal():
 
 @extended_bp.route('/api/goals/<int:goal_id>/contributions', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def add_goal_contribution(goal_id):
     try:
         user_id = get_jwt_identity()
@@ -177,6 +184,7 @@ def add_goal_contribution(goal_id):
 
 @extended_bp.route('/api/investments', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investments():
     try:
         user_id = get_jwt_identity()
@@ -195,6 +203,7 @@ def get_investments():
 
 @extended_bp.route('/api/investments', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_investment():
     try:
         user_id = get_jwt_identity()
@@ -229,6 +238,7 @@ def create_investment():
 
 @extended_bp.route('/api/investments/summary', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_investments_summary():
     try:
         user_id = get_jwt_identity()
@@ -268,6 +278,7 @@ def get_investments_summary():
 
 @extended_bp.route('/api/schedule', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_schedule_items():
     try:
         user_id = get_jwt_identity()
@@ -294,6 +305,7 @@ def get_schedule_items():
 
 @extended_bp.route('/api/schedule', methods=['POST'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_schedule_item():
     try:
         user_id = get_jwt_identity()
@@ -335,6 +347,7 @@ def create_schedule_item():
 
 @extended_bp.route('/api/schedule/<int:item_id>/complete', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def complete_schedule_item(item_id):
     try:
         user_id = get_jwt_identity()
@@ -355,6 +368,7 @@ def complete_schedule_item(item_id):
 
 @extended_bp.route('/api/dashboard/summary', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_dashboard_summary():
     try:
         user_id = get_jwt_identity()

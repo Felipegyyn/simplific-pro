@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from functools import wraps # <-- ADICIONE ESTA LINHA
 from flask_jwt_extended import (
     JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 )
@@ -6,6 +7,19 @@ from datetime import datetime, timedelta
 from src.models.user import User, db
 
 user_bp = Blueprint('user', __name__)
+
+# ▼▼▼ DECORADOR DE VERIFICAÇÃO DE USUÁRIO ATIVO ▼▼▼
+def active_user_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if user and user.status == 'ativo':
+            return fn(*args, **kwargs)
+        else:
+            return jsonify({"error": "Acesso não autorizado. Sua conta está inativa."}), 403
+    return wrapper
+# ▲▲▲ FIM DO DECORADOR ▲▲▲
 
 # === AUTH ROUTES ===
 
@@ -25,6 +39,12 @@ def login():
     
     if not user or not user.check_password(password):
         return jsonify({'error': 'Email ou senha inválidos'}), 401
+
+    # ▼▼▼ ADICIONE ESTE BLOCO DE CÓDIGO AQUI ▼▼▼
+    # Verificação de status do usuário
+    if user.status != 'ativo':
+         jsonify({'error': 'Esta conta de usuário está inativa ou bloqueada.'}), 403
+    
     
     # Update last login
     user.last_login = datetime.utcnow()
@@ -60,6 +80,7 @@ def refresh_token():
 
 @user_bp.route('/auth/me', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_current_user():
     if request.method == 'OPTIONS':
         return '', 200
@@ -76,6 +97,7 @@ def get_current_user():
 
 @user_bp.route('/auth/change-password', methods=['POST']) # <-- CORREÇÃO 1: A URL agora está correta
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def change_password():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
@@ -106,6 +128,7 @@ def change_password():
 
 @user_bp.route('/admin/users', methods=['GET', 'POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def manage_users():
     if request.method == 'OPTIONS':
         return '', 200
@@ -157,33 +180,37 @@ def manage_users():
         return jsonify(new_user.to_dict()), 201
 
 
-@user_bp.route('/admin/users/<int:user_id>', methods=['DELETE', 'OPTIONS'])
+@user_bp.route('/admin/users/<int:user_id>/status', methods=['PUT'])
 @jwt_required()
-def delete_user(user_id):
-    if request.method == 'OPTIONS':
-        return '', 200
-
+@active_user_required # <-- TRAVA APLICADA
+def update_user_status(user_id):
     admin_id = get_jwt_identity()
     admin = User.query.get(admin_id)
-    
+
     if not admin or admin.profile != 'admin':
         return jsonify({'error': 'Acesso negado'}), 403
-    
+
     user = User.query.get_or_404(user_id)
-    
-    # Prevent admin from deleting themselves
+
     if user.id == admin.id:
-        return jsonify({'error': 'Não é possível excluir sua própria conta'}), 400
-    
-    db.session.delete(user)
+        return jsonify({'error': 'Não é possível alterar o status da sua própria conta'}), 400
+
+    data = request.json
+    new_status = data.get('status')
+
+    if new_status not in ['ativo', 'inativo', 'bloqueado']:
+        return jsonify({'error': "Status inválido. Use 'ativo', 'inativo' ou 'bloqueado'."}), 400
+
+    user.status = new_status
     db.session.commit()
-    
-    return '', 204
+
+    return jsonify(user.to_dict())
 
 # === TEST ROUTE ===
 
 @user_bp.route('/auth/test_identity', methods=['GET'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def test_identity():
     user_id = get_jwt_identity()
     return jsonify({'user_id': user_id})
@@ -191,6 +218,7 @@ def test_identity():
 
 @user_bp.route('/profile', methods=['GET', 'PUT', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def manage_profile():
     # A requisição OPTIONS (preflight) será tratada automaticamente pelo Flask-CORS
     # se a rota estiver configurada com 'OPTIONS' no methods.
@@ -224,6 +252,7 @@ def manage_profile():
 # ▼▼▼ COLE TODO ESTE BLOCO NO FINAL DO ARQUIVO ▼▼▼
 @user_bp.route('/user/preference', methods=['PUT'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def update_user_preference():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)

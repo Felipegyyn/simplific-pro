@@ -4,6 +4,7 @@ from datetime import datetime
 from src.models.user import User
 from src.models.db import db
 from src.models.financial import Category
+from src.routes.user import active_user_required
 from src.models.extended import Goal, ScheduleEvent
 from src.models.extended_modules import CreditCard, CreditCardTransaction
 
@@ -14,6 +15,7 @@ extended_bp = Blueprint('extended', __name__)
 
 @extended_bp.route('/goals', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_goals():
     user_id = get_jwt_identity()
     goals = Goal.query.filter_by(user_id=user_id).all()
@@ -21,6 +23,7 @@ def get_goals():
 
 @extended_bp.route('/goals', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_goal():
     user_id = get_jwt_identity()
     data = request.json
@@ -56,6 +59,7 @@ def create_goal():
 
 @extended_bp.route('/goals/<int:goal_id>', methods=['DELETE', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_goal(goal_id):
     user_id = get_jwt_identity()
     goal = Goal.query.filter_by(id=goal_id, user_id=user_id).first()
@@ -72,6 +76,7 @@ def delete_goal(goal_id):
 
 @extended_bp.route('/credit-cards', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_credit_cards():
     user_id = get_jwt_identity()
     cards = CreditCard.query.filter_by(user_id=user_id).all()
@@ -79,6 +84,7 @@ def get_credit_cards():
 
 @extended_bp.route('/credit-cards', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_credit_card():
     user_id = get_jwt_identity()
     data = request.json
@@ -115,6 +121,7 @@ def create_credit_card():
 
 @extended_bp.route('/credit-cards/<int:card_id>', methods=['DELETE', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_credit_card(card_id):
     user_id = get_jwt_identity()
     card = CreditCard.query.filter_by(id=card_id, user_id=user_id).first()
@@ -131,6 +138,7 @@ def delete_credit_card(card_id):
 
 @extended_bp.route('/credit-cards/<int:card_id>/transactions', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_credit_card_transactions(card_id):
     if request.method == 'OPTIONS':
         return '', 200
@@ -145,6 +153,7 @@ def get_credit_card_transactions(card_id):
 
 @extended_bp.route('/credit-cards/<int:card_id>/transactions', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_credit_card_transaction(card_id):
     if request.method == 'OPTIONS':
         return '', 200
@@ -195,6 +204,7 @@ def create_credit_card_transaction(card_id):
 
 @extended_bp.route('/schedule', methods=['GET', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def get_schedule_events():
     user_id = get_jwt_identity()
     events = ScheduleEvent.query.filter_by(user_id=user_id).order_by(ScheduleEvent.date.asc()).all()
@@ -202,6 +212,7 @@ def get_schedule_events():
 
 @extended_bp.route('/schedule', methods=['POST', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def create_schedule_event():
     user_id = get_jwt_identity()
     data = request.json
@@ -239,6 +250,7 @@ def create_schedule_event():
 
 @extended_bp.route('/schedule/<int:event_id>', methods=['DELETE', 'OPTIONS'])
 @jwt_required()
+@active_user_required # <-- TRAVA APLICADA
 def delete_schedule_event(event_id):
     user_id = get_jwt_identity()
     event = ScheduleEvent.query.filter_by(id=event_id, user_id=user_id).first()

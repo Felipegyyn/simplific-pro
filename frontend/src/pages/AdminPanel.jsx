@@ -112,19 +112,28 @@ const AdminPanel = ({ user, onLogout }) => {
     }
   };
   
-  // Funções de exclusão e edição (ajustar para chamar API no futuro)
-  const excluirUsuario = async (usuario) => {
-    if (confirm(`Tem certeza que deseja excluir o usuário ${usuario.name}?`)) {
-      try {
-        await apiService.delete(`/api/admin/users/${usuario.id}`);
-        alert('Usuário excluído com sucesso!');
-        fetchUsers();
-      } catch (error) {
-        console.error("Erro ao excluir usuário:", error);
-        alert(`Erro ao excluir usuário: ${error.response?.data?.error || 'Tente novamente.'}`);
-      }
-    }
-  };
+ // Dentro do AdminPanel.jsx
+
+  // ▼▼▼ COLE ESTA NOVA FUNÇÃO AQUI ▼▼▼
+  const toggleUserStatus = async (usuario) => {
+    // Determina qual será o novo status e a mensagem de confirmação
+    const newStatus = usuario.status === 'ativo' ? 'inativo' : 'ativo';
+    const actionText = newStatus === 'ativo' ? 'reativar' : 'inativar';
+
+    if (confirm(`Tem certeza que deseja ${actionText} o usuário ${usuario.name}?`)) {
+      try {
+        // Chama a nova rota da API que criamos no backend
+        await apiService.put(`/api/admin/users/${usuario.id}/status`, {
+          status: newStatus
+        });
+        alert(`Usuário ${actionText} com sucesso!`);
+        fetchUsers(); // Atualiza a lista para refletir a mudança
+      } catch (error) {
+        console.error(`Erro ao ${actionText} usuário:`, error);
+        alert(`Erro ao ${actionText} usuário: ${error.response?.data?.error || 'Tente novamente.'}`);
+      }
+    }
+  };
 
   const getPerfilBadge = (perfil) => {
     const colors = {
@@ -133,6 +142,16 @@ const AdminPanel = ({ user, onLogout }) => {
     };
     return <Badge className={colors[perfil] || 'bg-gray-100 text-gray-800'}>{perfil}</Badge>;
   };
+
+// ▼▼▼ ADICIONE ESTA FUNÇÃO AQUI ▼▼▼
+  const getStatusBadge = (status) => {
+    const isActive = status === 'ativo';
+    const colors = isActive
+      ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+      : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-300';
+    return <Badge className={colors}>{isActive ? 'Ativo' : 'Inativo'}</Badge>;
+  };
+  // ▲▲▲ FIM DA FUNÇÃO ▲▲▲
 
   const formatarData = (dataString) => {
     if (!dataString) return 'Nunca';
@@ -294,6 +313,7 @@ const AdminPanel = ({ user, onLogout }) => {
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="text-lg font-semibold dark:text-gray-100">{u.name}</h3>
                           {getPerfilBadge(u.profile)}
+                          {getStatusBadge(u.status)}
                         </div>
                          <p className="text-gray-600 dark:text-gray-400 mb-3">{u.email}</p>
                         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -308,10 +328,18 @@ const AdminPanel = ({ user, onLogout }) => {
                         </div>
                       </div>
                       <div className="flex space-x-2 self-start sm:self-center mt-4 sm:mt-0 sm:ml-4">
-                        {/* Botões de editar e status podem ser implementados no futuro */}
-                        <Button variant="outline" size="sm" onClick={() => excluirUsuario(u)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {/* Botão inteligente para Ativar ou Inativar */}
+                        {u.id !== user.id && ( // Impede que o admin se auto-inactive
+                          u.status === 'ativo' ? (
+                            <Button variant="outline" size="sm" title="Inativar Usuário" onClick={() => toggleUserStatus(u)}>
+                              <UserX className="h-4 w-4 text-red-500" />
+                          </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" title="Ativar Usuário" onClick={() => toggleUserStatus(u)}>
+                          <UserCheck className="h-4 w-4 text-green-500" />
+                          </Button>
+                          )
+                        )}
                       </div>
                     </div>
                   </CardContent>
