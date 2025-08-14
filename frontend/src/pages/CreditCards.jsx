@@ -15,22 +15,6 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/LOGO.png';
-import afinzLogo from '../assets/card-logos/afinz.png';
-import bradescoLogo from '../assets/card-logos/bradesco.png';
-import c6Logo from '../assets/card-logos/c6.png';
-import digioLogo from '../assets/card-logos/digio.png';
-import DMLogo from '../assets/card-logos/DM.png';
-import interLogo from '../assets/card-logos/inter.png';
-import itauLogo from '../assets/card-logos/itau.png';
-import mercadoLogo from '../assets/card-logos/mercado.png';
-import neonLogo from '../assets/card-logos/neon.png';
-import nubankLogo from '../assets/card-logos/nubank.png';
-import PicpayLogo from '../assets/card-logos/Picpay.png';
-import santanderLogo from '../assets/card-logos/santander.png';
-import sicoobLogo from '../assets/card-logos/sicoob.png';
-import sicrediLogo from '../assets/card-logos/sicredi.png';
-import willLogo from '../assets/card-logos/will.png';
-import defaultCardLogo from '../assets/card-logos/default.png';
 
 const CreditCards = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -46,30 +30,6 @@ const CreditCards = ({ user, onLogout }) => {
     return localDate.toLocaleDateString('pt-BR');
   };
   // ▲▲▲ FIM DA FUNÇÃO ▲▲▲
-
-  // ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO AQUI ▼▼▼
-const getCardLogo = (cardName) => {
-  if (!cardName) return defaultCardLogo;
-  const name = cardName.toLowerCase();
-
-  if (name.includes('afinz')) return afinzLogo;
-  if (name.includes('itau') || name.includes('itau')) return itauLogo;
-  if (name.includes('bradesco')) return bradescoLogo;
-  if (name.includes('inter')) return interLogo;
-  if (name.includes('c6')) return c6Logo;
-  if (name.includes('santander')) return santanderLogo;
-  if (name.includes('digio')) return digioLogo;
-  if (name.includes('DM')) return DMLogo;
-  if (name.includes('mercado')) return mercadoLogo;
-  if (name.includes('neon')) return neonLogo;
-  if (name.includes('nubank')) return nubankLogo;
-  if (name.includes('Picpay')) return PicpayLogo;
-  if (name.includes('sicoob')) return sicoobLogo;
-  if (name.includes('sicredi')) return sicrediLogo;
-  if (name.includes('will')) return willLogo;
-
-  return defaultCardLogo; // Retorna um logo padrão se não encontrar
-};
   
   // Estados para cartões e modal
   const [cartoes, setCartoes] = useState([]);
@@ -683,14 +643,6 @@ const carregarFaturas = async (listaDeCartoes) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {Array.isArray(cartoes) && cartoes.map((cartao) => (
   <Card key={cartao.id} className="overflow-hidden">
-    <div className="flex flex-col md:flex-row">
-      <div className="md:w-1/3 flex-shrink-0 bg-slate-800 flex items-center justify-center p-4">
-    <img
-      src={getCardLogo(cartao.nome)}
-      alt={cartao.nome}
-      className="w-full h-auto object-contain max-h-24 md:max-h-full"
-    />
-  </div>
     <CardContent className="p-6">
       <div className="flex justify-between items-start mb-4">
         <div>
@@ -775,7 +727,6 @@ const carregarFaturas = async (listaDeCartoes) => {
         );
       })()}
     </CardContent>
-    </div>
   </Card>
 ))}
               </div>
