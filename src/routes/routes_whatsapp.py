@@ -221,7 +221,7 @@ def executar_acao_simplific(user_id, acao, from_number):
             for t in transacoes:
                 # Adiciona um emoji para diferenciar entrada e saída
                 emoji = "🟢" if t['type'] == 'entrada' else "🔴"
-                resposta += f"{emoji} *{t['description']}*: {format_currency_brl(t['value'])}\n"
+                resposta += f"{emoji} {t['description']}: {format_currency_brl(t['value'])}\n"
 
             return resposta
 
