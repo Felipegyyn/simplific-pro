@@ -96,7 +96,12 @@ def processar_investimento_whatsapp(user_id, data_gemini):
         return {"status": "erro", "mensagem": "Não consegui identificar o nome do ativo. Tente novamente."}
 
     # 1. VALIDAÇÃO DO ATIVO COM YFINANCE
-    current_price = _get_stock_price(ticker)
+    try:
+        current_price = _get_stock_price(ticker)
+    except Exception as e:
+        print(f"Uma exceção ocorreu ao buscar o preço para {ticker}: {e}")
+        # Se qualquer erro ocorrer, consideramos que o ativo não foi encontrado
+        current_price = None
     
     # 2. FLUXO PARA ATIVOS VÁLIDOS (AÇÕES/FIIs)
     if current_price:
