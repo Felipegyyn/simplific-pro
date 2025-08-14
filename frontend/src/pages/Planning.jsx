@@ -956,7 +956,7 @@ useEffect(() => {
 
 </div>
 
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {planejamentos.map((plan) => (
                   <Card key={plan.id} className="relative">
                     <CardContent className="p-6">
