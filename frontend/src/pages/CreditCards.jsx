@@ -29,7 +29,7 @@ import PicpayLogo from '../assets/card-logos/Picpay.png';
 import santanderLogo from '../assets/card-logos/santander.png';
 import sicoobLogo from '../assets/card-logos/sicoob.png';
 import sicrediLogo from '../assets/card-logos/sicredi.png';
-import willcoLogo from '../assets/card-logos/will.png';
+import willLogo from '../assets/card-logos/will.png';
 import defaultCardLogo from '../assets/card-logos/default.png';
 
 const CreditCards = ({ user, onLogout }) => {
