@@ -96,7 +96,8 @@ def receive_message():
     # DECISÃO: A resposta será em áudio SE...
     # 1. A mensagem original VEIO como áudio (contexto manda), OU
     # 2. A preferência do usuário no banco de dados está marcada como 'audio'.
-    if is_incoming_audio or (usuario and usuario.preferred_response_format == 'audio'):
+    if (usuario and usuario.preferred_response_format == 'audio') or \
+        (is_incoming_audio and (not usuario or usuario.preferred_response_format != 'text')):
         print("Decisão: Gerar resposta em áudio.")
         nome_arquivo = texto_para_audio(resposta_em_texto)
         if nome_arquivo:
