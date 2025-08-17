@@ -39,33 +39,31 @@ def preparar_texto_para_ssml(texto: str) -> str:
     
     return ssml
 
+# Dentro de src/services/tts_service.py
+
 def texto_para_audio(texto_para_falar: str) -> str:
     """
     Converte uma string de texto em um arquivo de áudio MP3,
-    usando SSML para uma fala mais natural.
+    usando SSML e preparado para capturar erros detalhados da API.
     """
     try:
-        # 1. PREPARA O TEXTO USANDO NOSSA NOVA FUNÇÃO
+        # Garante que a voz Studio esteja selecionada para o teste
+        voice_name_to_test = "pt-BR-Studio-B"
+
         ssml_input = preparar_texto_para_ssml(texto_para_falar)
-
         client = texttospeech.TextToSpeechClient()
-
-        # 2. A SÍNTESE AGORA É BASEADA EM SSML, NÃO EM TEXTO PURO
         synthesis_input = texttospeech.SynthesisInput(ssml=ssml_input)
 
-        # 3. SELECIONA UMA VOZ "WAVENET" (QUALIDADE PREMIUM)
-        # A voz 'pt-BR-Wavenet-C' é uma voz feminina de alta qualidade.
-        # Experimente também 'A', 'B' (masculina) e 'D' (masculina) para ver qual agrada mais.
         voice = texttospeech.VoiceSelectionParams(
             language_code="pt-BR",
-            name="pt-BR-Wavenet-D" 
+            name=voice_name_to_test
         )
 
         audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.MP3
         )
 
-        print(f"Enviando SSML para a API TTS: '{ssml_input}'")
+        print(f"Enviando SSML para a API TTS com a voz '{voice_name_to_test}': '{ssml_input}'")
         response = client.synthesize_speech(
             input=synthesis_input, voice=voice, audio_config=audio_config
         )
@@ -81,6 +79,15 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         return nome_arquivo
 
+    # ▼▼▼ BLOCO DE CAPTURA DE ERRO APRIMORADO ▼▼▼
     except Exception as e:
-        print(f"ERRO CRÍTICO ao gerar áudio: {e}")
+        # Imprime a mensagem de erro completa e detalhada que a biblioteca do Google nos fornece.
+        # Esta é a informação que precisamos.
+        print("--- ERRO DETALHADO DA API DO GOOGLE ---")
+        print(e)
+        print("-----------------------------------------")
+
+        # Mantém o log de erro crítico para o sistema
+        print(f"ERRO CRÍTICO ao gerar áudio com Google: {e}")
         return None
+    # ▲▲▲ FIM DO BLOCO ▲▲▲
