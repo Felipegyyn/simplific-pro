@@ -41,14 +41,17 @@ def preparar_texto_para_ssml(texto: str) -> str:
 
 # Dentro de src/services/tts_service.py
 
+# Em src/services/tts_service.py
+# SUBSTITUA A FUNÇÃO texto_para_audio por esta versão final
+
 def texto_para_audio(texto_para_falar: str) -> str:
     """
     Converte uma string de texto em um arquivo de áudio MP3,
-    usando SSML e preparado para capturar erros detalhados da API.
+    usando SSML e a melhor voz WaveNet disponível.
     """
     try:
-        # Garante que a voz Studio esteja selecionada para o teste
-        voice_name_to_test = "pt-BR-Studio-B"
+        # Usaremos a voz 'pt-BR-Wavenet-D', uma voz masculina de alta qualidade.
+        voice_name = "pt-BR-Wavenet-D" 
 
         ssml_input = preparar_texto_para_ssml(texto_para_falar)
         client = texttospeech.TextToSpeechClient()
@@ -56,14 +59,14 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         voice = texttospeech.VoiceSelectionParams(
             language_code="pt-BR",
-            name=voice_name_to_test
+            name=voice_name
         )
 
         audio_config = texttospeech.AudioConfig(
             audio_encoding=texttospeech.AudioEncoding.MP3
         )
 
-        print(f"Enviando SSML para a API TTS com a voz '{voice_name_to_test}': '{ssml_input}'")
+        print(f"Enviando SSML para a API TTS com a voz '{voice_name}': '{ssml_input}'")
         response = client.synthesize_speech(
             input=synthesis_input, voice=voice, audio_config=audio_config
         )
@@ -78,16 +81,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
             print(f"Arquivo de áudio salvo em: {caminho_completo}")
 
         return nome_arquivo
-
-    # ▼▼▼ BLOCO DE CAPTURA DE ERRO APRIMORADO ▼▼▼
     except Exception as e:
-        # Imprime a mensagem de erro completa e detalhada que a biblioteca do Google nos fornece.
-        # Esta é a informação que precisamos.
-        print("--- ERRO DETALHADO DA API DO GOOGLE ---")
-        print(e)
-        print("-----------------------------------------")
-
-        # Mantém o log de erro crítico para o sistema
+        # Mantém a captura de erro para o fallback funcionar
         print(f"ERRO CRÍTICO ao gerar áudio com Google: {e}")
         return None
-    # ▲▲▲ FIM DO BLOCO ▲▲▲
