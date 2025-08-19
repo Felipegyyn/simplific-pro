@@ -89,16 +89,25 @@ def receive_message():
         else:
             resposta_em_texto = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
 
-    # --- ORQUESTRADOR DE RESPOSTA (TEXTO OU ÁUDIO) ---
-    # 2. Com a resposta em texto em mãos, decidimos como enviá-la.
+    # --- ORQUESTRADOR DE RESPOSTA HÍBRIDO - LÓGICA FINAL E ROBUSTA ---
     resp = MessagingResponse()
+    send_as_audio = False  # Começamos assumindo que a resposta será em texto.
 
-    # DECISÃO: A resposta será em áudio SE...
-    # 1. A mensagem original VEIO como áudio (contexto manda), OU
-    # 2. A preferência do usuário no banco de dados está marcada como 'audio'.
-    if (usuario and usuario.preferred_response_format == 'audio') or \
-        (is_incoming_audio and (not usuario or usuario.preferred_response_format != 'text')):
-        print("Decisão: Gerar resposta em áudio.")
+    if usuario and usuario.preferred_response_format == 'audio':
+        # REGRA 1 (PRIORIDADE MÁXIMA): O usuário pediu áudio? Então será áudio.
+        print("Decisão: Enviar áudio (Preferência do usuário).")
+        send_as_audio = True
+    elif usuario and usuario.preferred_response_format == 'text':
+        # REGRA 2 (SEGUNDA PRIORIDADE): O usuário pediu texto? Então será texto. Fim de papo.
+        print("Decisão: Enviar texto (Preferência do usuário).")
+        send_as_audio = False
+    else:
+        # REGRA 3 (PADRÃO): O usuário não tem preferência. Então, espelhamos o formato.
+        print("Decisão: Sem preferência definida. Espelhando o formato da mensagem de entrada.")
+        send_as_audio = is_incoming_audio
+
+    # Agora, com a decisão tomada, executamos a ação
+    if send_as_audio:
         nome_arquivo = texto_para_audio(resposta_em_texto)
         if nome_arquivo:
             base_url = os.getenv('BASE_URL')
@@ -108,10 +117,8 @@ def receive_message():
         else:
             # Fallback para texto se a geração de áudio falhar
             resp.message("Tive um problema para gerar o áudio, mas aqui está a resposta em texto: " + resposta_em_texto)
-    
     else:
-        # Caso contrário, a resposta VAI como texto.
-        print("Decisão: Enviar resposta em texto.")
+        # Envia a resposta em texto
         resp.message(resposta_em_texto)
 
     return str(resp)
