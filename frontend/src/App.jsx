@@ -14,6 +14,7 @@ import Schedule from './pages/Schedule';
 import AdminPanel from './pages/AdminPanel';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings'; // <-- ADICIONE ESTA LINHA
+import Analysis from './pages/Analysis'; // <-- ADICIONE ESTA LINHA
 import MainLayout from './components/MainLayout'; 
 import { Outlet } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext'; 
@@ -129,6 +130,7 @@ return (
                 <Route path="/goals" element={<Goals user={user} onLogout={handleLogout} />} />
                 <Route path="/investments" element={<Investments user={user} onLogout={handleLogout} />} />
                 <Route path="/schedule" element={<Schedule user={user} onLogout={handleLogout} />} />
+                <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
                 // Para este bloco:
                 <Route 
                 path="/admin" 
