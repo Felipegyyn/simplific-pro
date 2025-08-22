@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   TrendingUp, TrendingDown, DollarSign, Plus, Edit, Trash2, 
-  PieChart, BarChart3, LogOut, ArrowLeft, Eye
+  PieChart, BarChart3, LogOut, ArrowLeft, Eye, Calculator
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { useNavigate } from 'react-router-dom';
@@ -52,6 +52,17 @@ const [analysisData, setAnalysisData] = useState(null);
     expected_monthly_yield: '',
     quantity: '1'
   });
+
+// ▼▼▼ ADICIONE ESTE BLOCO DE ESTADOS ▼▼▼
+const [calculatorForm, setCalculatorForm] = useState({
+  initialAmount: '',
+  monthlyContribution: '',
+  annualRate: '',
+  periodYears: ''
+});
+const [calculatorResult, setCalculatorResult] = useState(null);
+const [isCalculating, setIsCalculating] = useState(false);
+// ▲▲▲ FIM DO BLOCO ▲▲▲
 
   // Carregar investimentos da API
   useEffect(() => {
@@ -204,6 +215,33 @@ useEffect(() => {
     setSelectedInvestmentId(investmentId);
     setIsDetailModalOpen(true);
   };
+
+  // Em Investments.jsx, adicione estas duas funções
+
+const handleCalculatorChange = (e) => {
+  const { name, value } = e.target;
+  setCalculatorForm(prev => ({ ...prev, [name]: value }));
+};
+
+const handleCalculate = async (e) => {
+  e.preventDefault();
+  setIsCalculating(true);
+  setCalculatorResult(null);
+  try {
+    const response = await apiService.post('/api/investments/calculate-projection', {
+      initialAmount: parseFloat(calculatorForm.initialAmount) || 0,
+      monthlyContribution: parseFloat(calculatorForm.monthlyContribution) || 0,
+      annualRate: parseFloat(calculatorForm.annualRate) || 0,
+      periodYears: parseInt(calculatorForm.periodYears) || 0
+    });
+    setCalculatorResult(response);
+  } catch (error) {
+    console.error("Erro ao calcular projeção:", error);
+    alert(error.response?.data?.error || "Erro ao calcular. Verifique os valores.");
+  } finally {
+    setIsCalculating(false);
+  }
+};
   
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -441,6 +479,7 @@ useEffect(() => {
                <TabsTrigger value="home-broker">Home Broker</TabsTrigger> 
               <TabsTrigger value="performance">Performance</TabsTrigger>
               <TabsTrigger value="analise">Análise</TabsTrigger>
+              <TabsTrigger value="calculadora">Calculadora</TabsTrigger>
             </TabsList>
 
             {/* ADICIONE ESTE NOVO BLOCO DE CONTEÚDO */}
@@ -877,6 +916,92 @@ useEffect(() => {
       </CardContent>
     </Card>
   </div>
+</TabsContent>
+
+{/* calculadora de investimentos*/}
+
+<TabsContent value="calculadora" className="space-y-6">
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex items-center">
+        <Calculator className="h-6 w-6 mr-2" />
+        Calculadora da Independência Financeira
+      </CardTitle>
+      <p className="text-gray-600 dark:text-gray-400 pt-2">
+        Simule o crescimento dos seus investimentos ao longo do tempo com aportes mensais.
+      </p>
+    </CardHeader>
+    <CardContent>
+    {/* Em Investments.jsx, dentro do <CardContent> da calculadora */}
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+  {/* Coluna do Formulário */}
+  <form onSubmit={handleCalculate} className="md:col-span-1 space-y-4">
+    <div>
+      <Label htmlFor="initialAmount">Aporte Inicial (R$)</Label>
+      <Input id="initialAmount" name="initialAmount" type="number" step="0.01" value={calculatorForm.initialAmount} onChange={handleCalculatorChange} placeholder="1000.00" />
+    </div>
+    <div>
+      <Label htmlFor="monthlyContribution">Aportes Mensais (R$)</Label>
+      <Input id="monthlyContribution" name="monthlyContribution" type="number" step="0.01" value={calculatorForm.monthlyContribution} onChange={handleCalculatorChange} placeholder="500.00" />
+    </div>
+    <div>
+      <Label htmlFor="annualRate">Rentabilidade Anual (%)</Label>
+      <Input id="annualRate" name="annualRate" type="number" step="0.01" value={calculatorForm.annualRate} onChange={handleCalculatorChange} placeholder="8.5" />
+    </div>
+    <div>
+      <Label htmlFor="periodYears">Período (anos)</Label>
+      <Input id="periodYears" name="periodYears" type="number" value={calculatorForm.periodYears} onChange={handleCalculatorChange} placeholder="10" />
+    </div>
+    <Button type="submit" className="w-full" disabled={isCalculating}>
+      {isCalculating ? 'Calculando...' : 'Calcular Projeção'}
+    </Button>
+  </form>
+
+  {/* Coluna de Resultados */}
+  <div className="md:col-span-2">
+    {calculatorResult ? (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="text-center">
+            <CardHeader><CardTitle>Valor Acumulado</CardTitle></CardHeader>
+            <CardContent><p className="text-2xl font-bold text-green-600">{formatCurrency(calculatorResult.summary.final_amount)}</p></CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardHeader><CardTitle>Total Investido</CardTitle></CardHeader>
+            <CardContent><p className="text-2xl font-bold text-blue-600">{formatCurrency(calculatorResult.summary.total_invested)}</p></CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardHeader><CardTitle>Total em Juros</CardTitle></CardHeader>
+            <CardContent><p className="text-2xl font-bold text-purple-600">{formatCurrency(calculatorResult.summary.total_gains)}</p></CardContent>
+          </Card>
+           <Card className="text-center">
+            <CardHeader><CardTitle>Período</CardTitle></CardHeader>
+            <CardContent><p className="text-2xl font-bold">{calculatorResult.summary.period_years} anos</p></CardContent>
+          </Card>
+        </div>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={calculatorResult.projection}>
+              <CartesianGrid stroke="hsl(var(--border))" />
+              <XAxis dataKey="year" unit=" anos" />
+              <YAxis tickFormatter={(value) => `R$${(value/1000).toFixed(0)}k`} />
+              <Tooltip formatter={(value) => [formatCurrency(value), 'Valor Acumulado']} />
+              <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    ) : (
+      <div className="flex items-center justify-center h-full bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+        <p className="text-gray-500">Preencha os dados e clique em "Calcular" para ver a simulação.</p>
+      </div>
+    )}
+  </div>
+</div>
+      {/* Esta parte será adicionada no próximo passo */}
+    </CardContent>
+  </Card>
 </TabsContent>
           </Tabs>
           {/* ▼▼▼ ADICIONE A CHAMADA PARA O NOVO MODAL AQUI ▼▼▼ */}

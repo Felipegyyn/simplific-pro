@@ -666,3 +666,63 @@ def get_ticker_details(ticker_symbol):
     except Exception as e:
         print(f"Erro ao buscar detalhes do ticker {ticker_symbol}: {e}")
         return jsonify({'error': 'Erro interno ao buscar dados do ativo.'}), 500
+
+#calculadora de investimentos
+
+@investments_bp.route('/investments/calculate-projection', methods=['POST'])
+@jwt_required()
+@active_user_required
+def calculate_investment_projection():
+    """
+    Calcula a projeção de juros compostos com base nos dados fornecidos pelo usuário.
+    Esta rota não interage com o banco de dados, apenas realiza o cálculo.
+    """
+    data = request.json
+    
+    try:
+        initial_amount = float(data.get('initialAmount', 0))
+        monthly_contribution = float(data.get('monthlyContribution', 0))
+        # A rentabilidade vem como anual (ex: 8 para 8%), então dividimos por 100
+        annual_rate = float(data.get('annualRate', 0)) / 100
+        period_years = int(data.get('periodYears', 0))
+    except (ValueError, TypeError):
+        return jsonify({'error': 'Valores de entrada inválidos.'}), 400
+
+    if period_years <= 0:
+        return jsonify({'error': 'O período deve ser de pelo menos 1 ano.'}), 400
+
+    # Converte a taxa anual para mensal para o cálculo
+    monthly_rate = (1 + annual_rate) ** (1/12) - 1
+    total_months = period_years * 12
+    
+    projection_data = []
+    current_value = initial_amount
+
+    # Simula o crescimento mês a mês
+    for month in range(1, total_months + 1):
+        current_value += monthly_contribution
+        current_value *= (1 + monthly_rate)
+        
+        # Adiciona um ponto de dados a cada 12 meses (1 ano) para o gráfico
+        if month % 12 == 0:
+            year = month // 12
+            projection_data.append({
+                'year': year,
+                'value': round(current_value, 2)
+            })
+
+    # Calcula os totais para os cards de resumo
+    total_invested = initial_amount + (monthly_contribution * total_months)
+    total_gains = current_value - total_invested
+    
+    summary = {
+        'final_amount': round(current_value, 2),
+        'total_invested': round(total_invested, 2),
+        'total_gains': round(total_gains, 2),
+        'period_years': period_years
+    }
+
+    return jsonify({
+        'summary': summary,
+        'projection': projection_data
+    })
