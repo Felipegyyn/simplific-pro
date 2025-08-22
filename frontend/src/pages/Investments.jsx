@@ -17,6 +17,9 @@ import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
 import InvestmentDetailModal from './InvestmentDetailModal';
 import HomeBroker from '@/components/HomeBroker';
+const formatCurrency = (value) => {
+  return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
 
 const Investments = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -473,8 +476,8 @@ const handleCalculate = async (e) => {
             </Card>
           </div>
 
-          <Tabs defaultValue="carteira" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+            <Tabs defaultValue="carteira" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
               <TabsTrigger value="carteira">Carteira</TabsTrigger>
                <TabsTrigger value="home-broker">Home Broker</TabsTrigger> 
               <TabsTrigger value="performance">Performance</TabsTrigger>
