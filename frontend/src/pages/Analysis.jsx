@@ -83,33 +83,37 @@ const CashFlowReport = ({ data, isLoading }) => {
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="sticky left-0 bg-white dark:bg-slate-900">Categoria</TableHead>
-            {meses.map(mes => <TableHead key={mes} className="text-center">Planejado<br/>{mes}</TableHead>)}
-            {meses.map(mes => <TableHead key={`real-${mes}`} className="text-center">Realizado<br/>{mes}</TableHead>)}
-          </TableRow>
-        </TableHeader>
+  <TableRow>
+    <TableHead className="sticky left-0 bg-white dark:bg-slate-900 min-w-[150px]">Categoria</TableHead>
+    {meses.map(mes => (
+      <React.Fragment key={mes}>
+        <TableHead className="text-center">{`Planejado ${mes}`}</TableHead>
+        <TableHead className="text-center">{`Realizado ${mes}`}</TableHead>
+      </React.Fragment>
+    ))}
+  </TableRow>
+</TableHeader>
         <TableBody>
-          {data.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-semibold sticky left-0 bg-white dark:bg-slate-900">{row.category}</TableCell>
-              {row.monthly_data.map(month => (
-                <TableCell key={`${row.category}-plan-${month.month}`} className="text-center text-blue-600">
-                  {formatCurrency(month.planned)}
-                </TableCell>
-              ))}
-              {row.monthly_data.map(month => {
-                const diff = month.realized - month.planned;
-                const isOverBudget = diff > 0 && month.planned > 0;
-                return (
-                  <TableCell key={`${row.category}-real-${month.month}`} className={`text-center ${isOverBudget ? 'text-red-500 font-bold' : 'text-green-600'}`}>
-                    {formatCurrency(month.realized)}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
+  {data.map((row, index) => (
+    <TableRow key={index}>
+      <TableCell className="font-semibold sticky left-0 bg-white dark:bg-slate-900">{row.category}</TableCell>
+      {row.monthly_data.map(month => {
+        const diff = month.realized - month.planned;
+        const isOverBudget = diff > 0 && month.planned > 0;
+        return (
+          <React.Fragment key={`${row.category}-${month.month}`}>
+            <TableCell className="text-center text-blue-600">
+              {formatCurrency(month.planned)}
+            </TableCell>
+            <TableCell className={`text-center ${isOverBudget ? 'text-red-500 font-bold' : 'text-green-600'}`}>
+              {formatCurrency(month.realized)}
+            </TableCell>
+          </React.Fragment>
+        );
+      })}
+    </TableRow>
+  ))}
+</TableBody>
       </Table>
     </div>
   );
