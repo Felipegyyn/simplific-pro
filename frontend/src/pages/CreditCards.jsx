@@ -742,7 +742,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                 </Button>
               </div>
 
-              <div className="grid gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {faturas.map((fatura) => (
                   <Card key={fatura.id}>
                     <CardHeader>
