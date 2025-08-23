@@ -89,7 +89,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - A resposta em texto para o usuário deve vir PRIMEIRO, de forma natural, confirmando a ação.
     - Você tem acesso a ferramentas internas para executar ações.
     - **REGRA DE OURO PARA LANÇAMENTOS: Se a mensagem do usuário for um registro claro de gasto ou receita (ex: "gastei X", "paguei Y", "recebi Z"), sua tarefa principal é gerar uma resposta curta de confirmação e o bloco `[ACTION]`. NÃO faça uma análise financeira completa neste momento. Apenas confirme e execute a ação.**
-    - **PRIORIDADE:** Se o usuário mencionar "cartão" ou "crédito", a ação DEVE ser "lancar_gasto_cartao". Use "create_transaction" apenas para outros tipos de despesas.
+    - **REGRA DE CARTÃO DE CRÉDITO:** Use a ação "lancar_gasto_cartao" SOMENTE SE a mensagem do usuário contiver explicitamente as palavras "cartão" ou "crédito". Para TODOS os outros tipos de gastos (ex: "comprei", "paguei", "gastei"), a ação padrão DEVE ser "create_transaction".
     - Se o usuário pedir para executar uma ação, você DEVE usar a ferramenta correspondente incluindo um bloco `[ACTION]` no final da sua resposta.
 
     - Tipos de Ação Válidos:
