@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import eventService from '../services/eventService';
@@ -353,7 +353,21 @@ const totalPendentes = (Array.isArray(transacoes) ? transacoes : [])
 
 const saldoLiquido = totalReceitas - totalDespesas;
 
+  // ▼▼▼ COLE O NOVO BLOCO DE CÓDIGO AQUI ▼▼▼
+const { receitasPendentes, despesasPendentes } = useMemo(() => {
+  const pending = transacoes.filter(t => t.status === 'pendente');
 
+  const receitas = pending
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  const despesas = pending
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
+
+  return { receitasPendentes: receitas, despesasPendentes: despesas };
+}, [transacoes]); // Recalcula apenas quando a lista de transações muda
+// ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
 
   const getStatusBadge = (status) => {
     return status === 'confirmada' ? 
@@ -671,13 +685,35 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
             <TabsContent value={filtroAtivo} className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>
-                {filtroAtivo === 'todas' && 'Todas as Transações'}
-                {filtroAtivo === 'receita' && 'Receitas'}
-                {filtroAtivo === 'despesa' && 'Despesas'}
-                {filtroAtivo === 'pendentes' && 'Transações Pendentes'}
-                </CardTitle>
-                </CardHeader>
+  {/* Lógica condicional: verifica qual aba está ativa */}
+  {filtroAtivo === 'pendentes' ? (
+    // SE for a aba 'pendentes', renderiza o novo layout com mini-cards
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <CardTitle>Transações Pendentes</CardTitle>
+      <div className="flex items-center gap-4">
+        <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+          <p className="text-xs font-medium text-green-700 dark:text-green-300">Receitas</p>
+          <p className="text-lg font-bold text-green-600">
+            R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+        <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+          <p className="text-xs font-medium text-red-700 dark:text-red-300">Despesas</p>
+          <p className="text-lg font-bold text-red-600">
+            R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+      </div>
+    </div>
+  ) : (
+    // SENÃO, renderiza o título simples como era antes
+    <CardTitle>
+      {filtroAtivo === 'todas' && 'Todas as Transações'}
+      {filtroAtivo === 'receita' && 'Receitas'}
+      {filtroAtivo === 'despesa' && 'Despesas'}
+    </CardTitle>
+  )}
+</CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {(Array.isArray(transacoesFiltradas) ? transacoesFiltradas : []).map((transacao) => (transacao && (
