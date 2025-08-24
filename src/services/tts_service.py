@@ -63,6 +63,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
             input=texto_limpo,
             voice_id=voice_to_use 
         )
+
+        print(f"DEBUG: Resposta completa da Speechify: {response}")
         audio_base64_string = response.audio_data
 
         print("String de áudio Base64 recebida da API Speechify.")
