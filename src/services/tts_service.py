@@ -5,29 +5,19 @@ import uuid
 import re
 from speechify import Speechify
 
-# --- Bloco de Inicialização Robusto ---
-
-# Variável global para guardar as vozes disponíveis
-available_voices = []
+# --- Bloco de Inicialização Simplificado e Corrigido ---
 speechify_client = None
-
 SPEECHIFY_API_KEY = os.getenv('SPEECHIFY_API_KEY')
+
 if SPEECHIFY_API_KEY:
     try:
-        # 1. Inicializa o cliente com o token
+        # Apenas inicializa o cliente com o token. Não faz mais nada.
         speechify_client = Speechify(token=SPEECHIFY_API_KEY)
-        
-        # 2. Busca e armazena (cache) a lista de todas as vozes disponíveis na inicialização
-        all_voices_response = speechify_client.voices.get_all()
-        available_voices = all_voices_response.voices
-        print(f"Sucesso: {len(available_voices)} vozes carregadas da Speechify.")
-        
+        print("Sucesso: Cliente Speechify inicializado.")
     except Exception as e:
-        print(f"ERRO: Falha ao inicializar ou carregar vozes do Speechify: {e}")
-        speechify_client = None # Garante que o cliente seja nulo em caso de falha
+        print(f"ERRO: Falha ao inicializar o cliente Speechify: {e}")
 else:
     print("AVISO: SPEECHIFY_API_KEY não encontrada. O serviço de TTS não funcionará.")
-
 # --- Fim do Bloco de Inicialização ---
 
 
@@ -37,10 +27,10 @@ def _limpar_texto_para_fala(texto: str) -> str:
     """
     emoji_pattern = re.compile(
         "["
-        "\U0001F600-\U0001F64F"
-        "\U0001F300-\U0001F5FF"
-        "\U0001F680-\U0001F6FF"
-        "\U0001F1E0-\U0001F1FF"
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
         "\U00002702-\U000027B0"
         "\U000024C2-\U0001F251"
         "]+",
@@ -53,34 +43,30 @@ def _limpar_texto_para_fala(texto: str) -> str:
 
 def texto_para_audio(texto_para_falar: str) -> str:
     """
-    Converte texto em áudio usando a voz correta da lista carregada da Speechify.
+    Converte texto em áudio usando uma chamada direta e simples à API da Speechify.
     """
-    if not speechify_client or not available_voices:
-        print("ERRO CRÍTICO: Cliente Speechify não inicializado ou nenhuma voz disponível.")
+    if not speechify_client:
+        print("ERRO CRÍTICO: Cliente Speechify não foi inicializado na partida do servidor.")
         return None
 
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
+        
+        # Usando a voz "Oliver" que você tem disponível.
+        voice_to_use = "Oliver"
 
-        # 3. Procura por uma voz em Português do Brasil na lista que carregamos
-        pt_voice = next((v for v in available_voices if v.lang == 'pt-BR'), None)
+        print(f"Enviando texto para a API Speechify com a voz: {voice_to_use}")
 
-        if not pt_voice:
-            print("ERRO: Nenhuma voz em pt-BR foi encontrada na sua conta Speechify.")
-            return None
-
-        print(f"Enviando texto para a API Speechify com a voz: {pt_voice.name} (ID: {pt_voice.id})")
-
-        # 4. Usa o ID CORRETO (pt_voice.id) que pegamos da API
+        # Chamada direta e simplificada, como na documentação.
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
-            voice_id=pt_voice.id 
+            voice_id=voice_to_use 
         )
         audio_bytes = response
         
         print("Arquivo de áudio recebido da API Speechify.")
 
-        # 5. Salva o arquivo
+        # Salva o arquivo
         nome_arquivo = f"{uuid.uuid4()}.mp3"
         caminho_completo = os.path.join("src", "temp_audio", nome_arquivo)
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
