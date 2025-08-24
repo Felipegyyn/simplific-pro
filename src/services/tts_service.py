@@ -77,7 +77,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         with open(caminho_completo, "wb") as out:
             out.write(decoded_audio_bytes)
-             print(f"Arquivo de áudio salvo em: {caminho_completo}")
+            print(f"Arquivo de áudio salvo em: {caminho_completo}")
 
         return nome_arquivo
 
