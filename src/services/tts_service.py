@@ -77,6 +77,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         # Salva o arquivo com a extensão .wav
         nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
         caminho_completo = os.path.join(AUDIO_DIR, nome_arquivo)
+        
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
         with open(caminho_completo, "wb") as out:
