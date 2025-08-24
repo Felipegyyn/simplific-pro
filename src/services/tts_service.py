@@ -57,7 +57,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
-            voice_id="Ricardo" # Usamos o nome da voz diretamente como o ID
+            voice_id="Vitoria", # Usando uma voz feminina pt-BR popular para garantir
+            model="speechify-2.0" # Especifica o modelo de voz a ser usado
         )
 
         # A resposta da biblioteca já são os bytes do áudio
