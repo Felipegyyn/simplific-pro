@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
+from src.config import AUDIO_DIR
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from src.models.db import db  # instância única
 from src.models.user import User
@@ -30,8 +31,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from src.scheduler import check_and_send_reminders
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-
-AUDIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_audio')
 
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
