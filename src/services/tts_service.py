@@ -10,7 +10,7 @@ SPEECHIFY_API_KEY = os.getenv('SPEECHIFY_API_KEY')
 speechify_client = None
 if SPEECHIFY_API_KEY:
     try:
-        speechify_client = Speechify(api_key=SPEECHIFY_API_KEY)
+        speechify_client = Speechify(token=SPEECHIFY_API_KEY)
     except Exception as e:
         print(f"ERRO: Falha ao inicializar o cliente Speechify: {e}")
 else:
