@@ -30,6 +30,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from src.scheduler import check_and_send_reminders
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+
+AUDIO_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_audio')
+
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
 
@@ -166,8 +169,7 @@ def serve_audio(filename):
     O Twilio usará esta URL para pegar o áudio e enviar ao usuário.
     """
     # Define o caminho para o diretório de áudios temporários
-    audio_directory = os.path.join(os.path.dirname(__file__), 'temp_audio')
-    return send_from_directory(audio_directory, filename)
+    return send_from_directory(AUDIO_DIR, filename)
 
 
 scheduler = BackgroundScheduler(daemon=True)

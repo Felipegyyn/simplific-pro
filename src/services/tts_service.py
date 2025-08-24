@@ -5,6 +5,7 @@ import uuid
 import re
 import base64
 from speechify import Speechify
+from src.main import AUDIO_DIR
 
 # --- Bloco de Inicialização Simplificado e Corrigido ---
 speechify_client = None
@@ -75,7 +76,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         # Salva o arquivo com a extensão .wav
         nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
-        caminho_completo = os.path.join("src", "temp_audio", nome_arquivo)
+        caminho_completo = os.path.join(AUDIO_DIR, nome_arquivo)
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
         with open(caminho_completo, "wb") as out:
