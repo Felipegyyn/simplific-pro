@@ -3,7 +3,7 @@
 import os
 import uuid
 import re
-import base64 # <-- ADICIONE ESTA LINHA
+import base64
 from speechify import Speechify
 
 # --- Bloco de Inicialização Simplificado e Corrigido ---
@@ -45,6 +45,7 @@ def _limpar_texto_para_fala(texto: str) -> str:
 def texto_para_audio(texto_para_falar: str) -> str:
     """
     Converte texto em áudio usando a chamada correta à API da Speechify.
+    Retorna o nome do arquivo de áudio gerado.
     """
     if not speechify_client:
         print("ERRO CRÍTICO: Cliente Speechify não foi inicializado na partida do servidor.")
@@ -64,7 +65,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
             voice_id=voice_to_use 
         )
 
-        print(f"DEBUG: Resposta completa da Speechify: {response}")
+        print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
         audio_base64_string = response.audio_data
 
         print("String de áudio Base64 recebida da API Speechify.")
@@ -72,8 +73,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
         # Decodifica a string Base64 para o formato binário (bytes)
         decoded_audio_bytes = base64.b64decode(audio_base64_string)
 
-        # Salva o arquivo
-        nome_arquivo = f"{uuid.uuid4()}.mp3"
+        # Salva o arquivo com a extensão .wav
+        nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
         caminho_completo = os.path.join("src", "temp_audio", nome_arquivo)
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
