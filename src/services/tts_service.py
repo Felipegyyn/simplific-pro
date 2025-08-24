@@ -11,7 +11,7 @@ SPEECHIFY_API_KEY = os.getenv('SPEECHIFY_API_KEY')
 
 if SPEECHIFY_API_KEY:
     try:
-        # Apenas inicializa o cliente com o token. Não faz mais nada.
+        # Apenas inicializa o cliente com o token.
         speechify_client = Speechify(token=SPEECHIFY_API_KEY)
         print("Sucesso: Cliente Speechify inicializado.")
     except Exception as e:
@@ -43,7 +43,7 @@ def _limpar_texto_para_fala(texto: str) -> str:
 
 def texto_para_audio(texto_para_falar: str) -> str:
     """
-    Converte texto em áudio usando uma chamada direta e simples à API da Speechify.
+    Converte texto em áudio usando a chamada correta à API da Speechify.
     """
     if not speechify_client:
         print("ERRO CRÍTICO: Cliente Speechify não foi inicializado na partida do servidor.")
@@ -52,12 +52,12 @@ def texto_para_audio(texto_para_falar: str) -> str:
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
         
-        # Usando a voz "Oliver" que você tem disponível.
-        voice_to_use = "oliver"
+        # Usando a voz "Ricardo" em minúsculas, como você descobriu ser o ID correto.
+        voice_to_use = "ricardo" 
 
-        print(f"Enviando texto para a API Speechify com a voz: {voice_to_use}")
+        print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
 
-        # Chamada direta e simplificada, como na documentação.
+        # Chamada final, correta e simplificada.
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
             voice_id=voice_to_use 
