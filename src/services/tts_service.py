@@ -3,6 +3,7 @@
 import os
 import uuid
 import re
+import base64 # <-- ADICIONE ESTA LINHA
 from speechify import Speechify
 
 # --- Bloco de Inicialização Simplificado e Corrigido ---
@@ -62,9 +63,12 @@ def texto_para_audio(texto_para_falar: str) -> str:
             input=texto_limpo,
             voice_id=voice_to_use 
         )
-        audio_bytes = response.audio_data
-        
-        print("Arquivo de áudio recebido da API Speechify.")
+        audio_base64_string = response.audio_data
+
+        print("String de áudio Base64 recebida da API Speechify.")
+
+        # Decodifica a string Base64 para o formato binário (bytes)
+        decoded_audio_bytes = base64.b64decode(audio_base64_string)
 
         # Salva o arquivo
         nome_arquivo = f"{uuid.uuid4()}.mp3"
@@ -72,8 +76,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
         with open(caminho_completo, "wb") as out:
-            out.write(audio_bytes)
-            print(f"Arquivo de áudio salvo em: {caminho_completo}")
+            out.write(decoded_audio_bytes)
+             print(f"Arquivo de áudio salvo em: {caminho_completo}")
 
         return nome_arquivo
 
