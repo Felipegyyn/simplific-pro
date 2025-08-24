@@ -76,7 +76,9 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         # Salva o arquivo com a extensão .wav
         nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
+        print(f"DEBUG: Valor de AUDIO_DIR importado: {AUDIO_DIR}")
         caminho_completo = os.path.join(AUDIO_DIR, nome_arquivo)
+        print(f"DEBUG: Valor de caminho_completo gerado: {caminho_completo}")
 
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
