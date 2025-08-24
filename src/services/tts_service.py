@@ -55,9 +55,13 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         print(f"Enviando texto para a API Speechify: '{texto_limpo}'")
 
-        # 2. Seleciona uma das vozes premium em português
-        # 'Ricardo' é uma excelente voz conversacional.
-        voice_params = {"name": "Ricardo", "language": "pt-BR"}
+        response = speechify_client.tts.audio.speech(
+            input=texto_limpo,
+            voice_id="Ricardo" # Usamos o nome da voz diretamente como o ID
+        )
+
+        # A resposta da biblioteca já são os bytes do áudio
+        audio_bytes = response
 
         # Gera o áudio. A biblioteca cuida de fazer a chamada e retornar os bytes do áudio.
         audio_bytes = speechify_client.generate_audio_bytes(text=texto_limpo, voice=voice_params)
