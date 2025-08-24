@@ -53,7 +53,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
         
         # Usando a voz "Oliver" que você tem disponível.
-        voice_to_use = "Oliver"
+        voice_to_use = "oliver"
 
         print(f"Enviando texto para a API Speechify com a voz: {voice_to_use}")
 
