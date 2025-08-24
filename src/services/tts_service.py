@@ -52,8 +52,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
         
-        # Usando a voz "Ricardo" em minúsculas, como você descobriu ser o ID correto.
-        voice_to_use = "ricardo" 
+        # Usando a voz "Oliver" em minúsculas, como você descobriu ser o ID correto.
+        voice_to_use = "oliver" 
 
         print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
 
@@ -62,7 +62,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
             input=texto_limpo,
             voice_id=voice_to_use 
         )
-        audio_bytes = response
+        audio_bytes = response.content
         
         print("Arquivo de áudio recebido da API Speechify.")
 
