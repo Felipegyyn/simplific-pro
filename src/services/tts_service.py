@@ -1,15 +1,27 @@
-import re # <-- ADICIONE NO TOPO
+# src/services/tts_service.py
+
 import os
 import uuid
-from google.cloud import texttospeech
+import re
+from speechify import Speechify
 
-def preparar_texto_para_ssml(texto: str) -> str:
+# Inicializa o cliente da Speechify com a chave do ambiente
+SPEECHIFY_API_KEY = os.getenv('SPEECHIFY_API_KEY')
+speechify_client = None
+if SPEECHIFY_API_KEY:
+    try:
+        speechify_client = Speechify(api_key=SPEECHIFY_API_KEY)
+    except Exception as e:
+        print(f"ERRO: Falha ao inicializar o cliente Speechify: {e}")
+else:
+    print("AVISO: SPEECHIFY_API_KEY não encontrada. O serviço de TTS não funcionará.")
+
+def _limpar_texto_para_fala(texto: str) -> str:
     """
-    Limpa o texto de caracteres de chat (emojis, markdown) e o envolve em tags SSML
-    para uma fala mais natural.
+    Limpa o texto de caracteres que não devem ser falados, como emojis e markdown.
+    As vozes da Speechify já são boas em interpretar pontuação para dar ritmo.
     """
-    # 1. Remove emojis usando uma expressão regular
-    # Esta regex pega a maioria dos emojis comuns
+    # 1. Remove emojis
     emoji_pattern = re.compile(
         "["
         "\U0001F600-\U0001F64F"  # emoticons
@@ -23,65 +35,45 @@ def preparar_texto_para_ssml(texto: str) -> str:
     )
     texto_limpo = emoji_pattern.sub(r'', texto)
 
-    # 2. Converte markdown de negrito (**) em ênfase de fala
-    # A tag <emphasis> faz a voz dar mais força à palavra
-    texto_limpo = re.sub(r'\*\*(.*?)\*\*', r'<emphasis level="strong">\1</emphasis>', texto_limpo)
+    # 2. Remove asteriscos de markdown (negrito/itálico)
+    texto_limpo = texto_limpo.replace('**', '').replace('*', '')
 
-    # 3. Adiciona pausas sutis para um ritmo mais humano
-    # Troca vírgulas por uma pequena pausa e pontos finais por uma pausa maior.
-    texto_limpo = texto_limpo.replace(',', '<break time="300ms"/>')
-    texto_limpo = texto_limpo.replace('.', '<break time="600ms"/>')
-    texto_limpo = texto_limpo.replace('!', '<break time="700ms"/>')
-    texto_limpo = texto_limpo.replace('?', '<break time="700ms"/>')
-
-    # 4. Envolve o texto final nas tags SSML necessárias
-    ssml = f'<speak><prosody rate="1.15">{texto_limpo}</prosody></speak>'
-    
-    return ssml
-
-# Dentro de src/services/tts_service.py
-
-# Em src/services/tts_service.py
-# SUBSTITUA A FUNÇÃO texto_para_audio por esta versão final
+    return texto_limpo.strip()
 
 def texto_para_audio(texto_para_falar: str) -> str:
     """
-    Converte uma string de texto em um arquivo de áudio MP3,
-    usando SSML e a melhor voz WaveNet disponível.
+    Converte uma string de texto em um arquivo de áudio MP3 usando a API da Speechify.
+    Retorna o nome do arquivo gerado.
     """
+    if not speechify_client:
+        print("ERRO CRÍTICO: Cliente Speechify não inicializado.")
+        return None
+
     try:
-        # Usaremos a voz 'pt-BR-Wavenet-D', uma voz masculina de alta qualidade.
-        voice_name = "pt-BR-Wavenet-D" 
+        # 1. Limpa o texto vindo do Gemini
+        texto_limpo = _limpar_texto_para_fala(texto_para_falar)
 
-        ssml_input = preparar_texto_para_ssml(texto_para_falar)
-        client = texttospeech.TextToSpeechClient()
-        synthesis_input = texttospeech.SynthesisInput(ssml=ssml_input)
+        print(f"Enviando texto para a API Speechify: '{texto_limpo}'")
 
-        voice = texttospeech.VoiceSelectionParams(
-            language_code="pt-BR",
-            name=voice_name
-        )
+        # 2. Seleciona uma das vozes premium em português
+        # 'Ricardo' é uma excelente voz conversacional.
+        voice_params = {"name": "Ricardo", "language": "pt-BR"}
 
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3
-        )
+        # Gera o áudio. A biblioteca cuida de fazer a chamada e retornar os bytes do áudio.
+        audio_bytes = speechify_client.generate_audio_bytes(text=texto_limpo, voice=voice_params)
+        print("Arquivo de áudio recebido da API Speechify.")
 
-        print(f"Enviando SSML para a API TTS com a voz '{voice_name}': '{ssml_input}'")
-        response = client.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
-        )
-        print("Arquivo de áudio recebido da API.")
-
+        # 3. Salva o arquivo de áudio temporariamente
         nome_arquivo = f"{uuid.uuid4()}.mp3"
         caminho_completo = os.path.join("src", "temp_audio", nome_arquivo)
         os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
 
         with open(caminho_completo, "wb") as out:
-            out.write(response.audio_content)
+            out.write(audio_bytes)
             print(f"Arquivo de áudio salvo em: {caminho_completo}")
 
         return nome_arquivo
+
     except Exception as e:
-        # Mantém a captura de erro para o fallback funcionar
-        print(f"ERRO CRÍTICO ao gerar áudio com Google: {e}")
+        print(f"ERRO CRÍTICO ao gerar áudio com Speechify: {e}")
         return None
