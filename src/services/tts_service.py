@@ -60,7 +60,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
-        voice_to_use = "bruno" 
+        voice_to_use = "henrique" 
         print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
