@@ -168,7 +168,7 @@ def pay_credit_card_bill(card_id):
     # 3. Reestabelece o limite disponível
     # Converte o valor da fatura para Decimal para garantir a precisão
     valor_fatura = Decimal(fatura.valor_total)
-    card.available_limit += valor_fatura
+    card.available_limit = Decimal(card.available_limit) + valor_fatura
 
     # 4. Garante que o limite disponível não ultrapasse o limite total do cartão
     if card.available_limit > card.limit:
