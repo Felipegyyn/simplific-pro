@@ -150,7 +150,7 @@ return false;
 // Função para pagar fatura
   const pagarFatura = async (fatura) => {
     // 1. Confirmação do usuário
-    if (!confirm(`Deseja realmente pagar a fatura de R$ ${fatura.valor_total.toFixed(2)}?`)) {
+    if (!confirm(`Deseja realmente confirmar a fatura a fatura de R$ ${fatura.valor_total.toFixed(2)}? Uma transação será criada no módulo "Lançamentos"`)) {
       return; // Cancela a operação se o usuário clicar em "Cancelar"
     }
 
@@ -162,7 +162,7 @@ return false;
         type: 'saida',
         category_id: 5, // Use um ID de categoria que exista, como "Pagamento de Fatura"
         value: fatura.valor_total,
-        status: 'confirmada', // A transação já nasce confirmada
+        status: 'pendente', // A transação é gerada como "Pendente em transactions"
         date: new Date().toISOString().split('T')[0]
       });
       console.log('Transação de pagamento criada com sucesso.');
