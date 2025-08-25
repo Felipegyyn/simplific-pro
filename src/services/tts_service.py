@@ -73,6 +73,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         # Decodifica a string Base64 para o formato binário (bytes)
         decoded_audio_bytes = base64.b64decode(audio_base64_string)
+        print(f"DEBUG: Tamanho do áudio decodificado (bytes): {len(decoded_audio_bytes)}")
 
         # Salva o arquivo com a extensão .wav
         nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
