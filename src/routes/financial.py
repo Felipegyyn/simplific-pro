@@ -518,7 +518,7 @@ def pay_transaction(transaction_id):
     if not transaction:
         return jsonify({'error': 'Transação não encontrada'}), 404
 
-    transaction.status = 'confirmada'
+    transaction.status = 'pendente'
     db.session.commit()
 
     return jsonify({'message': 'Fatura paga com sucesso!', 'transaction': transaction.to_frontend_dict()}), 200
