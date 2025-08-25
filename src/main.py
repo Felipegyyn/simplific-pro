@@ -175,7 +175,7 @@ def serve_audio(filename):
 
     if audio_bytes:
         # Se encontrou, retorna os bytes diretamente com o tipo de conteúdo correto
-        return Response(audio_bytes, mimetype='audio/wav')
+        return Response(audio_bytes, mimetype='audio/mpeg')
     else:
         # Se não encontrou (já expirou ou nunca existiu), retorna 404
         return "Áudio não encontrado ou expirado.", 404

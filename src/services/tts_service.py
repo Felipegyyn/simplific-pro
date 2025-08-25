@@ -64,7 +64,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
         print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
-            voice_id=voice_to_use 
+            voice_id=voice_to_use,
+            format="mp3"
         )
 
         print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
@@ -81,7 +82,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
             return None
 
         # Gera um ID único para o áudio
-        nome_arquivo = f"{uuid.uuid4()}.wav"
+        nome_arquivo = f"{uuid.uuid4()}.mp3"
 
         # --- LÓGICA PRINCIPAL ALTERADA ---
         # Em vez de salvar em um arquivo, salvamos no Redis com um tempo de expiração
