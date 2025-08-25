@@ -145,35 +145,45 @@ def delete_credit_card(card_id):
     return '', 204
 
 
+# NOVA VERSÃO - REESTABELECE O LIMITE DO CARTÃO
 @credit_cards_bp.route('/credit-cards/<int:card_id>/pay-bill', methods=['PUT'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def pay_credit_card_bill(card_id):
     user_id = get_jwt_identity()
+    
+    # Usar 'from' aqui dentro é ok para evitar importação circular se necessário
+    from src.models.extended_modules import Fatura, CreditCard
 
-    # Busca a fatura EM ABERTO vinculada a este cartão
-    from src.models.extended_modules import Fatura
- 
+    # 1. Busca a fatura EM ABERTO
     fatura = Fatura.query.filter_by(cartao_id=card_id, user_id=user_id, status='aberta').first()
     if not fatura:
-        return jsonify({'error': 'Fatura em aberto não encontrada'}), 404
+        return jsonify({'error': 'Fatura em aberto não encontrada para este cartão.'}), 404
 
-    # Atualiza o status para "paga"
+    # 2. Busca o cartão de crédito correspondente
+    card = CreditCard.query.filter_by(id=card_id, user_id=user_id).first()
+    if not card:
+        return jsonify({'error': 'Cartão de crédito não encontrado.'}), 404
+
+    # 3. Reestabelece o limite disponível
+    # Converte o valor da fatura para Decimal para garantir a precisão
+    valor_fatura = Decimal(fatura.valor_total)
+    card.available_limit += valor_fatura
+
+    # 4. Garante que o limite disponível não ultrapasse o limite total do cartão
+    if card.available_limit > card.limit:
+        card.available_limit = card.limit
+
+    # 5. Atualiza o status da fatura para "paga"
     fatura.status = 'paga'
+    
+    # 6. Salva ambas as alterações (limite do cartão e status da fatura) no banco
     db.session.commit()
 
     return jsonify({
-    'message': '✅Fatura paga com sucesso',
-    'fatura': {
-        'id': fatura.id,
-        'cartao_id': fatura.cartao_id,
-        'valor_total': fatura.valor_total,
-        'mes': fatura.mes,
-        'ano': fatura.ano,
-        'status': 'fatura.status',
-        'created_at': fatura.created_at.isoformat() if fatura.created_at else None
-    }
-}), 200
+        'message': 'Fatura confirmada com sucesso e limite do cartão atualizado!',
+        'card_updated': card.to_dict() # Retorna os dados atualizados do cartão
+    }), 200
 
 
 
