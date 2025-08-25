@@ -53,7 +53,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         return None
 
      # Adicione uma verificação para o cliente Redis
-     if not redis_client:
+    if not redis_client:
         print("ERRO CRÍTICO: Cliente Redis não está conectado.")
         return None
 
