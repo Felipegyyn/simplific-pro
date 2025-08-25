@@ -52,15 +52,15 @@ def texto_para_audio(texto_para_falar: str) -> str:
         print("ERRO CRÍTICO: Cliente Speechify não foi inicializado na partida do servidor.")
         return None
 
+     # Adicione uma verificação para o cliente Redis
+     if not redis_client:
+        print("ERRO CRÍTICO: Cliente Redis não está conectado.")
+        return None
+
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
-        
-        # Usando a voz "Oliver" em minúsculas, como você descobriu ser o ID correto.
         voice_to_use = "oliver" 
-
-        print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
-
-        # Chamada final, correta e simplificada.
+        print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'").
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
             voice_id=voice_to_use 
@@ -71,21 +71,22 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
         print("String de áudio Base64 recebida da API Speechify.")
 
-        # Decodifica a string Base64 para o formato binário (bytes)
         decoded_audio_bytes = base64.b64decode(audio_base64_string)
+
         print(f"DEBUG: Tamanho do áudio decodificado (bytes): {len(decoded_audio_bytes)}")
 
-        # Salva o arquivo com a extensão .wav
-        nome_arquivo = f"{uuid.uuid4()}.wav" # <-- ALTERAÇÃO AQUI
-        print(f"DEBUG: Valor de AUDIO_DIR importado: {AUDIO_DIR}")
-        caminho_completo = os.path.join(AUDIO_DIR, nome_arquivo)
-        print(f"DEBUG: Valor de caminho_completo gerado: {caminho_completo}")
+        if not decoded_audio_bytes:
+            print("ERRO: A API da Speechify retornou dados de áudio vazios.")
+            return None
 
-        os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
+        # Gera um ID único para o áudio
+        nome_arquivo = f"{uuid.uuid4()}.wav"
 
-        with open(caminho_completo, "wb") as out:
-            out.write(decoded_audio_bytes)
-            print(f"Arquivo de áudio salvo em: {caminho_completo}")
+        # --- LÓGICA PRINCIPAL ALTERADA ---
+        # Em vez de salvar em um arquivo, salvamos no Redis com um tempo de expiração
+        # de 5 minutos (300 segundos), que é mais que suficiente para o Twilio buscar.
+        redis_client.set(nome_arquivo, decoded_audio_bytes, ex=300)
+        print(f"Áudio salvo no Redis com a chave: {nome_arquivo}")
 
         return nome_arquivo
 

@@ -160,15 +160,24 @@ def after_request(response):
         response.status_code = 200
     return response
 
-# --- ROTA PARA SERVIR OS ÁUDIOS GERADOS ---
+# --- SUBSTITUA COMPLETAMENTE A ROTA ANTIGA 'serve_audio' POR ESTA ---
 @app.route('/audio/<filename>')
 def serve_audio(filename):
     """
-    Esta rota serve os arquivos de áudio da pasta temp_audio.
-    O Twilio usará esta URL para pegar o áudio e enviar ao usuário.
+    Esta rota busca os bytes de áudio do cache Redis e os serve diretamente.
     """
-    # Define o caminho para o diretório de áudios temporários
-    return send_from_directory(AUDIO_DIR, filename)
+    if not redis_client:
+        return "Serviço de cache indisponível", 500
+
+    # Busca os dados do áudio no Redis usando o nome do arquivo como chave
+    audio_bytes = redis_client.get(filename)
+
+    if audio_bytes:
+        # Se encontrou, retorna os bytes diretamente com o tipo de conteúdo correto
+        return Response(audio_bytes, mimetype='audio/wav')
+    else:
+        # Se não encontrou (já expirou ou nunca existiu), retorna 404
+        return "Áudio não encontrado ou expirado.", 404
 
 
 scheduler = BackgroundScheduler(daemon=True)
