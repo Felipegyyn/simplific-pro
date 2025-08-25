@@ -64,10 +64,11 @@ def texto_para_audio(texto_para_falar: str) -> str:
         print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
-            voice_id="lucas",
+            voice_id=voice_to_use,
             language='pt-BR',
             audio_format="mp3",
             
+
         )
 
         print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
