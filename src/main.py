@@ -9,6 +9,7 @@ from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from src.config import AUDIO_DIR
+from src.redis_client import redis_client
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from src.models.db import db  # instância única
 from src.models.user import User
