@@ -6,6 +6,7 @@ import re
 import base64
 from speechify import Speechify
 from src.config import AUDIO_DIR
+from src.redis_client import redis_client
 
 # --- Bloco de Inicialização Simplificado e Corrigido ---
 speechify_client = None
