@@ -65,7 +65,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
             voice_id=voice_to_use,
-            format="mp3"
+            audio_format="mp3"
         )
 
         print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
