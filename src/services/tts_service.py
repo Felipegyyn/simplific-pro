@@ -60,16 +60,14 @@ def texto_para_audio(texto_para_falar: str) -> str:
 
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
-        ssml_input = f'<speak xml:lang="pt-BR">{texto_limpo}</speak>'
 
-        voice_to_use = "henrique" 
-        print(f"Enviando SSML para a API Speechify com a voice_id: '{voice_to_use}'")
+        voice_to_use = "lucas 
+        print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
 
         response = speechify_client.tts.audio.speech(
-            input=ssml_input,
+            input=texto_limpo,
             voice_id=voice_to_use,
             audio_format="mp3",
-            ssml=True
         )
 
         print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
