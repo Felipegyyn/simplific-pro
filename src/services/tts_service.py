@@ -66,6 +66,8 @@ def texto_para_audio(texto_para_falar: str) -> str:
             input=texto_limpo,
             voice_id=voice_to_use,
             audio_format="mp3",
+            language='pt-BR',
+            
         )
 
         print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
