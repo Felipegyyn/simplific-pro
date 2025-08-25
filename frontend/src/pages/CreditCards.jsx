@@ -815,7 +815,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                         {fatura.status === 'aberta' && (
                           <Button onClick={() => pagarFatura(fatura)}>
                             <DollarSign className="h-4 w-4 mr-2" />
-                            Pagar Fatura
+                            Confirmar Fatura
                           </Button>
                         )}
                       </div>
@@ -1061,7 +1061,7 @@ if (sucesso) {
                         setIsFaturaModalOpen(false);
                       }}>
                         <DollarSign className="h-4 w-4 mr-2" />
-                        Pagar Fatura
+                        Confirmar Fatura
                       </Button>
                     )}
                   </div>
