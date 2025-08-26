@@ -131,8 +131,6 @@ const [graficoSaida, setGraficoSaida] = useState([]);
 // ========================
 console.log("planosData", planosData); // debug
 
-
-
     // Dados para gráfico de rosca - saídas
     const saidasCorrigidas = planosData
 
@@ -310,7 +308,6 @@ const excluirPlanejamento = async (id) => {
   setIsEditModalOpen(true);
 };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -436,8 +433,6 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
   carregarDadosOrcamento();
 }, [abaAtiva]);
 
-
-
   const [newCategory, setNewCategory] = useState({ name: '', type: '' });
 
 const handleCreateCategory = async (e) => {
@@ -477,7 +472,21 @@ useEffect(() => {
   setTiposUnicos(tiposCompletos);
 }, [planejamentos]);
 
-
+  useEffect(() => {
+  if (planejamentos && planejamentos.length > 0) {
+    // 1. Extrai todos os nomes de categoria da lista de planejamentos
+    const nomesDeCategorias = planejamentos.map(p => p.category_name).filter(Boolean);
+    
+    // 2. Cria uma lista apenas com os nomes únicos e ordena em ordem alfabética
+    const categoriasFiltradas = [...new Set(nomesDeCategorias)].sort();
+    
+    // 3. Atualiza o estado que popula o dropdown do filtro
+    setCategoriasUnicas(categoriasFiltradas);
+  } else {
+    // Se não houver planejamentos, a lista de filtros fica vazia
+    setCategoriasUnicas([]);
+  }
+}, [planejamentos]); // Este efeito será executado sempre que a lista de planejamentos mudar
 
   useEffect(() => {
   if (categories.length && planejamentos.length) {
