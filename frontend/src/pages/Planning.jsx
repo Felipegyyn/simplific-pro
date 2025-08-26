@@ -166,17 +166,14 @@ setGraficoSaida(saidaFormatada);
   carregarDados();
 }, [filtroAnoVisaoGeral, filtroTipoVisaoGeral]);
 
-
-
   useEffect(() => {
   loadPlanejamentos();
 }, [filtroTipo, filtroCategoria, filtroInicio, filtroFim]);
 
-// E adicione este novo bloco de código logo abaixo:
 useEffect(() => {
   // Calcula os totais com base nos planejamentos filtrados que já estão na tela
-  const totalPlanejado = planejamentos.reduce((acc, p) => acc + (p.value || 0), 0);
-  const totalGasto = planejamentos.reduce((acc, p) => acc + (p.spent_amount || 0), 0);
+  const totalPlanejado = planejamentos.reduce((acc, p) => acc + parseFloat(p.total_amount || 0), 0);
+  const totalGasto = planejamentos.reduce((acc, p) => acc + parseFloat(p.spent_amount || 0), 0);
   const disponivel = totalPlanejado - totalGasto;
 
   setResumoFiltrado({
@@ -184,7 +181,7 @@ useEffect(() => {
     totalGasto,
     disponivel,
   });
-}, [planejamentos]); // A mágica está aqui: este efeito roda sempre que a lista 'planejamentos' muda
+}, [planejamentos]);
 
 // Função para confirmar planejamento (versão corrigida)
   const confirmarPlanejamento = async (id) => {
@@ -917,82 +914,86 @@ useEffect(() => {
                   </DialogContent>
                 </Dialog>
               </div>
-              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-end mb-4">
-  <div>
-    <Label className="block mb-1">Categoria</Label>
-    <select
-  value={filtroCategoria}
-  onChange={(e) => setFiltroCategoria(e.target.value)}
-  className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
->
-  <option value="">Todas</option>
-  {categoriasUnicas.length > 0 &&
-    categoriasUnicas.map((cat, index) => (
-      <option key={index} value={cat}>{cat}</option>
-    ))
-  }
-</select>
-
-  </div>
-
-  <div>
-    <Label className="block mb-1">Tipo</Label>
-   <select
-  value={filtroTipo}
-  onChange={(e) => setFiltroTipo(e.target.value)}
-  className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
->
-  <option value="">Todos</option>
-  {tiposUnicos.length > 0 &&
-    tiposUnicos.map((tipo, index) => (
-      <option key={index} value={tipo}>{tipo}</option>
-    ))
-  }
-</select>
-  </div>
-
-  <div>
-    <Label className="block mb-1">Início</Label>
-    <Input
-      type="date"
-      value={filtroInicio}
-      onChange={(e) => setFiltroInicio(e.target.value)}
-      className="px-3 py-2"
-    />
-  </div>
-
-  <div>
-    <Label className="block mb-1">Fim</Label>
-    <Input
-      type="date"
-      value={filtroFim}
-      onChange={(e) => setFiltroFim(e.target.value)}
-      className="px-3 py-2"
-    />
-  </div>
-<Card className="flex-grow p-3 bg-slate-800 border-slate-700">
-    <div className="flex items-center justify-around text-xs text-slate-400">
-      <div className="text-center">
-        <span>Planejado</span>
-        <p className="text-sm font-bold text-blue-400">
-          {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-        </p>
-      </div>
-      <div className="text-center">
-        <span>Gasto</span>
-        <p className="text-sm font-bold text-red-400">
-          {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-        </p>
-      </div>
-      <div className="text-center">
-        <span>Disponível</span>
-        <p className="text-sm font-bold text-green-400">
-          {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-        </p>
-      </div>
+  {/* Nova estrutura para alinhar os filtros e o resumo */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
+  
+  {/* Coluna 1: Todos os Filtros */}
+  <div className="flex flex-wrap gap-4 items-end">
+    <div>
+      <Label className="block mb-1">Categoria</Label>
+      <select
+        value={filtroCategoria}
+        onChange={(e) => setFiltroCategoria(e.target.value)}
+        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+      >
+        <option value="">Todas</option>
+        {categoriasUnicas.length > 0 &&
+          categoriasUnicas.map((cat, index) => (
+            <option key={index} value={cat}>{cat}</option>
+          ))
+        }
+      </select>
     </div>
-  </Card>
-  {/* ▲▲▲ FIM DO MINICARD ▲▲▲ */}
+    <div>
+      <Label className="block mb-1">Tipo</Label>
+      <select
+        value={filtroTipo}
+        onChange={(e) => setFiltroTipo(e.target.value)}
+        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+      >
+        <option value="">Todos</option>
+        {tiposUnicos.length > 0 &&
+          tiposUnicos.map((tipo, index) => (
+            <option key={index} value={tipo}>{tipo}</option>
+          ))
+        }
+      </select>
+    </div>
+    <div>
+      <Label className="block mb-1">Início</Label>
+      <Input
+        type="date"
+        value={filtroInicio}
+        onChange={(e) => setFiltroInicio(e.target.value)}
+        className="px-3 py-2"
+      />
+    </div>
+    <div>
+      <Label className="block mb-1">Fim</Label>
+      <Input
+        type="date"
+        value={filtroFim}
+        onChange={(e) => setFiltroFim(e.target.value)}
+        className="px-3 py-2"
+      />
+    </div>
+  </div>
+
+  {/* Coluna 2: O Minicard de Resumo */}
+  <div className="flex items-end">
+    <Card className="w-full p-3 bg-slate-800 border-slate-700">
+      <div className="flex items-center justify-around text-xs text-slate-400">
+        <div className="text-center">
+          <span>Planejado</span>
+          <p className="text-sm font-bold text-blue-400">
+            {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+        <div className="text-center">
+          <span>Gasto</span>
+          <p className="text-sm font-bold text-red-400">
+            {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+        <div className="text-center">
+          <span>Disponível</span>
+          <p className="text-sm font-bold text-green-400">
+            {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+      </div>
+    </Card>
+  </div>
 </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
