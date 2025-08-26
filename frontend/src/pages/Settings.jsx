@@ -72,8 +72,7 @@ const Settings = () => {
             <Label htmlFor="whatsapp">Nº do WhatsApp</Label>
             <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
           </div>
-          <Button onClick={handleSave}>Salvar Alterações</Button>
-          {feedback && <p className="text-sm text-green-600 mt-2">{feedback}</p>}
+          
         </CardContent>
       </Card>
 
@@ -120,6 +119,8 @@ const Settings = () => {
             </div>
           </RadioGroup>
         </div>
+        <Button onClick={handleSave}>Salvar Alterações</Button>
+        {feedback && <p className="text-sm text-green-600 mt-2">{feedback}</p>}
       </CardContent>
     </Card>
     {/* ▲▲▲ FIM DO NOVO CARD ▲▲▲ */}
