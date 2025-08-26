@@ -120,7 +120,7 @@ const Settings = () => {
           </RadioGroup>
         </div>
         <Button onClick={handleSave}>Salvar Alterações</Button>
-        {feedback && <p className="text-sm text-green-600 mt-2">{feedback}</p>}
+        {feedback && <p className="text-sm text-green-600 mt-4">{feedback}</p>}
       </CardContent>
     </Card>
     {/* ▲▲▲ FIM DO NOVO CARD ▲▲▲ */}
