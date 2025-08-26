@@ -79,6 +79,12 @@ const [graficoSaida, setGraficoSaida] = useState([]);
     start_date: '',
     end_date: ''
   });
+
+  const [resumoFiltrado, setResumoFiltrado] = useState({
+  totalPlanejado: 0,
+  totalGasto: 0,
+  disponivel: 0,
+});
   
 
   // Carregar planejamentos da API
@@ -165,6 +171,20 @@ setGraficoSaida(saidaFormatada);
   useEffect(() => {
   loadPlanejamentos();
 }, [filtroTipo, filtroCategoria, filtroInicio, filtroFim]);
+
+// E adicione este novo bloco de código logo abaixo:
+useEffect(() => {
+  // Calcula os totais com base nos planejamentos filtrados que já estão na tela
+  const totalPlanejado = planejamentos.reduce((acc, p) => acc + (p.value || 0), 0);
+  const totalGasto = planejamentos.reduce((acc, p) => acc + (p.spent_amount || 0), 0);
+  const disponivel = totalPlanejado - totalGasto;
+
+  setResumoFiltrado({
+    totalPlanejado,
+    totalGasto,
+    disponivel,
+  });
+}, [planejamentos]); // A mágica está aqui: este efeito roda sempre que a lista 'planejamentos' muda
 
 // Função para confirmar planejamento (versão corrigida)
   const confirmarPlanejamento = async (id) => {
@@ -929,9 +949,6 @@ useEffect(() => {
     ))
   }
 </select>
-
-
-
   </div>
 
   <div>
@@ -953,7 +970,29 @@ useEffect(() => {
       className="px-3 py-2"
     />
   </div>
-
+<Card className="flex-grow p-3 bg-slate-800 border-slate-700">
+    <div className="flex items-center justify-around text-xs text-slate-400">
+      <div className="text-center">
+        <span>Planejado</span>
+        <p className="text-sm font-bold text-blue-400">
+          {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </p>
+      </div>
+      <div className="text-center">
+        <span>Gasto</span>
+        <p className="text-sm font-bold text-red-400">
+          {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </p>
+      </div>
+      <div className="text-center">
+        <span>Disponível</span>
+        <p className="text-sm font-bold text-green-400">
+          {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </p>
+      </div>
+    </div>
+  </Card>
+  {/* ▲▲▲ FIM DO MINICARD ▲▲▲ */}
 </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
