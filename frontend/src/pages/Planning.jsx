@@ -624,7 +624,7 @@ useEffect(() => {
                         <DollarSign className="h-8 w-8 text-red-600 dark:text-red-400" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Utilizado</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Realizado</p>
                         <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                         R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
@@ -640,7 +640,7 @@ useEffect(() => {
                         <TrendingUp className="h-8 w-8 text-green-600" />
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Disponível para uso</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total a realizar</p>
                         <p className="text-2xl font-bold text-green-600">
                         R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
