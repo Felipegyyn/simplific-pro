@@ -96,22 +96,21 @@ def get_planning():
         query = query.filter(db.extract('month', cast(Planning.date, db.Date)) == int(mes))
 
     results = query.order_by(Planning.date.desc()).all()
-    transactions = Transaction.query.filter_by(user_id=user_id).all()
 
     response = []
     for plan in results:
-        gasto_total = sum(
-            t.value for t in transactions if
-            t.category_id == plan.category_id and
-            t.type == plan.type and
-            t.date.year == plan.date.year and
-            t.date.month == plan.date.month
-        )
+        gasto_total = 0
+        # Se o planejamento já foi confirmado, procuramos pela transação vinculada a ele.
+        if plan.status == 'confirmed':
+            linked_transaction = Transaction.query.filter_by(planning_id=plan.id).first()
+            if linked_transaction:
+                # O valor gasto é exatamente o valor da transação vinculada.
+                gasto_total = linked_transaction.value
+
         progresso = (gasto_total / plan.value * 100) if plan.value else 0
         
-
         plan_dict = plan.to_dict()
-        plan_dict['spent_amount'] = gasto_total
+        plan_dict['spent_amount'] = float(gasto_total) # Garante que o valor é float
         plan_dict['available'] = plan.value - gasto_total
         plan_dict['progress'] = progresso
 
@@ -258,7 +257,8 @@ def confirm_planning(planning_id):
         value=abs(float(planning.value)),
         status='pendente',
         installments=1,
-        current_installment=1
+        current_installment=1,
+        planning_id=planning.id  # <--- ADICIONE ESTA LINHA AQUI 26/08/2025
     )
 
     db.session.add(transaction)

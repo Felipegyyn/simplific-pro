@@ -76,6 +76,7 @@ class Transaction(db.Model):
         parent_transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id'))  # For installments
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
         confirmed_at = db.Column(db.DateTime)
+        planning_id = db.Column(db.Integer, db.ForeignKey('planning.id'), nullable=True)
         
         # Relationships
         category = db.relationship('Category', backref='transactions', lazy='joined')
