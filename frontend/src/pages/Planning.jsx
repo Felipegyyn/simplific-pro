@@ -95,17 +95,15 @@ const [graficoSaida, setGraficoSaida] = useState([]);
     if (filtroTipoVisaoGeral) queryParams.append('type', filtroTipoVisaoGeral);
 
     const planos = await apiService.get(`/api/planning?${queryParams.toString()}`);
-    const transacoesResponse = await apiService.get(`/api/transactions?${queryParams.toString()}`);
     const categoriasResponse = await apiService.get('/api/categories');
   
     setCategories(categoriasResponse); 
 
 
     const planosData = planos.plannings || [];
-    const transacoesData = transacoesResponse.transacoes || transacoesResponse.transactions || [];
 
     setPlanejamentosVisaoGeral(planosData);
-    calcularResumo(planosData, transacoesData);
+    calcularResumo(planosData);
 
     // Dados para gráfico de linha
     const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -232,12 +230,16 @@ const loadPlanejamentos = async () => {
   }
 };
 
-const calcularResumo = (planejamentos, transacoes) => {
-  const totalPlanejado = planejamentos.reduce((acc, p) => acc + parseFloat(p.total_amount), 0);
-  const totalGasto = transacoes.reduce((acc, t) => acc + parseFloat(t.amount), 0);
+// NOVA VERSÃO CORRIGIDA
+const calcularResumo = (planejamentos) => {
+  // Agora usamos 'total_amount' para o planejado, que está correto
+  const totalPlanejado = planejamentos.reduce((acc, p) => acc + parseFloat(p.total_amount || 0), 0);
+  
+  // AQUI ESTÁ A CORREÇÃO PRINCIPAL:
+  // Somamos o 'spent_amount' individual de cada planejamento.
+  const totalGasto = planejamentos.reduce((acc, p) => acc + parseFloat(p.spent_amount || 0), 0);
+  
   const disponivel = totalPlanejado - totalGasto;
-
-  //Progreso médio (Visão geral)
   const progressoMedio = totalPlanejado > 0 ? (totalGasto / totalPlanejado) * 100 : 0;
 
   setResumo({
