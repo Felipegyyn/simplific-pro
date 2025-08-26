@@ -980,13 +980,13 @@ useEffect(() => {
           </p>
         </div>
         <div className="text-center">
-          <span>Gasto</span>
+          <span>Realizado</span>
           <p className="text-sm font-bold text-red-400">
             {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </p>
         </div>
         <div className="text-center">
-          <span>Disponível</span>
+          <span>A realizar</span>
           <p className="text-sm font-bold text-green-400">
             {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </p>
