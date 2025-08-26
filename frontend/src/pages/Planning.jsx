@@ -1023,7 +1023,7 @@ useEffect(() => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-600 dark:text-gray-400">Progresso</p>
-                          <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{((plan.progresso ?? 0).toFixed(1))}%</p>
+                          <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{((plan.progress ?? 0).toFixed(1))}%</p>
                         </div>
                       </div>
 
