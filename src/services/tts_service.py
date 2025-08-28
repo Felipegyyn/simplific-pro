@@ -63,7 +63,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
         
         # Pode manter a voz que preferir (ex: "oliver"), pois o modelo é mais importante.
-        voice_to_use = "oliver" 
+        voice_to_use = "lucas" 
         
         print(f"Enviando texto para a API Speechify usando o modelo 'simba multilingual'")
 
