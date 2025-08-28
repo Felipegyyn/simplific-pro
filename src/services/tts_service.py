@@ -44,57 +44,53 @@ def _limpar_texto_para_fala(texto: str) -> str:
     return texto_limpo.strip()
 
 
+# Em src/services/tts_service.py
+
 def texto_para_audio(texto_para_falar: str) -> str:
     """
-    Converte texto em áudio usando a chamada correta à API da Speechify.
-    Retorna o nome do arquivo de áudio gerado.
+    Converte texto em áudio MP3, especificando o MODELO e o IDIOMA
+    para garantir a pronúncia correta, e salva os bytes no Redis.
     """
     if not speechify_client:
-        print("ERRO CRÍTICO: Cliente Speechify não foi inicializado na partida do servidor.")
+        print("ERRO CRÍTICO: Cliente Speechify não foi inicializado.")
         return None
 
-     # Adicione uma verificação para o cliente Redis
     if not redis_client:
         print("ERRO CRÍTICO: Cliente Redis não está conectado.")
         return None
 
     try:
         texto_limpo = _limpar_texto_para_fala(texto_para_falar)
-        voice_to_use = "otavio" 
-        print(f"Enviando texto para a API Speechify com a voice_id: '{voice_to_use}'")
+        
+        # Pode manter a voz que preferir (ex: "oliver"), pois o modelo é mais importante.
+        voice_to_use = "oliver" 
+        
+        print(f"Enviando texto para a API Speechify usando o modelo 'simba multilingual'")
+
+        # --- CHAMADA FINAL E CORRETA DA API ---
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
             voice_id=voice_to_use,
-            language="pt-BR",
-            audio_format="mp3"
-            
-
+            model="simba multilingual",  # <--- AQUI ESTÁ A MUDANÇA CRUCIAL
+            audio_format="mp3",        # Para gerar um arquivo leve
+            language="pt-BR"           # Para reforçar o idioma para o modelo multilingual
         )
+        # ----------------------------------------
 
-        print(f"DEBUG: Resposta completa da Speechify recebida.") # Removido o print do objeto inteiro para não poluir os logs.
         audio_base64_string = response.audio_data
-
-        print("String de áudio Base64 recebida da API Speechify.")
-
         decoded_audio_bytes = base64.b64decode(audio_base64_string)
 
-        print(f"DEBUG: Tamanho do áudio decodificado (bytes): {len(decoded_audio_bytes)}")
-
         if not decoded_audio_bytes:
-            print("ERRO: A API da Speechify retornou dados de áudio vazios.")
-            return None
+             print("ERRO: A API da Speechify retornou dados de áudio vazios.")
+             return None
 
-        # Gera um ID único para o áudio
         nome_arquivo = f"{uuid.uuid4()}.mp3"
-
-        # --- LÓGICA PRINCIPAL ALTERADA ---
-        # Em vez de salvar em um arquivo, salvamos no Redis com um tempo de expiração
-        # de 5 minutos (300 segundos), que é mais que suficiente para o Twilio buscar.
+        
         redis_client.set(nome_arquivo, decoded_audio_bytes, ex=300)
-        print(f"Áudio salvo no Redis com a chave: {nome_arquivo}")
+        print(f"Áudio MP3 salvo no Redis com a chave: {nome_arquivo}")
 
         return nome_arquivo
 
     except Exception as e:
-        print(f"ERRO CRÍTICO ao gerar áudio com Speechify: {e}")
+        print(f"ERRO CRÍTICO ao gerar ou salvar áudio no Redis: {e}")
         return None
