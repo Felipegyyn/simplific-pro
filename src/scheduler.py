@@ -5,6 +5,8 @@ from src.models.user import User
 from src.services.whatsapp_service import send_whatsapp_message 
 # Importe a nossa função de formatação de moeda para usar aqui também
 from src.services.transacoes_service import format_currency_brl
+from src.services.transacoes_service import gerar_resumo_semanal
+import time
 
 def check_and_send_reminders(app):
     """
@@ -61,6 +63,46 @@ def check_and_send_reminders(app):
                 send_whatsapp_message(f'whatsapp:{usuario.whatsapp}', mensagem)
 
         print("--- [SCHEDULER] Verificação de lembretes concluída. ---")
+
+# ▼▼▼ ADICIONE TODA A FUNÇÃO ABAIXO NESTE PONTO ▼▼▼
+
+def enviar_resumos_semanais(app):
+    """
+    Busca todos os usuários elegíveis e envia o resumo financeiro da última semana.
+    """
+    print(f"--- [SCHEDULER] Iniciando tarefa de envio de resumos semanais em {datetime.now()} ---")
+    with app.app_context():
+        # Busca usuários ativos que optaram por receber o resumo
+        usuarios = User.query.filter_by(status='ativo', receive_weekly_summary=True).all()
+        
+        print(f"Encontrados {len(usuarios)} usuários para enviar o resumo.")
+
+        for usuario in usuarios:
+            print(f"Processando resumo para o usuário: {usuario.name} ({usuario.whatsapp})")
+            resumo = gerar_resumo_semanal(usuario.id)
+            
+            # Só envia se o usuário teve movimentação na semana anterior
+            if resumo and resumo["has_activity"]:
+                saldo_texto = f"positivo em *{format_currency_brl(resumo['saldo'])}*" if resumo['saldo'] >= 0 else f"negativo em *{format_currency_brl(resumo['saldo'])}*"
+                
+                mensagem = (
+                    f"Bom dia, {usuario.name}! ☀️\n\n"
+                    f"Aqui está o resumo da sua última semana:\n\n"
+                    f" Gasto Total: *{format_currency_brl(resumo['total_gasto'])}*\n"
+                    f" Principal Categoria: *{resumo['categoria_principal']}*\n"
+                    f" Saldo da Semana: {saldo_texto}\n\n"
+                    f"Tenha uma ótima e produtiva semana! 💪"
+                )
+                
+                # Formata o número para o padrão da Twilio (whatsapp:+55...)
+                numero_destino = f'whatsapp:{usuario.whatsapp}'
+                
+                enviar_mensagem_whatsapp(numero_destino, mensagem)
+                time.sleep(1) # Pausa de 1 segundo para não sobrecarregar a API da Twilio
+            else:
+                print(f"Usuário {usuario.name} sem atividade na última semana. Resumo não enviado.")
+    
+    print("--- [SCHEDULER] Tarefa de resumos semanais concluída. ---")
 
 # Esta parte permite que o script seja executado manualmente para testes
 if __name__ == '__main__':
