@@ -71,7 +71,7 @@ def texto_para_audio(texto_para_falar: str) -> str:
         response = speechify_client.tts.audio.speech(
             input=texto_limpo,
             voice_id=voice_to_use,
-            model="simba multilingual",  # <--- AQUI ESTÁ A MUDANÇA CRUCIAL
+            model="simba-multilingual", # <--- CORRETO (com hífen)
             audio_format="mp3",        # Para gerar um arquivo leve
             language="pt-BR"           # Para reforçar o idioma para o modelo multilingual
         )
