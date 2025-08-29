@@ -750,11 +750,6 @@ const respostaFaturas = await apiService.get(url);
           <SelectItem value="paga">Pagas</SelectItem>
         </SelectContent>
       </Select>
-
-      <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
-        <Calendar className="h-4 w-4 mr-2" />
-        Filtrar por Período
-      </Button>
     </div>
     {/* ▲▲▲ FIM DO CONTAINER ▲▲▲ */}
                 <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
