@@ -112,7 +112,7 @@ const [graficoSaida, setGraficoSaida] = useState([]);
         .filter(p => new Date(p.start_date).getMonth() === i)
         .reduce((acc, p) => acc + parseFloat(p.total_amount), 0);
 
-      const realizadoMes = transacoesData
+      const realizadoMes = planosData
         .filter(t => new Date(t.date).getMonth() === i)
         .reduce((acc, t) => acc + parseFloat(t.value), 0);
 

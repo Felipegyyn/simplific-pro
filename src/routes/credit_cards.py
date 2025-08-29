@@ -211,21 +211,28 @@ def criar_fatura():
 
     return jsonify({'message': 'Fatura criada com sucesso'}), 201
 
-# Em credit_cards.py, substitua a função listar_faturas() inteira
-
-# Em credit_cards.py, substitua a função listar_faturas() inteira
-
 @credit_cards_bp.route('/faturas', methods=['GET'])
 @jwt_required()
 @active_user_required # <-- TRAVA APLICADA
 def listar_faturas():
     from src.models.extended_modules import Fatura, CreditCard
     from datetime import date
-
     user_id = get_jwt_identity()
-    faturas_e_cartoes = db.session.query(Fatura, CreditCard).join(
+
+    # 1. Pega o parâmetro 'status' da URL. Ex: /api/faturas?status=aberta
+    status_filter = request.args.get('status')
+
+    # 2. Inicia a construção da query no banco de dados
+    query = db.session.query(Fatura, CreditCard).join(
         CreditCard, Fatura.cartao_id == CreditCard.id
-    ).filter(Fatura.user_id == user_id).all()
+    ).filter(Fatura.user_id == user_id)
+
+    # 3. Se um filtro de status foi fornecido E é válido, adiciona à query
+    if status_filter and status_filter in ['aberta', 'paga']:
+        query = query.filter(Fatura.status == status_filter)
+
+    # 4. Executa a query final e ordena o resultado
+    faturas_e_cartoes = query.order_by(Fatura.ano.desc(), Fatura.mes.desc()).all()
 
     resultado = []
     for fatura, cartao in faturas_e_cartoes:

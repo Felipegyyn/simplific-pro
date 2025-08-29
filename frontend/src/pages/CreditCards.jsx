@@ -59,10 +59,7 @@ const CreditCards = ({ user, onLogout }) => {
     installments: 1              // <-- ADICIONE ESTA LINHA
   });
 
-  // Carregar cartões da API
-  useEffect(() => {
-    loadCartoes();
-  }, []);
+  const [filtroStatusFatura, setFiltroStatusFatura] = useState('aberta'); // 'aberta', 'paga', ou 'todas'
 
 const loadCartoes = async () => {
   try {
@@ -298,15 +295,20 @@ const handleUpdateCard = async (e) => {
   }
 };
 
-  // Carregar faturas (dados mock por enquanto)
+  // Carregar cartões da API
   useEffect(() => {
-  loadCartoes();
-}, []);
+    loadCartoes();
+  }, [filtroStatusFatura]); // <--- Adicione a variável do filtro aqui
 
 
 const carregarFaturas = async (listaDeCartoes) => { 
   try {
-    const respostaFaturas = await apiService.get('/api/faturas');
+    // Constrói a URL da API dinamicamente com base no filtro selecionado
+let url = '/api/faturas';
+if (filtroStatusFatura !== 'todas') {
+  url += `?status=${filtroStatusFatura}`;
+}
+const respostaFaturas = await apiService.get(url);
 
     // Usamos Promise.all para buscar as transações de todas as faturas em paralelo, o que é mais rápido.
     const faturasComTransacoes = await Promise.all(
@@ -736,6 +738,25 @@ const carregarFaturas = async (listaDeCartoes) => {
             <TabsContent value="faturas" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold dark:text-slate-100">Faturas dos Cartões</h3>
+              {/* ▼▼▼ NOVO CONTAINER PARA OS FILTROS ▼▼▼ */}
+    <div className="flex items-center gap-2">
+      <Select value={filtroStatusFatura} onValueChange={setFiltroStatusFatura}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filtrar por status..." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="todas">Todas as Faturas</SelectItem>
+          <SelectItem value="aberta">Em Aberto</SelectItem>
+          <SelectItem value="paga">Pagas</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
+        <Calendar className="h-4 w-4 mr-2" />
+        Filtrar por Período
+      </Button>
+    </div>
+    {/* ▲▲▲ FIM DO CONTAINER ▲▲▲ */}
                 <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
                   <Calendar className="h-4 w-4 mr-2" />
                   Filtrar por Período
