@@ -790,21 +790,39 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
               <DialogHeader>
                 <DialogTitle>Editar Transação</DialogTitle>
               </DialogHeader>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                if (!editFormData.description || !editFormData.amount || !editFormData.category) {
-                  alert('Por favor, preencha todos os campos obrigatórios.');
-                  return;
-                }
-                
-                const amount = parseFloat(editFormData.amount);
-                const finalAmount = Math.abs(amount); // Garante que o valor é sempre positivo
-                editarTransacao(selectedTransacao.id, {
-              ...editFormData,
-               value: finalAmount, // Chave alterada para 'value'
-              amount: undefined // Remove a chave 'amount' antiga do payload
-              });
-              }} className="space-y-4">
+                // NOVA VERSÃO CORRIGIDA
+<form onSubmit={(e) => {
+  e.preventDefault();
+  if (!editFormData.description || !editFormData.amount || !editFormData.category) {
+    alert('Por favor, preencha todos os campos obrigatórios.');
+    return;
+  }
+
+  // 1. Busca o ID da categoria a partir do nome selecionado no formulário
+  const tipoSelecionado = editFormData.type === 'income' ? 'entrada' : 'saida';
+  const categoriaObj = categorias.find(
+    cat => cat.name === editFormData.category && cat.type === tipoSelecionado
+  );
+
+  if (!categoriaObj) {
+    alert('Categoria inválida. Por favor, selecione uma da lista.');
+    return;
+  }
+
+  // 2. Monta o 'payload' com os nomes de campos EXATOS que a API espera
+  const payload = {
+    description: editFormData.description,
+    value: Math.abs(parseFloat(editFormData.amount)),
+    type: tipoSelecionado, // Garante que seja 'entrada' ou 'saida'
+    category_id: categoriaObj.id, // Envia o ID da categoria, não o nome
+    date: editFormData.transaction_date, // O backend espera 'date'
+    status: editFormData.status
+  };
+
+  // 3. Chama a função de edição com os dados corretos
+  editarTransacao(selectedTransacao.id, payload);
+
+}} className="space-y-4">
                 <div>
                   <Label htmlFor="edit_description">Descrição *</Label>
                   <Input
