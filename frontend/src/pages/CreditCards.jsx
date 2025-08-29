@@ -736,7 +736,7 @@ const respostaFaturas = await apiService.get(url);
 
             {/* Faturas */}
             <TabsContent value="faturas" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-start items-center gap-4">
                 <h3 className="text-lg font-semibold dark:text-slate-100">Faturas dos Cartões</h3>
               {/* ▼▼▼ NOVO CONTAINER PARA OS FILTROS ▼▼▼ */}
     <div className="flex items-center gap-2">
