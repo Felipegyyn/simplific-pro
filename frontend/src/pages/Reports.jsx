@@ -253,6 +253,7 @@ useEffect(() => {
                       </div>
                     </>
                   )}
+                   {/* ▼▼▼ AQUI COMEÇA A "MOLDURA" QUE SERÁ IMPRESSA ▼▼▼ */}
                   <div>
                     <Label htmlFor="type">Tipo</Label>
                     <Select value={filters.type} onValueChange={(value) => handleFilterChange('type', value)}>

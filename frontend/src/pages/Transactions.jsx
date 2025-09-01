@@ -336,20 +336,28 @@ const transacoesFiltradas = Array.isArray(transacoes)
     })
   : [];
 
+// NOVA VERSÃO (CALCULA A PARTIR DA LISTA FILTRADA E É MAIS EFICIENTE)
+const { totalReceitas, totalDespesas, totalPendentes } = useMemo(() => {
+  let receitas = 0;
+  let despesas = 0;
+  let pendentes = 0;
 
-  
-  // Calcular totais
-const totalReceitas = (Array.isArray(transacoes) ? transacoes : [])
-  .filter(t => t.type === 'income' && t.status === 'confirmada')
-  .reduce((sum, t) => sum + (t.amount || 0), 0); // VOLTAR PARA amount
-
-const totalDespesas = (Array.isArray(transacoes) ? transacoes : [])
-  .filter(t => t.type === 'expense' && t.status === 'confirmada')
-  .reduce((sum, t) => sum + (t.amount || 0), 0); // VOLTAR PARA amount
-
-const totalPendentes = (Array.isArray(transacoes) ? transacoes : [])
-  .filter(t => t.status === 'pendente')
-  .length;
+  // AGORA USAMOS A LISTA JÁ FILTRADA PELA DATA E PELA BUSCA!
+  for (const t of transacoesFiltradas) {
+    if (t.status === 'confirmada') {
+      if (t.type === 'income') {
+        receitas += (t.amount || 0);
+      } else if (t.type === 'expense') {
+        despesas += (t.amount || 0);
+      }
+    }
+    // A contagem de pendentes não deve ser afetada pelo filtro de 'confirmada'
+    if (t.status === 'pendente') {
+      pendentes++;
+    }
+  }
+  return { totalReceitas: receitas, totalDespesas: despesas, totalPendentes: pendentes };
+}, [transacoesFiltradas]); // A mágica está aqui: recalcula sempre que a lista filtrada mudar
 
 const saldoLiquido = totalReceitas - totalDespesas;
 
