@@ -128,7 +128,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
             - Extraia o "tipo" ('saida' para despesas, 'entrada' para receitas, 'ambos' se o usuário pedir 'lançamentos').
             - Extraia o "periodo".
             - Exemplo 1: "quais minhas despesas pendentes?" -> `[ACTION]{{"type": "consultar_transacoes", "data": {{"status": "pendente", "tipo": "saida", "periodo": "este mês"}}}}`
-            - Exemplo 2: "minhas receitas pendentes" -> `[ACTION]{{"type": "consultar_transacoes", "data": {{"status": "pendente", "tipo": "entrada", "periodo": "este mês"}}}}`
+            - Exemplo 2: "quais minhas receitas pendentes" -> `[ACTION]{{"type": "consultar_transacoes", "data": {{"status": "pendente", "tipo": "entrada", "periodo": "este mês"}}}}`
        
         - "consultar_agenda": Para listar os compromissos do usuário.
             - Exemplo: "o que tenho na agenda?" -> `[ACTION]{{"type": "consultar_agenda", "data": null}}`

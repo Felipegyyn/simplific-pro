@@ -90,7 +90,15 @@ def receive_message():
         else:
             resposta_em_texto = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
 
-    # --- ORQUESTRADOR DE RESPOSTA HÍBRIDO - LÓGICA FINAL E ROBUSTA ---
+        # ▼▼▼ ADICIONE ESTE BLOCO DE LIMPEZA DE TEXTO AQUI ▼▼▼
+        # Padroniza o negrito para o formato do WhatsApp (*texto*) e remove espaços
+        # que possam quebrar a formatação.
+        if resposta_em_texto:
+            resposta_em_texto = re.sub(r'\s*\*\*(.*?)\*\*\s*', r'*\1*', resposta_em_texto)
+         # ▲▲▲ FIM DO BLOCO DE LIMPEZA ▲▲▲
+
+
+# NOVA VERSÃO - 100% BASEADA NA PREFERÊNCIA DO USUÁRIO
     resp = MessagingResponse()
     
     # A decisão agora é uma única linha.
@@ -98,7 +106,7 @@ def receive_message():
     # Caso contrário (se for 'text' ou qualquer outra coisa), será False.
     send_as_audio = usuario and usuario.preferred_response_format == 'audio'
 
-    if send_as_audio
+    if send_as_audio:
         print("Decisão: Enviar áudio (Conforme preferência salva na plataforma).")
     else:
         print("Decisão: Enviar texto (Conforme preferência salva na plataforma).")
