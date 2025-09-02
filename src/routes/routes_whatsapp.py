@@ -84,6 +84,7 @@ def receive_message():
         sessao = user_sessions.get(from_number, {})
         contexto = sessao.get('contexto')
 
+
         if contexto:
             resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
         else:
@@ -91,20 +92,16 @@ def receive_message():
 
     # --- ORQUESTRADOR DE RESPOSTA HÍBRIDO - LÓGICA FINAL E ROBUSTA ---
     resp = MessagingResponse()
-    send_as_audio = False  # Começamos assumindo que a resposta será em texto.
+    
+    # A decisão agora é uma única linha.
+    # Se a preferência do usuário for 'audio', send_as_audio será True.
+    # Caso contrário (se for 'text' ou qualquer outra coisa), será False.
+    send_as_audio = usuario and usuario.preferred_response_format == 'audio'
 
-    if usuario and usuario.preferred_response_format == 'audio':
-        # REGRA 1 (PRIORIDADE MÁXIMA): O usuário pediu áudio? Então será áudio.
-        print("Decisão: Enviar áudio (Preferência do usuário).")
-        send_as_audio = True
-    elif usuario and usuario.preferred_response_format == 'text':
-        # REGRA 2 (SEGUNDA PRIORIDADE): O usuário pediu texto? Então será texto. Fim de papo.
-        print("Decisão: Enviar texto (Preferência do usuário).")
-        send_as_audio = False
+    if send_as_audio
+        print("Decisão: Enviar áudio (Conforme preferência salva na plataforma).")
     else:
-        # REGRA 3 (PADRÃO): O usuário não tem preferência. Então, espelhamos o formato.
-        print("Decisão: Sem preferência definida. Espelhando o formato da mensagem de entrada.")
-        send_as_audio = is_incoming_audio
+        print("Decisão: Enviar texto (Conforme preferência salva na plataforma).")
 
     # Agora, com a decisão tomada, executamos a ação
     if send_as_audio:
