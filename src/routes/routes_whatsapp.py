@@ -94,7 +94,7 @@ def receive_message():
         # Padroniza o negrito para o formato do WhatsApp (*texto*) e remove espaços
         # que possam quebrar a formatação.
         if resposta_em_texto:
-            resposta_em_texto = re.sub(r'\s*\*\*(.*?)\*\*\s*', r'*\1*', resposta_em_texto)
+            resposta_em_texto = re.sub(r'\*+([^\*]+)\*+', r'*\1*', resposta_em_texto)
          # ▲▲▲ FIM DO BLOCO DE LIMPEZA ▲▲▲
 
 
