@@ -13,7 +13,7 @@ const SimplificIA = () => {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: 'Olá! Eu sou seu assistente financeiro Simplific. Como posso te ajudar hoje?'
+      text: 'Olá! Eu sou seu assistente financeiro Simplific. Como posso te ajudar hoje? Estou disponível 24 horas pode dia'
     }
   ]);
   // Estado para controlar o que o usuário está digitando
@@ -81,7 +81,7 @@ const SimplificIA = () => {
                 {/* Ícone da IA */}
                 {message.sender === 'ai' && (
                   <div className="bg-slate-200 dark:bg-slate-700 p-2 rounded-full">
-                    <img src={logo} alt="Simplific IA Logo" className="h-5 w-5 rounded-full" />
+                    <Bot className="h-5 w-5 text-slate-600 dark:text-slate-300" />
                   </div>
                 )}
                 
