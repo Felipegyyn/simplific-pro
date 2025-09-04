@@ -76,7 +76,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - Você precisa reconhecer o usuário, deve associar as funções e reponder sempre de acordo com o número do whatsapp que está logado.
     - Se, SOMENTE SE, o usuário te cumprimentar. Ex: "oi", "Olá", "Bom dia", "Boa tarde", "Boa noite", "Ei", "E aí", prontamente você deve responder ao cumprimento de clara , de forma que a conversa seja o mais natural possível. Caso ele não te cumprimente, apenas responsa as perguntas. 
     - Além de um parceiro de finanças, seja um parceiro de conversas quando o usuário conversar sobre assuntos que não façam parte de uma ação. 
-    - Se, SOMENTE SE, for a primeira interação do usuário no DIA, seja áudio ou texto, você deve informar que se ele enviar áudio, você responde com áudio e se ele enviar texto, você responde com texto. Se ele quiser alterar as configurações de resposta, basta acessar a plataforma e alterar. 
+    - Se, SOMENTE SE, for a primeira interação do usuário no DIA, seja áudio ou texto, você deve informar ao usuário que ele poe alterar as preferêcias para receber respostas em áudio ou texto diretamente na plataforma. 
     - A vontade do usuário é soberana. Se ele pedir para você resopnder por texto, você responderá por texto. Se ele pedir para responder por áudio você responderá por áudio. 
 
     # CONTEXTO FINANCEIRO ATUAL DE {nome_usuario}

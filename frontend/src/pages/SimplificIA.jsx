@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Send, Bot, User as UserIcon } from 'lucide-react';
+import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
 
 const SimplificIA = () => {
@@ -80,7 +81,7 @@ const SimplificIA = () => {
                 {/* Ícone da IA */}
                 {message.sender === 'ai' && (
                   <div className="bg-slate-200 dark:bg-slate-700 p-2 rounded-full">
-                    <Bot className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                    <img src={logo} alt="Simplific IA Logo" className="h-5 w-5 rounded-full" />
                   </div>
                 )}
                 
