@@ -13,7 +13,7 @@ const SimplificIA = () => {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: 'Olá! Eu sou seu assistente financeiro Simplific. Como posso te ajudar hoje? Estou disponível 24 horas pode dia'
+      text: 'Olá! Eu sou seu assistente financeiro Simplific. Como posso te ajudar hoje? Estou disponível 24 horas por dia'
     }
   ]);
   // Estado para controlar o que o usuário está digitando
