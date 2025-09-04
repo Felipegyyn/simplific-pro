@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3
+  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3, Bot
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 
@@ -20,6 +20,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     { name: 'Metas', icon: Target, path: '/goals' },
     { name: 'Investimentos', icon: TrendingUp, path: '/investments' },
     { name: 'Agenda', icon: Calendar, path: '/schedule' },
+    { name: 'Simplific IA', icon: Bot, path: '/simplific-ia' },
     { name: 'Análise', icon: BarChart3, path: '/analysis' },
     { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
     { name: 'Configurações', icon: Settings, path: '/settings' }

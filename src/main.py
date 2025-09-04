@@ -28,6 +28,7 @@ from src.routes.extended_simple import extended_bp
 from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
 from src.routes.routes_whatsapp import whatsapp_bp
 from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
+from src.routes.chat_bp import chat_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 from src.scheduler import check_and_send_reminders, enviar_resumos_semanais
 
@@ -68,10 +69,11 @@ app.register_blueprint(credit_cards_bp, url_prefix='/api')
 app.register_blueprint(schedule_bp, url_prefix='/api')
 app.register_blueprint(investments_bp, url_prefix='/api')
 app.register_blueprint(extended_bp, url_prefix='/api')
-app.register_blueprint(reports_bp, url_prefix='/api') # <-- ADICIONE ESTA LINHA PARA REPOSRTS
+app.register_blueprint(reports_bp, url_prefix='/api') 
 app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
-app.register_blueprint(analysis_bp, url_prefix='/api') # <-- ADICIONE ESTA LINHA
+app.register_blueprint(analysis_bp, url_prefix='/api') 
+app.register_blueprint(chat_bp, url_prefix='/api')
 
 # Adicione esta linha logo acima da sua função
 
