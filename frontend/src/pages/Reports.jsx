@@ -375,24 +375,37 @@ useEffect(() => {
         <CardTitle>Distribuição por Categoria</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <RechartsPieChart>
-            <Pie
-              data={reportData.charts.categoryBreakdown}
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#8884d8"
-              dataKey="value"
-              label={({ name, percentage }) => `${name} ${percentage}%`}
-            >
-              {reportData.charts.categoryBreakdown.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88', '#ff0088'][index % 6]} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value) => formatCurrency(value)} />
-          </RechartsPieChart>
-        </ResponsiveContainer>
+      {/* NOVA VERSÃO (Gráfico de Barras) */}
+<ResponsiveContainer width="100%" height={300}>
+  <BarChart
+    data={reportData.charts.categoryBreakdown}
+    margin={{
+      top: 5,
+      right: 20,
+      left: 10,
+      bottom: 5, // Deixa um pouco de espaço na base
+    }}
+  >
+    <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="3 3" />
+    <XAxis 
+      dataKey="name" 
+      angle={-45} // Inclina os nomes para não sobrepor
+      textAnchor="end" // Alinha o texto inclinado corretamente
+      height={80} // Aumenta o espaço para os nomes longos
+      interval={0} // Garante que todos os nomes de categoria apareçam
+      tick={{ fontSize: 12 }} 
+    />
+    <YAxis 
+      tickFormatter={(value) => formatCurrency(value)} 
+      tick={{ fontSize: 12 }}
+    />
+    <Tooltip 
+      formatter={(value) => formatCurrency(value)}
+      cursor={{ fill: 'rgba(128, 128, 128, 0.1)' }}
+    />
+    <Bar dataKey="value" name="Gasto" fill="#3b82f6" />
+  </BarChart>
+</ResponsiveContainer>
       </CardContent>
     </Card>
 
