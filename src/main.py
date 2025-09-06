@@ -185,10 +185,10 @@ def serve_audio(filename):
 
 scheduler = BackgroundScheduler(daemon=True)
 # Roda a verificação de lembretes todos os dias às 8:00 da manhã (horário do servidor)
-scheduler.add_job(check_and_send_reminders, trigger='cron', hour=8, minute=0, args=[app])
-scheduler.add_job(enviar_resumos_semanais, trigger='cron', day_of_week='mon', hour=9, minute=0, args=[app])
+scheduler.add_job(check_and_send_reminders, trigger='cron', hour=11, minute=0, args=[app])
+scheduler.add_job(enviar_resumos_semanais, trigger='cron', day_of_week='mon', hour=11, minute=0, args=[app])
 # Roda a verificação de lançamentos pendentes todo dia às 8:30 da manhã
-scheduler.add_job(verificar_lancamentos_pendentes, trigger='cron', hour=8, minute=30, args=[app])
+scheduler.add_job(verificar_lancamentos_pendentes, trigger='cron', hour=11, minute=30, args=[app])
 
 scheduler.start()
 # Roda o envio de resumos toda Segunda-feira às 9:00 da manhã (horário do servidor)
