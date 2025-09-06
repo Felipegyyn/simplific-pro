@@ -1048,6 +1048,32 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             remover_sessao(from_number) # Limpa a sessão em caso de erro
             return 'Resposta inválida. Ação cancelada.' 
 
+    elif contexto == 'confirmar_lancamento_lembrete':
+        sessao = buscar_sessao(from_number) # Importar buscar_sessao
+        transaction_id = sessao.get('transaction_id')
+        resposta_usuario = mensagem.strip().lower()
+
+        if resposta_usuario in ['sim', 's']:
+            # Importar a função de confirmar
+            from src.services.transacoes_service import confirmar_transacao_por_id
+
+            sucesso = confirmar_transacao_por_id(transaction_id, user_id)
+            if sucesso:
+                remover_sessao(from_number)
+                return "Confirmado! Seu lançamento foi atualizado. ✅"
+            else:
+                remover_sessao(from_number)
+                return "Ocorreu um erro ao tentar confirmar. Por favor, confirme manualmente na plataforma."
+
+        elif resposta_usuario in ['não', 'nao', 'n']:
+            remover_sessao(from_number)
+            return "Ok! Não esqueça de confirmar o lançamento quando ele for concluído. 😉"
+        
+        else:
+            # Não remove a sessão, para o usuário poder tentar de novo
+            return "Não entendi sua resposta. Por favor, responda apenas com 'Sim' ou 'Não'."
+    # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
+
     # --- NOVO FLUXO: CONFIRMAR SE É RENDA FIXA ---
     elif contexto == 'cadastrar_renda_fixa':
         if mensagem == '1': # Sim, é Renda Fixa

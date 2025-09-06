@@ -2,6 +2,7 @@
 from datetime import date, timedelta, datetime
 from src.models.extended import ScheduleEvent
 from src.models.user import User
+from src.models.financial import Transaction 
 from src.services.whatsapp_service import send_whatsapp_message 
 # Importe a nossa função de formatação de moeda para usar aqui também
 from src.services.transacoes_service import format_currency_brl
@@ -107,5 +108,55 @@ def enviar_resumos_semanais(app):
 # Esta parte permite que o script seja executado manualmente para testes
 if __name__ == '__main__':
     check_and_send_reminders()
+
+
+# Em src/scheduler.py, adicione esta função no final do arquivo
+
+def verificar_lancamentos_pendentes(app):
+    """
+    Verifica transações com status 'pendente' para o dia atual e envia um lembrete/confirmação.
+    """
+    with app.app_context():
+        print(f"--- [SCHEDULER] Executando verificação de lançamentos pendentes em {datetime.now()} ---")
+        hoje = date.today()
+
+        # 1. Busca todos os lançamentos pendentes com a data de hoje
+        lancamentos_do_dia = Transaction.query.filter_by(date=hoje, status='pendente').all()
+
+        if not lancamentos_do_dia:
+            print("Nenhum lançamento pendente para hoje.")
+            return
+
+        print(f"Encontrados {len(lancamentos_do_dia)} lançamentos pendentes para hoje.")
+
+        for lancamento in lancamentos_do_dia:
+            usuario = User.query.get(lancamento.user_id)
+            if usuario and usuario.whatsapp:
+                
+                # 2. Guarda na "memória" (sessão) que estamos aguardando uma resposta para este lançamento
+                session_key = usuario.whatsapp # A chave da sessão é o número do usuário
+                user_sessions[session_key] = {
+                    'contexto': 'confirmar_lancamento_lembrete',
+                    'transaction_id': lancamento.id
+                }
+                print(f"Sessão criada para {session_key} com transaction_id {lancamento.id}")
+
+                # 3. Monta e envia a mensagem
+                tipo_texto = "receita" if lancamento.type == 'entrada' else "despesa"
+                valor_formatado = format_currency_brl(lancamento.value)
+                
+                mensagem = (
+                    f"Olá, {usuario.name}! 👋\n\n"
+                    f"Lembrete de um lançamento pendente para hoje:\n\n"
+                    f"*{lancamento.description}* ({tipo_texto}) no valor de *{valor_formatado}*.\n\n"
+                    f"Este lançamento já foi pago/recebido?\n\n"
+                    f"Responda com *Sim* para confirmar ou *Não*."
+                )
+
+                numero_destino = f'whatsapp:{usuario.whatsapp}'
+                enviar_mensagem_whatsapp(numero_destino, mensagem)
+                time.sleep(1) # Pausa para não sobrecarregar a API
+
+        print("--- [SCHEDULER] Verificação de lançamentos pendentes concluída. ---")
 
 
