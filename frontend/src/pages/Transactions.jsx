@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { 
   DollarSign, TrendingUp, TrendingDown, Plus, Edit, Trash2, 
-  Search, Filter, Calendar, CheckCircle, Clock, LogOut, ArrowLeft
+  Search, Filter, Calendar, CheckCircle, Clock, LogOut, ArrowLeft,
+  FileText, RefreshCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
