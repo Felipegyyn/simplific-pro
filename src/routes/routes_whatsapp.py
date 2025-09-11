@@ -13,7 +13,7 @@ from src.services.transcription_service import transcrever_audio_de_url # <-- AD
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
 from src.services.transacoes_service import buscar_transacoes_por_status
-from src.services.transacoes_service import buscar_resumo_planejamento
+from src.services.reports_service import buscar_resumo_planejamento
 from src.services.investments_service import buscar_dados_ativo
 from src.services.goals_service import get_user_goals, add_value_to_goal
 from src.services.credit_card_service import get_card_limit_details, process_card_payment
