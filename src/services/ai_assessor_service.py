@@ -7,7 +7,7 @@ from src.models.user import User
 
 # --- Importando TODOS os nossos serviços de resumo ---
 from src.services.gemini_service import construir_prompt_assessor, model
-from src.services.transacoes_service import get_financial_summary_for_ai
+from src.services.reports_service import get_financial_summary_for_ai
 from src.services.credit_card_service import get_credit_card_summary_for_ai
 from src.services.goals_service import get_goals_summary_for_ai
 from src.services.investments_service import get_investments_summary_for_ai
