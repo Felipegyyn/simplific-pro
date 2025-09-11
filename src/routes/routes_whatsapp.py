@@ -8,7 +8,7 @@ from src.services.schedule_service import criar_evento_agenda, buscar_resumo_age
 from src.services.tts_service import texto_para_audio # <-- ADICIONE
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
-from src.services.transacoes_service import format_currency_brl
+from src.utils.formatters import format_currency_brl
 from src.services.transcription_service import transcrever_audio_de_url # <-- ADICIONE ESTA LINHA
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp

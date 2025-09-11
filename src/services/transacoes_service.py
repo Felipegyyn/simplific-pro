@@ -8,18 +8,6 @@ import re
 from src.models.financial import Transaction, Category
 from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
 
-def format_currency_brl(value):
-    """
-    Formata um número como moeda brasileira (R$), de forma independente do locale do sistema.
-    Ex: 1234.5 -> 'R$ 1.234,50'
-    """
-    if value is None:
-        value = 0
-    # Formata o número com 2 casas decimais, usando vírgula como separador decimal
-    # e ponto como separador de milhar.
-    formatted_value = "{:,.2f}".format(value).replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"R$ {formatted_value}"
-
 def criar_lancamento(user_id, tipo, categoria_id, valor, descricao, formato='Variável', status='confirmada'):
     """
     Grava o lançamento na tabela de transações

@@ -5,7 +5,7 @@ from src.models.user import User
 from src.models.financial import Transaction 
 from src.services.whatsapp_service import send_whatsapp_message 
 # Importe a nossa função de formatação de moeda para usar aqui também
-from src.services.transacoes_service import format_currency_brl
+from src.utils.formatters import format_currency_brl
 from src.services.transacoes_service import gerar_resumo_semanal
 import time
 
