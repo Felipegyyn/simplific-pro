@@ -13,7 +13,7 @@ from src.services.goals_service import get_goals_summary_for_ai
 from src.services.investments_service import get_investments_summary_for_ai
 from src.services.schedule_service import get_schedule_summary_for_ai
 from src.services.categorias_service import get_categories_for_ai
-from src.services.transacoes_service import get_planning_summary_for_ai
+from src.services.reports_service import get_planning_summary_for_ai
 
 # --- Importando os serviços de AÇÃO ---
 from src.services.transacoes_service import criar_lancamento
