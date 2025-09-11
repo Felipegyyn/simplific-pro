@@ -21,6 +21,7 @@ from src.services.credit_card_service import process_card_payment
 from src.services.goals_service import add_value_to_goal
 from src.services.investments_service import processar_investimento_whatsapp
 from src.services.schedule_service import criar_evento_agenda
+from src.models.financial import Category
 
 
 
@@ -92,3 +93,54 @@ def get_ai_response(user_id, historico_chat):
         pass
 
     return texto_para_usuario, acao_a_executar
+
+
+# ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO ▼▼▼
+
+def categorizar_descricao_transacao(user_id, descricao):
+    """
+    Usa o Gemini para analisar uma descrição de transação e sugerir a categoria mais apropriada.
+    """
+    # 1. Busca todas as categorias de 'saida' do usuário
+    categorias = Category.query.filter_by(user_id=user_id, type='saida').all()
+    if not categorias:
+        # Se o usuário não tiver categorias, retorna 'Outros' por padrão.
+        return 'Outros'
+
+    # 2. Formata a lista de categorias para incluir no prompt
+    # Usamos uma lista simples de nomes para a IA.
+    nomes_categorias = [cat.name for cat in categorias]
+    # Garante que 'Outros' seja sempre uma opção válida.
+    if 'Outros' not in nomes_categorias:
+        nomes_categorias.append('Outros')
+    
+    lista_formatada = ", ".join(f"'{nome}'" for nome in nomes_categorias)
+
+    # 3. Cria o prompt para a IA
+    prompt = (
+        f"Analise a seguinte descrição de uma transação de extrato bancário: '{descricao}'.\n"
+        f"Com base na lista de categorias disponíveis: [{lista_formatada}], qual é a mais adequada?\n"
+        f"Se nenhuma categoria se encaixar perfeitamente, escolha 'Outros'.\n"
+        f"Responda APENAS com o nome exato de uma das categorias da lista."
+    )
+
+    try:
+        # 4. Chama a IA e obtém a resposta
+        model = genai.GenerativeModel('gemini-1.5-flash-latest') # ou o modelo que você usa
+        response = model.generate_content(prompt)
+        
+        # 5. Limpa e valida a resposta da IA
+        categoria_sugerida = response.text.strip().replace("'", "").replace('"', '')
+
+        # Garante que a IA não "inventou" uma categoria que não existe
+        if categoria_sugerida in nomes_categorias:
+            return categoria_sugerida
+        else:
+            # Se a IA sugerir algo que não está na lista, usamos 'Outros' por segurança
+            print(f"AVISO: IA sugeriu categoria não existente ('{categoria_sugerida}'). Usando 'Outros'.")
+            return 'Outros'
+            
+    except Exception as e:
+        print(f"ERRO na categorização com IA: {e}")
+        # Em caso de erro na API da IA, retorna 'Outros' como fallback
+        return 'Outros'

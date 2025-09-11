@@ -1,7 +1,11 @@
 from src.database.database import execute_query
-from datetime import datetime, date, timedelta 
+from datetime import datetime, date, timedelta
+import fitz  # PyMuPDF 
+from src.services.ai_assessor_service import categorizar_descricao_transacao # <-- Nova importação da IA
 from src.models.db import db
 from collections import defaultdict
+import re
+from src.models.financial import Transaction, Category
 from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
 
 def format_currency_brl(value):
@@ -424,3 +428,91 @@ def gerar_resumo_semanal(user_id):
         "categoria_principal": categoria_principal
     }
 # ▲▲▲ FIM DO BLOCO PARA COPIAR ▲▲▲
+
+# ▼▼▼ SUBSTITUA A FUNÇÃO 'processar_extrato_pdf' INTEIRA POR ESTA ▼▼▼
+
+def processar_extrato_pdf(user_id, pdf_file_stream):
+    """
+    Processa um PDF de extrato, extrai transações, as categoriza com IA
+    e as salva como pendentes no banco de dados.
+    """
+    try:
+        documento = fitz.open(stream=pdf_file_stream.read(), filetype="pdf")
+        texto_completo = "".join(pagina.get_text() for pagina in documento)
+        
+        # Expressão Regular (Regex) para encontrar transações no texto
+        # Padrão: DD/MM/AAAA (ou DD/MM) Descrição longa... 1.234,56
+        regex = r"(\d{2}/\d{2}(?:/\d{4})?)\s+(.*?)\s+([\d\.,]+(?:,\d{2}))\s*(D|C)?\n"
+        
+        transacoes_encontradas = re.finditer(regex, texto_completo)
+        
+        novos_lancamentos = []
+        contador_total = 0
+        contador_nao_categorizado = 0
+        
+        # Busca a categoria 'Outros' do usuário para usar como fallback
+        categoria_outros = Category.query.filter_by(user_id=user_id, name='Outros', type='saida').first()
+        if not categoria_outros:
+            # Se não existir, você pode querer criar ou simplesmente retornar um erro
+            return {"status": "erro", "mensagem": "Categoria 'Outros' do tipo 'saida' não encontrada. Crie-a antes de importar."}
+
+        for match in transacoes_encontradas:
+            data_str, descricao, valor_str = match.groups()[:3]
+            
+            # Limpeza dos dados extraídos
+            descricao = ' '.join(descricao.split())
+            valor = float(valor_str.replace('.', '').replace(',', '.'))
+            
+            # Tenta adivinhar o ano e formata a data
+            try:
+                if len(data_str) <= 5: # Formato DD/MM
+                    data_transacao = datetime.strptime(f"{data_str}/{datetime.now().year}", '%d/%m/%Y').date()
+                else: # Formato DD/MM/AAAA
+                    data_transacao = datetime.strptime(data_str, '%d/%m/%Y').date()
+            except ValueError:
+                continue # Pula transação se a data for inválida
+
+            # Ignora linhas que são cabeçalhos ou totais
+            if "SALDO" in descricao.upper() or valor == 0:
+                continue
+
+            # Chama a IA para categorizar a descrição
+            print(f"Categorizando com IA a descrição: '{descricao}'")
+            nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
+            
+            # Busca o ID da categoria que a IA retornou
+            categoria_final = Category.query.filter_by(user_id=user_id, name=nome_categoria_ia, type='saida').first()
+            
+            if not categoria_final:
+                categoria_id_final = categoria_outros.id
+                contador_nao_categorizado += 1
+            else:
+                categoria_id_final = categoria_final.id
+
+            # Cria o objeto de transação (sem salvar ainda)
+            novo_lancamento = Transaction(
+                user_id=user_id,
+                date=data_transacao,
+                type='saida', # Assumindo que a maioria são despesas, pode ser melhorado
+                category_id=categoria_id_final,
+                value=valor,
+                description=f"[Importado] {descricao}",
+                status='pendente' # Importante: sempre como pendente!
+            )
+            novos_lancamentos.append(novo_lancamento)
+            contador_total += 1
+            
+        if novos_lancamentos:
+            db.session.add_all(novos_lancamentos)
+            db.session.commit()
+
+        return {
+            "status": "sucesso",
+            "total_importado": contador_total,
+            "nao_categorizado": contador_nao_categorizado,
+            "mensagem": f"Importação concluída! {contador_total} lançamentos adicionados como pendentes."
+        }
+
+    except Exception as e:
+        print(f"ERRO CRÍTICO ao processar o arquivo PDF: {e}")
+        return {"status": "erro", "mensagem": "O arquivo enviado não parece ser um PDF válido ou está corrompido."}

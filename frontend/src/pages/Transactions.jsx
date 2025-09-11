@@ -104,6 +104,10 @@ await apiService.post('/api/categories', categoriaData);
     status: 'pendente'
   });
 
+  const fileInputRef = useRef(null); // <-- Adicione esta linha para o input de arquivo
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState(null); // para a mensagem de sucesso/erro
+
   // Carregar transações da API
   useEffect(() => {
     loadTransacoes();
@@ -153,6 +157,41 @@ const loadTransacoes = async () => {
     setCategoriasLoading(false); // Final do carregamento
   }
 };
+
+// ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO COMPLETA ▼▼▼
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return; // Cancela se o usuário não selecionar nenhum arquivo
+
+  // Validação simples do tipo de arquivo
+  if (file.type !== 'application/pdf') {
+    alert('Por favor, selecione um arquivo PDF.');
+    return;
+  }
+
+  setIsUploading(true);
+  setUploadResult(null); // Limpa o resultado anterior
+
+  // FormData é a forma padrão de enviar arquivos para uma API
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const result = await apiService.post('/api/transactions/import-statement', formData, {
+      // O cabeçalho 'Content-Type' é definido automaticamente pelo navegador ao usar FormData
+    });
+
+    setUploadResult({ success: true, message: result.mensagem });
+    await loadTransacoes(); // Recarrega a lista para mostrar os novos lançamentos pendentes
+
+  } catch (error) {
+    const errorMessage = error.response?.data?.error || 'Ocorreu um erro ao importar o extrato.';
+    setUploadResult({ success: false, message: errorMessage });
+  } finally {
+    setIsUploading(false);
+  }
+};
+
 const carregarCategoriasAntesDeAbrir = async () => {
   setCategoriasLoading(true);
   await loadCategorias();  // Garante carregamento completo
@@ -687,9 +726,39 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
 
                   </DialogContent>
                 </Dialog>
+                {/* ▼▼▼ ADICIONE O CÓDIGO DO BOTÃO E DO INPUT OCULTO AQUI ▼▼▼ */}
+    <Button 
+      variant="outline" 
+      onClick={() => fileInputRef.current.click()} 
+      disabled={isUploading}
+    >
+      {isUploading ? (
+        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <FileText className="h-4 w-4 mr-2" />
+      )}
+      {isUploading ? 'Importando...' : 'Importar Extrato'}
+    </Button>
+    <input
+      type="file"
+      ref={fileInputRef}
+      onChange={handleFileUpload}
+      accept=".pdf"
+      className="hidden" // O input fica invisível, o botão o aciona
+    />
+    
               </div>
             </div>
-
+{/* ▼▼▼ ADICIONE ESTE BLOCO PARA EXIBIR O RESULTADO DO UPLOAD ▼▼▼ */}
+      {uploadResult && (
+        <div className={`p-3 rounded-md text-sm mb-4 ${
+          uploadResult.success 
+            ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
+            : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+        }`}>
+          {uploadResult.message}
+        </div>
+      )}
             <TabsContent value={filtroAtivo} className="space-y-4">
               <Card>
                 <CardHeader>

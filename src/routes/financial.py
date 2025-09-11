@@ -8,6 +8,7 @@ from sqlalchemy import func, case
 from sqlalchemy import cast
 from src.models.db import db
 from src.models.financial import Category, Planning, Transaction
+from src.services.transacoes_service import processar_extrato_pdf 
 
 financial_bp = Blueprint('financial', __name__)
 
@@ -678,3 +679,30 @@ def get_dashboard_summary():
         "previous_month": previous_month_totals
     })
 
+# ▼▼▼ ADICIONE ESTA NOVA ROTA NO FINAL DO ARQUIVO ▼▼▼
+
+@financial_bp.route('/transactions/import-statement', methods=['POST'])
+@jwt_required()
+@active_user_required
+def import_statement():
+    user_id = get_jwt_identity()
+
+    # Verifica se o arquivo está na requisição
+    if 'file' not in request.files:
+        return jsonify({'error': 'Nenhum arquivo enviado.'}), 400
+    
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({'error': 'Nenhum arquivo selecionado.'}), 400
+
+    # Valida se o arquivo é um PDF e o processa
+    if file and file.filename.lower().endswith('.pdf'):
+        resultado = processar_extrato_pdf(user_id, file.stream)
+        
+        if resultado['status'] == 'sucesso':
+            return jsonify(resultado), 200
+        else:
+            return jsonify({'error': resultado['mensagem']}), 400
+    else:
+        return jsonify({'error': 'Formato de arquivo inválido. Por favor, envie um PDF.'}), 400
