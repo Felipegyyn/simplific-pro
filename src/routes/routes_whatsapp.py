@@ -29,11 +29,11 @@ from collections import defaultdict
 from src.services.ai_assessor_service import get_ai_response # <-- O NOVO CÉREBRO
 from src.services.whatsapp_service import user_sessions, remover_sessao
 from src.services.transacoes_service import (
-    criar_lancamento,
     buscar_transacoes_pendentes,
     confirmar_transacao_por_id,
 )
 
+from src.routes.financial import criar_lancamento
 from src.services.reports_service import buscar_resumo_planejamento, buscar_transacoes_por_periodo
 from src.services.reports_service import buscar_transacoes_por_periodo
 from src.services.categorias_service import buscar_categorias

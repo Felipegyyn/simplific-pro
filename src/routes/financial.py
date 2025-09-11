@@ -706,3 +706,26 @@ def import_statement():
             return jsonify({'error': resultado['mensagem']}), 400
     else:
         return jsonify({'error': 'Formato de arquivo inválido. Por favor, envie um PDF.'}), 400
+
+def criar_lancamento(user_id, tipo, categoria_id, valor, descricao, formato='Variável', status='confirmada'):
+    """
+    Grava o lançamento na tabela de transações
+    """
+    # ... (O código desta função permanece o mesmo)
+    query = """
+        INSERT INTO transactions (user_id, date, type, category_id, value, description, format, payment_form, status)
+        VALUES (:user_id, :date, :type, :category_id, :value, :description, :format, :payment_form, :status)
+    """
+    params = {
+        'user_id': user_id,
+        'date': datetime.now().date(),
+        'type': tipo,
+        'category_id': categoria_id,
+        'value': valor,
+        'description': descricao,
+        'format': formato,
+        'payment_form': 'À vista',
+        'status': 'confirmada'
+    }
+    execute_query(query, params)
+

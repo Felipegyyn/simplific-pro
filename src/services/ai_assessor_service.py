@@ -16,7 +16,6 @@ from src.services.categorias_service import get_categories_for_ai
 from src.services.reports_service import get_planning_summary_for_ai
 
 # --- Importando os serviços de AÇÃO ---
-from src.services.transacoes_service import criar_lancamento
 from src.services.credit_card_service import process_card_payment
 from src.services.goals_service import add_value_to_goal
 from src.services.investments_service import processar_investimento_whatsapp
