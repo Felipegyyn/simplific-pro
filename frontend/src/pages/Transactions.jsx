@@ -162,8 +162,6 @@ const loadTransacoes = async () => {
 // Em src/pages/Transactions.jsx
 
 // ▼▼▼ SUBSTITUA A SUA FUNÇÃO 'handleFileUpload' INTEIRA POR ESTA ▼▼▼
-// Em src/pages/Transactions.jsx
-
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -180,16 +178,40 @@ const handleFileUpload = async (event) => {
   formData.append('file', file);
 
   try {
-    // AGORA USAMOS O APISERVICE CENTRALIZADO E CORRETO
-    const result = await apiService.post('/api/transactions/import-statement', formData);
+    // --- MUDANÇA PRINCIPAL: USANDO 'FETCH' EM VEZ DE 'APISERVICE' ---
+    // Pegamos o token de autenticação diretamente do localStorage
+    const token = localStorage.getItem('simplific_token');
+    if (!token) {
+        throw new Error('Token de autenticação não encontrado.');
+    }
+
+    // Usamos a API 'fetch' nativa para ter controle total sobre o upload
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/transactions/import-statement`, {
+      method: 'POST',
+      headers: {
+        // NÃO definimos 'Content-Type' aqui. O navegador faz isso
+        // automaticamente para FormData, incluindo o 'boundary' correto.
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData,
+    });
     
-    // O apiService já retorna os dados (result), não a resposta completa (response)
+    // Convertemos a resposta 
+    const result = await response.json();
+
+    // Verificamos se a resposta da API foi um sucesso (status 2xx)
+    if (!response.ok) {
+        // Se não foi sucesso, lançamos um erro com a mensagem da API
+        throw new Error(result.error || 'Erro no servidor.');
+    }
+
+    // Se tudo deu certo, atualizamos a tela
     setUploadResult({ success: true, message: result.mensagem });
     await loadTransacoes();
 
   } catch (error) {
-    const errorMessage = error.response?.data?.error || 'Ocorreu um erro ao importar o extrato.';
-    setUploadResult({ success: false, message: errorMessage });
+    // A mensagem de erro agora virá do 'throw new Error' acima
+    setUploadResult({ success: false, message: error.message });
   } finally {
     setIsUploading(false);
   }

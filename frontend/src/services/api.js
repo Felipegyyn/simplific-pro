@@ -1,50 +1,340 @@
-// Local: src/services/api.js (ou apiService.js)
+// Este é o conteúdo completo e corrigido para o seu arquivoo api.jsx
 
-import axios from 'axios';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// 1. Pega a URL base do backend a partir das variáveis de ambiente.
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+class ApiService {
+  constructor() {
+    this.token = localStorage.getItem('simplific_token');
+    this.refreshToken = localStorage.getItem('refresh_token');
+    this.isRefreshing = false;
+    this.failedQueue = [];
 
-if (!API_BASE_URL) {
-  console.error("ERRO CRÍTICO: A variável de ambiente VITE_API_BASE_URL não está definida!");
+    this.setupTokenRefresh();
+  }
+
+  setToken(token, refreshToken) {
+    this.token = token;
+    this.refreshToken = refreshToken;
+
+    localStorage.setItem('simplific_token', token);
+    localStorage.setItem('refresh_token', refreshToken);
+  }
+
+  setupTokenRefresh() {
+    setInterval(() => {
+      this.checkTokenValidity();
+    }, 5 * 60 * 1000);
+  }
+
+  async checkTokenValidity() {
+    if (!this.token) return;
+
+    try {
+      const payload = JSON.parse(atob(this.token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      const timeUntilExpiry = payload.exp - currentTime;
+
+      if (timeUntilExpiry < 600) {
+        console.log('Token próximo do vencimento, renovando...');
+        await this.silentRefreshToken();
+      }
+    } catch (error) {
+      console.error('Erro ao verificar validade do token:', error);
+    }
+  }
+
+  async silentRefreshToken() {
+    if (this.isRefreshing) {
+      return new Promise((resolve, reject) => {
+        this.failedQueue.push({ resolve, reject });
+      });
+    }
+
+    if (!this.refreshToken) {
+      this.logout();
+      return Promise.reject(new Error('Refresh token não encontrado'));
+    }
+
+    this.isRefreshing = true;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.refreshToken}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha na renovação do token');
+      }
+
+      const data = await response.json();
+      this.setToken(data.access_token, data.refresh_token || this.refreshToken);
+      this.processQueue(null, this.token);
+      console.log('Token renovado com sucesso');
+      return this.token;
+
+    } catch (error) {
+      console.error('Erro na renovação do token:', error);
+      this.processQueue(error, null);
+      this.logout();
+      throw error;
+    } finally {
+      this.isRefreshing = false;
+    }
+  }
+
+  processQueue(error, token = null) {
+    this.failedQueue.forEach(({ resolve, reject }) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(token);
+      }
+    });
+
+    this.failedQueue = [];
+  }
+
+  getHeaders() {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    return headers;
+  }
+
+  async request(endpoint, options = {}) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const config = {
+      headers: this.getHeaders(),
+      ...options,
+    };
+
+    try {
+      const response = await fetch(url, config);
+
+      if (response.status === 401 && !options._retry) {
+        try {
+          await this.silentRefreshToken();
+          const newConfig = { ...config, headers: this.getHeaders() };
+          return this.request(endpoint, { ...newConfig, _retry: true });
+        } catch (refreshError) {
+          this.logout();
+          throw new Error('Sessão expirada. Faça login novamente.');
+        }
+      }
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Erro na requisição');
+      }
+      return data;
+
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
+  async get(endpoint) {
+    return this.request(endpoint, { method: 'GET' });
+  }
+
+  async post(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async put(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async delete(endpoint) {
+    return this.request(endpoint, { method: 'DELETE' });
+  }
+
+  // Autenticação
+  async login(email, password) {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Credenciais inválidas' }));
+      throw new Error(errorData.message);
+    }
+
+    const data = await response.json();
+    this.setToken(data.access_token, data.refresh_token);
+    localStorage.setItem('simplific_user', JSON.stringify(data.user));
+    this.checkTokenValidity();
+    return data;
+  }
+
+  async logout() {
+    this.token = null;
+    this.refreshToken = null;
+    localStorage.removeItem('simplific_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('simplific_user');
+
+    if (window.location.hash !== '#/login' && window.location.hash !== '#/') {
+      window.location.hash = '#/login';
+    }
+  }
+
+  isAuthenticated() {
+    return !!this.token;
+  }
+
+  async getCurrentUser() {
+    return this.request('/api/profile');
+  }
+
+  // Planejamento
+  async getPlannings() {
+    return this.get('/api/planning');
+  }
+
+  async createPlanning(planningData) {
+    return this.post('/api/planning', planningData);
+  }
+
+  async updatePlanning(planningId, planningData) {
+    return this.put(`/api/planning/${planningId}`, planningData);
+  }
+
+  async deletePlanning(planningId) {
+    return this.delete(`/api/planning/${planningId}`);
+  }
+
+  // Transações
+  async getTransactions() {
+    return this.get('/api/transactions');
+  }
+
+  async createTransaction(transactionData) {
+    return this.post('/api/transactions', transactionData);
+  }
+
+  async updateTransaction(transactionId, transactionData) {
+    return this.put(`/api/transactions/${transactionId}`, transactionData);
+  }
+
+  async deleteTransaction(transactionId) {
+    return this.delete(`/api/transactions/${transactionId}`);
+  }
+
+  // Cartões de Crédito
+  async getCreditCards() {
+    return this.get('/api/credit-cards');
+  }
+
+  async createCreditCard(cardData) {
+    return this.post('/api/credit-cards', cardData);
+  }
+
+  async updateCreditCard(cardId, cardData) {
+    return this.put(`/api/credit-cards/${cardId}`, cardData);
+  }
+
+  async deleteCreditCard(cardId) {
+    return this.delete(`/api/credit-cards/${cardId}`);
+  }
+
+  async getCreditCardTransactions(cardId) {
+    return this.get(`/api/credit-cards/${cardId}/transactions`);
+  }
+
+  async createCreditCardTransaction(cardId, transactionData) {
+    return this.post(`/api/credit-cards/${cardId}/transactions`, transactionData);
+  }
+
+  // Metas
+  async getGoals() {
+    return this.get('/api/goals');
+  }
+
+  async createGoal(goalData) {
+    return this.post('/api/goals', goalData);
+  }
+
+  async updateGoal(goalId, goalData) {
+    return this.put(`/api/goals/${goalId}`, goalData);
+  }
+
+  async deleteGoal(goalId) {
+    return this.delete(`/api/goals/${goalId}`);
+  }
+  
+  // Categorias
+  async getCategories() {
+      return this.get('/api/categories');
+  }
+
+  // Reports
+  async getDashboardSummary(year, month) {
+      return this.get(`/api/reports/dashboard_summary?year=${year}&month=${month}`);
+  }
+
+  async getPlannedVsRealized(year, type, categoryId = null) {
+      let endpoint = `/api/reports/planned_vs_realized?year=${year}&type=${type}`;
+      if (categoryId) {
+          endpoint += `&category_id=${categoryId}`;
+      }
+      return this.get(endpoint);
+  }
+
+
+  // Investimentos
+  async getInvestments() {
+    return this.get('/api/investments');
+  }
+
+  async createInvestment(investmentData) {
+    return this.post('/api/investments', investmentData);
+  }
+
+  async updateInvestment(investmentId, investmentData) {
+    return this.put(`/api/investments/${investmentId}`, investmentData);
+  }
+
+  async deleteInvestment(investmentId) {
+    return this.delete(`/api/investments/${investmentId}`);
+  }
+
+  // Agenda
+  async getScheduleEvents() {
+    return this.get('/api/schedule');
+  }
+
+  async createScheduleEvent(eventData) {
+    return this.post('/api/schedule', eventData);
+  }
+
+  async updateScheduleEvent(eventId, eventData) {
+    return this.put(`/api/schedule/${eventId}`, eventData);
+  }
+
+  async deleteScheduleEvent(eventId) {
+    return this.delete(`/api/schedule/${eventId}`);
+  }
 }
 
-// 2. Cria uma instância do Axios com configurações padrão.
-const apiService = axios.create({
-  baseURL: API_BASE_URL,
-});
-
-// 3. Configura um "interceptor" para adicionar o token de autenticação em TODAS as requisições.
-// Isso elimina a necessidade de adicionar o token manualmente em cada chamada.
-apiService.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('simplific_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    // Para uploads de arquivo, o Axios/navegador define o Content-Type,
-    // então não forçamos um 'application/json' aqui.
-    if (!(config.data instanceof FormData)) {
-        config.headers['Content-Type'] = 'application/json';
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// 4. Interceptor de resposta para simplificar o acesso aos dados
-apiService.interceptors.response.use(
-  (response) => {
-    // Retorna diretamente os dados da resposta (response.data) para simplificar o código
-    return response.data;
-  },
-  (error) => {
-    // Aqui você pode adicionar lógica global de tratamento de erros (ex: logout em erro 401)
-    console.error('Erro na chamada da API:', error.response);
-    return Promise.reject(error);
-  }
-);
-
-export default apiService;
+export default new ApiService();
