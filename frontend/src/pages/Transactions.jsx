@@ -196,7 +196,7 @@ const handleFileUpload = async (event) => {
       body: formData,
     });
     
-    // Convertemos a resposta para JSON
+    // Convertemos a resposta 
     const result = await response.json();
 
     // Verificamos se a resposta da API foi um sucesso (status 2xx)
