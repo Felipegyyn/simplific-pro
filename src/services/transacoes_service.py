@@ -82,43 +82,6 @@ def criar_fatura(numero_usuario, valor, descricao, cartao):
         cartao_obj.available_limit = 0
     db.session.commit()
 
-# --- NOVA FUNÇÃO ADICIONADA ABAIXO ---
-
-def buscar_transacoes_por_periodo(user_id, data_inicio, data_fim, tipo_consulta):
-    """
-    Busca transações de um usuário em um determinado período e tipo.
-    """
-    base_query = """
-        SELECT 
-            t.value, 
-            t.description,
-            t.type, 
-            c.name as category_name
-        FROM 
-            transactions t
-        JOIN 
-            categories c ON t.category_id = c.id
-        WHERE 
-            t.user_id = :user_id AND
-            t.date BETWEEN :data_inicio AND :data_fim
-    """
-    
-    params = {
-        'user_id': user_id,
-        'data_inicio': data_inicio,
-        'data_fim': data_fim
-    }
-
-    if tipo_consulta == 'despesas':
-        base_query += " AND t.type = 'saida'"
-    elif tipo_consulta == 'receitas':
-        base_query += " AND t.type = 'entrada'"
-    
-    base_query += " ORDER BY t.date DESC"
-
-    resultado = execute_query(base_query, params)
-    
-    return resultado
 
 # --- NOVAS FUNÇÕES ADICIONADAS ABAIXO ---
 

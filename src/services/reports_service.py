@@ -1,5 +1,6 @@
 from datetime import date
 from collections import defaultdict
+from src.database.database import execute_query
 from src.services.transacoes_service import buscar_transacoes_por_periodo, format_currency_brl
 
 
@@ -36,4 +37,41 @@ def get_financial_summary_for_ai(user_id):
     
     return resumo
 
-# Adicione esta função ao final de transacoes_service.py
+# --- NOVA FUNÇÃO ADICIONADA ABAIXO ---
+
+def buscar_transacoes_por_periodo(user_id, data_inicio, data_fim, tipo_consulta):
+    """
+    Busca transações de um usuário em um determinado período e tipo.
+    """
+    base_query = """
+        SELECT 
+            t.value, 
+            t.description,
+            t.type, 
+            c.name as category_name
+        FROM 
+            transactions t
+        JOIN 
+            categories c ON t.category_id = c.id
+        WHERE 
+            t.user_id = :user_id AND
+            t.date BETWEEN :data_inicio AND :data_fim
+    """
+    
+    params = {
+        'user_id': user_id,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim
+    }
+
+    if tipo_consulta == 'despesas':
+        base_query += " AND t.type = 'saida'"
+    elif tipo_consulta == 'receitas':
+        base_query += " AND t.type = 'entrada'"
+    
+    base_query += " ORDER BY t.date DESC"
+
+    resultado = execute_query(base_query, params)
+    
+    return resultado
+

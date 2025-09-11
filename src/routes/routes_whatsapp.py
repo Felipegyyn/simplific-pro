@@ -30,11 +30,12 @@ from src.services.ai_assessor_service import get_ai_response # <-- O NOVO CÉREB
 from src.services.whatsapp_service import user_sessions, remover_sessao
 from src.services.transacoes_service import (
     criar_lancamento,
-    buscar_transacoes_por_periodo,
     buscar_transacoes_pendentes,
     confirmar_transacao_por_id,
     buscar_resumo_planejamento # <-- ADICIONE ESTA LINHA
 )
+
+from src.services.reports_service import buscar_transacoes_por_periodo
 from src.services.categorias_service import buscar_categorias
 
 whatsapp_bp = Blueprint('whatsapp', __name__)
