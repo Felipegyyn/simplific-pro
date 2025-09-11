@@ -183,6 +183,33 @@ def serve_audio(filename):
         return "Áudio não encontrado ou expirado.", 404
 
 
+# Em src/main.py
+
+# ... (todo o seu código existente) ...
+
+
+# ▼▼▼ ADICIONE ESTA ROTA DE DIAGNÓSTICO TEMPORÁRIA AQUI ▼▼▼
+@app.route('/debug/routes')
+def list_routes():
+    """
+    Lista todas as rotas disponíveis na aplicação. 
+    Útil para depuração.
+    """
+    import urllib
+    output = []
+    for rule in app.url_map.iter_rules():
+        options = {}
+        for arg in rule.arguments:
+            options[arg] = f"[{arg}]"
+        
+        methods = ','.join(rule.methods)
+        url = urllib.parse.unquote(rule.rule)
+        line = f"<b>{rule.endpoint}</b>: {methods} <code>{url}</code>"
+        output.append(line)
+        
+    return "<br>".join(sorted(output))
+# ▲▲▲ FIM DA ROTA DE DIAGNÓSTICO ▲▲▲
+
 scheduler = BackgroundScheduler(daemon=True)
 # Roda a verificação de lembretes todos os dias às 8:00 da manhã (horário do servidor)
 scheduler.add_job(check_and_send_reminders, trigger='cron', hour=11, minute=0, args=[app])
@@ -211,6 +238,8 @@ with app.app_context():
     app.config['MAIL_DEBUG'] = True # Ativa o log detalhado de depuração
 
 mail.init_app(app)
+
+
 
 
 
