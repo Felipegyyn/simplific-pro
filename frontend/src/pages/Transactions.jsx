@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import eventService from '../services/eventService';
@@ -237,16 +237,21 @@ const carregarCategoriasAntesDeAbrir = async () => {
 };
 
 
-  // Função para editar transação
+// VERSÃO CORRIGIDA
   const editarTransacao = async (id, dados) => {
     try {
       const response = await apiService.put(`/api/transactions/${id}`, dados);
-      if (response.success) {
+      // ▼▼▼ ALTERE APENAS A LINHA ABAIXO ▼▼▼
+      if (response.data && response.data.success) {
+      // ▲▲▲ FIM DA ALTERAÇÃO ▲▲▲
         await loadTransacoes();
-        eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
+        eventService.emit('transactionsChanged');
         setIsEditModalOpen(false);
         setSelectedTransacao(null);
         alert('Transação atualizada com sucesso!');
+      } else {
+        // Adiciona um feedback caso a API não retorne sucesso
+        alert('A API não confirmou a atualização. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro ao editar transação:', error);
