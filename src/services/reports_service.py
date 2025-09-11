@@ -1,7 +1,7 @@
 from datetime import date
 from collections import defaultdict
 from src.database.database import execute_query
-from src.services.transacoes_service import buscar_transacoes_por_periodo, format_currency_brl
+from src.services.transacoes_service import format_currency_brl
 
 
 def get_financial_summary_for_ai(user_id):
