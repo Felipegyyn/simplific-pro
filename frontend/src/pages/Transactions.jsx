@@ -159,38 +159,59 @@ const loadTransacoes = async () => {
   }
 };
 
-// ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO COMPLETA ▼▼▼
+// Em src/pages/Transactions.jsx
+
+// ▼▼▼ SUBSTITUA A SUA FUNÇÃO 'handleFileUpload' INTEIRA POR ESTA ▼▼▼
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
-  if (!file) return; // Cancela se o usuário não selecionar nenhum arquivo
+  if (!file) return;
 
-  // Validação simples do tipo de arquivo
   if (file.type !== 'application/pdf') {
     alert('Por favor, selecione um arquivo PDF.');
     return;
   }
 
   setIsUploading(true);
-  setUploadResult(null); // Limpa o resultado anterior
+  setUploadResult(null);
 
-  // FormData é a forma padrão de enviar arquivos para uma API
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    // Linha CORRIGIDA
-  const result = await apiService.post('/api/transactions/import-statement', formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-  },
-});
+    // --- MUDANÇA PRINCIPAL: USANDO 'FETCH' EM VEZ DE 'APISERVICE' ---
+    // Pegamos o token de autenticação diretamente do localStorage
+    const token = localStorage.getItem('simplific_token');
+    if (!token) {
+        throw new Error('Token de autenticação não encontrado.');
+    }
 
+    // Usamos a API 'fetch' nativa para ter controle total sobre o upload
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/transactions/import-statement`, {
+      method: 'POST',
+      headers: {
+        // NÃO definimos 'Content-Type' aqui. O navegador faz isso
+        // automaticamente para FormData, incluindo o 'boundary' correto.
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData,
+    });
+    
+    // Convertemos a resposta para JSON
+    const result = await response.json();
+
+    // Verificamos se a resposta da API foi um sucesso (status 2xx)
+    if (!response.ok) {
+        // Se não foi sucesso, lançamos um erro com a mensagem da API
+        throw new Error(result.error || 'Erro no servidor.');
+    }
+
+    // Se tudo deu certo, atualizamos a tela
     setUploadResult({ success: true, message: result.mensagem });
-    await loadTransacoes(); // Recarrega a lista para mostrar os novos lançamentos pendentes
+    await loadTransacoes();
 
   } catch (error) {
-    const errorMessage = error.response?.data?.error || 'Ocorreu um erro ao importar o extrato.';
-    setUploadResult({ success: false, message: errorMessage });
+    // A mensagem de erro agora virá do 'throw new Error' acima
+    setUploadResult({ success: false, message: error.message });
   } finally {
     setIsUploading(false);
   }
