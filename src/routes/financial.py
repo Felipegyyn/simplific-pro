@@ -11,6 +11,7 @@ from src.models.financial import Category, Planning, Transaction
 from src.services.transacoes_service import processar_extrato_pdf 
 
 financial_bp = Blueprint('financial', __name__)
+transactions_bp = Blueprint('transactions', __name__) # <-- ADICIONE ESTA LINHA
 
 # Categories routes
 @financial_bp.route('/categories', methods=['GET', 'OPTIONS'])
@@ -315,7 +316,7 @@ def planning_to_transaction(planning_id):
     return jsonify(transaction.to_dict()), 201
 
 # Transactions routes
-@financial_bp.route('/transactions', methods=['GET'])
+@transactions_bp.route('/', methods=['GET'])
 @jwt_required()
 @active_user_required # <-- TRAVA APLICADA
 def get_transactions():
@@ -383,7 +384,7 @@ def get_transactions():
 
     
 
-@financial_bp.route('/transactions', methods=['POST', 'OPTIONS'])
+@transactions_bp.route('/', methods=['POST', 'OPTIONS'])
 @jwt_required()
 @active_user_required # <-- TRAVA APLICADA
 def create_transaction():
@@ -479,7 +480,7 @@ def create_transaction():
     
     return jsonify(transactions_created[0].to_frontend_dict()), 201
 
-@financial_bp.route('/transactions/<int:transaction_id>', methods=['PUT', 'OPTIONS'])
+@transactions_bp.route('/<int:transaction_id>', methods=['PUT', 'OPTIONS'])
 def update_transaction(transaction_id):
     if request.method == 'OPTIONS':
         return '', 200  # Resposta para o preflight, sem autenticação
@@ -509,7 +510,7 @@ def update_transaction(transaction_id):
     return jsonify({'success': True, 'message': 'Transação atualizada com sucesso'}), 200
 
 
-@financial_bp.route('/transactions/<int:transaction_id>/pay', methods=['PUT'])
+@transactions_bp.route('/<int:transaction_id>/pay', methods=['PUT'])
 @jwt_required()
 @active_user_required # <-- TRAVA APLICADA
 def pay_transaction(transaction_id):
@@ -525,7 +526,7 @@ def pay_transaction(transaction_id):
     return jsonify({'message': 'Fatura paga com sucesso!', 'transaction': transaction.to_frontend_dict()}), 200
 
 
-@financial_bp.route('/transactions/<int:transaction_id>/confirm', methods=['POST', 'OPTIONS'])
+@transactions_bp.route('/<int:transaction_id>/confirm', methods=['POST', 'OPTIONS'])
 def confirm_transaction(transaction_id):
 
     if request.method == 'OPTIONS':
@@ -681,7 +682,7 @@ def get_dashboard_summary():
 
 # ▼▼▼ ADICIONE ESTA NOVA ROTA NO FINAL DO ARQUIVO ▼▼▼
 
-@financial_bp.route('/transactions/import-statement', methods=['POST'])
+@transactions_bp.route('/import-statement', methods=['POST'])
 @jwt_required()
 @active_user_required
 def import_statement():

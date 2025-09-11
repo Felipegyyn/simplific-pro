@@ -17,7 +17,7 @@ from src.models.financial import Category, Planning, Transaction
 from src.models.extended import Goal, ScheduleEvent, Investment
 from src.models.extended_modules import CreditCard, CreditCardTransaction
 from src.routes.user import user_bp
-from src.routes.financial import financial_bp
+from src.routes.financial import financial_bp, transactions_bp
 from src.routes.goals import goals_bp
 from src.extensions import mail, db, bcrypt
 from src.routes.webhooks import webhooks_bp
@@ -64,6 +64,7 @@ jwt = JWTManager(app)
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(financial_bp, url_prefix='/api')
+app.register_blueprint(transactions_bp, url_prefix='/api/transactions')
 app.register_blueprint(goals_bp, url_prefix='/api')
 app.register_blueprint(credit_cards_bp, url_prefix='/api')
 app.register_blueprint(schedule_bp, url_prefix='/api')
