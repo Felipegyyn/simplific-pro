@@ -178,9 +178,12 @@ const handleFileUpload = async (event) => {
   formData.append('file', file);
 
   try {
-    const result = await apiService.post('/api/transactions/import-statement', formData, {
-      // O cabeçalho 'Content-Type' é definido automaticamente pelo navegador ao usar FormData
-    });
+    // Linha CORRIGIDA
+  const result = await apiService.post('/api/transactions/import-statement', formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+});
 
     setUploadResult({ success: true, message: result.mensagem });
     await loadTransacoes(); // Recarrega a lista para mostrar os novos lançamentos pendentes
