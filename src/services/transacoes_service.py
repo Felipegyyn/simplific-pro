@@ -209,7 +209,7 @@ def processar_extrato_pdf(user_id, pdf_file_stream):
         
         # Expressão Regular (Regex) para encontrar transações no texto
         # Padrão: DD/MM/AAAA (ou DD/MM) Descrição longa... 1.234,56
-        regex = r"(\d{2}/\d{2}(?:/\d{4})?)\s+(.*?)\s+([\d\.,]+(?:,\d{2}))\s*(D|C)?\n"
+        regex = r"(\d{2}/\d{2}(?:/\d{4})?)\s+([^\n\d]+?)\s+(-?[\d\.,]+,\d{2})"
         
         transacoes_encontradas = re.finditer(regex, texto_completo)
         
