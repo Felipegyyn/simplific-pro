@@ -245,7 +245,9 @@ def processar_extrato_pdf(user_id, pdf_file_stream):
                 category_id=categoria_id_final,
                 value=abs(valor), # Salva sempre o valor positivo
                 description=f"[Importado] {descricao}",
-                status='pendente'
+                status='pendente',
+                format='variavel',      # Define o formato como 'variável'
+                payment_form='a_vista'  # Define a forma de pagamento como 'à vista'
             )
             novos_lancamentos.append(novo_lancamento)
 
