@@ -186,7 +186,7 @@ const handleFileUpload = async (event) => {
     }
 
     // Usamos a API 'fetch' nativa para ter controle total sobre o upload
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/transactions/import-statement`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions/import-statement`, {
       method: 'POST',
       headers: {
         // NÃO definimos 'Content-Type' aqui. O navegador faz isso
