@@ -151,20 +151,27 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     """
     ano_atual = datetime.now().year
 
+    # Dentro de src/services/ai_assessor_service.py, na função extrair_transacoes_de_texto_com_ia
+
     prompt = f"""
-    Você é um assistente especialista em extração de dados financeiros de textos não estruturados de extratos bancários brasileiros.
+    Você é um assistente especialista em extração de dados financeiros de extratos bancários brasileiros.
     Sua tarefa é analisar o texto abaixo, identificar CADA transação (entrada ou saída) e retorná-las como um array de objetos JSON.
 
-    REGRAS IMPORTANTES:
-    1. Ignore linhas que são cabeçalhos, totais, saldos ou texto informativo. Foque apenas nas linhas de transação individuais.
-    2. Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: "data" (no formato "AAAA-MM-DD"), "descricao" (string), e "valor" (número de ponto flutuante).
-    3. Para despesas/débitos, o valor deve ser um número NEGATIVO.
-    4. Para receitas/créditos, o valor deve ser um número POSITIVO.
-    5. Se uma data não tiver o ano, assuma o ano atual: {ano_atual}.
-    6. Se você não encontrar NENHUMA transação, retorne um array JSON vazio: [].
-    7. NÃO inclua nada na sua resposta além do array JSON. Sem explicações, sem texto introdutório, apenas o JSON.
+    REGRAS CRÍTICAS PARA ANÁLISE E FORMATO DA RESPOSTA:
+    1.  **Ignorar Conteúdo Não Transacional:** Desconsidere totalmente cabeçalhos, rodapés, "Saldo Anterior", "Saldo do Dia", "Saldo Bloqueado", "Aplicacao Financeira", "Rendimentos", "Tributos", ou qualquer linha que não seja uma transação financeira explícita de débito ou crédito.
+    2.  **Formato de Saída JSON:** Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: "data" (string, no formato "AAAA-MM-DD"), "descricao" (string), e "valor" (número de ponto flutuante).
+    3.  **Determinação do Valor:**
+        * Para despesas/débitos (saídas), o valor deve ser um número NEGATIVO. (Ex: -159.00)
+        * Para receitas/créditos (entradas), o valor deve ser um número POSITIVO. (Ex: 159.00)
+        * Observe indicadores como "D", "C", "DÉB", "CRÉD", "-" ou ausência de sinal para determinar o tipo da transação e o sinal do valor.
+    4.  **Datas:**
+        * Se a data estiver incompleta (apenas dia/mês, ex: "03/01"), assuma o ano atual: {ano_atual}.
+        * Se a descrição contiver "DD/MM" ou "MM/AAAA", como "TAR PLANO ADAPT 1 06/25", priorize a data explícita da linha. Se a data da linha for mais genérica, e a descrição indicar um mês/ano específico para a transação, use o ano e mês da descrição com o dia da transação, se plausível. Caso contrário, use a data da linha com o ano atual.
+    5.  **Valores Numéricos:** Converta todos os valores para o formato numérico padrão (usando ponto como separador decimal). Por exemplo, "1.638,46" deve virar 1638.46, e "404,54C" deve virar 404.54.
+    6.  **Resposta Pura:** NÃO inclua qualquer texto introdutório, explicações ou formatação adicional na sua resposta, além do array JSON puro.
+    7.  **Array Vazio:** Se nenhuma transação for encontrada após seguir todas as regras, retorne um array JSON vazio: [].
 
-    TEXTO DO EXTRATO:
+    TEXTO DO EXTRATO A SER ANALISADO:
     ---
     {texto_do_extrato}
     ---
