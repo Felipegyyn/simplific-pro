@@ -1,7 +1,7 @@
 from src.database.database import execute_query
 from datetime import datetime, date, timedelta
 import fitz  # PyMuPDF 
-from src.services.ai_assessor_service import categorizar_descricao_transacao # <-- Nova importação da IA
+from src.services.ai_assessor_service import categorizar_descricao_transacao, extrair_transacoes_de_texto_com_ia # <-- Nova importação da IA
 from src.models.db import db
 from collections import defaultdict
 import re
