@@ -6,6 +6,7 @@ from src.routes.user import active_user_required
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, case
 from sqlalchemy import cast
+from src.database.database import execute_query # <-- ADICIONE ESTA LINHA
 from src.models.db import db
 from src.models.financial import Category, Planning, Transaction
 from src.services.transacoes_service import processar_extrato_pdf 
@@ -549,7 +550,7 @@ def confirm_transaction(transaction_id):
     
     return jsonify(transaction.to_dict())
 
-@financial_bp.route('/transactions/<int:transaction_id>', methods=['DELETE', 'OPTIONS'])
+@transactions_bp.route('/<int:transaction_id>', methods=['DELETE', 'OPTIONS'])
 def delete_transaction(transaction_id):
     if request.method == 'OPTIONS':
         return '', 200  # Resposta para o preflight, sem autenticação
