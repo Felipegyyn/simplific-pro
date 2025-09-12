@@ -196,90 +196,68 @@ def gerar_resumo_semanal(user_id):
     }
 # ▲▲▲ FIM DO BLOCO PARA COPIAR ▲▲▲
 
-# ▼▼▼ SUBSTITUA A FUNÇÃO 'processar_extrato_pdf' INTEIRA POR ESTA ▼▼▼
-
 def processar_extrato_pdf(user_id, pdf_file_stream):
     """
-    Processa um PDF de extrato, extrai transações, as categoriza com IA
+    Processa um PDF de extrato, extrai transações usando IA, as categoriza
     e as salva como pendentes no banco de dados.
     """
     try:
         documento = fitz.open(stream=pdf_file_stream.read(), filetype="pdf")
         texto_completo = "".join(pagina.get_text() for pagina in documento)
-        
-        # Expressão Regular (Regex) para encontrar transações no texto
-        # Padrão: DD/MM/AAAA (ou DD/MM) Descrição longa... 1.234,56
-        regex = r"(\d{2}/\d{2}(?:/\d{4})?)\s+([^\n\d]+?)\s+(-?[\d\.,]+,\d{2})"
-        
-        transacoes_encontradas = re.finditer(regex, texto_completo)
-        
+
+        # --- A MÁGICA ACONTECE AQUI ---
+        # 1. Chama a IA para extrair as transações do texto
+        print("INFO: Chamando IA para extrair transações do texto do extrato...")
+        transacoes_extraidas = extrair_transacoes_de_texto_com_ia(texto_completo)
+
+        if not transacoes_extraidas:
+            return {"status": "sucesso", "mensagem": "Importação concluída! 0 lançamentos encontrados no extrato."}
+
         novos_lancamentos = []
-        contador_total = 0
-        contador_nao_categorizado = 0
-        
-        # Busca a categoria 'Outros' do usuário para usar como fallback
-        categoria_outros = Category.query.filter_by(user_id=user_id, name='Outros', type='saida').first()
-        if not categoria_outros:
-            # Se não existir, você pode querer criar ou simplesmente retornar um erro
-            return {"status": "erro", "mensagem": "Categoria 'Outros' do tipo 'saida' não encontrada. Crie-a antes de importar."}
+        categoria_outros_saida = Category.query.filter_by(user_id=user_id, name='Outros', type='saida').first()
+        categoria_outros_entrada = Category.query.filter_by(user_id=user_id, name='Outros', type='entrada').first()
 
-        for match in transacoes_encontradas:
-            data_str, descricao, valor_str = match.groups()[:3]
-            
-            # Limpeza dos dados extraídos
-            descricao = ' '.join(descricao.split())
-            valor = float(valor_str.replace('.', '').replace(',', '.'))
-            
-            # Tenta adivinhar o ano e formata a data
-            try:
-                if len(data_str) <= 5: # Formato DD/MM
-                    data_transacao = datetime.strptime(f"{data_str}/{datetime.now().year}", '%d/%m/%Y').date()
-                else: # Formato DD/MM/AAAA
-                    data_transacao = datetime.strptime(data_str, '%d/%m/%Y').date()
-            except ValueError:
-                continue # Pula transação se a data for inválida
+        # 2. Itera sobre a lista de transações que a IA retornou
+        for transacao in transacoes_extraidas:
+            valor = float(transacao.get('valor', 0))
+            descricao = transacao.get('descricao', 'Sem descrição')
+            data_str = transacao.get('data')
 
-            # Ignora linhas que são cabeçalhos ou totais
-            if "SALDO" in descricao.upper() or valor == 0:
-                continue
+            if valor == 0 or not data_str:
+                continue # Pula se a transação for inválida
 
-            # Chama a IA para categorizar a descrição
-            print(f"Categorizando com IA a descrição: '{descricao}'")
+            tipo_transacao = 'entrada' if valor > 0 else 'saida'
+
+            # 3. Usa a outra função de IA para categorizar a descrição
             nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
-            
-            # Busca o ID da categoria que a IA retornou
-            categoria_final = Category.query.filter_by(user_id=user_id, name=nome_categoria_ia, type='saida').first()
-            
-            if not categoria_final:
-                categoria_id_final = categoria_outros.id
-                contador_nao_categorizado += 1
-            else:
-                categoria_id_final = categoria_final.id
 
-            # Cria o objeto de transação (sem salvar ainda)
+            categoria_final = Category.query.filter_by(user_id=user_id, name=nome_categoria_ia, type=tipo_transacao).first()
+
+            if categoria_final:
+                categoria_id_final = categoria_final.id
+            else:
+                categoria_id_final = categoria_outros_entrada.id if tipo_transacao == 'entrada' else categoria_outros_saida.id
+
             novo_lancamento = Transaction(
                 user_id=user_id,
-                date=data_transacao,
-                type='saida', # Assumindo que a maioria são despesas, pode ser melhorado
+                date=datetime.strptime(data_str, '%Y-%m-%d').date(),
+                type=tipo_transacao,
                 category_id=categoria_id_final,
-                value=valor,
+                value=abs(valor), # Salva sempre o valor positivo
                 description=f"[Importado] {descricao}",
-                status='pendente' # Importante: sempre como pendente!
+                status='pendente'
             )
             novos_lancamentos.append(novo_lancamento)
-            contador_total += 1
-            
+
         if novos_lancamentos:
             db.session.add_all(novos_lancamentos)
             db.session.commit()
 
         return {
             "status": "sucesso",
-            "total_importado": contador_total,
-            "nao_categorizado": contador_nao_categorizado,
-            "mensagem": f"Importação concluída! {contador_total} lançamentos adicionados como pendentes."
+            "mensagem": f"Importação concluída! {len(novos_lancamentos)} lançamentos adicionados como pendentes."
         }
 
     except Exception as e:
-        print(f"ERRO CRÍTICO ao processar o arquivo PDF: {e}")
-        return {"status": "erro", "mensagem": "O arquivo enviado não parece ser um PDF válido ou está corrompido."}
+        print(f"ERRO CRÍTICO ao processar o arquivo PDF com IA: {e}")
+        return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar o extrato. Tente novamente."}

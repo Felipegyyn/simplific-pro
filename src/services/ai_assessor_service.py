@@ -3,6 +3,7 @@
 import re
 import json
 from src.models.user import User
+from datetime import datetime
 
 
 # --- Importando TODOS os nossos serviços de resumo ---
@@ -125,7 +126,6 @@ def categorizar_descricao_transacao(user_id, descricao):
 
     try:
         # 4. Chama a IA e obtém a resposta
-        model = genai.GenerativeModel('gemini-1.5-flash-latest') # ou o modelo que você usa
         response = model.generate_content(prompt)
         
         # 5. Limpa e valida a resposta da IA
@@ -143,3 +143,47 @@ def categorizar_descricao_transacao(user_id, descricao):
         print(f"ERRO na categorização com IA: {e}")
         # Em caso de erro na API da IA, retorna 'Outros' como fallback
         return 'Outros'
+
+def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
+    """
+    Usa o Gemini para analisar um bloco de texto de um extrato e retornar
+    uma lista estruturada de transações em formato JSON.
+    """
+    ano_atual = datetime.now().year
+
+    prompt = f"""
+    Você é um assistente especialista em extração de dados financeiros de textos não estruturados de extratos bancários brasileiros.
+    Sua tarefa é analisar o texto abaixo, identificar CADA transação (entrada ou saída) e retorná-las como um array de objetos JSON.
+
+    REGRAS IMPORTANTES:
+    1. Ignore linhas que são cabeçalhos, totais, saldos ou texto informativo. Foque apenas nas linhas de transação individuais.
+    2. Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: "data" (no formato "AAAA-MM-DD"), "descricao" (string), e "valor" (número de ponto flutuante).
+    3. Para despesas/débitos, o valor deve ser um número NEGATIVO.
+    4. Para receitas/créditos, o valor deve ser um número POSITIVO.
+    5. Se uma data não tiver o ano, assuma o ano atual: {ano_atual}.
+    6. Se você não encontrar NENHUMA transação, retorne um array JSON vazio: [].
+    7. NÃO inclua nada na sua resposta além do array JSON. Sem explicações, sem texto introdutório, apenas o JSON.
+
+    TEXTO DO EXTRATO:
+    ---
+    {texto_do_extrato}
+    ---
+    """
+
+    try:
+        # Chama o modelo de IA diretamente para esta tarefa específica
+        resposta_ia_texto = model.generate_content(prompt).text
+
+        # Limpa a resposta para garantir que seja um JSON válido
+        json_str = resposta_ia_texto.strip().replace('```json', '').replace('```', '')
+
+        transacoes_extraidas = json.loads(json_str)
+
+        if isinstance(transacoes_extraidas, list):
+            return transacoes_extraidas
+        else:
+            return []
+
+    except (json.JSONDecodeError, TypeError) as e:
+        print(f"ERRO ao decodificar a resposta JSON da IA para extração: {e}")
+        return []
