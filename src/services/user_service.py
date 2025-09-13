@@ -82,7 +82,7 @@ def create_user_from_purchase(name, email, whatsapp):
             'name': new_user.name,
             'email': new_user.email,
             'whatsapp': new_user.whatsapp,
-            'temp_password': temp_password
+            'password': temp_password
         }
 
     except Exception as e:
