@@ -18,6 +18,8 @@ class User(db.Model):
     last_login = db.Column(db.DateTime)
     preferred_response_format = db.Column(db.String(10), nullable=False, default='text')
     receive_weekly_summary = db.Column(db.Boolean, nullable=False, default=True)
+    # Adicione esta linha junto com as outras colunas do modelo User
+    subscription_valid_until = db.Column(db.Date, nullable=True, default=None)
 
 
     def __repr__(self):
