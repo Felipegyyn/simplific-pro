@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify
 import os
 from src.services.user_service import create_user_from_purchase
 from src.services.notification_service import send_welcome_credentials
+from src.models.user import User
+from src.models.db import db
+from datetime import datetime
 
 
 
@@ -35,19 +38,57 @@ def monetizze_webhook():
 
     # --- PROCESSAMENTO DOS DADOS DO CLIENTE ---
     # Se a chave é válida, continuamos com a sua lógica original
+
+    # --- PASSO 1: Extrair o tipo de evento e os dados do comprador ---
+    evento_descricao = dados_completos.get('tipoEvento', {}).get('descricao')
     comprador = dados_completos.get('comprador', {})
-    nome = comprador.get('nome')
     email = comprador.get('email')
-    whatsapp = comprador.get('telefone')
 
-    # --- CHAMADA PARA A FÁBRICA DE USUÁRIOS ---
-    success, result = create_user_from_purchase(nome, email, whatsapp)
+    # Se não houver e-mail na notificação, não há o que fazer.
+    if not email:
+        print("Webhook recebido sem e-mail do comprador. Ignorando.")
+        return jsonify({'status': 'success', 'message': 'Webhook ignorado (sem e-mail)'}), 200
 
-    if success:
-        print("Usuário criado. Acionando central de notificações...")
-        send_welcome_credentials(result)
+    # --- PASSO 2: Lógica principal baseada no tipo de evento ---
+    if evento_descricao == 'Finalizada / Aprovada':
+        print(f"Evento 'Finalizada / Aprovada' para o e-mail: {email}.")
+        nome = comprador.get('nome')
+        whatsapp = comprador.get('telefone')
+
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Caso 1: Usuário já existe (ex: re-assinatura)
+            # Reativamos o status e limpamos a data de expiração.
+            user.status = 'active'
+            user.subscription_valid_until = None
+            db.session.commit()
+            print(f"Assinatura reativada para o usuário existente: {email}")
+        else:
+            # Caso 2: Novo cliente
+            # Usamos a função que já existe para criar o usuário e enviar as credenciais.
+            success, result = create_user_from_purchase(nome, email, whatsapp)
+            if success:
+                print("Usuário criado. Acionando central de notificações...")
+                send_welcome_credentials(result)
+            else:
+                print(f"Falha ao criar usuário: {result}")
+
+    elif evento_descricao in ['Assinatura Cancelada', 'Em Atraso', 'Recusada', 'Cancelada']:
+        print(f"Evento de falha/cancelamento '{evento_descricao}' para o e-mail: {email}.")
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Anota a data em que o acesso pago do usuário termina.
+            # O "agente noturno" (Cron Job) usará esta data para calcular os 5 dias de tolerância.
+            user.subscription_valid_until = datetime.utcnow().date()
+            db.session.commit()
+            print(f"Data de validade da assinatura atualizada para {user.subscription_valid_until} para o usuário: {email}")
+        else:
+            print(f"AVISO: Recebido evento de cancelamento para um usuário não encontrado: {email}")
     else:
-        print(f"Falha ao criar usuário: {result}")
+        # Para qualquer outro evento que não nos interessa, apenas registramos e ignoramos.
+        print(f"Evento não tratado recebido da Monetizze: '{evento_descricao}'. Ignorando.")
 
-    # Responde à Monetizze que recebemos os dados com sucesso.
-    return jsonify({'status': 'success', 'message': 'Webhook recebido'}), 200
+    # Responde à Monetizze que recebemos e processamos o webhook com sucesso.
+    return jsonify({'status': 'success', 'message': 'Webhook processado'}), 200

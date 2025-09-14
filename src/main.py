@@ -240,6 +240,51 @@ with app.app_context():
 
 mail.init_app(app)
 
+# COLE ESTE BLOCO NO FINAL DO SEU ARQUIVO main.py
+
+@app.cli.command("check-subscriptions")
+def check_subscriptions_command():
+    """
+    Verifica e inativa assinaturas que expiraram após o período de tolerância.
+    Este comando é para ser executado via Cron Job (agendador).
+    """
+    print("--- [CRON] Iniciando verificação de assinaturas expiradas... ---")
+
+    # Define a regra de negócio: 5 dias de tolerância
+    GRACE_PERIOD_DAYS = 5
+    cutoff_date = datetime.utcnow().date() - timedelta(days=GRACE_PERIOD_DAYS)
+
+    # Busca por usuários que:
+    # 1. Estão com status 'ativo'.
+    # 2. Têm uma data de expiração definida.
+    # 3. Essa data de expiração já passou do nosso limite de tolerância.
+    users_to_deactivate = User.query.filter(
+        User.status == 'active',
+        User.subscription_valid_until != None,
+        User.subscription_valid_until <= cutoff_date
+    ).all()
+
+    if not users_to_deactivate:
+        print("--- [CRON] Nenhum usuário para inativar hoje. ---")
+        return
+
+    print(f"--- [CRON] Encontrados {len(users_to_deactivate)} usuários para inativar... ---")
+
+    count = 0
+    for user in users_to_deactivate:
+        user.status = 'inactive'
+        print(f"  - Inativando usuário: {user.email} (ID: {user.id})")
+        count += 1
+
+    try:
+        db.session.commit()
+        print(f"--- [CRON] Sucesso! {count} usuários foram inativados. ---")
+    except Exception as e:
+        db.session.rollback()
+        print(f"--- [CRON] ERRO: Falha ao salvar as alterações. {e} ---")
+
+    print("--- [CRON] Verificação concluída. ---")
+
 
 
 
