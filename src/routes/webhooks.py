@@ -4,6 +4,7 @@ from src.services.user_service import create_user_from_purchase
 from src.services.notification_service import send_welcome_credentials
 from src.models.user import User
 from src.models.db import db
+from src.services.user_service import create_user_from_purchase, normalize_phone_number
 from datetime import datetime
 
 
@@ -53,7 +54,9 @@ def monetizze_webhook():
     if evento_descricao == 'Finalizada / Aprovada':
         print(f"Evento 'Finalizada / Aprovada' para o e-mail: {email}.")
         nome = comprador.get('nome')
-        whatsapp = comprador.get('telefone')
+        telefone_bruto = comprador.get('telefone')
+        whatsapp = normalize_phone_number(telefone_bruto) # <-- ADICIONE A NORMALIZAÇÃO AQUI
+
 
         user = User.query.filter_by(email=email).first()
 

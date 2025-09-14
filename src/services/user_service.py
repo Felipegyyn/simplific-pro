@@ -15,7 +15,7 @@ def _generate_temporary_password(length=10):
     password = ''.join(secrets.choice(alphabet) for i in range(length))
     return password
 
-def _normalize_phone_number(number):
+def normalize_phone_number(number):
     """Normaliza o número de telefone para o padrão E.164 (+55119XXXXXXXX)."""
     if not number:
         return None
