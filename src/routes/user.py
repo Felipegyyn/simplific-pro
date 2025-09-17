@@ -4,7 +4,10 @@ from flask_jwt_extended import (
     JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 )
 from datetime import datetime, timedelta
-from src.models.user import User, db
+from src.models.user import User, db, PasswordResetToken
+from src.models.db import db
+from src.services.user_service import generate_password_reset_token
+from src.services.notification_service import send_password_reset_email
 from src.extensions import bcrypt # <-- LINHA ADICIONADA
 
 user_bp = Blueprint('user', __name__)
@@ -135,6 +138,84 @@ def change_password():
     db.session.commit()
     
     return jsonify({'message': 'Senha alterada com sucesso!'}), 200
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO auth.py
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    """
+    Recebe um e-mail, gera um token de redefinição de senha e o envia.
+    """
+    data = request.get_json()
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'O campo e-mail é obrigatório.'}), 400
+
+    # 1. Encontra o usuário pelo e-mail
+    user = User.query.filter_by(email=email).first()
+
+    # Por segurança, mesmo que o usuário não exista, retornamos uma
+    # mensagem de sucesso para não permitir que pessoas mal-intencionadas
+    # descubram quais e-mails estão cadastrados no sistema.
+    if not user:
+        print(f"AVISO: Solicitação de recuperação de senha para e-mail não cadastrado: {email}")
+        return jsonify({'message': 'Se um usuário com este e-mail existir, um link de recuperação foi enviado.'}), 200
+
+    try:
+        # 2. Gera e salva o token de recuperação
+        token = generate_password_reset_token(user)
+
+        # 3. Envia o e-mail com o link de recuperação
+        send_password_reset_email(user.email, user.name, token)
+
+        return jsonify({'message': 'Se um usuário com este e-mail existir, um link de recuperação foi enviado.'}), 200
+
+    except Exception as e:
+        print(f"ERRO GERAL na rota /forgot-password: {e}")
+        # Mesmo em caso de erro, retornamos uma mensagem genérica por segurança.
+        return jsonify({'message': 'Se um usuário com este e-mail existir, um link de recuperação foi enviado.'}), 200
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO auth.py
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """
+    Recebe um token e uma nova senha, valida o token e atualiza a senha do usuário.
+    """
+    data = request.get_json()
+    token = data.get('token')
+    new_password = data.get('new_password')
+
+    if not token or not new_password:
+        return jsonify({'error': 'Token e nova senha são obrigatórios.'}), 400
+
+    # 1. Busca o token no banco de dados.
+    reset_token = PasswordResetToken.query.filter_by(token=token).first()
+
+    # 2. Valida se o token existe e se não está expirado.
+    #    A função is_expired() foi a que criamos no nosso modelo.
+    if not reset_token or reset_token.is_expired():
+        return jsonify({'error': 'Token inválido ou expirado. Por favor, solicite uma nova recuperação de senha.'}), 400
+
+    # 3. Se o token é válido, encontramos o usuário associado a ele.
+    user = reset_token.user
+    if not user:
+         return jsonify({'error': 'Usuário associado ao token não encontrado.'}), 404
+
+    # 4. Define a nova senha (o método 'set_password' já faz o hash de segurança).
+    user.set_password(new_password)
+
+    # Bônus: Garante que a flag de primeiro login seja desativada.
+    user.first_login = False
+
+    # 5. Limpeza: Remove o token do banco de dados para que não possa ser reutilizado.
+    db.session.delete(reset_token)
+
+    # 6. Salva as alterações (nova senha e remoção do token) no banco.
+    db.session.commit()
+
+    return jsonify({'message': 'Sua senha foi redefinida com sucesso!'}), 200
 
 
 # === ADMIN ROUTES ===

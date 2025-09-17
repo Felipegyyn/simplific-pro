@@ -3,6 +3,8 @@
 from src.models.user import User
 from src.models.db import db
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
+from src.models.user import PasswordResetToken
 import string
 import secrets
 import re
@@ -89,3 +91,28 @@ def create_user_from_purchase(name, email, whatsapp):
         db.session.rollback()
         print(f"ERRO CRÍTICO ao criar usuário a partir da compra: {e}")
         return False, str(e)
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO user_service.py
+
+def generate_password_reset_token(user):
+    """
+    Gera e salva um token de redefinição de senha para um usuário.
+    Retorna o token em texto puro para ser enviado por e-mail.
+    """
+    # Define a validade do token (ex: 1 hora)
+    expires_delta = timedelta(hours=1)
+
+    # Gera um token seguro e aleatório
+    token = secrets.token_urlsafe(32)
+
+    # Cria a nova instância do token
+    new_token = PasswordResetToken(
+        user_id=user.id,
+        token=token,
+        expires_at=datetime.utcnow() + expires_delta
+    )
+
+    db.session.add(new_token)
+    db.session.commit()
+
+    return token

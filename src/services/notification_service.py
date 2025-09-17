@@ -74,3 +74,33 @@ def send_welcome_credentials(user_credentials):
     whatsapp_sent = _send_welcome_whatsapp(user_credentials)
 
     return email_sent and whatsapp_sent
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO notification_service.py
+
+def send_password_reset_email(user_email, user_name, token):
+    """Envia o e-mail de recuperação de senha com o link."""
+    try:
+        # O URL do frontend para a página de redefinição de senha
+        reset_url = f"https://simplificpro.com/#/reset-password?token={token}"
+
+        msg = Message(
+            subject="Recuperação de Senha - Simplific Pro",
+            recipients=[user_email]
+        )
+
+        msg.body = (
+            f"Olá, {user_name}!\n\n"
+            f"Recebemos uma solicitação para redefinir sua senha. Se foi você, por favor, clique no link abaixo para criar uma nova senha:\n\n"
+            f"{reset_url}\n\n"
+            f"Este link é válido por 1 hora. Após esse período, você precisará solicitar uma nova recuperação.\n\n"
+            f"Se você não solicitou esta alteração, por favor, ignore este e-mail. Entre em conttao imediatamente com o suporte\n\n"
+            f"Atenciosamente,\n"
+            f"Equipe Simplific Pro"
+        )
+
+        mail.send(msg)
+        print(f"✅ E-mail de recuperação de senha enviado para {user_email}.")
+        return True
+    except Exception as e:
+        print(f"ERRO CRÍTICO ao enviar e-mail de recuperação: {e}")
+        return False

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // <-- ADICIONE ESTA LINHA
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Eye, EyeOff } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -171,6 +174,14 @@ const Login = ({ onLogin }) => {
                   </AlertDescription>
                 </Alert>
               )}
+
+              {/* ▼▼▼ COLE O BLOCO ABAIXO EXATAMENTE AQUI ▼▼▼ */}
+      <div className="text-right text-sm">
+        <Link to="/forgot-password" className="underline hover:text-green-700 dark:hover:text-green-400">
+          Esqueceu sua senha?
+        </Link>
+      </div>
+      {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
 
               <Button 
                 type="submit" 

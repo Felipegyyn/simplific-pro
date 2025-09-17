@@ -2,6 +2,7 @@ from datetime import datetime
 # Importe a werkzeug.security para hashing de senha
 from src.models.db import db
 from src.extensions import bcrypt
+from datetime import datetime, timedelta
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -20,6 +21,8 @@ class User(db.Model):
     receive_weekly_summary = db.Column(db.Boolean, nullable=False, default=True)
     # Adicione esta linha junto com as outras colunas do modelo User
     subscription_valid_until = db.Column(db.Date, nullable=True, default=None)
+    # Adicione esta linha dentro da classe User
+    password_reset_tokens = db.relationship('PasswordResetToken', backref='user', lazy=True, cascade="all, delete-orphan")
 
 
     def __repr__(self):
@@ -48,3 +51,17 @@ class User(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None
         }
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO user.py
+
+class PasswordResetToken(db.Model):
+    __tablename__ = 'password_reset_tokens'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(128), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
