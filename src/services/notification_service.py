@@ -93,7 +93,7 @@ def send_password_reset_email(user_email, user_name, token):
             f"Recebemos uma solicitação para redefinir sua senha. Se foi você, por favor, clique no link abaixo para criar uma nova senha:\n\n"
             f"{reset_url}\n\n"
             f"Este link é válido por 1 hora. Após esse período, você precisará solicitar uma nova recuperação.\n\n"
-            f"Se você não solicitou esta alteração, por favor, ignore este e-mail. Entre em conttao imediatamente com o suporte\n\n"
+            f"Se você não solicitou esta alteração, por favor, ignore este e-mail.\n\n"
             f"Atenciosamente,\n"
             f"Equipe Simplific Pro"
         )
