@@ -20,6 +20,8 @@ import MainLayout from './components/MainLayout';
 import { Outlet } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext'; 
 import HomePage from './pages/HomePage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Serviços
 import notificationService from './services/notifications';

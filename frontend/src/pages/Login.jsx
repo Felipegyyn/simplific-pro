@@ -9,8 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Eye, EyeOff } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({

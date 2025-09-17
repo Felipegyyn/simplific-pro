@@ -9,6 +9,7 @@ from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS
 from flask_migrate import Migrate
 from datetime import datetime, timedelta
+from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
 from src.redis_client import redis_client
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
@@ -76,6 +77,7 @@ app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
 app.register_blueprint(chat_bp, url_prefix='/api')
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
 # Adicione esta linha logo acima da sua função
 
