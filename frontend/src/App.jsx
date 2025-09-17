@@ -122,6 +122,9 @@ return (
                 element={user ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />} 
             />
 
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
             {/* Rota de Layout Protegido */}
             <Route 
                 element={user ? <MainLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
@@ -129,8 +132,6 @@ return (
                 <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} />} />
                 <Route path="/planning" element={<Planning user={user} onLogout={handleLogout} />} />
                 <Route path="/transactions" element={<Transactions user={user} onLogout={handleLogout} />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/credit-cards" element={<CreditCards user={user} onLogout={handleLogout} />} />
                 <Route path="/goals" element={<Goals user={user} onLogout={handleLogout} />} />
                 <Route path="/investments" element={<Investments user={user} onLogout={handleLogout} />} />
