@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS
 from flask_migrate import Migrate
+from src.routes.user_routes import user_api_bp
 from datetime import datetime, timedelta
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
@@ -65,7 +66,8 @@ jwt = JWTManager(app)
 
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
-print("--- DEBUG: O blueprint 'user_bp' foi registrado no prefixo /api/users. ---")
+app.register_blueprint(user_api_bp, url_prefix='/api/users')
+print("--- DEBUG: O blueprint 'user_api_bp' foi registrado no prefixo /api/users. ---") # Linha de debug atualizada
 app.register_blueprint(financial_bp, url_prefix='/api')
 app.register_blueprint(transactions_bp, url_prefix='/api/transactions')
 app.register_blueprint(goals_bp, url_prefix='/api')
