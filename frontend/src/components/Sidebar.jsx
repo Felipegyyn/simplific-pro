@@ -27,8 +27,10 @@ const handleProfilePictureChange = async (event) => {
 
     try {
         const response = await apiService.post('/api/users/profile-picture', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
+    headers: {
+        'Content-Type': 'multipart/form-data',
+    },
+});
 
         const updatedUser = { ...user, profile_image_url: response.data.profile_image_url };
         localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
