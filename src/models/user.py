@@ -52,7 +52,8 @@ class User(db.Model):
             'status': self.status,
             'first_login': self.first_login,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'last_login': self.last_login.isoformat() if self.last_login else None
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'profile_image_url': self.profile_image_url
         }
 
 # COLE ESTE BLOCO NO FINAL DO ARQUIVO user.py
