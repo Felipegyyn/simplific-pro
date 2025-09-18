@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import apiService from '../services/api';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3, Bot
@@ -10,6 +11,37 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   // 2. Estado separado para controlar o menu no desktop
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
   const navigate = useNavigate();
+
+  // ▼▼▼ COLE O BLOCO ABAIXO ▼▼▼
+const [isUploading, setIsUploading] = useState(false);
+const fileInputRef = useRef(null);
+
+const handleProfilePictureChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    try {
+        const response = await apiService.post('/api/users/profile-picture', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        const updatedUser = { ...user, profile_image_url: response.data.profile_image_url };
+        localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
+
+        window.location.reload();
+    } catch (error) {
+        console.error("Erro ao fazer upload da foto de perfil:", error);
+        alert("Ocorreu um erro ao enviar sua foto. Tente novamente.");
+    } finally {
+        setIsUploading(false);
+    }
+};
+// ▲▲▲ FIM DO BLOCO ▲▲▲
 
   const modules = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -86,26 +118,59 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         ))}
       </nav>
 
-      <div className="border-t pt-4 dark:border-slate-700">
-        <div className="flex items-center p-2">
-          <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center font-bold text-gray-600 dark:text-slate-300">
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
-          {isDesktopOpen && (
-            <div className="ml-4">
-              <p className="font-semibold text-sm whitespace-nowrap text-gray-800 dark:text-slate-200">{user?.name}</p>
-              <p className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap">Simplific Pro</p>
+{/* ▼▼▼ SUBSTITUA O BLOCO INTEIRO DO PERFIL POR ESTE ▼▼▼ */}
+  <div className="border-t pt-4 dark:border-slate-700">
+    {/* Input de arquivo, invisível para o usuário */}
+    <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleProfilePictureChange}
+        className="hidden"
+        accept="image/png, image/jpeg"
+    />
+    <div 
+        className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer"
+        onClick={() => !isUploading && fileInputRef.current.click()}
+        title="Alterar foto de perfil"
+    >
+      <div className="relative">
+        {/* Lógica para exibir a imagem ou a inicial */}
+        {user?.profile_image_url ? (
+            <img 
+                src={user.profile_image_url} 
+                alt="Foto de Perfil" 
+                className="h-10 w-10 rounded-full object-cover" 
+            />
+        ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center font-bold text-gray-600 dark:text-slate-300">
+                {user?.name?.charAt(0).toUpperCase()}
             </div>
-          )}
-        </div>
-        <button 
-          onClick={handleLogoutClick}
-          className="flex items-center p-2 mt-2 w-full rounded-lg text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-        >
-          <LogOut className="h-5 w-5" />
-          {isDesktopOpen && <span className="ml-4 whitespace-nowrap">Sair</span>}
-        </button>
+        )}
+
+        {/* Animação de loading durante o upload */}
+        {isUploading && (
+            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+            </div>
+        )}
       </div>
+
+      {isDesktopOpen && (
+        <div className="ml-4">
+          <p className="font-semibold text-sm whitespace-nowrap text-gray-800 dark:text-slate-200">{user?.name}</p>
+          <p className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap">Simplific Pro</p>
+        </div>
+      )}
+    </div>
+    <button 
+      onClick={handleLogoutClick}
+      className="flex items-center p-2 mt-2 w-full rounded-lg text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+    >
+      <LogOut className="h-5 w-5" />
+      {isDesktopOpen && <span className="ml-4 whitespace-nowrap">Sair</span>}
+    </button>
+  </div>
+{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
     </div>
   );
 };
