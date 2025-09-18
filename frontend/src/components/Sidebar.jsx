@@ -26,22 +26,43 @@ const handleProfilePictureChange = async (event) => {
     formData.append('profile_picture', file);
 
     try {
-        const response = await apiService.post('/api/users/profile-picture', formData, {
-    headers: {
-        'Content-Type': 'multipart/form-data',
-    },
-});
-
-        const updatedUser = { ...user, profile_image_url: response.data.profile_image_url };
-        localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
-
-        window.location.reload();
-    } catch (error) {
-        console.error("Erro ao fazer upload da foto de perfil:", error);
-        alert("Ocorreu um erro ao enviar sua foto. Tente novamente.");
-    } finally {
-        setIsUploading(false);
+    // Pega o token de autenticação diretamente do localStorage
+    const token = localStorage.getItem('simplific_token');
+    if (!token) {
+        throw new Error('Token de autenticação não encontrado. Faça o login novamente.');
     }
+
+    // Usa a API 'fetch' nativa do navegador para controle total
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile-picture`, {
+        method: 'POST',
+        headers: {
+            // NÃO definimos 'Content-Type'. O navegador faz isso
+            // automaticamente para FormData, incluindo o 'boundary' correto.
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        // Se a resposta não for OK (ex: 400, 500), lança um erro com a mensagem da API
+        throw new Error(result.error || 'Erro no servidor. Tente novamente.');
+    }
+
+    // Se o upload foi bem-sucedido, atualiza o localStorage e recarrega a página
+    const updatedUser = { ...user, profile_image_url: result.profile_image_url };
+    localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
+
+    window.location.reload();
+
+} catch (error) {
+    console.error("Erro ao fazer upload da foto de perfil:", error);
+    // Exibe a mensagem de erro específica que criamos
+    alert(error.message);
+} finally {
+    setIsUploading(false);
+}
 };
 // ▲▲▲ FIM DO BLOCO ▲▲▲
 
