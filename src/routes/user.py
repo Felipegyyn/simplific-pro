@@ -10,6 +10,8 @@ from src.services.image_service import upload_profile_image
 from flask import request, jsonify
 from src.extensions import bcrypt # <-- LINHA ADICIONADA
 
+print("--- DEBUG: O arquivo src/routes/user.py foi carregado com sucesso. ---")
+
 user_bp = Blueprint('user', __name__)
 
 # ▼▼▼ DECORADOR DE VERIFICAÇÃO DE USUÁRIO ATIVO ▼▼▼
@@ -290,6 +292,8 @@ def update_user_preference():
 @user_bp.route('/profile-picture', methods=['POST'])
 @jwt_required()
 def upload_profile_picture():
+
+    print("--- DEBUG: A ROTA /api/users/profile-picture FOI ACESSADA! ---") # <-- ADICIONE AQUI
     """
     Recebe um arquivo de imagem do frontend, faz o upload
     e atualiza o perfil do usuário logado.

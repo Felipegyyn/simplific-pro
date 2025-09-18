@@ -65,6 +65,7 @@ jwt = JWTManager(app)
 
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
+print("--- DEBUG: O blueprint 'user_bp' foi registrado no prefixo /api/users. ---")
 app.register_blueprint(financial_bp, url_prefix='/api')
 app.register_blueprint(transactions_bp, url_prefix='/api/transactions')
 app.register_blueprint(goals_bp, url_prefix='/api')
