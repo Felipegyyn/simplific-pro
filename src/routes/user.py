@@ -5,6 +5,9 @@ from flask_jwt_extended import (
 )
 from datetime import datetime, timedelta
 from src.models.user import User, db
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from src.services.image_service import upload_profile_image
+from flask import request, jsonify
 from src.extensions import bcrypt # <-- LINHA ADICIONADA
 
 user_bp = Blueprint('user', __name__)
@@ -281,6 +284,41 @@ def update_user_preference():
     db.session.commit()
 
     return jsonify({"message": "Preferência atualizada com sucesso", "new_format": new_format}), 200
+
+# COLE ESTE BLOCO NO FINAL DO ARQUIVO user.py
+
+@user_bp.route('/profile-picture', methods=['POST'])
+@jwt_required()
+def upload_profile_picture():
+    """
+    Recebe um arquivo de imagem do frontend, faz o upload
+    e atualiza o perfil do usuário logado.
+    """
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if 'profile_picture' not in request.files:
+        return jsonify({'error': 'Nenhum arquivo de imagem enviado.'}), 400
+
+    file = request.files['profile_picture']
+
+    if file.filename == '':
+        return jsonify({'error': 'Nenhum arquivo selecionado.'}), 400
+
+    # Chama nosso novo serviço para fazer o trabalho pesado do upload
+    image_url = upload_profile_image(file, current_user_id)
+
+    if not image_url:
+        return jsonify({'error': 'Falha no upload da imagem para o servidor externo.'}), 500
+
+    # Salva a URL da nova imagem no banco de dados
+    user.profile_image_url = image_url
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Foto de perfil atualizada com sucesso!', 
+        'profile_image_url': image_url
+    }), 200
 
 
 
