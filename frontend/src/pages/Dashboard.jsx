@@ -16,8 +16,7 @@ import {
   TrendingUp, TrendingDown, DollarSign, CreditCard, Target, 
   PieChart as PieChartIcon, Calendar, Users, LogOut, 
   ArrowUpRight, ArrowDownRight, Wallet, Building2,
-  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,
-  Bell, BellRing, FileText, BookOpen
+  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,BookOpen
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
