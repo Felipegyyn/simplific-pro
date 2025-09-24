@@ -897,7 +897,7 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
               <DialogHeader>
                 <DialogTitle>Editar Transação</DialogTitle>
               </DialogHeader>
-                // NOVA VERSÃO CORRIGIDA
+                
 <form onSubmit={(e) => {
   e.preventDefault();
   if (!editFormData.description || !editFormData.amount || !editFormData.category) {

@@ -390,9 +390,9 @@ const Dashboard = ({ user, onLogout }) => {
 
   // ▼▼▼ COLE O BLOCO ABAIXO ANTES DO RETURN ▼▼▼
 const tutorials = [
-  { name: 'Primeiros passos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Planejamento', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Lançamentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Primeiros passos', url: 'https://drive.google.com/file/d/1J3wHu2sFvlCamIPj9Fi5OGFeYmEisEVh/view?usp=sharing' },
+  { name: 'Planejamento', url: 'https://drive.google.com/file/d/1F-z6QO8OQaySz1OUshtQIj6kEjVhrIUP/view?usp=drive_link' },
+  { name: 'Lançamentos', url: 'https://drive.google.com/file/d/1Jv60P9xCEf2c9_PMwGxipQyNF6lAWK5I/view?usp=drive_link' },
   { name: 'Cartões', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
   { name: 'Metas', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
   { name: 'Investimentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
