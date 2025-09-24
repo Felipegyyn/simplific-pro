@@ -429,7 +429,7 @@ const tutorials = [
         <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Tutoriais
+                Tutoriais (Em breve)
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
