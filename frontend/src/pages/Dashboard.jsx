@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,8 @@ import {
   TrendingUp, TrendingDown, DollarSign, CreditCard, Target, 
   PieChart as PieChartIcon, Calendar, Users, LogOut, 
   ArrowUpRight, ArrowDownRight, Wallet, Building2,
-  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText
+  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,
+  Bell, BellRing, FileText, BookOpen
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
@@ -387,6 +389,22 @@ const Dashboard = ({ user, onLogout }) => {
     }
   }
 
+  // ▼▼▼ COLE O BLOCO ABAIXO ANTES DO RETURN ▼▼▼
+const tutorials = [
+  { name: 'Primeiros passos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Planejamento', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Lançamentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Cartões', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Metas', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Investimentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Agenda', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Análise', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Balanço Geral', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Assessor Simplific', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Simplific IA', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+];
+// ▲▲▲ FIM DO BLOCO ▲▲▲
+
   if (dashboardData.loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
@@ -407,6 +425,28 @@ const Dashboard = ({ user, onLogout }) => {
             <h1 className="text-xl font-bold text-green-800 dark:text-green-400">Simplific Pro</h1>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
+          {/* ▼▼▼ COLE O NOVO COMPONENTE DE DROPDOWN AQUI ▼▼▼ */}
+    <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Tutoriais
+            </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Guia Rápido</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {tutorials.map((tutorial) => (
+                <DropdownMenuItem key={tutorial.name} asChild>
+                    <a href={tutorial.url} target="_blank" rel="noopener noreferrer">
+                        {tutorial.name}
+                    </a>
+                </DropdownMenuItem>
+            ))}
+        </DropdownMenuContent>
+    </DropdownMenu>
+    {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
+
             <Dialog open={isNotificationCenterOpen} onOpenChange={setIsNotificationCenterOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="relative">
