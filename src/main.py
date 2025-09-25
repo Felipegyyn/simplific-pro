@@ -217,17 +217,6 @@ def list_routes():
     return "<br>".join(sorted(output))
 # ▲▲▲ FIM DA ROTA DE DIAGNÓSTICO ▲▲▲
 
-scheduler = BackgroundScheduler(daemon=True)
-# Roda a verificação de lembretes todos os dias às 8:00 da manhã (horário do servidor)
-scheduler.add_job(check_and_send_reminders, trigger='cron', hour=11, minute=0, args=[app])
-scheduler.add_job(enviar_resumos_semanais, trigger='cron', day_of_week='mon', hour=11, minute=0, args=[app])
-# Roda a verificação de lançamentos pendentes todo dia às 8:30 da manhã
-scheduler.add_job(verificar_lancamentos_pendentes, trigger='cron', hour=11, minute=30, args=[app])
-
-scheduler.start()
-# Roda o envio de resumos toda Segunda-feira às 9:00 da manhã (horário do servidor)
-
-
 # Execução condicional para evitar conflito com migrações
 #if os.getenv('FLASK_SKIP_SETUP') != '1':
 with app.app_context():
@@ -290,6 +279,20 @@ def check_subscriptions_command():
         print(f"--- [CRON] ERRO: Falha ao salvar as alterações. {e} ---")
 
     print("--- [CRON] Verificação concluída. ---")
+
+# ▼▼▼ COLE O NOVO COMANDO NO FINAL DO main.py ▼▼▼
+
+@app.cli.command("send-weekly-reports")
+def send_weekly_reports_command():
+    """
+    Busca todos os usuários elegíveis e envia o resumo financeiro da última semana.
+    Este comando é para ser executado via Cron Job.
+    """
+    # Precisamos do contexto da aplicação para acessar o banco de dados
+    with app.app_context():
+        # A função 'enviar_resumos_semanais' já está no scheduler.py,
+        # nós apenas a chamamos a partir daqui.
+        enviar_resumos_semanais(app)
 
 
 

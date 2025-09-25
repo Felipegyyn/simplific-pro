@@ -2,7 +2,9 @@ from datetime import date, timedelta
 from collections import defaultdict
 from src.database.database import execute_query
 from src.utils.formatters import format_currency_brl
-
+from src.models.db import db
+from src.models.financial import Transaction, Category
+from sqlalchemy import func, case
 
 def get_financial_summary_for_ai(user_id):
     """Gera um resumo textual do status financeiro do mês atual para a IA."""
@@ -191,3 +193,57 @@ def buscar_resumo_planejamento(user_id, data_inicio, data_fim):
         
     return resultado_final
 
+def gerar_resumo_semanal(user_id):
+    """
+    Calcula o resumo financeiro da última semana completa (Segunda a Domingo) para um usuário.
+    """
+    hoje = date.today()
+    # A linha abaixo calcula o início da semana passada (a última segunda-feira)
+    # Ex: se hoje for qua, 28/ago, ele voltará para seg, 19/ago
+    inicio_semana = hoje - timedelta(days=hoje.weekday() + 7) 
+    
+    # O fim da semana passada (o último domingo)
+    fim_semana = inicio_semana + timedelta(days=6)
+
+    print(f"DEBUG: Gerando resumo para User ID {user_id} no período de {inicio_semana} a {fim_semana}")
+
+    # 1. Busca os totais de entrada e saída com uma única query no banco
+    totais = db.session.query(
+        func.sum(case((Transaction.type == 'entrada', Transaction.value), else_=0)).label('total_entradas'),
+        func.sum(case((Transaction.type == 'saida', Transaction.value), else_=0)).label('total_saidas')
+    ).filter(
+        Transaction.user_id == user_id,
+        Transaction.status == 'confirmada', # Apenas transações confirmadas
+        Transaction.date.between(inicio_semana, fim_semana)
+    ).first()
+
+    total_entradas = totais.total_entradas if totais.total_entradas is not None else 0
+    total_saidas = totais.total_saidas if totais.total_saidas is not None else 0
+    saldo_semanal = total_entradas - total_saidas
+
+    # Se não houve nenhum gasto, retornamos um objeto indicando isso
+    if total_saidas == 0:
+        return {
+            "has_activity": False
+        }
+
+    # 2. Busca a categoria com o maior gasto no período
+    gastos_por_categoria = db.session.query(
+        Category.name,
+        func.sum(Transaction.value).label('total')
+    ).join(Category, Transaction.category_id == Category.id).filter(
+        Transaction.user_id == user_id,
+        Transaction.status == 'confirmada',
+        Transaction.type == 'saida',
+        Transaction.date.between(inicio_semana, fim_semana)
+    ).group_by(Category.name).order_by(func.sum(Transaction.value).desc()).first()
+
+    # Define a categoria principal ou um valor padrão
+    categoria_principal = gastos_por_categoria.name if gastos_por_categoria else "Diversos"
+
+    return {
+        "has_activity": True,
+        "total_gasto": float(total_saidas),
+        "saldo": float(saldo_semanal),
+        "categoria_principal": categoria_principal
+    }

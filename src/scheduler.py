@@ -6,7 +6,7 @@ from src.models.financial import Transaction
 from src.services.whatsapp_service import send_whatsapp_message 
 # Importe a nossa função de formatação de moeda para usar aqui também
 from src.utils.formatters import format_currency_brl
-from src.services.transacoes_service import gerar_resumo_semanal
+from src.services.reports_service import gerar_resumo_semanal
 import time
 
 def check_and_send_reminders(app):
@@ -98,7 +98,7 @@ def enviar_resumos_semanais(app):
                 # Formata o número para o padrão da Twilio (whatsapp:+55...)
                 numero_destino = f'whatsapp:{usuario.whatsapp}'
                 
-                enviar_mensagem_whatsapp(numero_destino, mensagem)
+                send_whatsapp_message(numero_destino, mensagem)
                 time.sleep(1) # Pausa de 1 segundo para não sobrecarregar a API da Twilio
             else:
                 print(f"Usuário {usuario.name} sem atividade na última semana. Resumo não enviado.")
