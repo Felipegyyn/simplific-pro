@@ -82,12 +82,12 @@ def enviar_resumos_semanais(app):
             print(f"Processando resumo para o usuário: {usuario.name} ({usuario.whatsapp})")
             resumo = gerar_resumo_semanal(usuario.id)
             
+            # Só envia se o usuário teve movimentação na semana anterior
             if resumo and resumo["has_activity"]:
                 saldo_texto = f"positivo em *{format_currency_brl(resumo['saldo'])}*" if resumo['saldo'] >= 0 else f"negativo em *{format_currency_brl(resumo['saldo'])}*"
-
+                
                 # Formata o número para o padrão da Twilio
                 numero_destino = f'whatsapp:{usuario.whatsapp}'
-
                 # Busca o ID (SID) do nosso novo template
                 template_sid = template_sids.get('resumo_semanal_v1')
 
@@ -106,7 +106,8 @@ def enviar_resumos_semanais(app):
                         "4": saldo_texto
                     }
                 )
-                time.sleep(1) # Pausa para não sobrecarregar a API
+
+                time.sleep(1) # Pausa de 1 segundo para não sobrecarregar a API da Twilio
             else:
                 print(f"Usuário {usuario.name} sem atividade na última semana. Resumo não enviado.")
     
