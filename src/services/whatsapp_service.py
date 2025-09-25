@@ -18,7 +18,7 @@ template_sids = {
     'planejamento_extrapolado': 'HX678b082253a03d42ceb842b2b703b5c3',
     'resumo_faturas': 'HX1e16cbb43cd749b1a3ec72fa3d461972',
     'resumo_lancamentos': 'HXed924fd8d2f7be3bc9bb1caaf70ffe47',
-    'welcome_simplific': 'HX5be9120897732c8cbf75e0cafb5c4fca'
+    'welcome_simplific': 'HX5be9120897732c8cbf75e0cafb5c4fca',
     'resumo_semanal_v1':'HXe2c234ee0d58afc0c299b880fa01c3c4'
 }
 
