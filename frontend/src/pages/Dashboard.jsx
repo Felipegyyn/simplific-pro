@@ -393,8 +393,8 @@ const tutorials = [
   { name: 'Primeiros passos', url: 'https://drive.google.com/file/d/10eHUcQS7rOOp1c4glcFY2Q9JevMvQNyf/view?usp=sharing' },
   { name: 'Planejamento', url: 'https://drive.google.com/file/d/1F-z6QO8OQaySz1OUshtQIj6kEjVhrIUP/view?usp=drive_link' },
   { name: 'Lançamentos', url: 'https://drive.google.com/file/d/1Jv60P9xCEf2c9_PMwGxipQyNF6lAWK5I/view?usp=drive_link' },
-  { name: 'Cartões', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Metas', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Cartões', url: 'https://drive.google.com/file/d/1TqYdxBrC8mgFfADKLtd4VP2wGc0BPEgt/view?usp=drive_link' },
+  { name: 'Metas', url: 'https://drive.google.com/file/d/1HBegoIhPzfVpWLuNTxMziilSxnxu0_A3/view?usp=drive_link' },
   { name: 'Investimentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
   { name: 'Agenda', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
   { name: 'Análise', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
@@ -429,7 +429,7 @@ const tutorials = [
         <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
                 <BookOpen className="h-4 w-4 mr-2" />
-                Tutoriais (Em breve)
+                Tutoriais
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
