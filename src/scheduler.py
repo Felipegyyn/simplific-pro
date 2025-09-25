@@ -3,7 +3,7 @@ from datetime import date, timedelta, datetime
 from src.models.extended import ScheduleEvent
 from src.models.user import User
 from src.models.financial import Transaction 
-from src.services.whatsapp_service import send_whatsapp_message 
+from src.services.whatsapp_service import send_whatsapp_template, template_sids 
 # Importe a nossa função de formatação de moeda para usar aqui também
 from src.utils.formatters import format_currency_brl
 from src.services.reports_service import gerar_resumo_semanal
@@ -82,24 +82,31 @@ def enviar_resumos_semanais(app):
             print(f"Processando resumo para o usuário: {usuario.name} ({usuario.whatsapp})")
             resumo = gerar_resumo_semanal(usuario.id)
             
-            # Só envia se o usuário teve movimentação na semana anterior
             if resumo and resumo["has_activity"]:
                 saldo_texto = f"positivo em *{format_currency_brl(resumo['saldo'])}*" if resumo['saldo'] >= 0 else f"negativo em *{format_currency_brl(resumo['saldo'])}*"
-                
-                mensagem = (
-                    f"Bom dia, {usuario.name}! ☀️\n\n"
-                    f"Aqui está o resumo da sua última semana:\n\n"
-                    f" Gasto Total: *{format_currency_brl(resumo['total_gasto'])}*\n"
-                    f" Principal Categoria: *{resumo['categoria_principal']}*\n"
-                    f" Saldo da Semana: {saldo_texto}\n\n"
-                    f"Tenha uma ótima e produtiva semana! 💪"
-                )
-                
-                # Formata o número para o padrão da Twilio (whatsapp:+55...)
+
+                # Formata o número para o padrão da Twilio
                 numero_destino = f'whatsapp:{usuario.whatsapp}'
-                
-                send_whatsapp_message(numero_destino, mensagem)
-                time.sleep(1) # Pausa de 1 segundo para não sobrecarregar a API da Twilio
+
+                # Busca o ID (SID) do nosso novo template
+                template_sid = template_sids.get('resumo_semanal_v1')
+
+                if not template_sid:
+                    print(f"ERRO: Template SID para 'resumo_semanal_v1' não foi encontrado no código.")
+                    continue # Pula para o próximo usuário
+
+                # Chama a função de envio de TEMPLATE com as variáveis
+                send_whatsapp_template(
+                    to=numero_destino,
+                    template_sid=template_sid,
+                    content_variables={
+                        "1": usuario.name.split()[0], # Envia apenas o primeiro nome
+                        "2": format_currency_brl(resumo['total_gasto']),
+                        "3": resumo['categoria_principal'],
+                        "4": saldo_texto
+                    }
+                )
+                time.sleep(1) # Pausa para não sobrecarregar a API
             else:
                 print(f"Usuário {usuario.name} sem atividade na última semana. Resumo não enviado.")
     
