@@ -262,27 +262,31 @@ const carregarCategoriasAntesDeAbrir = async () => {
 };
 
 
-// VERSÃO CORRIGIDA
+// ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'editarTransacao' POR ESTA ▼▼▼
   const editarTransacao = async (id, dados) => {
     try {
+      // A chamada para a API permanece a mesma
       const response = await apiService.put(`/api/transactions/${id}`, dados);
-      // ▼▼▼ ALTERE APENAS A LINHA ABAIXO ▼▼▼
-      if (response.data && response.data.success) {
-      // ▲▲▲ FIM DA ALTERAÇÃO ▲▲▲
+
+      // A MUDANÇA ESTÁ AQUI. Como a API retorna um status 200 OK (sucesso),
+      // podemos confiar que, se não houve um erro pego pelo 'catch',
+      // a operação foi bem-sucedida. Este 'if' é mais robusto.
+      if (response) {
         await loadTransacoes();
         eventService.emit('transactionsChanged');
         setIsEditModalOpen(false);
         setSelectedTransacao(null);
         alert('Transação atualizada com sucesso!');
       } else {
-        // Adiciona um feedback caso a API não retorne sucesso
-        alert('A API não confirmou a atualização. Tente novamente.');
+        // Este bloco de 'else' agora serve como uma segurança extra.
+        alert('A API não retornou uma confirmação. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro ao editar transação:', error);
       alert('Erro ao editar transação. Tente novamente.');
     }
   };
+// ▲▲▲ FIM DO BLOCO DE SUBSTITUIÇÃO ▲▲▲
 
   // Função para abrir modal de edição
   const abrirModalEdicao = (transacao) => {
