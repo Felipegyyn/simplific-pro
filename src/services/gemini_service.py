@@ -3,58 +3,51 @@
 import os
 import google.generativeai as genai
 from datetime import datetime
+import json # Adicionado para a função de categorização
 
-# Pega a chave da API do ambiente do Render
+# --- CONFIGURAÇÃO ÚNICA E CENTRALIZADA ---
+
+# 1. Pega a chave da API do ambiente de forma segura
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
-# Configura a biblioteca Gemini com a chave
-# Esta linha força a autenticação para todas as funcionalidades
+# 2. Configura a biblioteca Gemini (apenas uma vez)
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 else:
     print("AVISO CRÍTICO: A chave da API do Gemini não foi encontrada no ambiente.")
 
-# O resto do seu código (a definição da classe GeminiService, etc.) continua abaixo...
-
-# Carrega a chave da API do Gemini a partir do arquivo .env
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-
-# Configura o cliente do Gemini com a sua chave, se ela existir
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-else:
-    print("AVISO: GEMINI_API_KEY não encontrada no .env. O serviço Gemini não funcionará.")
-
-# Configurações do modelo otimizadas para uma conversa mais natural
+# 3. Define as configurações do modelo
 generation_config = {
-  "temperature": 0.7, # Aumentamos a temperatura para respostas mais criativas e menos robóticas
-  "top_p": 1,
-  "top_k": 1,
-  "max_output_tokens": 2048,
+    "temperature": 0.7,
+    "top_p": 1,
+    "top_k": 1,
+    "max_output_tokens": 2048,
 }
 
 safety_settings = [
-  {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-  {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-  {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-  {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-# Inicializa o modelo
-model = genai.GenerativeModel('gemini-1.5-flash-latest', # Usando um modelo mais recente e capaz
-                              generation_config=generation_config,
-                              safety_settings=safety_settings)
+# 4. Inicializa o modelo CORRETO (apenas uma vez)
+# Esta é a principal correção: usamos 'gemini-1.5-flash-latest'
+model = genai.GenerativeModel(
+    'gemini-1.5-flash-latest',
+    generation_config=generation_config,
+    safety_settings=safety_settings
+)
+
+# --- FUNÇÕES DO SERVIÇO ---
 
 def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat):
     """
-    Cria o Master Prompt para o Assessor Financeiro "Simplific",
-    combinando sua persona, o contexto financeiro do usuário e o histórico da conversa.
+    Cria o Master Prompt para o Assessor Financeiro "Simplific".
+    (O conteúdo desta função permanece o mesmo que você já tem)
     """
-    
-    # Monta o histórico da conversa em um formato legível para a IA
     historico_formatado = "\n".join([f"{msg['role']}: {msg['content']}" for msg in historico_chat])
-
-    # O Novo Master Prompt - A Alma do "Simplific"
+    
     prompt = f"""
     # PERSONA E DIRETRIZES MESTRAS
     - Seu nome é Simplific. Você é o assessor financeiro pessoal, de investimentos, parceiro de finanças e também parceiro do dia-dia do usuário chamado {nome_usuario}.
@@ -129,7 +122,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
             - Extraia o "periodo".
             - Exemplo 1: "quais minhas despesas pendentes?" -> `[ACTION]{{"type": "consultar_transacoes", "data": {{"status": "pendente", "tipo": "saida", "periodo": "este mês"}}}}`
             - Exemplo 2: "quais minhas receitas pendentes" -> `[ACTION]{{"type": "consultar_transacoes", "data": {{"status": "pendente", "tipo": "entrada", "periodo": "este mês"}}}}`
-       
+        
         - "consultar_agenda": Para listar os compromissos do usuário.
             - Exemplo: "o que tenho na agenda?" -> `[ACTION]{{"type": "consultar_agenda", "data": null}}`
         - "cadastrar_evento_agenda": Para agendar um novo lembrete ou evento.
@@ -150,6 +143,6 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     """
     return prompt
 
-# As funções antigas (analisar_mensagem, _construir_prompt_mestre, etc.)
-# foram removidas, pois pertencem ao paradigma antigo de extração de intenção.
-# A nova arquitetura usará um serviço orquestrador para chamar `construir_prompt_assessor`.
+# A função categorizar_descricao_transacao foi removida deste arquivo
+# para manter o foco apenas no serviço de assessoria.
+# Ela pertence ao ai_assessor_service.py
