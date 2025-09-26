@@ -332,7 +332,7 @@ def seed_achievements_command():
 
     print("--- Cadastro de conquistas concluído! ---")
 
-# ▼▼▼ COLE O NOVO COMANDO NO FINAL DO main.py ▼▼▼
+# ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'check_achievements_command' POR ESTA ▼▼▼
 
 @app.cli.command("check-achievements")
 def check_achievements_command():
@@ -342,16 +342,32 @@ def check_achievements_command():
     """
     print("--- [CRON] Iniciando verificação de conquistas para todos os usuários... ---")
     with app.app_context():
-        users = User.query.filter(func.lower(User.status) == 'active').all()
-        print(f"Encontrados {len(users)} usuários ativos para verificar.")
+        
+        # --- ETAPA DE DEBUG ---
+        # 1. Busca TODOS os usuários, sem nenhum filtro.
+        all_users = User.query.all()
+        print(f"--- [DEBUG] Total de usuários encontrados no banco: {len(all_users)} ---")
+        
+        # 2. Imprime o status de cada usuário encontrado.
+        for u in all_users:
+            # Usamos repr() para ver o valor exato da string, incluindo espaços ou caracteres ocultos.
+            print(f"  - [DEBUG] Usuário ID: {u.id}, Email: {u.email}, Status: {repr(u.status)}")
+        # --- FIM DA ETAPA DE DEBUG ---
 
-        for user in users:
+        # A busca original, que estamos depurando.
+        users_to_check = User.query.filter(func.lower(User.status) == 'active').all()
+        print(f"Encontrados {len(users_to_check)} usuários ativos para verificar.")
+        
+        if not users_to_check:
+            print("--- [CRON] Nenhum usuário ativo encontrado para verificação. Concluindo. ---")
+            return
+            
+        for user in users_to_check:
             print(f"  - Verificando conquistas para: {user.email}")
             check_all_achievements_for_user(user)
-
-        # Salva todas as novas conquistas concedidas no banco de uma vez
+        
         db.session.commit()
-
+    
     print("--- [CRON] Verificação de conquistas concluída. ---")
 
 
