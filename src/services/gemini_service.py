@@ -41,7 +41,7 @@ safety_settings = [
 ]
 
 # Inicializa o modelo
-model = genai.GenerativeModel(model_name="gemini-1.5-flash", # Usando um modelo mais recente e capaz
+model = genai.GenerativeModel('gemini-1.5-flash-latest'), # Usando um modelo mais recente e capaz
                               generation_config=generation_config,
                               safety_settings=safety_settings)
 
