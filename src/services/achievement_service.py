@@ -7,7 +7,7 @@ from src.models.extended import Goal, Investment
 from src.models.gamification import Achievement, UserAchievement
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import func
+from sqlalchemy import func, case
 
 # --- FUNÇÃO AUXILIAR PARA CONCEDER UMA CONQUISTA ---
 
