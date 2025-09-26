@@ -395,12 +395,11 @@ const tutorials = [
   { name: 'Lançamentos', url: 'https://drive.google.com/file/d/1Jv60P9xCEf2c9_PMwGxipQyNF6lAWK5I/view?usp=drive_link' },
   { name: 'Cartões', url: 'https://drive.google.com/file/d/1TqYdxBrC8mgFfADKLtd4VP2wGc0BPEgt/view?usp=drive_link' },
   { name: 'Metas', url: 'https://drive.google.com/file/d/1HBegoIhPzfVpWLuNTxMziilSxnxu0_A3/view?usp=drive_link' },
-  { name: 'Investimentos', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Agenda', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Análise', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Balanço Geral', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Assessor Simplific', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
-  { name: 'Simplific IA', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Investimentos', url: 'https://drive.google.com/file/d/1FXA8k_S7_oSoxu_0jMEFSu6IA-DiWpGa/view?usp=drive_link' },
+  { name: 'Agenda', url: 'https://drive.google.com/file/d/1gwuEcxEV6t7lSJSuqjUgO8ganuE6osoy/view?usp=drive_link' },
+  //{ name: 'Análise e Balanço', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  //{ name: 'Assessor Simplific', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  //{ name: 'Simplific IA', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
 ];
 // ▲▲▲ FIM DO BLOCO ▲▲▲
 

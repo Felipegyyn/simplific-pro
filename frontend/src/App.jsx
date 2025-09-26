@@ -5,6 +5,7 @@ import './App.css';
 // Componentes
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Achievements from './pages/Achievements';
 import Planning from './pages/Planning';
 import Transactions from './pages/Transactions';
 import CreditCards from './pages/CreditCards';
@@ -137,6 +138,7 @@ return (
                 <Route path="/investments" element={<Investments user={user} onLogout={handleLogout} />} />
                 <Route path="/schedule" element={<Schedule user={user} onLogout={handleLogout} />} />
                 <Route path="/simplific-ia" element={<SimplificIA user={user} onLogout={handleLogout} />} />
+                <Route path="/achievements" element={<Achievements />} />
                 <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
                 // Para este bloco:
                 <Route 

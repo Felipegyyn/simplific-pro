@@ -7,8 +7,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS
+from src.models.gamification import Achievement, UserAchievement
 from flask_migrate import Migrate
 from src.routes.user_routes import user_api_bp
+from src.services.achievement_service import check_all_achievements_for_user
 from datetime import datetime, timedelta
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
@@ -20,6 +22,7 @@ from src.models.financial import Category, Planning, Transaction
 from src.models.extended import Goal, ScheduleEvent, Investment
 from src.models.extended_modules import CreditCard, CreditCardTransaction
 from src.routes.user import user_bp
+from src.routes.gamification_routes import gamification_bp
 from src.routes.financial import financial_bp, transactions_bp
 from src.routes.goals import goals_bp
 from src.extensions import mail, db, bcrypt
@@ -78,6 +81,7 @@ app.register_blueprint(extended_bp, url_prefix='/api')
 app.register_blueprint(reports_bp, url_prefix='/api') 
 app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
+app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -293,6 +297,61 @@ def send_weekly_reports_command():
         # A função 'enviar_resumos_semanais' já está no scheduler.py,
         # nós apenas a chamamos a partir daqui.
         enviar_resumos_semanais(app)
+
+# ▼▼▼ COLE O NOVO COMANDO NO FINAL DO main.py ▼▼▼
+
+@app.cli.command("seed-achievements")
+def seed_achievements_command():
+    """
+    Cadastra as conquistas padrão do sistema no banco de dados.
+    """
+    print("--- Iniciando o cadastro de conquistas padrão... ---")
+
+    # A lista mestre de todas as conquistas do sistema
+    achievements_list = [
+        {'key': 'FIRST_LOGIN', 'name': 'Primeiros Passos', 'description': 'Fez o primeiro login e iniciou a jornada.', 'icon': 'DoorOpen'},
+        {'key': 'FIRST_TRANSACTION', 'name': 'Organizador(a) Iniciante', 'description': 'Cadastrou seu primeiro lançamento financeiro.', 'icon': 'PencilLine'},
+        {'key': 'FIRST_PLAN', 'name': 'Planejador(a)', 'description': 'Criou seu primeiro item no planejamento.', 'icon': 'ClipboardList'},
+        {'key': 'FIRST_GOAL', 'name': 'Visionário(a)', 'description': 'Definiu sua primeira meta financeira.', 'icon': 'Target'},
+        {'key': 'FIRST_INVESTMENT', 'name': 'Investidor(a) Aspirante', 'description': 'Cadastrou seu primeiro investimento na carteira.', 'icon': 'TrendingUp'},
+        {'key': 'BUDGET_MASTER_1', 'name': 'Mestre do Orçamento', 'description': 'Passou 1 mês completo sem estourar o orçamento de nenhuma categoria.', 'icon': 'Award'},
+        {'key': 'SAVER_1', 'name': 'Poupador(a) Bronze', 'description': 'Manteve o saldo mensal positivo por 1 mês.', 'icon': 'PiggyBank'}
+    ]
+
+    with app.app_context():
+        for ach_data in achievements_list:
+            # Verifica se a conquista já existe para não duplicar
+            exists = Achievement.query.filter_by(key=ach_data['key']).first()
+            if not exists:
+                new_achievement = Achievement(**ach_data)
+                db.session.add(new_achievement)
+                print(f"  - Conquista '{ach_data['name']}' cadastrada.")
+
+        db.session.commit()
+
+    print("--- Cadastro de conquistas concluído! ---")
+
+# ▼▼▼ COLE O NOVO COMANDO NO FINAL DO main.py ▼▼▼
+
+@app.cli.command("check-achievements")
+def check_achievements_command():
+    """
+    Verifica e concede novas conquistas para todos os usuários ativos.
+    Este comando é para ser executado via Cron Job.
+    """
+    print("--- [CRON] Iniciando verificação de conquistas para todos os usuários... ---")
+    with app.app_context():
+        users = User.query.filter_by(status='active').all()
+        print(f"Encontrados {len(users)} usuários ativos para verificar.")
+
+        for user in users:
+            print(f"  - Verificando conquistas para: {user.email}")
+            check_all_achievements_for_user(user)
+
+        # Salva todas as novas conquistas concedidas no banco de uma vez
+        db.session.commit()
+
+    print("--- [CRON] Verificação de conquistas concluída. ---")
 
 
 

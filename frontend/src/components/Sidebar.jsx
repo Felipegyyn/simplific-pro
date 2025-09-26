@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import apiService from '../services/api';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3, Bot
+  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3, Bot, Award 
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 
@@ -77,6 +77,7 @@ const handleProfilePictureChange = async (event) => {
     { name: 'Agenda', icon: Calendar, path: '/schedule' },
     { name: 'Simplific IA', icon: Bot, path: '/simplific-ia' },
     { name: 'Análise', icon: BarChart3, path: '/analysis' },
+    { name: 'Conquistas', icon: Award, path: '/achievements' },
     { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
     { name: 'Configurações', icon: Settings, path: '/settings' }
   ];

@@ -26,6 +26,8 @@ class User(db.Model):
     password_reset_tokens = db.relationship('PasswordResetToken', backref='user', lazy=True, cascade="all, delete-orphan")
     # Adicione esta linha junto com as outras colunas do modelo User
     profile_image_url = db.Column(db.String(255), nullable=True, default=None)
+    # Adicione esta linha dentro da classe User
+    achievements = db.relationship('UserAchievement', back_populates='user', lazy='dynamic', cascade="all, delete-orphan")
 
 
     def __repr__(self):
