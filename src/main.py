@@ -259,7 +259,7 @@ def check_subscriptions_command():
     # 2. Têm uma data de expiração definida.
     # 3. Essa data de expiração já passou do nosso limite de tolerância.
     users_to_deactivate = User.query.filter(
-        User.status == 'active',
+        func.lower(User.status) == 'ativo',
         User.subscription_valid_until != None,
         User.subscription_valid_until <= cutoff_date
     ).all()

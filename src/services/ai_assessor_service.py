@@ -61,10 +61,26 @@ def get_ai_response(user_id, historico_chat):
     
     try:
         # Envia o prompt para o modelo Gemini
-        resposta_gemini = model.generate_content(prompt).text
+        response = model.generate_content(prompt)
+
+        # Adiciona uma verificação de segurança ANTES de tentar ler o texto
+        if not response.parts:
+            try:
+                # Tenta obter o motivo do bloqueio para um log mais claro
+                finish_reason = response.candidates[0].finish_reason
+                print(f"AVISO: A resposta do Gemini foi bloqueada. Motivo: {finish_reason.name}")
+            except (IndexError, AttributeError):
+                print("AVISO: A resposta do Gemini foi bloqueada (resposta vazia).")
+
+            # Retorna uma mensagem amigável para o usuário
+            return "Não consegui processar sua solicitação devido às políticas de segurança. Por favor, tente reformular sua pergunta.", None
+
+        resposta_gemini = response.text
+    
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
         return "Tive um problema para me conectar com minha inteligência. Tente novamente em alguns instantes.", None
+        
 
     # --- PASSO 3: Processar a Resposta do Gemini ---
     texto_para_usuario = resposta_gemini
@@ -127,6 +143,10 @@ def categorizar_descricao_transacao(user_id, descricao):
     try:
         # 4. Chama a IA e obtém a resposta
         response = model.generate_content(prompt)
+
+        if not response.parts:
+            print(f"AVISO: Resposta do Gemini para categorizar '{descricao}' foi bloqueada.")
+            return 'Outros' # Retorna um valor seguro
         
         # 5. Limpa e valida a resposta da IA
         categoria_sugerida = response.text.strip().replace("'", "").replace('"', '')
@@ -179,7 +199,12 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
 
     try:
         # Chama o modelo de IA diretamente para esta tarefa específica
-        resposta_ia_texto = model.generate_content(prompt).text
+        response = model.generate_content(prompt)
+
+        if not response.parts:
+            print(f"AVISO: Resposta do Gemini para extrair transações foi bloqueada.")
+            return [] # Retorna uma lista vazia segura
+        resposta_ia_texto = response.text
 
         # Limpa a resposta para garantir que seja um JSON válido
         json_str = resposta_ia_texto.strip().replace('```json', '').replace('```', '')
