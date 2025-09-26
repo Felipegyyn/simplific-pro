@@ -34,7 +34,7 @@ safety_settings = [
 # 4. Inicializa o modelo CORRETO (apenas uma vez)
 # Esta é a principal correção: usamos 'gemini-1.5-flash-latest'
 model = genai.GenerativeModel(
-    'gemini-2.5-flash-latest',
+    'gemini-2.5-flash',
     generation_config=generation_config,
     safety_settings=safety_settings
 )
