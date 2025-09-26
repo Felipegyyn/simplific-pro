@@ -343,19 +343,25 @@ def check_achievements_command():
     print("--- [CRON] Iniciando verificação de conquistas para todos os usuários... ---")
     with app.app_context():
         
-        # --- ETAPA DE DEBUG ---
-        # 1. Busca TODOS os usuários, sem nenhum filtro.
+        # --- ETAPA DE DEBUG APROFUNDADO ---
         all_users = User.query.all()
         print(f"--- [DEBUG] Total de usuários encontrados no banco: {len(all_users)} ---")
         
-        # 2. Imprime o status de cada usuário encontrado.
+        manually_filtered_users = []
         for u in all_users:
-            # Usamos repr() para ver o valor exato da string, incluindo espaços ou caracteres ocultos.
-            print(f"  - [DEBUG] Usuário ID: {u.id}, Email: {u.email}, Status: {repr(u.status)}")
+            # Imprime o status original para análise
+            print(f"  - [DEBUG] Analisando Usuário ID: {u.id}, Status: {repr(u.status)}")
+            # Forçamos a conversão para minúsculas e removemos espaços em branco
+            # para ter certeza absoluta na comparação.
+            if u.status and u.status.strip().lower() == 'ativo':
+                manually_filtered_users.append(u)
+                print(f"    --> [DEBUG] SUCESSO! Usuário ID {u.id} passou no filtro manual.")
+        
+        print(f"--- [DEBUG] Total de usuários após filtro MANUAL em Python: {len(manually_filtered_users)} ---")
         # --- FIM DA ETAPA DE DEBUG ---
 
-        # A busca original, que estamos depurando.
-        users_to_check = User.query.filter(func.lower(User.status) == 'active').all()
+        # Agora, usamos a lista que filtramos manualmente
+        users_to_check = manually_filtered_users
         print(f"Encontrados {len(users_to_check)} usuários ativos para verificar.")
         
         if not users_to_check:
