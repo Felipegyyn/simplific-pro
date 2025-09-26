@@ -397,7 +397,7 @@ const tutorials = [
   { name: 'Metas', url: 'https://drive.google.com/file/d/1HBegoIhPzfVpWLuNTxMziilSxnxu0_A3/view?usp=drive_link' },
   { name: 'Investimentos', url: 'https://drive.google.com/file/d/1FXA8k_S7_oSoxu_0jMEFSu6IA-DiWpGa/view?usp=drive_link' },
   { name: 'Agenda', url: 'https://drive.google.com/file/d/1gwuEcxEV6t7lSJSuqjUgO8ganuE6osoy/view?usp=drive_link' },
-  //{ name: 'Análise e Balanço', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  { name: 'Análise e Balanço', url: 'https://drive.google.com/file/d/1LeSJHcaBlzZ22KhQuFmyJ-7EqGZdkmIv/view?usp=drive_link' },
   //{ name: 'Assessor Simplific', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
   //{ name: 'Simplific IA', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
 ];

@@ -12,6 +12,7 @@ from flask_migrate import Migrate
 from src.routes.user_routes import user_api_bp
 from src.services.achievement_service import check_all_achievements_for_user
 from datetime import datetime, timedelta
+from sqlalchemy import func
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
 from src.redis_client import redis_client
@@ -341,7 +342,7 @@ def check_achievements_command():
     """
     print("--- [CRON] Iniciando verificação de conquistas para todos os usuários... ---")
     with app.app_context():
-        users = User.query.filter_by(status='active').all()
+        users = User.query.filter(func.lower(User.status) == 'active').all()
         print(f"Encontrados {len(users)} usuários ativos para verificar.")
 
         for user in users:
