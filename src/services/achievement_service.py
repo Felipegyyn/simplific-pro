@@ -56,57 +56,6 @@ def _check_first_investment(user):
     if Investment.query.filter_by(user_id=user.id).first():
         _grant_achievement(user, 'FIRST_INVESTMENT')
 
-def _check_budget_master_1(user):
-    # Lógica para verificar o orçamento do mês anterior completo
-    today = date.today()
-    start_of_last_month = (today.replace(day=1) - relativedelta(months=1))
-    end_of_last_month = (today.replace(day=1) - relativedelta(days=1))
-
-    # Busca o planejado vs. realizado do mês anterior
-    planned = db.session.query(Planning.category_id, func.sum(Planning.value).label('total_planned')) \
-        .filter(Planning.user_id == user.id, Planning.date.between(start_of_last_month, end_of_last_month), Planning.type == 'saida') \
-        .group_by(Planning.category_id).all()
-    
-    if not planned: # Se não houver planejamento, não pode ganhar a conquista
-        return
-
-    realized = db.session.query(Transaction.category_id, func.sum(Transaction.value).label('total_realized')) \
-        .filter(Transaction.user_id == user.id, Transaction.date.between(start_of_last_month, end_of_last_month), Transaction.type == 'saida', Transaction.status == 'confirmada') \
-        .group_by(Transaction.category_id).all()
-
-    planned_map = {p.category_id: p.total_planned for p in planned}
-    realized_map = {r.category_id: r.total_realized for r in realized}
-
-    # Verifica se algum gasto extrapolou o planejado
-    for category_id, total_planned in planned_map.items():
-        total_realized = realized_map.get(category_id, 0)
-        if total_realized > total_planned:
-            return # Se estourou um, já para a verificação
-
-    # Se chegou até aqui, o usuário cumpriu a meta
-    _grant_achievement(user, 'BUDGET_MASTER_1')
-
-def _check_saver_1(user):
-    # Lógica para verificar o saldo do mês anterior completo
-    today = date.today()
-    start_of_last_month = (today.replace(day=1) - relativedelta(months=1))
-    end_of_last_month = (today.replace(day=1) - relativedelta(days=1))
-
-    totals = db.session.query(
-        func.sum(case((Transaction.type == 'entrada', Transaction.value), else_=0)).label('total_revenue'),
-        func.sum(case((Transaction.type == 'saida', Transaction.value), else_=0)).label('total_expense')
-    ).filter(
-        Transaction.user_id == user.id,
-        Transaction.date.between(start_of_last_month, end_of_last_month),
-        Transaction.status == 'confirmada'
-    ).one()
-
-    if totals.total_revenue is not None and totals.total_expense is not None:
-        if (totals.total_revenue - totals.total_expense) > 0:
-            _grant_achievement(user, 'SAVER_1')
-
-# --- FUNÇÃO PRINCIPAL (ORQUESTRADOR) ---
-
 def check_all_achievements_for_user(user):
     """
     Orquestra a verificação de todas as conquistas para um usuário específico.
@@ -120,8 +69,14 @@ def check_all_achievements_for_user(user):
         'FIRST_PLAN': _check_first_plan,
         'FIRST_GOAL': _check_first_goal,
         'FIRST_INVESTMENT': _check_first_investment,
-        'BUDGET_MASTER_1': _check_budget_master_1,
-        'SAVER_1': _check_saver_1,
+        'FIRST_GOAL_COMPLETED': _check_first_goal_completed,
+        'DIVERSIFIED_INVESTOR': _check_diversified_investor,
+
+        'BUDGET_MASTER_1': lambda u: _check_consecutive_months_budget(u, 1, 'BUDGET_MASTER_1'),
+        'BUDGET_MASTER_3': lambda u: _check_consecutive_months_budget(u, 3, 'BUDGET_MASTER_3'),
+        'BUDGET_MASTER_6': lambda u: _check_consecutive_months_budget(u, 6, 'BUDGET_MASTER_6'),
+        'SAVER_1': lambda u: _check_consecutive_months_saver(u, 1, 'SAVER_1'),
+        'SAVER_3': lambda u: _check_consecutive_months_saver(u, 3, 'SAVER_3'),
     }
 
     # Itera sobre as possíveis conquistas e verifica apenas as que o usuário ainda não tem
@@ -131,3 +86,75 @@ def check_all_achievements_for_user(user):
     
     # A conquista 'FIRST_LOGIN' será concedida em outro momento (ex: no primeiro login)
     # por isso não está no loop de verificação diária.
+
+# ▼▼▼ COLE O BLOCO DE NOVAS FUNÇÕES AQUI ▼▼▼
+
+def _check_first_goal_completed(user):
+    """Verifica se o usuário completou alguma meta pela primeira vez."""
+    if Goal.query.filter_by(user_id=user.id, is_completed=True).first():
+        _grant_achievement(user, 'FIRST_GOAL_COMPLETED')
+
+def _check_diversified_investor(user):
+    """Verifica se o usuário possui pelo menos 3 tipos diferentes de investimentos."""
+    investment_types_count = db.session.query(Investment.type).filter_by(user_id=user.id).distinct().count()
+    if investment_types_count >= 3:
+        _grant_achievement(user, 'DIVERSIFIED_INVESTOR')
+
+def _check_consecutive_months_budget(user, months_required, achievement_key):
+    """
+    Função auxiliar genérica para verificar se o orçamento foi respeitado
+    por um número X de meses consecutivos.
+    """
+    today = date.today()
+    for i in range(months_required):
+        # Itera para trás, do mês passado até 'months_required' meses atrás
+        target_month_start = (today.replace(day=1) - relativedelta(months=i+1))
+        target_month_end = (today.replace(day=1) - relativedelta(months=i) - relativedelta(days=1))
+
+        planned = db.session.query(func.sum(Planning.value).label('total')) \
+            .filter(Planning.user_id == user.id, Planning.date.between(target_month_start, target_month_end), Planning.type == 'saida').scalar()
+
+        # Se não houve planejamento para um dos meses no período, a sequência é quebrada.
+        if planned is None or planned == 0:
+            return 
+
+        realized = db.session.query(func.sum(Transaction.value).label('total')) \
+            .filter(Transaction.user_id == user.id, Transaction.date.between(target_month_start, target_month_end), Transaction.type == 'saida', Transaction.status == 'confirmada').scalar() or 0
+
+        # Se em qualquer mês o gasto foi maior que o planejado, a sequência é quebrada.
+        if realized > planned:
+            return
+
+    # Se o loop terminar sem interrupção, o usuário cumpriu o requisito.
+    _grant_achievement(user, achievement_key)
+
+def _check_consecutive_months_saver(user, months_required, achievement_key):
+    """
+    Função auxiliar genérica para verificar se o saldo foi positivo
+    por um número X de meses consecutivos.
+    """
+    today = date.today()
+    for i in range(months_required):
+        target_month_start = (today.replace(day=1) - relativedelta(months=i+1))
+        target_month_end = (today.replace(day=1) - relativedelta(months=i) - relativedelta(days=1))
+
+        totals = db.session.query(
+            func.sum(case((Transaction.type == 'entrada', Transaction.value), else_=0)).label('rev'),
+            func.sum(case((Transaction.type == 'saida', Transaction.value), else_=0)).label('exp')
+        ).filter(
+            Transaction.user_id == user.id,
+            Transaction.date.between(target_month_start, target_month_end),
+            Transaction.status == 'confirmada'
+        ).one()
+
+        revenue = totals.rev or 0
+        expense = totals.exp or 0
+
+        # Se em qualquer mês o saldo for negativo ou zero, a sequência é quebrada.
+        if (revenue - expense) <= 0:
+            return
+
+    # Se o loop terminar, o usuário cumpriu o requisito.
+    _grant_achievement(user, achievement_key)
+
+# ▲▲▲ FIM DO BLOCO ▲▲▲

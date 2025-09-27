@@ -316,7 +316,16 @@ def seed_achievements_command():
         {'key': 'FIRST_GOAL', 'name': 'Visionário(a)', 'description': 'Definiu sua primeira meta financeira.', 'icon': 'Target'},
         {'key': 'FIRST_INVESTMENT', 'name': 'Investidor(a) Aspirante', 'description': 'Cadastrou seu primeiro investimento na carteira.', 'icon': 'TrendingUp'},
         {'key': 'BUDGET_MASTER_1', 'name': 'Mestre do Orçamento', 'description': 'Passou 1 mês completo sem estourar o orçamento de nenhuma categoria.', 'icon': 'Award'},
-        {'key': 'SAVER_1', 'name': 'Poupador(a) Bronze', 'description': 'Manteve o saldo mensal positivo por 1 mês.', 'icon': 'PiggyBank'}
+        {'key': 'SAVER_1', 'name': 'Poupador(a) Bronze', 'description': 'Manteve o saldo mensal positivo por 1 mês.', 'icon': 'PiggyBank'},
+    
+        # Nível Prata
+        {'key': 'BUDGET_MASTER_3', 'name': 'Mestre do Orçamento Prata', 'description': 'Passou 3 meses consecutivos sem estourar o orçamento.', 'icon': 'ShieldCheck'},
+        {'key': 'SAVER_3', 'name': 'Poupador(a) Prata', 'description': 'Manteve o saldo mensal positivo por 3 meses consecutivos.', 'icon': 'Gem'},
+        {'key': 'FIRST_GOAL_COMPLETED', 'name': 'Meta Conquistada', 'description': 'Atingiu 100% do valor de uma meta pela primeira vez.', 'icon': 'Trophy'},
+    
+        # Nível Ouro
+        {'key': 'BUDGET_MASTER_6', 'name': 'Mestre do Orçamento Ouro', 'description': 'Passou 6 meses consecutivos sem estourar o orçamento.', 'icon': 'Crown'},
+        {'key': 'DIVERSIFIED_INVESTOR', 'name': 'Investidor(a) Diversificado(a)', 'description': 'Possui pelo menos 3 tipos diferentes de investimentos na carteira.', 'icon': 'Library'}
     ]
 
     with app.app_context():
