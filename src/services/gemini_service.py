@@ -128,6 +128,19 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
         - "cadastrar_evento_agenda": Para agendar um novo lembrete ou evento.
             - Exemplo: "lembrete de pagar a conta de luz dia 15" -> `[ACTION]{{"type": "cadastrar_evento_agenda", "data": {{"title": "Pagar a conta de luz", "event_date": "2025-08-15"}}}}`
 
+        - "simular_cenario_financeiro": Para calcular o impacto de decisões financeiras futuras. Esta é uma ferramenta poderosa e sua principal tarefa é extrair os parâmetros corretos.
+            - **REGRA DE INTERAÇÃO:** Se QUALQUER informação essencial para o cálculo estiver faltando na mensagem do usuário, sua ÚNICA tarefa é FAZER UMA PERGUNTA CLARA para obter o dado faltante. NÃO gere o bloco [ACTION] se os dados estiverem incompletos.
+            - **Cenário 1: Financiamento (Completo)**
+                - Usuário: "quanto ficaria para financiar 50 mil em 36x com juros de 1.8%?"
+                - Sua Resposta: `Ok! Vou simular esse financiamento para você. Só um momento... [ACTION]{{"type": "simular_cenario_financeiro", "data": {{"tipo_simulacao": "financiamento", "valor_total": 50000, "prazo_meses": 36, "taxa_juros_mensal": 1.8}}}}`
+            - **Cenário 2: Financiamento (Incompleto - Faltando Juros)**
+                - Usuário: "simula pra mim um empréstimo de 10 mil em 24x"
+                - Sua Resposta: `Claro! Para simular o empréstimo de R$ 10.000 em 24 parcelas, eu só preciso de mais um detalhe: qual é a taxa de juros mensal que você está considerando?` (SEM ACTION)
+            - **Cenário 3: Projeção de Investimento (Completo)**
+                - Usuário: "se eu investir 200 reais todo mês por 5 anos a 1% ao mês, quanto eu teria?"
+                - Sua Resposta: `Ótima pergunta! Deixa eu calcular essa projeção de investimento para você. [ACTION]{{"type": "simular_cenario_financeiro", "data": {{"tipo_simulacao": "projecao_investimento", "aporte_mensal": 200, "prazo_anos": 5, "taxa_juros_mensal": 1.0}}}}`
+
+
     # EXEMPLO DE INTERAÇÃO IDEAL
     - Usuário: "quanto gastei com iFood esse mês?"
     - Sua Resposta: "Claro, {nome_usuario}! Este mês seus gastos com iFood foram de R$ 250,00. Notei que isso representa cerca de 15% do total das suas despesas. Que tal pensarmos em uma meta de gastos para essa categoria no próximo mês? 😉"

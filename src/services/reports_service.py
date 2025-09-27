@@ -6,38 +6,56 @@ from src.models.db import db
 from src.models.financial import Transaction, Category
 from sqlalchemy import func, case
 
+# ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'get_financial_summary_for_ai' POR ESTA ▼▼▼
+
 def get_financial_summary_for_ai(user_id):
-    """Gera um resumo textual do status financeiro do mês atual para a IA."""
+    """
+    Gera um resumo CONCISO do status financeiro do mês atual para a IA,
+    focando em totais e principais gastos para economizar tokens.
+    """
     hoje = date.today()
     inicio_mes = hoje.replace(day=1)
     
-    # Reutiliza a função existente para buscar transações
-    transacoes = buscar_transacoes_por_periodo(user_id, inicio_mes, hoje, 'ambos')
+    # 1. Busca os totais de Receitas e Despesas com uma única query eficiente
+    totals = db.session.query(
+        func.sum(case((Transaction.type == 'entrada', Transaction.value), else_=0)).label('total_revenue'),
+        func.sum(case((Transaction.type == 'saida', Transaction.value), else_=0)).label('total_expense')
+    ).filter(
+        Transaction.user_id == user_id,
+        Transaction.date.between(inicio_mes, hoje),
+        Transaction.status == 'confirmada'
+    ).one()
 
-    if not transacoes:
+    total_receitas = totals.total_revenue or 0
+    total_despesas = totals.total_expense or 0
+    
+    if total_receitas == 0 and total_despesas == 0:
         return "Resumo do Mês: Nenhuma transação registrada este mês."
 
-    total_receitas = sum(t['value'] for t in transacoes if t['type'] == 'entrada')
-    total_despesas = sum(t['value'] for t in transacoes if t['type'] == 'saida')
+    # 2. Busca as 3 categorias com os maiores gastos
+    top_expenses = db.session.query(
+        Category.name,
+        func.sum(Transaction.value).label('total')
+    ).join(Category, Transaction.category_id == Category.id).filter(
+        Transaction.user_id == user_id,
+        Transaction.date.between(inicio_mes, hoje),
+        Transaction.type == 'saida',
+        Transaction.status == 'confirmada'
+    ).group_by(Category.name).order_by(func.sum(Transaction.value).desc()).limit(3).all()
     
-    despesas_por_categoria = defaultdict(float)
-    for t in transacoes:
-        if t['type'] == 'saida':
-            despesas_por_categoria[t['category_name']] += t['value']
+    top_categorias_texto = ", ".join([f"{cat} ({format_currency_brl(val)})" for cat, val in top_expenses])
 
-    # Pega as 3 categorias com maiores gastos
-    top_categorias = sorted(despesas_por_categoria.items(), key=lambda item: item[1], reverse=True)[:3]
-    top_categorias_texto = ", ".join([f"{cat} (R$ {val:.2f})" for cat, val in top_categorias])
-
+    # 3. Monta o resumo final, agora muito mais curto e direto
     resumo = (
         f"Resumo do Mês: "
         f"Receitas totais de {format_currency_brl(total_receitas)}. "
         f"Despesas totais de {format_currency_brl(total_despesas)}. "
         f"Saldo do período: {format_currency_brl(total_receitas - total_despesas)}. "
-        f"Principais gastos: {top_categorias_texto if top_categorias_texto else 'Nenhuma despesa registrada'}."
+        f"Principais gastos do mês: {top_categorias_texto if top_categorias_texto else 'Nenhuma despesa registrada'}."
     )
     
     return resumo
+# ▲▲▲ FIM DO BLOCO DE SUBSTITUIÇÃO ▲▲▲
 
 # --- NOVA FUNÇÃO ADICIONADA ABAIXO ---
 
@@ -78,34 +96,47 @@ def buscar_transacoes_por_periodo(user_id, data_inicio, data_fim, tipo_consulta)
     return resultado
 
 
+# ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'get_planning_summary_for_ai' POR ESTA ▼▼▼
+
 def get_planning_summary_for_ai(user_id):
-    """Gera um resumo textual do planejamento financeiro (Orçado vs. Realizado) para a IA."""
+    """
+    Gera um resumo CONCISO do planejamento (Orçado vs. Realizado) para a IA,
+    focando nos totais e nas 3 categorias mais críticas.
+    """
     hoje = date.today()
     inicio_mes = hoje.replace(day=1)
     
-    # Reutiliza a função que já existe para buscar os dados consolidados
+    # A função 'buscar_resumo_planejamento' já é eficiente, vamos continuar usando-a.
     resumo_planejamento = buscar_resumo_planejamento(user_id, inicio_mes, hoje)
 
     if not resumo_planejamento:
         return "Planejamento do Mês: Nenhum orçamento definido para o período atual."
 
-    resumos = []
-    total_orcado = 0
-    total_realizado = 0
+    # 1. Calcula os totais gerais.
+    total_orcado = sum(item['orcado'] for item in resumo_planejamento)
+    total_realizado = sum(item['realizado'] for item in resumo_planejamento)
 
-    for item in resumo_planejamento:
-        total_orcado += item['orcado']
-        total_realizado += item['realizado']
-        status = "Extrapolado!" if item['realizado'] > item['orcado'] else "Ok"
-        resumos.append(
-            f"{item['categoria']} (Gasto: R$ {item['realizado']:.2f} / Orçado: R$ {item['orcado']:.2f} - Status: {status})"
+    # 2. Encontra as 3 categorias mais críticas (maior percentual gasto).
+    #    A função sorted() com a chave 'lambda' e 'reverse=True' faz essa mágica.
+    categorias_criticas = sorted(resumo_planejamento, key=lambda x: x['percentual'], reverse=True)[:3]
+    
+    resumos_criticos = []
+    for item in categorias_criticas:
+        # Adiciona um emoji para status visual rápido
+        status_emoji = "🚨" if item['percentual'] >= 100 else "⚠️" if item['percentual'] > 80 else "✅"
+        resumos_criticos.append(
+            f"{item['categoria']} ({item['percentual']:.0f}% gasto {status_emoji})"
         )
     
+    # 3. Monta o resumo final, muito mais curto.
     resumo_texto = (
-        f"Planejamento do Mês: Orçamento total de R$ {total_orcado:.2f}, com R$ {total_realizado:.2f} já gastos. "
-        f"Status por categoria: {'; '.join(resumos)}."
+        f"Planejamento do Mês: Orçamento total de {format_currency_brl(total_orcado)}, "
+        f"com {format_currency_brl(total_realizado)} já gastos. "
+        f"Categorias mais críticas: {', '.join(resumos_criticos) if resumos_criticos else 'Nenhuma despesa registrada'}."
     )
+    
     return resumo_texto
+# ▲▲▲ FIM DO BLOCO DE SUBSTITUIÇÃO ▲▲▲
 
 def buscar_resumo_planejamento(user_id, data_inicio, data_fim):
     """

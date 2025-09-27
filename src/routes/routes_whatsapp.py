@@ -9,6 +9,7 @@ from src.services.tts_service import texto_para_audio # <-- ADICIONE
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
 from src.utils.formatters import format_currency_brl
+from src.services.simulation_service import run_financial_simulation
 from src.services.transcription_service import transcrever_audio_de_url # <-- ADICIONE ESTA LINHA
 from src.models.extended import Investment
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
@@ -212,6 +213,17 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return None
             else:
                 return message # Retorna a mensagem de erro
+
+        # ▼▼▼ COLE O NOVO BLOCO elif DENTRO DE executar_acao_simplific ▼▼▼
+
+        elif tipo_acao == 'simular_cenario_financeiro':
+            # 1. Chama o nosso novo motor de simulação com os dados extraídos pela IA
+            resultado = run_financial_simulation(user_id, dados_acao)
+
+            # 2. Envia o resultado numérico para ser "traduzido" para uma mensagem amigável
+            return formatar_resultado_simulacao(resultado)
+
+        # ▲▲▲ FIM DO BLOCO ▲▲▲
 
         elif tipo_acao == 'consultar_transacoes':
             dados = dados_acao
@@ -1223,3 +1235,50 @@ def normalizar_numero(numero):
         return f'+55{ddd}9{resto}'
     if len(numero_limpo) <= 11: return f'+55{numero_limpo}'
     return f'+{numero_limpo}'
+
+
+# ▼▼▼ COLE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO routes_whatsapp.py ▼▼▼
+
+def formatar_resultado_simulacao(resultado):
+    """
+    Pega o dicionário de resultados da simulação e o transforma em uma
+    mensagem de texto formatada para o usuário.
+    """
+    if not resultado or resultado.get('error'):
+        return "Desculpe, não consegui realizar a simulação. Verifique os dados e tente novamente."
+
+    tipo_resultado = resultado.get('tipo_resultado')
+
+    if tipo_resultado == 'financiamento':
+        valor_parcela = format_currency_brl(resultado.get('valor_parcela', 0))
+        total_pago = format_currency_brl(resultado.get('total_pago', 0))
+        total_juros = format_currency_brl(resultado.get('total_juros', 0))
+        impacto = resultado.get('impacto_percentual_despesas', 0)
+
+        resposta = (
+            f"Aqui está a simulação do seu financiamento:\n\n"
+            f"🗓️ *Valor da Parcela Mensal:* {valor_parcela}\n"
+            f"💰 *Total Pago (Final):* {total_pago}\n"
+            f"💸 *Custo Total em Juros:* {total_juros}\n\n"
+            f"📉 *Impacto no Orçamento:*\n"
+            f"Essa parcela representaria aproximadamente *{impacto:.1f}%* do total das suas despesas mensais atuais."
+        )
+        return resposta
+
+    elif tipo_resultado == 'projecao_investimento':
+        valor_futuro = format_currency_brl(resultado.get('valor_futuro', 0))
+        total_investido = format_currency_brl(resultado.get('total_investido', 0))
+        total_juros = format_currency_brl(resultado.get('total_juros', 0))
+
+        resposta = (
+            f"Aqui está a projeção do seu investimento:\n\n"
+            f"🚀 *Valor Futuro Acumulado:* {valor_futuro}\n"
+            f"🌱 *Total Aportado por Você:* {total_investido}\n"
+            f"📈 *Total Gerado em Juros:* {total_juros}\n\n"
+            f"Lembre-se que a rentabilidade passada não é garantia de rentabilidade futura!"
+        )
+        return resposta
+
+    return "Não foi possível formatar o resultado da simulação."
+
+# ▲▲▲ FIM DA FUNÇÃO ▲▲▲
