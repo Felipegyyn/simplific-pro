@@ -22,7 +22,8 @@ def _send_welcome_email(user_credentials):
             f"Acesse o Simplific.Ai no número - +55 11 5199-1373  .\n\n"
             f"Como sugestão: Pergunte ao Simplific IA tudo o que ele pode fazer por você e veja todas as funcionalidades\n\n"
             f"Recomendamos que você altere sua senha no primeiro login.\n\n"
-            f"Atenciosamente,\n"
+            f"O guia de TUTORIAIS com vídeo aulas está dispoível na área de 'Dashboard' \n\n"
+            f"Até breve,\n"
             f"Equipe Simplific Pro"
         )
 
