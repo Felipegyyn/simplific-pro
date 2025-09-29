@@ -65,7 +65,7 @@ def create_user_from_purchase(name, email, whatsapp):
             email=email,
             whatsapp=whatsapp,
             profile='usuario', # Perfil padrão para novos clientes
-            status='active',
+            status='ativo',
             first_login=True # Marca que é o primeiro login
         )
 

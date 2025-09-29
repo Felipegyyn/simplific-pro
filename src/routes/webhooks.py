@@ -63,7 +63,7 @@ def monetizze_webhook():
         if user:
             # Caso 1: Usuário já existe (ex: re-assinatura)
             # Reativamos o status e limpamos a data de expiração.
-            user.status = 'active'
+            user.status = 'ativo'
             user.subscription_valid_until = None
             db.session.commit()
             print(f"Assinatura reativada para o usuário existente: {email}")
