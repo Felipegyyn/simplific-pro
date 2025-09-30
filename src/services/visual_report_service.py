@@ -4,6 +4,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, case
 from src.models.db import db
+import io
 import base64
 from src.models.user import User
 from src.models.financial import Transaction, Category
@@ -135,18 +136,28 @@ def generate_visual_report(user_id, target_date=None):
         print("--- [Relatório Visual] Criando prompt de geração de imagem...")
         prompt = _create_image_generation_prompt(financial_data, user.name)
 
-
         # 3. Chama a API do Gemini para gerar a imagem
         print("--- [Relatório Visual] Solicitando imagem à API do Gemini (nano-banana)...")
         response = image_model.generate_content(prompt)
-            
-        # 4. Extrai os bytes brutos da imagem da resposta da IA
-        image_bytes = response.candidates[0].content.parts[0].inline_data.data
 
-        # 5. Faz o upload dos BYTES da imagem DIRETAMENTE para o Cloudinary
+        # --- DEBUG: Imprime a estrutura da resposta para análise ---
+        print(f"--- [DEBUG] Estrutura da resposta do Gemini: {response.candidates[0].content}")
+        # --- FIM DO DEBUG ---
+
+        # 4. Extrai os bytes brutos da imagem da resposta da IA
+        try:
+            image_bytes = response.candidates[0].content.parts[0].inline_data.data
+        except (IndexError, AttributeError) as e:
+            print(f"ERRO: Não foi possível extrair os dados da imagem da resposta do Gemini. Erro: {e}")
+            return None, "A IA não retornou uma imagem válida."
+
+        # 5. Cria um "arquivo virtual" em memória a partir dos bytes da imagem
+        image_file = io.BytesIO(image_bytes)
+
+        # 6. Faz o upload do ARQUIVO VIRTUAL para o Cloudinary
         print("--- [Relatório Visual] Enviando imagem gerada para o Cloudinary...")
         upload_result = cloudinary.uploader.upload(
-            image_bytes, # <-- A MUDANÇA CRÍTICA ESTÁ AQUI: passamos os dados brutos
+            image_file, # <-- A MUDANÇA CRÍTICA: passamos o objeto que se comporta como um arquivo
             public_id=f"simplific-pro/visual-reports/{user_id}/resumo_{target_date.strftime('%Y_%m')}",
             overwrite=True,
             resource_type="image"
@@ -154,9 +165,10 @@ def generate_visual_report(user_id, target_date=None):
 
         image_url = upload_result.get('secure_url')
         print(f"--- [Relatório Visual] Sucesso! URL da imagem: {image_url}")
-            
-        # 6. Retorna a URL da imagem guardada na nuvem
+
+        # 7. Retorna a URL da imagem guardada na nuvem
         return image_url, None
+
 
     except Exception as e:
         print(f"ERRO CRÍTICO durante a geração do relatório visual: {e}")
