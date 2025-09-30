@@ -64,52 +64,31 @@ def _collect_financial_data(user_id, target_date):
 
 # (As próximas funções, como a que gera o prompt e a imagem, virão aqui nas próximas etapas)
 
-# ▼▼▼ COLE A NOVA FUNÇÃO ABAIXO NO FINAL DO ARQUIVO ▼▼▼
+# ▼▼▼ SUBSTITUA TODA A FUNÇÃO '_create_image_generation_prompt' POR ESTA ▼▼▼
 
 def _create_image_generation_prompt(financial_data, user_name):
     """
-    Pega os dados financeiros sumarizados e os transforma em um prompt de texto
-    detalhado para o modelo de geração de imagem.
+    Cria um prompt de texto para o modelo de imagem gerar um TEMPLATE DE FUNDO,
+    sem nenhum texto ou número.
     """
-    # Formata os dados numéricos para serem incluídos no texto
-    receitas_str = format_currency_brl(financial_data['total_receitas'])
-    despesas_str = format_currency_brl(financial_data['total_despesas'])
-    saldo_str = format_currency_brl(financial_data['saldo_liquido'])
-    poupanca_str = f"{financial_data['taxa_poupanca']:.0f}%"
-
-    # Cria a parte do prompt que descreve o gráfico de pizza
-    top_despesas_prompt = "um gráfico de pizza moderno mostrando as 3 maiores despesas:"
-    for despesa in financial_data['top_3_despesas']:
-        categoria = despesa['categoria']
-        valor_str = format_currency_brl(despesa['valor'])
-        top_despesas_prompt += f" fatia para '{categoria}' com o valor '{valor_str}',"
-
-    # O prompt principal. É uma descrição detalhada da imagem que queremos.
     prompt = f"""
-    Crie um infográfico de finanças pessoais elegante e moderno para {user_name}, com o título 'Resumo Financeiro de {financial_data['mes_ano']}'.
-    O estilo deve ser limpo, minimalista, com um fundo azul escuro (#1E293B), texto principal em branco e destaques em verde esmeralda (#10B981) e amarelo âmbar (#F59E0B). Use uma fonte sans-serif moderna e legível.
+    Create a background image for a stylish and modern personal finance infographic.
+    The style must be clean, minimalist, with a dark blue background (#1E293B).
+    The layout should have clear placeholder areas for text and charts. DO NOT write any text or numbers.
 
-    O layout deve ser organizado em seções claras:
+    The layout must contain:
+    1.  At the top, a placeholder for a main title.
+    2.  Below the title, three card shapes side-by-side: the first one vibrant green, the second one soft red, the third one amber yellow. These cards should be empty placeholders.
+    3.  In the middle section, on the left, a large circular area as a placeholder for a pie chart.
+    4.  In the middle section, on the right, a placeholder area for an icon and a percentage number.
+    5.  A subtle, clean footer area.
 
-    1. No topo, três cartões lado a lado:
-       - Cartão 1 (verde esmeralda): título 'Receitas Totais', valor em destaque '{receitas_str}'.
-       - Cartão 2 (vermelho suave): título 'Despesas Totais', valor em destaque '{despesas_str}'.
-       - Cartão 3 (amarelo âmbar): título 'Saldo do Mês', valor em destaque '{saldo_str}'.
-
-    2. Na seção do meio, à esquerda:
-       - {top_despesas_prompt}. Use cores vibrantes e contrastantes para as fatias.
-
-    3. Na seção do meio, à direita:
-       - Um ícone grande de um cofrinho estilizado. Ao lado, o texto 'Taxa de Poupança' e o valor '{poupanca_str}' em destaque.
-
-    4. No rodapé, o logo 'Simplific Pro' de forma sutil.
+    CRITICAL RULE: The image must be a template only. Generate NO text, NO numbers, NO words.
     """
-
+    
     return prompt
-
 # ▲▲▲ FIM DO BLOCO ▲▲▲
 
-# ▼▼▼ COLE A FUNÇÃO PRINCIPAL ABAIXO NO FINAL DO ARQUIVO ▼▼▼
 
 def generate_visual_report(user_id, target_date=None):
     """

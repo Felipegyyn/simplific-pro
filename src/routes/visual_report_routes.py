@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.services.visual_report_service import generate_visual_report
 from datetime import datetime
+from src.services.visual_report_service import _collect_financial_data # <-- Adicione esta importação
 
 visual_report_bp = Blueprint('visual_report', __name__)
 
@@ -11,8 +12,8 @@ visual_report_bp = Blueprint('visual_report', __name__)
 @jwt_required()
 def handle_generate_visual_report():
     """
-    Gatilho da API para gerar um relatório visual.
-    Aceita 'month' e 'year' no corpo da requisição.
+    Gera um relatório visual e retorna tanto a URL da imagem de fundo
+    quanto os dados brutos para o frontend renderizar.
     """
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -24,9 +25,19 @@ def handle_generate_visual_report():
     except (ValueError, TypeError):
         return jsonify({'error': 'Mês ou ano inválido.'}), 400
 
+    # 1. Coleta os dados financeiros (reutilizando nossa função de serviço)
+    financial_data = _collect_financial_data(user_id, target_date)
+
+    # 2. Gera a imagem de fundo
     image_url, error = generate_visual_report(user_id, target_date)
 
     if error:
         return jsonify({'error': error}), 500
 
-    return jsonify({'image_url': image_url}), 200
+    # 3. Retorna AMBOS os dados em uma única resposta
+    return jsonify({
+        'background_image_url': image_url,
+        'financial_data': financial_data
+    }), 200
+
+# ▲▲▲ FIM DO BLOCO ▲▲▲
