@@ -78,25 +78,44 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
 
-// ▼▼▼ SUBSTITUA A FUNÇÃO 'handleGenerateVisualReport' INTEIRA POR ESTA ▼▼▼
+// ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'handleGenerateVisualReport' POR ESTA ▼▼▼
 const handleGenerateVisualReport = async () => {
   setIsGeneratingReport(true);
-  setGeneratedReportData(null);
-  setIsReportModalOpen(false);
+  setGeneratedImageUrl(null);
+  setIsReportModalOpen(false); // Garante que o modal feche antes de uma nova geração
 
   try {
-    const response = await apiService.post('/api/reports/visual-reports', {
-      month: selectedMonth,
-      year: selectedYear,
+    const token = localStorage.getItem('simplific_token');
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado.');
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports/visual-reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        month: selectedMonth,
+        year: selectedYear,
+      }),
     });
 
-    if (response.data && response.data.background_image_url && response.data.financial_data) {
-      setGeneratedReportData(response.data); // Armazena o objeto completo
-      setIsReportModalOpen(true);
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Erro desconhecido no servidor.');
     }
+
+    if (result.image_url) {
+      setGeneratedImageUrl(result.image_url);
+      setIsReportModalOpen(true); // Abre o modal com a imagem
+    }
+
   } catch (error) {
     console.error("Erro ao gerar relatório visual:", error);
-    alert(error.response?.data?.error || "Não foi possível gerar seu relatório visual. Tente novamente.");
+    alert(error.message);
   } finally {
     setIsGeneratingReport(false);
   }
@@ -574,8 +593,8 @@ const tutorials = [
               <SelectItem value="2028">2028</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button
+                  {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
+          {/*<Button
           onClick={handleGenerateVisualReport}
             disabled={isGeneratingReport}
             variant="outline"
@@ -587,7 +606,7 @@ const tutorials = [
               <Image className="h-4 w-4 mr-2" />
             )}
             {isGeneratingReport ? 'Gerando...' : 'Gerar Resumo Visual'}
-          </Button>
+          </Button>*/}
         </div>
       </div>
 
