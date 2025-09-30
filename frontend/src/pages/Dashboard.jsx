@@ -594,7 +594,7 @@ const tutorials = [
             </SelectContent>
           </Select>
                   {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
-          {/*<Button
+          *<Button
           onClick={handleGenerateVisualReport}
             disabled={isGeneratingReport}
             variant="outline"
@@ -606,7 +606,7 @@ const tutorials = [
               <Image className="h-4 w-4 mr-2" />
             )}
             {isGeneratingReport ? 'Gerando...' : 'Gerar Resumo Visual'}
-          </Button>*/}
+          </Button>*
         </div>
       </div>
 
