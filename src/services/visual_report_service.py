@@ -4,6 +4,8 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, case
 from src.models.db import db
+import requests
+import os
 import io
 import base64
 from src.models.user import User
@@ -12,11 +14,6 @@ from src.utils.formatters import format_currency_brl
 import google.generativeai as genai
 from src.services.image_service import cloudinary # Importamos o objeto já configurado
 
-# Inicializa o modelo de geração de imagem
-image_model = genai.GenerativeModel(
-    'gemini-2.5-flash-image-preview',
-    generation_config={'response_modalities': ['IMAGE']}
-)
 
 def _collect_financial_data(user_id, target_date):
     """
@@ -139,28 +136,40 @@ def generate_visual_report(user_id, target_date=None):
         print("--- [Relatório Visual] Criando prompt de geração de imagem...")
         prompt = _create_image_generation_prompt(financial_data, user.name)
 
-        # 3. Chama a API do Gemini para gerar a imagem
-        print("--- [Relatório Visual] Solicitando imagem à API do Gemini (nano-banana)...")
-        response = image_model.generate_content(prompt)
+    # ▼▼▼ SUBSTITUA TODO O BLOCO A PARTIR DA CHAMADA DO GEMINI ▼▼▼
 
-        # --- DEBUG: Imprime a estrutura da resposta para análise ---
-        print(f"--- [DEBUG] Estrutura da resposta do Gemini: {response.candidates[0].content}")
-        # --- FIM DO DEBUG ---
+        # 3. Prepara a chamada para a API do Imagen 3
+        print("--- [Relatório Visual] Solicitando imagem à API do Imagen 3...")
+        api_key = os.getenv('GEMINI_API_KEY')
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key={api_key}"
 
-        # 4. Extrai os bytes brutos da imagem da resposta da IA
+        payload = {
+            "instances": [{"prompt": prompt}],
+            "parameters": {"sampleCount": 1}
+        }
+
+        # 4. Executa a chamada para a API
+        response = requests.post(api_url, json=payload)
+        response_data = response.json()
+
+        # --- DEBUG: Imprime a resposta completa do Imagen para análise ---
+        print(f"--- [DEBUG] Resposta completa da API do Imagen: {response_data}")
+
+        # 5. Extrai os dados da imagem da resposta (que vem em base64)
         try:
-            image_bytes = response.candidates[0].content.parts[0].inline_data.data
-        except (IndexError, AttributeError) as e:
-            print(f"ERRO: Não foi possível extrair os dados da imagem da resposta do Gemini. Erro: {e}")
+            base64_image_data = response_data['predictions'][0]['bytesBase64Encoded']
+            image_bytes = base64.b64decode(base64_image_data)
+        except (KeyError, IndexError) as e:
+            print(f"ERRO: Não foi possível extrair os dados da imagem da resposta do Imagen. Erro: {e}")
             return None, "A IA não retornou uma imagem válida."
 
-        # 5. Cria um "arquivo virtual" em memória a partir dos bytes da imagem
+        # 6. Cria um "arquivo virtual" em memória
         image_file = io.BytesIO(image_bytes)
 
-        # 6. Faz o upload do ARQUIVO VIRTUAL para o Cloudinary
+        # 7. Faz o upload do arquivo virtual para o Cloudinary
         print("--- [Relatório Visual] Enviando imagem gerada para o Cloudinary...")
         upload_result = cloudinary.uploader.upload(
-            image_file, # <-- A MUDANÇA CRÍTICA: passamos o objeto que se comporta como um arquivo
+            image_file,
             public_id=f"simplific-pro/visual-reports/{user_id}/resumo_{target_date.strftime('%Y_%m')}",
             overwrite=True,
             resource_type="image"
@@ -169,8 +178,10 @@ def generate_visual_report(user_id, target_date=None):
         image_url = upload_result.get('secure_url')
         print(f"--- [Relatório Visual] Sucesso! URL da imagem: {image_url}")
 
-        # 7. Retorna a URL da imagem guardada na nuvem
+        # 8. Retorna a URL final
         return image_url, None
+
+# ▲▲▲ FIM DO BLOCO ▲▲▲
 
 
     except Exception as e:
