@@ -76,28 +76,49 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
 
+// ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'handleGenerateVisualReport' POR ESTA ▼▼▼
 const handleGenerateVisualReport = async () => {
   setIsGeneratingReport(true);
   setGeneratedImageUrl(null);
+  setIsReportModalOpen(false); // Garante que o modal feche antes de uma nova geração
 
   try {
-    // Chama a nossa nova API, passando o mês e ano selecionados
-    const response = await apiService.post('/api/reports/visual-reports', {
-      month: selectedMonth,
-      year: selectedYear,
+    const token = localStorage.getItem('simplific_token');
+    if (!token) {
+      throw new Error('Token de autenticação não encontrado.');
+    }
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reports/visual-reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        month: selectedMonth,
+        year: selectedYear,
+      }),
     });
 
-    if (response.data && response.data.image_url) {
-      setGeneratedImageUrl(response.data.image_url);
-      setIsReportModalOpen(true); // Abre o modal para exibir a imagem
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Erro desconhecido no servidor.');
     }
+
+    if (result.image_url) {
+      setGeneratedImageUrl(result.image_url);
+      setIsReportModalOpen(true); // Abre o modal com a imagem
+    }
+
   } catch (error) {
     console.error("Erro ao gerar relatório visual:", error);
-    alert(error.response?.data?.error || "Não foi possível gerar seu relatório visual. Tente novamente.");
+    alert(error.message);
   } finally {
     setIsGeneratingReport(false);
   }
 };
+// ▲▲▲ FIM DO BLOCO ▲▲▲
 
 
   const calculateInvestmentValues = (investment) => {
