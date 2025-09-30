@@ -5,6 +5,8 @@ import dateparser # <-- ADICIONE AQUI
 import calendar   # <-- ADICIONE AQUI
 from src.models.user import User
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
+from src.services.visual_report_service import generate_visual_report
+from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
 from src.services.tts_service import texto_para_audio # <-- ADICIONE
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
@@ -224,6 +226,29 @@ def executar_acao_simplific(user_id, acao, from_number):
             return formatar_resultado_simulacao(resultado)
 
         # ▲▲▲ FIM DO BLOCO ▲▲▲
+
+        elif tipo_acao == 'gerar_resumo_visual':
+            periodo_texto = dados_acao.get('periodo', 'este mês')
+            try:
+                # Reutilizamos nossa função de datas para entender o período
+                data_inicio, _ = calcular_intervalo_datas(periodo_texto)
+
+                # Chama o motor para gerar a imagem
+                image_url, error = generate_visual_report(user_id, data_inicio)
+
+                if error:
+                    return error # Retorna a mensagem de erro para o usuário
+
+                # Envia a imagem diretamente pelo WhatsApp
+                numero_destino = f'whatsapp:{User.query.get(user_id).whatsapp}'
+                send_whatsapp_media(numero_destino, image_url, f"Prontinho! Aqui está seu resumo visual de {periodo_texto}. ✨")
+
+                # Retorna None para que a IA não envie uma mensagem de texto duplicada
+                return None
+
+            except Exception as e:
+                print(f"ERRO ao gerar/enviar resumo visual: {e}")
+                return "Não consegui gerar seu resumo visual agora. Tente novamente."
 
         elif tipo_acao == 'consultar_transacoes':
             dados = dados_acao

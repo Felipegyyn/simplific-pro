@@ -278,3 +278,5 @@ def gerar_resumo_semanal(user_id):
         "saldo": float(saldo_semanal),
         "categoria_principal": categoria_principal
     }
+
+    

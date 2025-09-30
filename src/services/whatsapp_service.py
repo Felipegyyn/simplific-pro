@@ -84,3 +84,22 @@ def send_whatsapp_message(to, body):
         print(f"Erro ao enviar mensagem via Twilio: {e}")
         return {'status': 'error', 'message': str(e)}
 
+# ▼▼▼ COLE ESTA NOVA FUNÇÃO NO FINAL DE whatsapp_service.py ▼▼▼
+
+def send_whatsapp_media(to, media_url, caption):
+    """
+    Envia uma mensagem com mídia (imagem) via Twilio.
+    """
+    try:
+        message = twilio_client.messages.create(
+            from_=TWILIO_WHATSAPP_NUMBER,
+            to=to,
+            body=caption, # A legenda da imagem
+            media_url=[media_url] # A URL da imagem
+        )
+        print(f"Mensagem de mídia enviada com SID: {message.sid}")
+        return {'status': 'success', 'sid': message.sid}
+    except Exception as e:
+        print(f"ERRO ao enviar mídia via WhatsApp: {e}")
+        return {'status': 'error', 'message': str(e)}
+

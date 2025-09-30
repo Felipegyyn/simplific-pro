@@ -140,6 +140,10 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
                 - Usuário: "se eu investir 200 reais todo mês por 5 anos a 1% ao mês, quanto eu teria?"
                 - Sua Resposta: `Ótima pergunta! Deixa eu calcular essa projeção de investimento para você. [ACTION]{{"type": "simular_cenario_financeiro", "data": {{"tipo_simulacao": "projecao_investimento", "aporte_mensal": 200, "prazo_anos": 5, "taxa_juros_mensal": 1.0}}}}`
 
+        - "gerar_resumo_visual": Para criar um infográfico do resumo financeiro de um período.
+            - Extraia o "periodo" da mensagem do usuário (ex: "setembro", "mês passado"). Se nenhum for mencionado, use "este mês".
+            - Exemplo 1: "meu resumo visual" -> `[ACTION]{{"type": "gerar_resumo_visual", "data": {{"periodo": "este mês"}}}}`
+            - Exemplo 2: "gera o infográfico de outubro" -> `[ACTION]{{"type": "gerar_resumo_visual", "data": {{"periodo": "outubro"}}}}`
 
     # EXEMPLO DE INTERAÇÃO IDEAL
     - Usuário: "quanto gastei com iFood esse mês?"

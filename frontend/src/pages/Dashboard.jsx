@@ -16,7 +16,7 @@ import {
   TrendingUp, TrendingDown, DollarSign, CreditCard, Target, 
   PieChart as PieChartIcon, Calendar, Users, LogOut, 
   ArrowUpRight, ArrowDownRight, Wallet, Building2,
-  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,BookOpen
+  AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,BookOpen, Image, Download
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
@@ -59,6 +59,10 @@ const Dashboard = ({ user, onLogout }) => {
   const [pvrCategoryFilter, setPvrCategoryFilter] = useState('all');
   const [categories, setCategories] = useState([]);
   const [summaryData, setSummaryData] = useState(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
 
   const loadSummaryData = async () => {
     try {
@@ -70,6 +74,31 @@ const Dashboard = ({ user, onLogout }) => {
       setSummaryData(null);
     }
   };
+
+
+const handleGenerateVisualReport = async () => {
+  setIsGeneratingReport(true);
+  setGeneratedImageUrl(null);
+
+  try {
+    // Chama a nossa nova API, passando o mês e ano selecionados
+    const response = await apiService.post('/api/reports/visual-reports', {
+      month: selectedMonth,
+      year: selectedYear,
+    });
+
+    if (response.data && response.data.image_url) {
+      setGeneratedImageUrl(response.data.image_url);
+      setIsReportModalOpen(true); // Abre o modal para exibir a imagem
+    }
+  } catch (error) {
+    console.error("Erro ao gerar relatório visual:", error);
+    alert(error.response?.data?.error || "Não foi possível gerar seu relatório visual. Tente novamente.");
+  } finally {
+    setIsGeneratingReport(false);
+  }
+};
+
 
   const calculateInvestmentValues = (investment) => {
     let currentValue = investment.current_value;
@@ -399,7 +428,7 @@ const tutorials = [
   { name: 'Agenda', url: 'https://drive.google.com/file/d/1gwuEcxEV6t7lSJSuqjUgO8ganuE6osoy/view?usp=drive_link' },
   { name: 'Análise e Balanço', url: 'https://drive.google.com/file/d/1LeSJHcaBlzZ22KhQuFmyJ-7EqGZdkmIv/view?usp=drive_link' },
   { name: 'Assessor Simplific', url: 'https://drive.google.com/file/d/1kKL3cdwyLx_J7KLeQ78FudKn2oMgw6dQ/view?usp=drive_link' },
-  //{ name: 'Simplific IA', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
+  //{ name: 'Novas Funcionalidades', url: 'SEU_LINK_DO_GOOGLE_DRIVE' },
 ];
 // ▲▲▲ FIM DO BLOCO ▲▲▲
 
@@ -522,6 +551,20 @@ const tutorials = [
               <SelectItem value="2028">2028</SelectItem>
             </SelectContent>
           </Select>
+
+          <Button
+          onClick={handleGenerateVisualReport}
+            disabled={isGeneratingReport}
+            variant="outline"
+            className="ml-2"
+          >
+            {isGeneratingReport ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 dark:border-gray-100 mr-2"></div>
+            ) : (
+              <Image className="h-4 w-4 mr-2" />
+            )}
+            {isGeneratingReport ? 'Gerando...' : 'Gerar Resumo Visual'}
+          </Button>
         </div>
       </div>
 
@@ -823,6 +866,32 @@ const tutorials = [
           </Card>
         </div>
       </div>
+
+      // ... (resto do seu código JSX do dashboard)
+
+{/* ▼▼▼ COLE O MODAL DE EXIBIÇÃO AQUI NO FINAL DO COMPONENTE ▼▼▼ */}
+<Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+  <DialogContent className="max-w-3xl">
+    <DialogHeader>
+      <DialogTitle>Seu Resumo Visual de {new Date(selectedYear, selectedMonth - 1).toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}</DialogTitle>
+    </DialogHeader>
+    <div className="mt-4">
+      {generatedImageUrl ? (
+        <>
+          <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full" />
+          <Button asChild className="mt-4 w-full">
+            <a href={generatedImageUrl} download={`resumo_simplific_${selectedYear}_${selectedMonth}.png`}>
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Imagem
+            </a>
+          </Button>
+        </>
+      ) : (
+        <p>Carregando imagem...</p>
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
     </div>
   );
 };

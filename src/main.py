@@ -12,6 +12,7 @@ from flask_migrate import Migrate
 from src.routes.user_routes import user_api_bp
 from src.services.achievement_service import check_all_achievements_for_user
 from datetime import datetime, timedelta
+from src.routes.visual_report_routes import visual_report_bp
 from sqlalchemy import func
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
@@ -78,6 +79,7 @@ app.register_blueprint(goals_bp, url_prefix='/api')
 app.register_blueprint(credit_cards_bp, url_prefix='/api')
 app.register_blueprint(schedule_bp, url_prefix='/api')
 app.register_blueprint(investments_bp, url_prefix='/api')
+app.register_blueprint(visual_report_bp, url_prefix='/api/reports')
 app.register_blueprint(extended_bp, url_prefix='/api')
 app.register_blueprint(reports_bp, url_prefix='/api') 
 app.register_blueprint(whatsapp_bp)
