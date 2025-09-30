@@ -13,7 +13,10 @@ import google.generativeai as genai
 from src.services.image_service import cloudinary # Importamos o objeto já configurado
 
 # Inicializa o modelo de geração de imagem
-image_model = genai.GenerativeModel('gemini-2.5-flash-image-preview')
+image_model = genai.GenerativeModel(
+    'gemini-2.5-flash-image-preview',
+    generation_config={'response_modalities': ['IMAGE']}
+)
 
 def _collect_financial_data(user_id, target_date):
     """
