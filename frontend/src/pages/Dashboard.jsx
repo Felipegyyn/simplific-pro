@@ -61,9 +61,8 @@ const Dashboard = ({ user, onLogout }) => {
   const [categories, setCategories] = useState([]);
   const [summaryData, setSummaryData] = useState(null);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
-  const [generatedReportData, setGeneratedReportData] = useState(null); // <-- MUDOU AQUI
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const reportRef = useRef(null); // <-- ADICIONE AQUI
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
 
 
   const loadSummaryData = async () => {
@@ -78,10 +77,10 @@ const Dashboard = ({ user, onLogout }) => {
   };
 
 
-// ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'handleGenerateVisualReport' POR ESTA ▼▼▼
+// ▼▼▼ SUBSTITUA A FUNÇÃO 'handleGenerateVisualReport' INTEIRA POR ESTA ▼▼▼
 const handleGenerateVisualReport = async () => {
   setIsGeneratingReport(true);
-  setGeneratedReportData(null); // Garante que usa a nova função
+  setGeneratedImageUrl(null); // Usaremos o state antigo de imagem
   setIsReportModalOpen(false);
 
   try {
@@ -90,12 +89,11 @@ const handleGenerateVisualReport = async () => {
       year: selectedYear,
     });
 
-    if (response.data && response.data.background_image_url && response.data.financial_data) {
-      setGeneratedReportData(response.data); // Garante que usa a nova função
+    if (response.data && response.data.image_url) {
+      setGeneratedImageUrl(response.data.image_url); // Armazena apenas a URL
       setIsReportModalOpen(true);
     } else {
-      // Adiciona um erro caso a resposta da API venha incompleta
-      throw new Error("A resposta da API está incompleta.");
+      throw new Error("A resposta da API não continha um URL de imagem.");
     }
   } catch (error) {
     console.error("Erro ao gerar relatório visual:", error);
@@ -104,27 +102,6 @@ const handleGenerateVisualReport = async () => {
     setIsGeneratingReport(false);
   }
 };
-// ▲▲▲ FIM DO BLOCO ▲▲▲
-
-// ▼▼▼ COLE A NOVA FUNÇÃO DE DOWNLOAD AQUI ▼▼▼
-const handleDownloadReport = () => {
-  if (reportRef.current === null) {
-    return;
-  }
-
-  toPng(reportRef.current, { cacheBust: true, })
-    .then((dataUrl) => {
-      const link = document.createElement('a');
-      link.download = `resumo_simplific_${selectedYear}_${selectedMonth}.png`;
-      link.href = dataUrl;
-      link.click();
-    })
-    .catch((err) => {
-      console.log(err);
-      alert('Ocorreu um erro ao tentar baixar a imagem.');
-    });
-};
-// ▲▲▲ FIM DO BLOCO ▲▲▲
 
   const calculateInvestmentValues = (investment) => {
     let currentValue = investment.current_value;
@@ -896,73 +873,30 @@ const tutorials = [
       // ... (resto do seu código JSX do dashboard)
 
 {/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
+{/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
 <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-  <DialogContent className="max-w-4xl p-0 border-0">
-    <DialogHeader className="p-6 pb-0">
+  <DialogContent className="max-w-3xl">
+    <DialogHeader>
       <DialogTitle>Seu Resumo Visual</DialogTitle>
     </DialogHeader>
-    <div className="p-6 pt-2">
-      {generatedReportData ? (
+    <div className="mt-4">
+      {generatedImageUrl ? (
         <>
-          {/* O "Palco" onde a mágica acontece */}
-          <div 
-            ref={reportRef} 
-            className="relative w-full aspect-[1/1.414] bg-cover bg-center text-white" 
-            style={{ backgroundImage: `url(${generatedReportData.background_image_url})` }}
-          >
-            {/* Posicionamento dos Textos e Números */}
-            <div className="absolute top-[12%] left-[50%] -translate-x-1/2 text-center w-full">
-              <h1 className="text-3xl font-bold">Resumo Financeiro de {generatedReportData.financial_data.mes_ano}</h1>
-            </div>
-
-            {/* Card de Receitas */}
-            <div className="absolute top-[23%] left-[16%] text-center">
-              <p className="text-sm">Receitas Totais</p>
-              <p className="text-2xl font-bold">{formatCurrency(generatedReportData.financial_data.total_receitas)}</p>
-            </div>
-
-            {/* Card de Despesas */}
-            <div className="absolute top-[23%] left-[49%] -translate-x-1/2 text-center">
-              <p className="text-sm">Despesas Totais</p>
-              <p className="text-2xl font-bold">{formatCurrency(generatedReportData.financial_data.total_despesas)}</p>
-            </div>
-
-            {/* Card de Saldo */}
-            <div className="absolute top-[23%] right-[16%] text-center">
-              <p className="text-sm">Saldo do Mês</p>
-              <p className="text-2xl font-bold">{formatCurrency(generatedReportData.financial_data.saldo_liquido)}</p>
-            </div>
-
-            {/* Gráfico de Pizza (Simulado) e Top Despesas */}
-            <div className="absolute top-[45%] left-[16%] w-[30%]">
-                <h3 className="font-bold mb-2">Maiores Despesas</h3>
-                {generatedReportData.financial_data.top_3_despesas.map((d, i) => (
-                  <div key={i} className="text-sm flex justify-between">
-                    <span>• {d.categoria}</span>
-                    <span>{formatCurrency(d.valor)}</span>
-                  </div>
-                ))}
-            </div>
-
-            {/* Taxa de Poupança */}
-            <div className="absolute top-[48%] right-[18%] text-center">
-               <p className="text-lg">Taxa de Poupança</p>
-               <p className="text-4xl font-bold">{generatedReportData.financial_data.taxa_poupanca.toFixed(0)}%</p>
-            </div>
-
-          </div>
-
-          <Button onClick={handleDownloadReport} className="mt-4 w-full">
-            <Download className="h-4 w-4 mr-2" />
-            Baixar Imagem
+          <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full" />
+          <Button asChild className="mt-4 w-full">
+            <a href={generatedImageUrl} download={`resumo_simplific_${selectedYear}_${selectedMonth}.png`}>
+              <Download className="h-4 w-4 mr-2" />
+              Baixar Imagem
+            </a>
           </Button>
         </>
       ) : (
-        <p>Carregando imagem e dados...</p>
+        <p>Carregando imagem...</p>
       )}
     </div>
   </DialogContent>
 </Dialog>
+{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
     </div>
   );
 };

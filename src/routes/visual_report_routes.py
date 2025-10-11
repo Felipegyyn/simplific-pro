@@ -8,12 +8,13 @@ from src.services.visual_report_service import _collect_financial_data # <-- Adi
 
 visual_report_bp = Blueprint('visual_report', __name__)
 
+# ▼▼▼ SUBSTITUA A FUNÇÃO 'handle_generate_visual_report' INTEIRA POR ESTA ▼▼▼
+
 @visual_report_bp.route('/visual-reports', methods=['POST'])
 @jwt_required()
 def handle_generate_visual_report():
     """
-    Gera um relatório visual e retorna tanto a URL da imagem de fundo
-    quanto os dados brutos para o frontend renderizar.
+    Gatilho da API para gerar um relatório visual finalizado e retornar sua URL.
     """
     user_id = get_jwt_identity()
     data = request.get_json()
@@ -25,19 +26,13 @@ def handle_generate_visual_report():
     except (ValueError, TypeError):
         return jsonify({'error': 'Mês ou ano inválido.'}), 400
 
-    # 1. Coleta os dados financeiros (reutilizando nossa função de serviço)
-    financial_data = _collect_financial_data(user_id, target_date)
-
-    # 2. Gera a imagem de fundo
+    # Chama o motor, que agora faz todo o trabalho
     image_url, error = generate_visual_report(user_id, target_date)
 
     if error:
         return jsonify({'error': error}), 500
 
-    # 3. Retorna AMBOS os dados em uma única resposta
-    return jsonify({
-        'background_image_url': image_url,
-        'financial_data': financial_data
-    }), 200
+    # Retorna apenas a URL da imagem final
+    return jsonify({'image_url': image_url}), 200
 
 # ▲▲▲ FIM DO BLOCO ▲▲▲
