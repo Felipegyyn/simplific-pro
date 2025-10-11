@@ -103,8 +103,8 @@ def _draw_data_on_image(image_bytes, data, user_name):
 
     # Define os caminhos para as nossas fontes
     # (Este caminho relativo funciona a partir de 'src/services/')
-    base_path = os.path.dirname(__file__)
-    font_path = os.path.join(base_path, '..', 'assets', 'fonts', 'Roboto-Regular.ttf')
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    font_path = os.path.join(base_dir, 'assets', 'fonts', 'Roboto-Regular.ttf')
 
     # Carrega as fontes em diferentes tamanhos
     font_title = ImageFont.truetype(font_path, 60)
