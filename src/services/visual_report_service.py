@@ -183,6 +183,7 @@ def generate_visual_report(user_id, target_date=None):
         print("--- [Relatório Visual] Desenhando dados sobre o template...")
         final_image_bytes = _draw_data_on_image(background_image_bytes, financial_data, user.name)
 
+        # ▼▼▼ SUBSTITUA O BLOCO DE UPLOAD POR ESTE ▼▼▼
         print("--- [Relatório Visual] Enviando imagem final para o Cloudinary...")
         upload_result = cloudinary.uploader.upload(
             io.BytesIO(final_image_bytes),
@@ -191,10 +192,16 @@ def generate_visual_report(user_id, target_date=None):
             resource_type="image"
         )
 
-        image_url = upload_result.get('secure_url')
-        print(f"--- [Relatório Visual] Sucesso! URL da imagem: {image_url}")
-        
-        return image_url, None
+        # --- VERIFICAÇÃO DE SUCESSO ADICIONADA ---
+        if upload_result and upload_result.get('secure_url'):
+            image_url = upload_result.get('secure_url')
+            print(f"--- [Relatório Visual] Sucesso! URL da imagem: {image_url}")
+            return image_url, None
+        else:
+            # Se o upload falhou, logamos o que o Cloudinary nos retornou e enviamos um erro claro.
+            print(f"ERRO: Falha no upload para o Cloudinary. Resposta recebida: {upload_result}")
+            return None, "Não foi possível guardar a imagem final no nosso servidor. Por favor, tente novamente."
+        # ▲▲▲ FIM DO BLOCO ▲▲▲
 
     except Exception as e:
         print(f"ERRO CRÍTICO durante a geração do relatório visual: {e}")
