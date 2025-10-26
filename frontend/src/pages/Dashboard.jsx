@@ -870,7 +870,6 @@ const tutorials = [
         </div>
       </div>
 
-      // ... (resto do seu código JSX do dashboard)
 
 {/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
 {/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
