@@ -91,7 +91,7 @@ def send_whatsapp_media(to, media_url, caption):
     Envia uma mensagem com mídia (imagem) via Twilio.
     """
     try:
-        message = twilio_client.messages.create(
+        message = client.messages.create(
             from_=TWILIO_WHATSAPP_NUMBER,
             to=to,
             body=caption, # A legenda da imagem

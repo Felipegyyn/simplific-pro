@@ -4,6 +4,13 @@ import os # <-- ADICIONE
 import dateparser # <-- ADICIONE AQUI
 import calendar   # <-- ADICIONE AQUI
 from src.models.user import User
+import threading
+from src.services.whatsapp_service import (
+    send_whatsapp_media, 
+    send_whatsapp_message,  # <--- ADICIONE ESTA
+    user_sessions, 
+    remover_sessao
+)
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
 from src.services.visual_report_service import generate_visual_report
 from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
@@ -46,18 +53,77 @@ whatsapp_bp = Blueprint('whatsapp', __name__)
 
 # Dentro de src/routes/routes_whatsapp.py
 
+def processar_mensagem_em_background(from_number, mensagem_processada, usuario):
+    """
+    Esta função roda em um thread separado para não bloquear o webhook da Twilio.
+    Ela contém toda a lógica lenta de IA e banco de dados.
+    """
+    try:
+        # 1. Pega a sessão
+        sessao = user_sessions.get(from_number, {})
+        contexto = sessao.get('contexto')
+        
+        resposta_em_texto = "" # Variável para guardar a resposta
+
+        # 2. Lógica de decisão (copiada de 'receive_message')
+        if contexto:
+            resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
+        else:
+            # Passamos 'None' para media_url pois a mensagem já foi processada (transcrita se áudio)
+            resposta_em_texto = tratar_nova_interacao(mensagem_processada, None, from_number, usuario) 
+
+        # 3. Bloco de limpeza (copiado)
+        if resposta_em_texto:
+            resposta_em_texto = re.sub(r'\*+([^\*]+)\*+', r'*\1*', resposta_em_texto)
+
+        # 4. Barreira de segurança (copiada)
+        if not resposta_em_texto or not resposta_em_texto.strip():
+            print(f"AVISO: A rota /receive_whatsapp (BG) está prestes a enviar uma resposta vazia. (Usuário: {usuario.id})")
+            resposta_em_texto = "Ocorreu um problema e não consegui gerar uma resposta. Por favor, tente novamente."
+
+        # 5. Lógica de envio (agora usando REST API)
+        send_as_audio = usuario.preferred_response_format == 'audio'
+
+        if send_as_audio:
+            print("Decisão (BG): Enviar áudio (Via REST API).")
+            nome_arquivo = texto_para_audio(resposta_em_texto)
+            if nome_arquivo:
+                base_url = os.getenv('BASE_URL')
+                url_publica = f"{base_url}/audio/{nome_arquivo}"
+                print(f"Enviando áudio (BG): {url_publica}")
+                # Envia o áudio (com caption vazio)
+                send_whatsapp_media(from_number, url_publica, caption="")
+            else:
+                # Fallback para texto se áudio falhar
+                send_whatsapp_message(from_number, "Tive um problema para gerar o áudio, mas aqui está a resposta: " + resposta_em_texto)
+        else:
+            print("Decisão (BG): Enviar texto (Via REST API).")
+            # Envia o texto
+            send_whatsapp_message(from_number, resposta_em_texto)
+    
+    except Exception as e:
+        print(f"ERRO CRÍTICO NO THREAD DE PROCESSAMENTO: {e}")
+        try:
+            # Tenta enviar um erro final
+            send_whatsapp_message(from_number, "Ocorreu um erro inesperado no sistema. A equipe já foi notificada.")
+        except:
+            pass # Falha total
+
 @whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
 def receive_message():
     """
-    Função coração do webhook. Agora com a lógica para "espelhar" o formato da mensagem.
+    Função coração do webhook.
+    Agora ela é RÁPIDA. Ela apenas coleta os dados, inicia um thread
+    em segundo plano para fazer o trabalho pesado e retorna um 200 OK
+    imediato para a Twilio para evitar timeout.
     """
+    # 1. Coleta de dados
     incoming_msg_text = request.values.get('Body', '').strip()
     media_url = request.values.get('MediaUrl0', None)
     media_type = request.values.get('MediaContentType0', '')
     from_number = request.values.get('From', '')
 
-    # --- LÓGICA DE DECISÃO DE FORMATO ---
-    # 1. Determinamos se a mensagem original foi um áudio.
+    # 2. Transcrição (tarefa rápida, pode ficar aqui)
     is_incoming_audio = media_url and 'audio' in media_type
     mensagem_processada = incoming_msg_text
 
@@ -66,89 +132,47 @@ def receive_message():
         if texto_transcrito:
             mensagem_processada = texto_transcrito
         else:
+            # Falha na transcrição, retorna erro rápido
             resp = MessagingResponse()
-            resp.message("Não consegui entender o que você disse no áudio. Pode tentar de novo ou digitar? 🤔")
+            resp.message("Não consegui entender o que você disse no áudio. Pode tentar de novo? 🤔")
             return str(resp)
 
     if not mensagem_processada:
+        # Mensagem vazia, retorna rápido
         return str(MessagingResponse())
 
-    # ▼▼▼ ADICIONE ESTE BLOCO 'ELIF' AQUI ▼▼▼
-    elif mensagem_processada.lower().strip() == 'cancelar':
-        remover_sessao(from_number) # Limpa a sessão
+    # 3. Lógica de "cancelar" (rápida, pode ficar aqui)
+    if mensagem_processada.lower().strip() == 'cancelar':
+        remover_sessao(from_number)
         resp = MessagingResponse()
         resp.message("Ok! Ação anterior cancelada. 👋\nEm que posso te ajudar agora?")
-        return str(resp)
-    # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
+        return str(resp) # Retorno rápido
 
+    # 4. Validação do usuário (rápida, pode ficar aqui)
     numero_normalizado = normalizar_numero(from_number)
     usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
 
-    resposta_em_texto = "" # Variável para guardar a resposta final em texto
-
     if not usuario:
-        resposta_em_texto = 'Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.'
+        resp = MessagingResponse()
+        resp.message('Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.')
+        return str(resp) # Retorno rápido
     
-    # ▼▼▼ ADICIONE ESTE BLOCO "elif" AQUI ▼▼▼
-    elif usuario.status != 'ativo':
-        resposta_em_texto = "Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte."
+    if usuario.status != 'ativo':
+        resp = MessagingResponse()
+        resp.message("Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte.")
+        return str(resp) # Retorno rápido
         
-    else:
-        sessao = user_sessions.get(from_number, {})
-        contexto = sessao.get('contexto')
+    # --- A GRANDE MUDANÇA ---
+    # 5. Inicia o processamento pesado em um thread separado
+    thread = threading.Thread(
+        target=processar_mensagem_em_background, 
+        args=(from_number, mensagem_processada, usuario)
+    )
+    thread.start()
 
-
-        if contexto:
-            resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
-        else:
-            resposta_em_texto = tratar_nova_interacao(mensagem_processada, media_url, from_number, usuario)
-
-        # ▼▼▼ ADICIONE ESTE BLOCO DE LIMPEZA DE TEXTO AQUI ▼▼▼
-        # Padroniza o negrito para o formato do WhatsApp (*texto*) e remove espaços
-        # que possam quebrar a formatação.
-        if resposta_em_texto:
-            resposta_em_texto = re.sub(r'\*+([^\*]+)\*+', r'*\1*', resposta_em_texto)
-         # ▲▲▲ FIM DO BLOCO DE LIMPEZA ▲▲▲
-
-        if not resposta_em_texto or not resposta_em_texto.strip():
-            print(f"AVISO: A rota /receive_whatsapp está prestes a enviar uma resposta vazia. (Usuário: {usuario.id if usuario else 'desconhecido'})")
-            resposta_em_texto = "Ocorreu um problema e não consegui gerar uma resposta. Por favor, tente novamente."
-
-
-# NOVA VERSÃO - 100% BASEADA NA PREFERÊNCIA DO USUÁRIO
+    # 6. Retorna o TwiML vazio IMEDIATAMENTE para a Twilio
     resp = MessagingResponse()
-    
-    # A decisão agora é uma única linha.
-    # Se a preferência do usuário for 'audio', send_as_audio será True.
-    # Caso contrário (se for 'text' ou qualquer outra coisa), será False.
-    send_as_audio = usuario and usuario.preferred_response_format == 'audio'
-
-    if send_as_audio:
-        print("Decisão: Enviar áudio (Conforme preferência salva na plataforma).")
-    else:
-        print("Decisão: Enviar texto (Conforme preferência salva na plataforma).")
-
-    # Agora, com a decisão tomada, executamos a ação
-    if send_as_audio:
-        nome_arquivo = texto_para_audio(resposta_em_texto)
-        if nome_arquivo:
-            base_url = os.getenv('BASE_URL')
-            url_publica = f"{base_url}/audio/{nome_arquivo}"
-            print(f"Enviando áudio via TwiML: {url_publica}")
-            resp.message().media(url_publica)
-        else:
-            # Fallback para texto se a geração de áudio falhar
-            resp.message("Tive um problema para gerar o áudio, mas aqui está a resposta em texto: " + resposta_em_texto)
-    else:
-        # Envia a resposta em texto
-        resp.message(resposta_em_texto)
-
     return str(resp)
-
-# --------------------------------------------------------------------------
-# ORQUESTRADOR PRINCIPAL DA IA
-# --------------------------------------------------------------------------
-
 
 def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     sessao = user_sessions.get(from_number, {})
@@ -1103,13 +1127,6 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             remover_sessao(from_number) # Limpa a sessão em caso de erro
             return 'Resposta inválida. Ação cancelada.' 
 
-    # ▼▼▼ ADICIONE ESTE BLOCO 'ELSE' FINAL AQUI ▼▼▼
-        else:
-            # Se o contexto for desconhecido ou a mensagem não for um número
-            # (como "Como está meu orçamento?"), limpa a sessão e avisa.
-            remover_sessao(from_number)
-            return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
-    # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
 
     elif contexto == 'confirmar_lancamento_lembrete':
         sessao = buscar_sessao(from_number) # Importar buscar_sessao
@@ -1271,6 +1288,11 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
         except (ValueError, IndexError):
             remover_sessao(from_number)
             return 'Resposta inválida. Ação cancelada.'
+
+else:
+    # Se NENHUM dos 'if/elif contexto == ...' for verdadeiro
+    remover_sessao(from_number)
+    return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
 
 def normalizar_numero(numero):
     """
