@@ -164,21 +164,25 @@ def receive_message():
         resp.message("Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte.")
         return str(resp) # Retorno rápido
         
-    # --- A GRANDE MUDANÇA ---
+    # --- A GRANDE MUDANÇA (COM INDENTAÇÃO CORRIGIDA) ---
+    
     # 5. Pega o objeto 'app' real de dentro do proxy
+    # (Esta linha deve estar no mesmo nível de 'if usuario.status...')
     app_context = current_app._get_current_object()
 
     # 6. Inicia o processamento pesado em um thread separado
-        thread = threading.Thread(
-            target=processar_mensagem_em_background,
-            # Passa o 'app' real como o primeiro argumento
-            args=(app_context, from_number, mensagem_processada, usuario)
-
+    # (Esta linha também deve estar no mesmo nível)
+    thread = threading.Thread(
+        target=processar_mensagem_em_background,
+        # Passa o 'app' real como o primeiro argumento
+        args=(app_context, from_number, mensagem_processada, usuario)
     )
-
+    
+    # (Esta linha também deve estar no mesmo nível)
     thread.start()
 
     # 7. Retorna o TwiML vazio IMEDIATAMENTE para a Twilio
+    # (Esta linha também deve estar no mesmo nível)
     resp = MessagingResponse()
     return str(resp)
 
