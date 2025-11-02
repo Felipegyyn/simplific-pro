@@ -73,6 +73,14 @@ def receive_message():
     if not mensagem_processada:
         return str(MessagingResponse())
 
+    # ▼▼▼ ADICIONE ESTE BLOCO 'ELIF' AQUI ▼▼▼
+    elif mensagem_processada.lower().strip() == 'cancelar':
+        remover_sessao(from_number) # Limpa a sessão
+        resp = MessagingResponse()
+        resp.message("Ok! Ação anterior cancelada. 👋\nEm que posso te ajudar agora?")
+        return str(resp)
+    # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
+
     numero_normalizado = normalizar_numero(from_number)
     usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
 
@@ -1086,6 +1094,14 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
         except (ValueError, IndexError):
             remover_sessao(from_number) # Limpa a sessão em caso de erro
             return 'Resposta inválida. Ação cancelada.' 
+
+    # ▼▼▼ ADICIONE ESTE BLOCO 'ELSE' FINAL AQUI ▼▼▼
+        else:
+            # Se o contexto for desconhecido ou a mensagem não for um número
+        # (como "Como está meu orçamento?"), limpa a sessão e avisa.
+        remover_sessao(from_number)
+        return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
+    # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
 
     elif contexto == 'confirmar_lancamento_lembrete':
         sessao = buscar_sessao(from_number) # Importar buscar_sessao
