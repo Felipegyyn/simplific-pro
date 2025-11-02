@@ -1098,9 +1098,9 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
     # ▼▼▼ ADICIONE ESTE BLOCO 'ELSE' FINAL AQUI ▼▼▼
         else:
             # Se o contexto for desconhecido ou a mensagem não for um número
-        # (como "Como está meu orçamento?"), limpa a sessão e avisa.
-        remover_sessao(from_number)
-        return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
+            # (como "Como está meu orçamento?"), limpa a sessão e avisa.
+            remover_sessao(from_number)
+            return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
     # ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
 
     elif contexto == 'confirmar_lancamento_lembrete':
