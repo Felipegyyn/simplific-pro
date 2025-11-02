@@ -1289,11 +1289,6 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             remover_sessao(from_number)
             return 'Resposta inválida. Ação cancelada.'
 
-else:
-    # Se NENHUM dos 'if/elif contexto == ...' for verdadeiro
-    remover_sessao(from_number)
-    return "Ops! Parece que estávamos no meio de algo, mas não entendi sua resposta. Cancelei a ação anterior, pode me pedir de novo. 😉"
-
 def normalizar_numero(numero):
     """
     Normaliza o número de telefone para o padrão E.164 (+55119XXXXXXXX).
