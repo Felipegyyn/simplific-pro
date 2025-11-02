@@ -108,6 +108,10 @@ def get_ai_response(user_id, historico_chat):
         # Isso mantém nosso serviço focado apenas na lógica da IA.
         pass
 
+    if not texto_para_usuario and not acao_a_executar:
+        print("AVISO: get_ai_response está retornando uma resposta vazia. Forçando mensagem de erro.")
+        texto_para_usuario = "OPa! Não consegui entender sua solicitação no momento. Pode tentar reformular?"
+
     return texto_para_usuario, acao_a_executar
 
 

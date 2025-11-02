@@ -110,6 +110,10 @@ def receive_message():
             resposta_em_texto = re.sub(r'\*+([^\*]+)\*+', r'*\1*', resposta_em_texto)
          # ▲▲▲ FIM DO BLOCO DE LIMPEZA ▲▲▲
 
+        if not resposta_em_texto or not resposta_em_texto.strip():
+            print(f"AVISO: A rota /receive_whatsapp está prestes a enviar uma resposta vazia. (Usuário: {usuario.id if usuario else 'desconhecido'})")
+            resposta_em_texto = "Ocorreu um problema e não consegui gerar uma resposta. Por favor, tente novamente."
+
 
 # NOVA VERSÃO - 100% BASEADA NA PREFERÊNCIA DO USUÁRIO
     resp = MessagingResponse()
@@ -165,6 +169,10 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     historico_chat.append({"role": "model", "content": resposta_final})
     sessao['chat_history'] = historico_chat
     user_sessions[from_number] = sessao
+
+    if not resposta_final or not resposta_final.strip():
+        print(f"AVISO: tratar_nova_interacao está retornando uma resposta vazia para o usuário {usuario.id}.")
+        return "Desculpe, não consegui processar isso. Pode tentar de novo?"
 
     return resposta_final
 
