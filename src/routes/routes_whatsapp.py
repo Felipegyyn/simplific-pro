@@ -57,10 +57,13 @@ def processar_mensagem_em_background(app, from_number, mensagem_processada, usua
     """
     Esta função roda em um thread separado para não bloquear o webhook da Twilio.
     Ela contém toda a lógica lenta de IA e banco de dados.
+    AGORA USANDO O LOGGER OFICIAL.
     """
     # Todo o código agora está DENTRO do 'with'
     with app.app_context():
         try:
+            app.logger.info(f"Iniciando processamento em background para: {from_number}")
+            
             # 1. Pega a sessão
             sessao = user_sessions.get(from_number, {})
             contexto = sessao.get('contexto')
@@ -69,8 +72,10 @@ def processar_mensagem_em_background(app, from_number, mensagem_processada, usua
 
             # 2. Lógica de decisão (copiada de 'receive_message')
             if contexto:
+                app.logger.info(f"Usuário {from_number} está no contexto: {contexto}")
                 resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
             else:
+                app.logger.info(f"Usuário {from_number} sem contexto, chamando nova interação.")
                 # Passamos 'None' para media_url pois a mensagem já foi processada (transcrita se áudio)
                 resposta_em_texto = tratar_nova_interacao(mensagem_processada, None, from_number, usuario) 
 
@@ -80,35 +85,41 @@ def processar_mensagem_em_background(app, from_number, mensagem_processada, usua
 
             # 4. Barreira de segurança (copiada)
             if not resposta_em_texto or not resposta_em_texto.strip():
-                print(f"AVISO: A rota /receive_whatsapp (BG) está prestes a enviar uma resposta vazia. (Usuário: {usuario.id})")
+                app.logger.warning(f"AVISO: A rota /receive_whatsapp (BG) está prestes a enviar uma resposta vazia. (Usuário: {usuario.id})")
                 resposta_em_texto = "Ocorreu um problema e não consegui gerar uma resposta. Por favor, tente novamente."
 
             # 5. Lógica de envio (agora usando REST API)
             send_as_audio = usuario.preferred_response_format == 'audio'
 
             if send_as_audio:
-                print("Decisão (BG): Enviar áudio (Via REST API).")
+                app.logger.info("Decisão (BG): Enviar áudio (Via REST API).")
                 nome_arquivo = texto_para_audio(resposta_em_texto)
                 if nome_arquivo:
                     base_url = os.getenv('BASE_URL')
                     url_publica = f"{base_url}/audio/{nome_arquivo}"
-                    print(f"Enviando áudio (BG): {url_publica}")
+                    app.logger.info(f"Enviando áudio (BG): {url_publica}")
                     # Envia o áudio (com caption vazio)
                     send_whatsapp_media(from_number, url_publica, caption="")
                 else:
+                    app.logger.warning("Falha ao gerar áudio. Enviando fallback em texto.")
                     # Fallback para texto se áudio falhar
                     send_whatsapp_message(from_number, "Tive um problema para gerar o áudio, mas aqui está a resposta: " + resposta_em_texto)
             else:
-                print("Decisão (BG): Enviar texto (Via REST API).")
+                app.logger.info("Decisão (BG): Enviar texto (Via REST API).")
                 # Envia o texto
                 send_whatsapp_message(from_number, resposta_em_texto)
-        
+            
+            app.logger.info(f"Processamento em background para {from_number} concluído com sucesso.")
+
         except Exception as e:
-            print(f"ERRO CRÍTICO NO THREAD DE PROCESSAMENTO: {e}")
+            # ESTA É A LINHA MAIS IMPORTANTE
+            # Ela vai nos dar o stack trace completo do erro
+            app.logger.error(f"ERRO CRÍTICO NO THREAD DE PROCESSAMENTO: {e}", exc_info=True)
             try:
                 # Tenta enviar um erro final
                 send_whatsapp_message(from_number, "Ocorreu um erro inesperado no sistema. A equipe já foi notificada.")
-            except:
+            except Exception as e2:
+                app.logger.error(f"ERRO AO ENVIAR MENSAGEM DE ERRO: {e2}", exc_info=True)
                 pass # Falha total
 
 @whatsapp_bp.route('/receive_whatsapp', methods=['POST'])
