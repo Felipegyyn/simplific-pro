@@ -1,5 +1,5 @@
 # routes_whatsapp.py
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 import os # <-- ADICIONE
 import dateparser # <-- ADICIONE AQUI
 import calendar   # <-- ADICIONE AQUI
@@ -53,11 +53,12 @@ whatsapp_bp = Blueprint('whatsapp', __name__)
 
 # Dentro de src/routes/routes_whatsapp.py
 
-def processar_mensagem_em_background(from_number, mensagem_processada, usuario):
+def processar_mensagem_em_background(app, from_number, mensagem_processada, usuario):
     """
     Esta função roda em um thread separado para não bloquear o webhook da Twilio.
     Ela contém toda a lógica lenta de IA e banco de dados.
     """
+    with app.app_context():
     try:
         # 1. Pega a sessão
         sessao = user_sessions.get(from_number, {})
@@ -163,14 +164,20 @@ def receive_message():
         return str(resp) # Retorno rápido
         
     # --- A GRANDE MUDANÇA ---
-    # 5. Inicia o processamento pesado em um thread separado
-    thread = threading.Thread(
-        target=processar_mensagem_em_background, 
-        args=(from_number, mensagem_processada, usuario)
+    # 5. Pega o objeto 'app' real de dentro do proxy
+    app_context = current_app._get_current_object()
+
+    # 6. Inicia o processamento pesado em um thread separado
+        thread = threading.Thread(
+            target=processar_mensagem_em_background,
+            # Passa o 'app' real como o primeiro argumento
+            args=(app_context, from_number, mensagem_processada, usuario)
+
     )
+
     thread.start()
 
-    # 6. Retorna o TwiML vazio IMEDIATAMENTE para a Twilio
+    # 7. Retorna o TwiML vazio IMEDIATAMENTE para a Twilio
     resp = MessagingResponse()
     return str(resp)
 
