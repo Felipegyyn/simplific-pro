@@ -96,6 +96,8 @@ app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.config['CELERY_BROKER_URL'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+app.config['CELERY_RESULT_BACKEND'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 
 # Adicione esta linha logo acima da sua função
 
