@@ -5,6 +5,8 @@ from flask import Blueprint, request, current_app
 from twilio.twiml.messaging_response import MessagingResponse
 from src.models.user import User
 from src.services.whatsapp_service import remover_sessao
+
+# Importamos o serviço de transcrição, pois ele é leve e rápido
 from src.services.transcription_service import transcrever_audio_de_url
 
 # O "pulo do gato": Importamos nossa nova tarefa
@@ -31,6 +33,10 @@ def receive_message():
     mensagem_processada = incoming_msg_text
 
     if is_incoming_audio:
+        # --- Importação Local ---
+        # Só carregamos o Google Speech se recebermos um áudio
+        from src.services.transcription_service import transcrever_audio_de_url
+        # --- Fim ---
         texto_transcrito = transcrever_audio_de_url(media_url)
         if texto_transcrito:
             mensagem_processada = texto_transcrito

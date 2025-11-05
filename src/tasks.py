@@ -1,5 +1,6 @@
 # src/tasks.py
 
+# --- IMPORTS LEVES (OK FICAR AQUI) ---
 import os
 import re
 import dateparser
@@ -8,68 +9,30 @@ import locale
 import traceback
 from collections import defaultdict
 from datetime import date, timedelta, datetime
-
-# Importa o 'celery' que criamos na Etapa 1
-from src.celery_worker import celery
-
-# Imports dos seus serviços (necessários para a lógica)
+from src.celery_worker import celery # O principal
 from src.models.user import User
 from src.models.db import db
 from src.models.extended import Investment
 from src.models.extended_modules import Fatura, CreditCard
-from src.services.ai_assessor_service import get_ai_response
 from src.services.whatsapp_service import (
     send_whatsapp_media, 
     send_whatsapp_message, 
     user_sessions, 
     remover_sessao
 )
-from src.services.tts_service import texto_para_audio
-from src.services.visual_report_service import generate_visual_report
-from src.services.investments_service import (
-    processar_investimento_whatsapp, 
-    buscar_dados_ativo, 
-    gerar_resumo_carteira
-)
-from src.utils.formatters import format_currency_brl
-from src.services.simulation_service import run_financial_simulation
-from src.services.schedule_service import (
-    get_agenda_summary, 
-    create_agenda_event_from_whatsapp,
-    criar_evento_agenda,
-    buscar_resumo_agenda
-)
-from src.services.transacoes_service import (
-    buscar_transacoes_por_status,
-    buscar_transacoes_pendentes,
-    confirmar_transacao_por_id
-)
-from src.services.reports_service import (
-    buscar_resumo_planejamento,
-    buscar_transacoes_por_periodo
-)
-from src.services.goals_service import get_user_goals, add_value_to_goal
-from src.services.credit_card_service import (
-    get_card_limit_details, 
-    process_card_payment,
-    process_card_transaction
-)
 
+# --- IMPORTS PESADOS (FORAM REMOVIDOS DAQUI) ---
+# (ai_assessor_service, reports_service, etc. foram removidos do topo)
 
 
 # ==========================================================================
 # A TAREFA CELERY PRINCIPAL
 # ==========================================================================
-# Esta é a nossa antiga 'processar_mensagem_em_background', agora como uma tarefa Celery.
-# O decorator '@celery.task' faz a mágica.
-# Note que não precisamos mais do 'app' ou do 'with app.app_context()',
-# o 'ContextTask' da Etapa 1 cuida disso para nós.
-
 @celery.task(name='tasks.processar_mensagem_whatsapp')
 def processar_mensagem_whatsapp_task(from_number, mensagem_processada, usuario_id):
     """
-    Esta função roda no Celery Worker, em segundo plano.
-    Ela contém toda a lógica lenta de IA e banco de dados.
+    Esta função roda no Celery Worker.
+    O 'app.app_context()' é gerenciado pelo 'ContextTask' no celery_worker.py.
     """
     try:
         # 1. Busca o usuário a partir do ID
@@ -84,14 +47,16 @@ def processar_mensagem_whatsapp_task(from_number, mensagem_processada, usuario_i
         sessao = user_sessions.get(from_number, {})
         contexto = sessao.get('contexto')
         
-        resposta_em_texto = "" # Variável para guardar a resposta
+        resposta_em_texto = "" 
 
         # 3. Lógica de decisão
         if contexto:
             print(f"Usuário {from_number} está no contexto: {contexto}")
+            # 'tratar_resposta_numerica' é uma função local deste arquivo
             resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
         else:
             print(f"Usuário {from_number} sem contexto, chamando nova interação.")
+            # 'tratar_nova_interacao' é uma função local deste arquivo
             resposta_em_texto = tratar_nova_interacao(mensagem_processada, None, from_number, usuario) 
 
         # 4. Bloco de limpeza
@@ -104,6 +69,12 @@ def processar_mensagem_whatsapp_task(from_number, mensagem_processada, usuario_i
             resposta_em_texto = "Ocorreu um problema e não consegui gerar uma resposta. Por favor, tente novamente."
 
         # 6. Lógica de envio
+        
+        # --- Importação local (Lazy Loading) ---
+        # Só importamos o serviço de áudio se precisarmos dele
+        from src.services.tts_service import texto_para_audio
+        # --- Fim da Importação ---
+
         send_as_audio = usuario.preferred_response_format == 'audio'
 
         if send_as_audio:
@@ -135,13 +106,16 @@ def processar_mensagem_whatsapp_task(from_number, mensagem_processada, usuario_i
 
 
 # ==========================================================================
-# FUNÇÕES DE LÓGICA (Movidas de routes_whatsapp.py)
-# ==========================================================================
-# Todas as funções que 'processar_mensagem_whatsapp_task' precisa
-# estão agora neste mesmo arquivo, o que evita erros de importação.
+# FUNÇÕES DE LÓGICA (Com Lazy Loading)
 # ==========================================================================
 
 def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
+    
+    # --- Importação local (Lazy Loading) ---
+    # A IA só é carregada quando esta função é chamada
+    from src.services.ai_assessor_service import get_ai_response
+    # --- Fim da Importação ---
+
     sessao = user_sessions.get(from_number, {})
     historico_chat = sessao.get('chat_history', [])
     historico_chat.append({"role": "user", "content": mensagem_usuario})
@@ -150,6 +124,7 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
 
     resposta_final = texto_para_usuario
     if acao_a_executar:
+        # 'executar_acao_simplific' é uma função local
         resultado_acao = executar_acao_simplific(usuario.id, acao_a_executar, from_number)
         if resultado_acao:
             resposta_final = resultado_acao
@@ -167,6 +142,7 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
 def executar_acao_simplific(user_id, acao, from_number):
     """
     Recebe um dicionário de ação e chama o serviço correspondente.
+    Os imports são feitos DENTRO de cada 'if' para economizar memória.
     """
     tipo_acao = acao.get('type')
     dados_acao = acao.get('data')
@@ -178,6 +154,11 @@ def executar_acao_simplific(user_id, acao, from_number):
 
     try:
         if tipo_acao == 'create_transaction':
+            # --- Imports Locais ---
+            from src.routes.financial import criar_lancamento
+            from src.services.categorias_service import buscar_categorias
+            # --- Fim ---
+            
             dados = dados_acao
             category_name = dados.get('category_name')
             categorias_usuario = buscar_categorias(user_id)
@@ -196,10 +177,16 @@ def executar_acao_simplific(user_id, acao, from_number):
             return None
 
         elif tipo_acao == 'consultar_agenda':
+            # --- Imports Locais ---
+            from src.services.schedule_service import get_agenda_summary
+            # --- Fim ---
             resumo = get_agenda_summary(user_id)
-            return formatar_resumo_agenda(resumo)
+            return formatar_resumo_agenda(resumo) # formatar_ é local
 
         elif tipo_acao == 'cadastrar_evento_agenda':
+            # --- Imports Locais ---
+            from src.services.schedule_service import create_agenda_event_from_whatsapp
+            # --- Fim ---
             success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
             if success:
                 return None
@@ -207,13 +194,19 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return message 
 
         elif tipo_acao == 'simular_cenario_financeiro':
+            # --- Imports Locais ---
+            from src.services.simulation_service import run_financial_simulation
+            # --- Fim ---
             resultado = run_financial_simulation(user_id, dados_acao)
-            return formatar_resultado_simulacao(resultado)
+            return formatar_resultado_simulacao(resultado) # formatar_ é local
 
         elif tipo_acao == 'gerar_resumo_visual':
+            # --- Imports Locais ---
+            from src.services.visual_report_service import generate_visual_report
+            # --- Fim ---
             periodo_texto = dados_acao.get('periodo', 'este mês')
             try:
-                data_inicio, _ = calcular_intervalo_datas(periodo_texto)
+                data_inicio, _ = calcular_intervalo_datas(periodo_texto) # calcular_ é local
                 image_url, error = generate_visual_report(user_id, data_inicio)
 
                 if error:
@@ -227,13 +220,16 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return "Não consegui gerar seu resumo visual agora. Tente novamente."
 
         elif tipo_acao == 'consultar_transacoes':
+            # --- Imports Locais ---
+            from src.services.transacoes_service import buscar_transacoes_por_status
+            # --- Fim ---
             dados = dados_acao
             status = dados.get('status', 'confirmada')
             tipo = dados.get('tipo', 'ambos') 
             periodo_texto = dados.get('periodo', 'este mês')
 
             try:
-                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto)
+                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto) # calcular_ é local
             except ValueError as e:
                 return str(e)
 
@@ -250,6 +246,9 @@ def executar_acao_simplific(user_id, acao, from_number):
             return resposta
 
         elif tipo_acao == 'lancar_gasto_cartao':
+            # --- Imports Locais ---
+            from src.services.credit_card_service import process_card_transaction
+            # --- Fim ---
             dados = dados_acao
             nome_cartao = dados.get('card_name')
             valor = dados.get('value')
@@ -269,6 +268,9 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return message 
 
         elif tipo_acao == 'add_value_to_goal':
+            # --- Imports Locais ---
+            from src.services.goals_service import get_user_goals, add_value_to_goal
+            # --- Fim ---
             dados = dados_acao
             nome_meta = dados.get('goal_name')
             valor = dados.get('value')
@@ -284,6 +286,9 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return message 
 
         elif tipo_acao == 'cadastrar_investimento':
+            # --- Imports Locais ---
+            from src.services.investments_service import processar_investimento_whatsapp
+            # --- Fim ---
             resultado = processar_investimento_whatsapp(user_id, dados_acao)
             status = resultado.get('status')
             if status == 'sucesso_acao_fii':
@@ -305,9 +310,12 @@ def executar_acao_simplific(user_id, acao, from_number):
             return "Ação de agendamento executada."
 
         elif tipo_acao == 'consultar_planejamento':
+            # --- Imports Locais ---
+            from src.services.reports_service import buscar_resumo_planejamento
+            # --- Fim ---
             periodo_texto_gemini = dados_acao.get('periodo', 'este mês')
             try:
-                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto_gemini)
+                data_inicio, data_fim = calcular_intervalo_datas(periodo_texto_gemini) # calcular_ é local
                 try:
                     locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
                     periodo_descritivo = data_inicio.strftime("para %B de %Y").capitalize()
@@ -318,9 +326,12 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return str(e)
             
             resumo_planejamento = buscar_resumo_planejamento(user_id, data_inicio, data_fim)
-            return formatar_resumo_planejamento(resumo_planejamento, periodo_descritivo)
+            return formatar_resumo_planejamento(resumo_planejamento, periodo_descritivo) # formatar_ é local
     
         elif tipo_acao == 'consultar_preco_ativo':
+            # --- Imports Locais ---
+            from src.services.investments_service import buscar_dados_ativo
+            # --- Fim ---
             nome_ativo = dados_acao.get('ativo')
             if not nome_ativo:
                 return "Não foi possível identificar o ativo para consulta."
@@ -328,7 +339,7 @@ def executar_acao_simplific(user_id, acao, from_number):
             resultado = buscar_dados_ativo(nome_ativo)
             
             if resultado.get('status') == 'sucesso':
-                return formatar_resposta_ativo(resultado.get('data'))
+                return formatar_resposta_ativo(resultado.get('data')) # formatar_ é local
             else:
                 return resultado.get('mensagem', 'Não foi possível encontrar os dados do ativo.')
             
@@ -343,8 +354,13 @@ def executar_acao_simplific(user_id, acao, from_number):
 def tratar_resposta_numerica(mensagem, from_number, user_id):
     """
     Trata a resposta do usuário quando ele está em uma conversa (sessão).
-    (Esta função foi movida para cá e permanece a mesma)
     """
+    # --- Imports Locais ---
+    from src.services.transacoes_service import confirmar_transacao_por_id
+    from src.services.credit_card_service import process_card_payment
+    from src.services.goals_service import add_value_to_goal
+    # --- Fim ---
+
     sessao = user_sessions.get(from_number)
     if not sessao:
         return "Sua sessão expirou. Por favor, envie o comando novamente."
@@ -374,8 +390,24 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             return 'Resposta inválida. Ação cancelada.' 
 
     elif contexto == 'confirmar_lancamento_lembrete':
-        # ... (lógica omitida por brevidade, é a mesma que você já tem) ...
-        pass # Placeholder
+        from src.services.transacoes_service import confirmar_transacao_por_id # Import específico
+        sessao = user_sessions.get(from_number) # Usa a função global, não 'buscar_sessao'
+        transaction_id = sessao.get('transaction_id')
+        resposta_usuario = mensagem.strip().lower()
+
+        if resposta_usuario in ['sim', 's']:
+            sucesso = confirmar_transacao_por_id(transaction_id, user_id)
+            if sucesso:
+                remover_sessao(from_number)
+                return "Confirmado! Seu lançamento foi atualizado. ✅"
+            else:
+                remover_sessao(from_number)
+                return "Ocorreu um erro ao tentar confirmar. Por favor, confirme manually na plataforma."
+        elif resposta_usuario in ['não', 'nao', 'n']:
+            remover_sessao(from_number)
+            return "Ok! Não esqueça de confirmar o lançamento quando ele for concluído. 😉"
+        else:
+            return "Não entendi sua resposta. Por favor, responda apenas com 'Sim' ou 'Não'."
 
     elif contexto == 'cadastrar_renda_fixa':
         if mensagem == '1': # Sim, é Renda Fixa
@@ -433,12 +465,64 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             remover_sessao(from_number)
             return "Ok, pagamento cancelado."
     
-    # ... (outros contextos como 'selecionar_cartao_para_gasto', 'selecionar_meta_para_adicionar_valor') ...
-    # ... (eles permanecem os mesmos que você já tem) ...
+    elif contexto == 'selecionar_cartao_para_gasto':
+        # --- Imports Locais ---
+        # Nota: create_credit_card_transaction não foi encontrada,
+        # Usando process_card_transaction do 'executar_acao...'
+        from src.services.credit_card_service import process_card_transaction
+        # --- Fim ---
+        try:
+            idx_escolhido = int(mensagem)
+            lista_cartoes = sessao['lista_cartoes']
+            gasto_data = sessao['gasto_data']
+
+            if 1 <= idx_escolhido <= len(lista_cartoes):
+                cartao_escolhido = lista_cartoes[idx_escolhido - 1]
+                if gasto_data['value'] > cartao_escolhido['available_limit']:
+                    remover_sessao(from_number)
+                    return f"❌ Limite insuficiente no cartão *{cartao_escolhido['name']}*! Ação cancelada."
+                
+                # Ajustado para usar a função que sabemos que existe
+                success, message = process_card_transaction(user_id, cartao_escolhido['id'], gasto_data)
+                remover_sessao(from_number)
+                if success:
+                    return f"✅ Gasto lançado com sucesso no cartão *{cartao_escolhido['name']}*!"
+                else:
+                    return message
+            else:
+                remover_sessao(from_number)
+                return 'Opção inválida. Ação cancelada.'
+        except (ValueError, IndexError, KeyError):
+            remover_sessao(from_number)
+            return 'Resposta inválida. Ação cancelada.'
+
+    elif contexto == 'selecionar_meta_para_adicionar_valor':
+        try:
+            idx_escolhido = int(mensagem)
+            lista_metas = sessao['lista_metas']
+            valor_adicionar = sessao['valor_adicionar']
+
+            if 1 <= idx_escolhido <= len(lista_metas):
+                meta_escolhida = lista_metas[idx_escolhido - 1]
+                success, message = add_value_to_goal(user_id, meta_escolhida['id'], valor_adicionar)
+                remover_sessao(from_number)
+                if success:
+                    return f"✅ Sucesso! {message}"
+                else:
+                    return f"❌ Ops! {message}"
+            else:
+                remover_sessao(from_number)
+                return 'Opção inválida. Ação cancelada.'
+        except (ValueError, IndexError, KeyError):
+            remover_sessao(from_number)
+            return 'Resposta inválida. Ação cancelada.'
 
     # --- LÓGICA ANTIGA PARA ESCOLHER UMA CATEGORIA ---
     elif 'categorias' in sessao: # Fallback para o fluxo de categoria
         try:
+            # --- Imports Locais ---
+            from src.routes.financial import criar_lancamento
+            # --- Fim ---
             idx_escolhido = int(mensagem)
             categorias_na_sessao = sessao['categorias']
             if 1 <= idx_escolhido <= len(categorias_na_sessao):
@@ -460,19 +544,13 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
 
 
 # ==========================================================================
-# FUNÇÕES DE FORMATAÇÃO E UTILITÁRIOS (Movidas de routes_whatsapp.py)
+# FUNÇÕES DE FORMATAÇÃO E UTILITÁRIOS (Leves, OK ficar aqui)
 # ==========================================================================
-# (Todas as suas funções 'formatar_resumo_...', 'handle_...', 
-# 'extrair_data_alvo', 'calcular_intervalo_datas' devem ser 
-# coladas aqui. Eu omiti o código delas por brevidade, 
-# mas você deve MOVÊ-LAS para cá.)
-# ...
-# (Cole suas funções de formatação aqui)
-# ...
+from src.utils.formatters import format_currency_brl
+
 def formatar_resumo_planejamento(resumo, periodo_texto):
     if not resumo:
         return f"Não encontrei nenhum planejamento de despesas para *{periodo_texto}*. Que tal criar um? 😉"
-    # ... (resto da sua função)
     resposta = f"📊 Aqui está o resumo do seu orçamento para *{periodo_texto}*:\n\n"
     total_orcado = 0
     total_realizado = 0
