@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import User
 
 # Importa a função principal de interação da IA que já usamos no WhatsApp
-from src.tasks import tratar_nova_interacao
+from src.routes.routes_whatsapp import tratar_nova_interacao
 
 # Cria o nosso novo "Blueprint" para as rotas de chat
 chat_bp = Blueprint('chat', __name__)

@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 load_dotenv()
 import cloudinary
 import cloudinary.uploader
-from src.celery_worker import celery
 cloudinary.config(
     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"),
     api_key = os.getenv("CLOUDINARY_API_KEY"),
@@ -16,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS
+from src.models.gamification import Achievement, UserAchievement
 from flask_migrate import Migrate
 from src.routes.user_routes import user_api_bp
 from src.services.achievement_service import check_all_achievements_for_user
@@ -25,12 +25,28 @@ from sqlalchemy import func
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
 from src.redis_client import redis_client
-from src.extensions import mail, db, bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from src.models.db import db  # instância única
 from src.models.user import User
-
-
+from src.models.financial import Category, Planning, Transaction
+from src.models.extended import Goal, ScheduleEvent, Investment
+from src.models.extended_modules import CreditCard, CreditCardTransaction
+from src.routes.user import user_bp
+from src.routes.gamification_routes import gamification_bp
+from src.routes.financial import financial_bp, transactions_bp
+from src.routes.goals import goals_bp
+from src.extensions import mail, db, bcrypt
+from src.routes.webhooks import webhooks_bp
+from src.routes.credit_cards import credit_cards_bp
+from src.routes.schedule import schedule_bp
+from src.routes.investments import investments_bp
+from src.routes.extended_simple import extended_bp
+from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
+from src.routes.routes_whatsapp import whatsapp_bp
+from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
+from src.routes.chat_bp import chat_bp
+from apscheduler.schedulers.background import BackgroundScheduler
+from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, verificar_lancamentos_pendentes
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
@@ -61,45 +77,6 @@ migrate = Migrate(app, db)
 # Initialize JWT
 jwt = JWTManager(app)
 
-app.config['CELERY_BROKER_URL'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-app.config['CELERY_RESULT_BACKEND'] = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
-
-# ▼▼▼ COLE ESTE BLOCO INTEIRO AQUI ▼▼▼
-# -----------------------------------
-# Configura o Celery com o app Flask
-
-celery.config_from_object(app.config, namespace='CELERY')
-celery.conf.update(app.config)
-
-class ContextTask(celery.Task):
-    def __call__(self, *args, **kwargs):
-        with app.app_context():
-            return self.run(*args, **kwargs)
-
-celery.Task = ContextTask
-# -----------------------------------
-# ▲▲▲ FIM DO BLOCO ▲▲▲
-
-from src.routes.user import user_bp
-from src.routes.gamification_routes import gamification_bp
-from src.routes.financial import financial_bp, transactions_bp
-from src.routes.goals import goals_bp
-from src.routes.webhooks import webhooks_bp
-from src.routes.credit_cards import credit_cards_bp
-from src.models.financial import Category, Planning, Transaction
-from src.models.extended import Goal, ScheduleEvent, Investment
-from src.models.extended_modules import CreditCard, CreditCardTransaction
-from src.models.gamification import Achievement, UserAchievement
-from src.routes.schedule import schedule_bp
-from src.routes.investments import investments_bp
-from src.routes.extended_simple import extended_bp
-from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
-from src.routes.routes_whatsapp import whatsapp_bp
-from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
-from src.routes.chat_bp import chat_bp
-from apscheduler.schedulers.background import BackgroundScheduler
-from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, verificar_lancamentos_pendentes
-
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(user_api_bp, url_prefix='/api/users')
@@ -119,7 +96,6 @@ app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
-
 
 # Adicione esta linha logo acima da sua função
 
