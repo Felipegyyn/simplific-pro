@@ -25,6 +25,7 @@ from sqlalchemy import func
 from src.routes.auth import auth_bp
 from src.config import AUDIO_DIR
 from src.redis_client import redis_client
+from src.extensions import mail, db, bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from src.models.db import db  # instância única
 from src.models.user import User
@@ -83,7 +84,6 @@ from src.routes.user import user_bp
 from src.routes.gamification_routes import gamification_bp
 from src.routes.financial import financial_bp, transactions_bp
 from src.routes.goals import goals_bp
-from src.extensions import mail, db, bcrypt
 from src.routes.webhooks import webhooks_bp
 from src.routes.credit_cards import credit_cards_bp
 from src.models.financial import Category, Planning, Transaction
