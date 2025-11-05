@@ -54,8 +54,7 @@ from src.services.credit_card_service import (
     process_card_payment,
     process_card_transaction
 )
-from src.services.categorias_service import buscar_categorias
-from src.routes.financial import criar_lancamento # Este import pode precisar de revisão, mas vamos manter por enquanto
+
 
 
 # ==========================================================================
