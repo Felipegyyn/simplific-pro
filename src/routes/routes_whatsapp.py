@@ -189,10 +189,21 @@ def receive_message():
         resp.message("Ok! Ação anterior cancelada. 👋\nEm que posso te ajudar agora?")
         return str(resp) # Retorno rápido
 
+    # ▼▼▼ ESTE É O BLOCO QUE FALTAVA ▼▼▼
     # 4. Validação do usuário (rápida, pode ficar aqui)
-    # ... (seu código de validação de usuário continua igual) ...
-    # ... (if not usuario:) ...
-    # ... (if usuario.status != 'ativo':) ...
+    numero_normalizado = normalizar_numero(from_number)
+    usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
+
+    if not usuario:
+        resp = MessagingResponse()
+        resp.message('Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.')
+        return str(resp) # Retorno rápido
+    
+    if usuario.status != 'ativo':
+        resp = MessagingResponse()
+        resp.message("Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte.")
+        return str(resp) # Retorno rápido
+    # ▲▲▲ FIM DO BLOCO QUE FALTAVA ▲▲▲
 
     # --- A GRANDE MUDANÇA (COM INDENTAÇÃO CORRIGIDA) ---
     
