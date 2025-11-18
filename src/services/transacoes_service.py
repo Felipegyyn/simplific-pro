@@ -8,6 +8,11 @@ import re
 from src.models.financial import Transaction, Category
 from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
 from sqlalchemy import func, case
+# ▼▼▼ ADICIONE ESTAS NOVAS IMPORTAÇÕES ▼▼▼
+from src.services.ocr_service import extract_text_from_url
+from src.utils.storage import upload_image_from_url
+from src.utils.formatters import format_currency_brl # Importe seu formatador de moeda
+# ▲▲▲ FIM DAS NOVAS IMPORTAÇÕES ▲▲▲
 
 def criar_fatura(numero_usuario, valor, descricao, cartao):
     """
@@ -203,3 +208,114 @@ def processar_extrato_pdf(user_id, pdf_file_stream):
     except Exception as e:
         print(f"ERRO CRÍTICO ao processar o arquivo PDF com IA: {e}")
         return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar o extrato. Tente novamente."}
+
+# Em: src/services/transacoes_service.py
+
+# ... (função processar_extrato_pdf e outras) ...
+
+
+# ▼▼▼ COLE A NOVA FUNÇÃO ABAIXO ▼▼▼
+
+def processar_comprovante_imagem(user_id, image_url):
+    """
+    Orquestra o processamento completo de uma imagem de comprovante.
+    1. Salva a imagem no Cloudinary.
+    2. Extrai texto com OCR (Google Vision).
+    3. Extrai dados da transação com IA (Gemini).
+    4. Categoriza a transação com IA (Gemini).
+    5. Salva a transação como 'pendente' no banco.
+    """
+    print(f"Iniciando processamento de comprovante para user_id: {user_id}")
+    
+    permanent_url = None # Inicializa a variável
+    
+    try:
+        # --- Passo 1: Salvar Imagem Permanentemente (Segurança) ---
+        # Salva antes de processar, para garantir que temos o comprovante
+        permanent_url = upload_image_from_url(image_url, folder_name="comprovantes")
+        if not permanent_url:
+            print("FALHA: Erro ao salvar imagem no Cloudinary.")
+            # Se falhar aqui, ainda podemos tentar processar, mas não salvaremos a URL
+            pass # Continua o fluxo mesmo assim
+
+        # --- Passo 2: Ler Imagem (OCR) ---
+        raw_text = extract_text_from_url(image_url)
+        if not raw_text:
+            print("FALHA: OCR não encontrou texto na imagem.")
+            return {"status": "erro", "mensagem": "Não consegui ler nenhum texto nesse comprovante. 🧾 Tente uma foto melhor, por favor."}
+
+        # --- Passo 3: Extrair Dados (IA) ---
+        # Reutiliza a função do extrato de PDF
+        transacoes_extraidas = extrair_transacoes_de_texto_com_ia(raw_text)
+        
+        if not transacoes_extraidas:
+            print("FALHA: IA não identificou uma transação no texto do OCR.")
+            return {"status": "info", "mensagem": "Recebi seu comprovante, mas não consegui identificar um lançamento claro nele. Vou deixar passar por enquanto."}
+        
+        # Pega a primeira transação (comprovantes geralmente são de 1 item)
+        transacao_ia = transacoes_extraidas[0]
+        valor = float(transacao_ia.get('valor', 0))
+        descricao = transacao_ia.get('descricao', 'Sem descrição')
+        data_str = transacao_ia.get('data')
+
+        if valor == 0 or not data_str:
+            print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
+            return {"status": "info", "mensagem": "Entendi o comprovante, mas não achei o valor ou a data. Pode me dizer qual é?"}
+
+        # --- Passo 4: Categorizar (IA) ---
+        tipo_transacao = 'entrada' if valor > 0 else 'saida'
+        # Reutiliza a função de categorização
+        nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
+
+        # Busca o ID da Categoria no banco
+        categoria_final = Category.query.filter(
+            Category.user_id == user_id,
+            Category.name.ilike(nome_categoria_ia), # Usa ilike para ser case-insensitive
+            Category.type == tipo_transacao
+        ).first()
+
+        # Fallback para categoria "Outros"
+        if not categoria_final:
+            categoria_fallback_name = 'Outros' # Nome padrão
+            categoria_final = Category.query.filter_by(
+                user_id=user_id,
+                name=categoria_fallback_name,
+                type=tipo_transacao
+            ).first()
+            
+            # Se nem "Outros" existir... (situação rara)
+            if not categoria_final:
+                 print(f"ERRO CRÍTICO: Categoria 'Outros' do tipo '{tipo_transacao}' não encontrada para user_id {user_id}.")
+                 return {"status": "erro", "mensagem": "Não encontrei sua categoria 'Outros'. Por favor, verifique suas categorias na plataforma."}
+
+        # --- Passo 5: Salvar no Banco ---
+        novo_lancamento = Transaction(
+            user_id=user_id,
+            date=datetime.strptime(data_str, '%Y-%m-%d').date(),
+            type=tipo_transacao,
+            category_id=categoria_final.id,
+            value=abs(valor), # Salva sempre o valor positivo
+            description=f"[Comprovante] {descricao}",
+            status='pendente', # IMPORTANTE: Salva como pendente
+            format='variavel',
+            payment_form='a_vista',
+            receipt_image_url=permanent_url # <-- AQUI! Salvamos a URL do Cloudinary
+        )
+        
+        db.session.add(novo_lancamento)
+        db.session.commit()
+
+        print(f"SUCESSO: Lançamento pendente criado (ID: {novo_lancamento.id})")
+        
+        # Formata a moeda para a resposta
+        valor_formatado = format_currency_brl(abs(valor))
+        
+        return {
+            "status": "sucesso",
+            "mensagem": f"Legal! 🧾 Processei seu comprovante e criei um lançamento pendente de *{valor_formatado}* ({descricao}). Você pode confirmá-lo na plataforma."
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERRO CRÍTICO ao processar comprovante de imagem: {e}")
+        return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar seu comprovante. A equipe já foi notificada."}

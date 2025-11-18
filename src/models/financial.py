@@ -77,6 +77,7 @@ class Transaction(db.Model):
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
         confirmed_at = db.Column(db.DateTime)
         planning_id = db.Column(db.Integer, db.ForeignKey('planning.id'), nullable=True)
+        receipt_image_url = db.Column(db.String(255), nullable=True) # URL do comprovante (Cloudinary)
         
         # Relationships
         category = db.relationship('Category', backref='transactions', lazy='joined')
