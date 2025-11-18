@@ -3,6 +3,7 @@
 import requests
 from google.cloud import vision
 import io
+import os
 
 def extract_text_from_url(image_url):
     """
@@ -13,15 +14,28 @@ def extract_text_from_url(image_url):
     """
     print(f"Iniciando OCR para a imagem em: {image_url}")
 
+    # ▼▼▼ BLOCO DE MUDANÇA ▼▼▼
     try:
-        # --- Passo 1: Fazer o download da imagem ---
-        # A Twilio (WhatsApp) nos dá uma URL que expira. 
-        # Precisamos baixar o conteúdo dela imediatamente.
-        response = requests.get(image_url, timeout=10) # Timeout de 10s
+        # --- Pega as credenciais da Twilio do ambiente ---
+        TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+        TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+
+        if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN:
+            print("ERRO CRÍTICO (OCR): Credenciais TWILIO_ACCOUNT_SID ou TWILIO_AUTH_TOKEN não configuradas.")
+            return None
+
+        # --- Passo 1: Fazer o download da imagem (COM AUTENTICAÇÃO) ---
+        print("Baixando imagem da Twilio com autenticação...")
+        response = requests.get(
+            image_url, 
+            auth=(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN), # <-- A MUDANÇA MÁGICA
+            timeout=10
+        )
+    # ▲▲▲ FIM DO BLOCO DE MUDANÇA ▲▲▲
         
         # Verifica se o download foi bem-sucedido
         if response.status_code != 200:
-            print(f"Falha ao baixar a imagem. Status: {response.status_code}")
+            print(f"Falha ao baixar a imagem. Status: {response.status_code} {response.text}") # Adiciona .text para ver o erro
             return None
         
         # Carrega o conteúdo (bytes) da imagem em memória
