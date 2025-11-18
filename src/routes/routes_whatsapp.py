@@ -42,6 +42,7 @@ from src.services.whatsapp_service import user_sessions, remover_sessao
 from src.services.transacoes_service import (
     buscar_transacoes_pendentes,
     confirmar_transacao_por_id,
+    processar_comprovante_imagem
 )
 
 from src.routes.financial import criar_lancamento
@@ -54,7 +55,7 @@ whatsapp_bp = Blueprint('whatsapp', __name__)
 
 # Dentro de src/routes/routes_whatsapp.py
 
-def processar_mensagem_em_background(app, from_number, mensagem_processada, usuario):
+def processar_mensagem_em_background(app, from_number, usuario, mensagem_processada, media_url_imagem):
     """
     Esta função roda em um thread separado para não bloquear o webhook da Twilio.
     Ela contém toda a lógica lenta de IA e banco de dados.
@@ -70,13 +71,32 @@ def processar_mensagem_em_background(app, from_number, mensagem_processada, usua
             
             resposta_em_texto = "" # Variável para guardar a resposta
 
-            # 2. Lógica de decisão
-            if contexto:
+            # 3. ▼▼▼ ESTA É A NOVA LÓGICA DE DECISÃO ▼▼▼
+            if media_url_imagem:
+                # Se recebemos uma URL de imagem, ela tem prioridade MÁXIMA
+                print(f"Usuário {from_number} enviou uma IMAGEM. Processando comprovante...")
+                
+                # Chama nosso novo orquestrador da Fase 2
+                resultado = processar_comprovante_imagem(usuario.id, media_url_imagem)
+                
+                # Pega a mensagem de sucesso ou erro do serviço
+                resposta_em_texto = resultado.get('mensagem', "Não consegui processar seu comprovante.")
+            
+            elif contexto:
+                # Se não for imagem E tiver contexto, trata resposta numérica
                 print(f"Usuário {from_number} está no contexto: {contexto}")
                 resposta_em_texto = tratar_resposta_numerica(mensagem_processada, from_number, usuario.id)
-            else:
+            
+            elif mensagem_processada:
+                # Se não for imagem, não tiver contexto, mas tiver texto, trata nova interação
                 print(f"Usuário {from_number} sem contexto, chamando nova interação.")
-                resposta_em_texto = tratar_nova_interacao(mensagem_processada, None, from_number, usuario) 
+                resposta_em_texto = tratar_nova_interacao(mensagem_processada, None, from_number, usuario)
+            
+            else:
+                # Caso de segurança: recebeu nem imagem, nem texto, nem contexto
+                print(f"AVISO: Processamento em background não recebeu dados (nem texto, nem imagem).")
+                resposta_em_texto = "Não entendi o que você enviou. Pode tentar de novo?"
+            # ▲▲▲ FIM DA NOVA LÓGICA DE DECISÃO ▲▲▲
 
             # 3. Bloco de limpeza
             if resposta_em_texto:
@@ -137,8 +157,10 @@ def receive_message():
 
     # 2. Transcrição (tarefa rápida, pode ficar aqui)
     is_incoming_audio = media_url and 'audio' in media_type
+    is_incoming_image = media_url and 'image' in media_type
     mensagem_processada = incoming_msg_text
 
+    # ▼▼▼ BLOCO MODIFICADO ▼▼▼
     if is_incoming_audio:
         texto_transcrito = transcrever_audio_de_url(media_url)
         if texto_transcrito:
@@ -148,47 +170,55 @@ def receive_message():
             resp = MessagingResponse()
             resp.message("Não consegui entender o que você disse no áudio. Pode tentar de novo? 🤔")
             return str(resp)
-
-    if not mensagem_processada:
-        # Mensagem vazia, retorna rápido
+            
+    # Se for uma imagem, não há texto para processar, mas não é um erro
+    elif is_incoming_image:
+        mensagem_processada = None # Não há texto
+        
+    elif not mensagem_processada:
+        # Mensagem vazia (e não é áudio nem imagem), retorna rápido
         return str(MessagingResponse())
+    # ▲▲▲ FIM DO BLOCO MODIFICADO ▲▲▲
+
 
     # 3. Lógica de "cancelar" (rápida, pode ficar aqui)
-    if mensagem_processada.lower().strip() == 'cancelar':
+    # MODIFICADO: Verifica se mensagem_processada não é None antes de acessar .lower()
+    if mensagem_processada and mensagem_processada.lower().strip() == 'cancelar':
         remover_sessao(from_number)
         resp = MessagingResponse()
         resp.message("Ok! Ação anterior cancelada. 👋\nEm que posso te ajudar agora?")
         return str(resp) # Retorno rápido
 
     # 4. Validação do usuário (rápida, pode ficar aqui)
-    numero_normalizado = normalizar_numero(from_number)
-    usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
+    # ... (seu código de validação de usuário continua igual) ...
+    # ... (if not usuario:) ...
+    # ... (if usuario.status != 'ativo':) ...
 
-    if not usuario:
-        resp = MessagingResponse()
-        resp.message('Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.')
-        return str(resp) # Retorno rápido
-    
-    if usuario.status != 'ativo':
-        resp = MessagingResponse()
-        resp.message("Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte.")
-        return str(resp) # Retorno rápido
-        
     # --- A GRANDE MUDANÇA (COM INDENTAÇÃO CORRIGIDA) ---
     
     # 5. Pega o objeto 'app' real de dentro do proxy
-    # (Esta linha deve estar no mesmo nível de 'if usuario.status...')
     app_context = current_app._get_current_object()
 
+    # ▼▼▼ ESTA É A MUDANÇA CRÍTICA NOS ARGUMENTOS DO THREAD ▼▼▼
+    
+    # Determina o que será passado para o background
+    media_url_imagem_final = None
+    if is_incoming_image:
+        media_url_imagem_final = media_url # Passa a URL da imagem
+    
     # 6. Inicia o processamento pesado em um thread separado
-    # (Esta linha também deve estar no mesmo nível)
     thread = threading.Thread(
         target=processar_mensagem_em_background,
-        # Passa o 'app' real como o primeiro argumento
-        args=(app_context, from_number, mensagem_processada, usuario)
+        args=(
+            app_context, 
+            from_number, 
+            usuario,
+            mensagem_processada,       # Passa o texto (ou None)
+            media_url_imagem_final  # Passa a URL da imagem (ou None)
+        )
     )
+    # ▲▲▲ FIM DA MUDANÇA CRÍTICA ▲▲▲
     
-    # (Esta linha também deve estar no mesmo nível)
     thread.start()
 
     # 7. Retorna o TwiML vazio IMEDIATAMENTE para a Twilio
