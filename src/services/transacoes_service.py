@@ -296,7 +296,7 @@ def processar_comprovante_imagem(user_id, image_url):
             category_id=categoria_final.id,
             value=abs(valor), # Salva sempre o valor positivo
             description=f"[Comprovante] {descricao}",
-            status='pendente', # IMPORTANTE: Salva como pendente
+            status='confirmada', # IMPORTANTE: Salva como pendente
             format='variavel',
             payment_form='a_vista',
             receipt_image_url=permanent_url # <-- AQUI! Salvamos a URL do Cloudinary
@@ -312,7 +312,7 @@ def processar_comprovante_imagem(user_id, image_url):
         
         return {
             "status": "sucesso",
-            "mensagem": f"Legal! 🧾 Processei seu comprovante e criei um lançamento pendente de *{valor_formatado}* ({descricao}). Você pode confirmá-lo na plataforma."
+            "mensagem": f"Legal! 🧾 Seu comprovante foi processado e o lançamento de *{valor_formatado}* ({descricao}) já está *confirmado*."
         }
 
     except Exception as e:
