@@ -39,9 +39,24 @@ const HomePage = () => {
   };
 
   const pricing = {
-    monthly: { oldPrice: "R$ 89,90", price: "24,90", period: "Por mês", description: "Menos de um cafézinho por dia.", buttonText: "Quero assinar mensal", savings: null },
-    annual: { oldPrice: "R$ 298,80", price: "198,90", period: "Por ano (à vista)", description: "Equivalente a R$ 16,57 por mês.", buttonText: "Quero assinar anual", savings: "Economize R$ 100,00 no ano" }
+    monthly: {
+      oldPrice: "R$ 89,90",
+      price: "24,90",
+      period: "Por mês",
+      description: "Menos de um cafézinho por dia.",
+      buttonText: "Quero assinar mensal",
+      savings: null
+    },
+    annual: {
+        oldPrice: "R$ 298,80", 
+        price: "198,90",
+        period: "Por ano (à vista)",
+        description: "Equivalente a R$ 16,57 por mês.",
+        buttonText: "Quero assinar anual",
+        savings: "Economize R$ 100,00 no ano"
+      }
   };
+
   const currentPlan = pricing[billingCycle];
 
   return (
@@ -148,19 +163,29 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO IA --- */}
+       {/* --- SEÇÃO DESTAQUE IA (WhatsApp) --- */}
       <section id="ia" className="py-20 bg-green-600 text-white overflow-hidden">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
-            <img src="/assets/image_74563a.png" alt="Chat WhatsApp Simplific" className="rounded-2xl shadow-2xl border-4 border-green-400/30 mx-auto" />
+            <img 
+              src="/assets/image_74563a.png"
+              alt="Chat WhatsApp Simplific" 
+              className="rounded-2xl shadow-2xl border-4 border-green-400/30 mx-auto"
+            />
           </div>
           <div className="order-1 md:order-2 space-y-6">
-            <div className="inline-block bg-green-800/50 px-3 py-1 rounded-full text-sm font-semibold text-green-200">🤖 Tecnologia Exclusiva</div>
+            <div className="inline-block bg-green-800/50 px-3 py-1 rounded-full text-sm font-semibold text-green-200">
+              🤖 Tecnologia Exclusiva
+            </div>
             <h2 className="text-3xl md:text-5xl font-bold">Seu Assessor Financeiro no WhatsApp</h2>
-            <p className="text-green-100 text-lg leading-relaxed">Registre gastos, consulte seu orçamento, agende compromissos e tire dúvidas diretamente do seu WhatsApp.</p>
+            <p className="text-green-100 text-lg leading-relaxed">
+              Registre gastos, consulte seu orçamento, agende compromissos, receba lembretes e tire dúvidas diretamente do seu WhatsApp, por texto ou por áudio você escolhe.
+            </p>
             <ul className="space-y-3">
               <li className="flex items-center gap-3"><CheckCircle className="text-green-300" /> Acesso fácil e didático</li>
+              <li className="flex items-center gap-3"><CheckCircle className="text-green-300" /> Integrado com principais corretoras</li>
               <li className="flex items-center gap-3"><CheckCircle className="text-green-300" /> Comandos por voz ou texto</li>
+              <li className="flex items-center gap-3"><CheckCircle className="text-green-300" /> Sua plataforma direto no whatsapp</li>
             </ul>
             
             {/* BOTÃO 3: Link direto para Checkout (IA) */}
@@ -174,36 +199,74 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO OFERTA --- */}
+       {/* --- SEÇÃO DE OFERTA (Planos Mensal/Anual) --- */}
       <section id="oferta" className="py-24 bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
+          
+          {/* Toggle Mensal/Anual */}
           <div className="flex justify-center mb-12">
             <div className="bg-gray-200 p-1 rounded-full flex items-center relative">
-                <button onClick={() => setBillingCycle('monthly')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600'}`}>Mensal</button>
-                <button onClick={() => setBillingCycle('annual')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${billingCycle === 'annual' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600'}`}>Anual</button>
+                <button 
+                    onClick={() => setBillingCycle('monthly')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold transition-all relative z-10 ${billingCycle === 'monthly' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
+                >
+                    Mensal
+                </button>
+                <button 
+                    onClick={() => setBillingCycle('annual')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold transition-all relative z-10 flex items-center ${billingCycle === 'annual' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-800'}`}
+                >
+                    Anual
+                    {billingCycle === 'annual' && (
+                         <span className="absolute -top-3 -right-3 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full uppercase">Economize</span>
+                    )}
+                </button>
             </div>
           </div>
 
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 relative">
-            {currentPlan.savings && (<div className="bg-green-500 text-white text-center text-sm font-bold py-2 absolute top-0 w-full z-10">🎉 {currentPlan.savings}</div>)}
+            {/* Faixa de Economia (só aparece no anual) */}
+            {currentPlan.savings && (
+                <div className="bg-green-500 text-white text-center text-sm font-bold py-2 absolute top-0 w-full z-10">
+                    🎉 {currentPlan.savings}
+                </div>
+            )}
+            
             <div className={`bg-green-600 p-6 text-center ${currentPlan.savings ? 'mt-8' : ''}`}>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Sua Oportunidade</h2>
-              <p className="text-green-100">Acesso ilimitado</p>
+              <p className="text-green-100">Acesso ilimitado a todas as funcionalidades</p>
             </div>
+            
             <div className="p-8 md:p-12 text-center">
               <div className="inline-block bg-yellow-100 border border-yellow-200 px-4 py-2 rounded-lg mb-6">
                 <span className="text-yellow-800 font-medium text-sm line-through mr-2">{currentPlan.oldPrice}</span>
                 <span className="text-yellow-800 font-bold">por apenas</span>
               </div>
+
               <div className="flex justify-center items-baseline gap-1 mb-2">
                 <span className="text-2xl text-gray-500 font-medium">R$</span>
                 <span className="text-6xl md:text-7xl font-extrabold text-green-600">{currentPlan.price}</span>
               </div>
               <p className="text-gray-500 mb-8 font-medium">{currentPlan.period}</p>
 
-              <Button onClick={handleBuyClick} className="w-full md:w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-8 rounded-xl shadow-xl hover:shadow-green-600/30 transition-all animate-pulse">
-                {currentPlan.buttonText} <ArrowRight className="ml-2" />
+              <p className="text-sm text-gray-500 mb-8">
+                ☕ {currentPlan.description}
+              </p>
+
+              <Button 
+                onClick={handleBuyClick} 
+                className="w-full md:w-2/3 bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-8 rounded-xl shadow-xl hover:shadow-green-600/30 transition-all animate-pulse"
+              >
+                {currentPlan.buttonText}
+                <ArrowRight className="ml-2" />
               </Button>
+
+              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-500">
+                <div className="flex items-center justify-center gap-1"><ShieldCheck size={16} className="text-green-600"/> Dados Seguros</div>
+                <div className="flex items-center justify-center gap-1"><Target size={16} className="text-green-600"/> Cancele quando quiser</div>
+                <div className="flex items-center justify-center gap-1"><MessageCircle size={16} className="text-green-600"/> Suporte Premium</div>
+                <div className="flex items-center justify-center gap-1"><CheckCircle size={16} className="text-green-600"/> Acesso Imediato</div>
+              </div>
             </div>
           </div>
         </div>
@@ -212,9 +275,28 @@ const HomePage = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-3xl font-bold text-center mb-12">Perguntas Frequentes</h2>
+          
           <div className="space-y-2">
-            <FaqItem question="Meus dados financeiros estão seguros?" answer="Sim! Utilizamos criptografia de ponta a ponta." />
-            <FaqItem question="Posso cancelar a assinatura quando quiser?" answer="Com certeza. Sem contratos de fidelidade." />
+            <FaqItem 
+              question="Meus dados financeiros estão seguros?" 
+              answer="Sim! Utilizamos criptografia de ponta a ponta e seguimos rigorosamente as leis de proteção de dados. Suas informações são suas e de mais ninguém." 
+            />
+            <FaqItem 
+              question="Posso cancelar a assinatura quando quiser?" 
+              answer="Com certeza. Sem contratos de fidelidade longos ou letras miúdas. Você pode cancelar a renovação automática a qualquer momento pelo painel." 
+            />
+             <FaqItem 
+              question="O Simplific Pro funciona no celular?" 
+              answer="Sim, nossa plataforma é 100% responsiva e funciona perfeitamente no navegador do seu celular. Além disso, você tem o Assessor via WhatsApp que é nativo mobile." 
+            />
+            <FaqItem 
+              question="Como funciona a integração com corretoras?" 
+              answer="Utilizamos parceiros homologados pelo Banco Central para conectar sua conta de investimento de forma segura, permitindo a leitura automática do seu saldo e ativos." 
+            />
+            <FaqItem 
+              question="Preciso de conhecimento técnico para usar?" 
+              answer="Zero! O Simplific Pro foi desenhado para ser intuitivo. Se você sabe mandar mensagem no WhatsApp, você sabe usar nossa plataforma." 
+            />
           </div>
         </div>
       </section>
