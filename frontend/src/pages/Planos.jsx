@@ -8,7 +8,7 @@ const Planos = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   // LINKS
-  const MONTHLY_LINK = "SEU_LINK_MENSAL_AQUI"; // Cole seu link mensal
+  const MONTHLY_LINK = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=32b3ed00690942218ea5daaa362ac55d"; // Cole seu link mensal
   const ANNUAL_LINK = "#"; // Cole seu link anual aqui quando tiver
 
   const handleSubscribe = () => {
