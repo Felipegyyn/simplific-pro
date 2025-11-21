@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Importamos o hook aqui
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ShieldCheck, Target, Zap } from 'lucide-react';
+import { CheckCircle, ShieldCheck, Target, Zap, ArrowRight } from 'lucide-react';
 
 const Planos = () => {
+  const navigate = useNavigate(); // 2. Iniciamos a função de navegação aqui
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   // LINKS
-  const MONTHLY_LINK = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=32b3ed00690942218ea5daaa362ac55d"; // Cole seu link mensal
   const ANNUAL_LINK = "#"; // Cole seu link anual aqui quando tiver
 
   const handleSubscribe = () => {
-    if (billingCycle === 'monthly') window.location.href = MONTHLY_LINK;
-    else if (ANNUAL_LINK !== "#") window.location.href = ANNUAL_LINK;
-    else alert("Link anual em breve!");
+    if (billingCycle === 'monthly') {
+        // 3. Se for mensal, vai para a nossa página interna de Checkout
+        navigate('/checkout');
+    } else {
+        // Se for anual, continua usando o link externo (se houver)
+        if (ANNUAL_LINK !== "#") {
+             window.location.href = ANNUAL_LINK;
+        } else {
+            alert("Link anual em breve!");
+        }
+    }
   };
 
   const isAnnual = billingCycle === 'annual';
@@ -75,6 +84,7 @@ const Planos = () => {
                     className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-8 rounded-xl shadow-lg mb-8"
                 >
                     {isAnnual ? 'Quero o Plano Anual' : 'Quero o Plano Mensal'}
+                    <ArrowRight className="ml-2" />
                 </Button>
 
                 <div className="space-y-4 text-left">

@@ -133,6 +133,7 @@ return (
             <Route path="/beneficios" element={<Beneficios />} />
             <Route path="/inteligencia" element={<Inteligencia />} />
             <Route path="/planos" element={<Planos />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/termos" element={<Termos />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/contato" element={<Contato />} />

@@ -48,9 +48,10 @@ const HomePage = () => {
   const ANNUAL_CHECKOUT_LINK = "#"; // Cole seu link anual aqui quando tiver
 
   const handleBuyClick = () => {
-    if (billingCycle === 'monthly') {
-        window.location.href = MONTHLY_CHECKOUT_LINK;
-    } else {
+  // Se for mensal, vai para nosso checkout transparente
+  if (billingCycle === 'monthly') {
+      navigate('/checkout'); 
+  } else {
         if (ANNUAL_CHECKOUT_LINK !== "#") {
              window.location.href = ANNUAL_CHECKOUT_LINK;
         } else {
