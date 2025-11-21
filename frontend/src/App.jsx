@@ -24,6 +24,15 @@ import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
+// --- NOVO: Importando as Páginas da Landing Page ---
+import Beneficios from './pages/Beneficios';
+import Inteligencia from './pages/Inteligencia';
+import Planos from './pages/Planos';
+import Termos from './pages/Termos';
+import Privacidade from './pages/Privacidade';
+import Contato from './pages/Contato';
+// --------------------------------------------------
+
 // Serviços
 import notificationService from './services/notifications';
 
@@ -118,6 +127,17 @@ return (
     <Router>
       <ThemeProvider> {/* <-- ADICIONE A TAG DE ABERTURA AQUI */}
         <Routes>
+
+        {/* --- NOVO: Rotas Públicas da Landing Page --- */}
+            {/* Elas ficam acessíveis mesmo sem login */}
+            <Route path="/beneficios" element={<Beneficios />} />
+            <Route path="/inteligencia" element={<Inteligencia />} />
+            <Route path="/planos" element={<Planos />} />
+            <Route path="/termos" element={<Termos />} />
+            <Route path="/privacidade" element={<Privacidade />} />
+            <Route path="/contato" element={<Contato />} />
+            {/* ------------------------------------------- */}
+
             <Route 
                 path="/login" 
                 element={user ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />} 
