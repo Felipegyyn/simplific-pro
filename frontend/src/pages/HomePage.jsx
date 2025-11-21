@@ -17,8 +17,6 @@ import {
   Smartphone
 } from 'lucide-react';
 
-import { Smartphone } from 'lucide-react'; // (O último import que já estava lá)
-
 // ▼▼▼ ADICIONE ESTAS LINHAS ▼▼▼
 import dashboardImg from '@/assets/image_745581.png';
 import whatsappImg from '@/assets/image_74563a.png';
