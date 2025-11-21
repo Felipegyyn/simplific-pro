@@ -3,7 +3,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, MessageCircle } from 'lucide-react';
-import whatsappImg from '@/assets/image_74563a.png'; // Usando a mesma imagem da Home
+
+// REMOVEMOS O IMPORT DA IMAGEM AQUI
 
 const Inteligencia = () => {
   const capabilities = [
@@ -36,13 +37,16 @@ const Inteligencia = () => {
                 <p className="text-lg text-green-100 mb-8 leading-relaxed">
                     Imagine ter um especialista financeiro disponível 24h por dia para organizar sua vida. Você manda um áudio, ele entende, registra e te aconselha.
                 </p>
-                <Button className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-6 h-auto rounded-xl">
-                    <MessageCircle className="mr-2" /> Falar com o Simplific
-                </Button>
+                <a href="/planos">
+                    <Button className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-6 h-auto rounded-xl">
+                        <MessageCircle className="mr-2" /> Falar com o Simplific
+                    </Button>
+                </a>
             </div>
             <div className="flex justify-center">
+                 {/* AQUI ESTÁ A CORREÇÃO: Caminho direto para a pasta pública */}
                  <img 
-                  src={whatsappImg} 
+                  src="/assets/image_74563a.png" 
                   alt="Chat WhatsApp" 
                   className="rounded-2xl shadow-2xl border-4 border-green-500/50 max-w-sm w-full"
                 />
