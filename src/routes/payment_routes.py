@@ -1,57 +1,95 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import User
 from src.models.db import db
 from src.services.payment_service import create_subscription
 from datetime import datetime, timedelta
+from src.extensions import bcrypt # Precisamos disso para criar senha
 
 payment_bp = Blueprint('payment', __name__)
 
 @payment_bp.route('/process_subscription', methods=['POST'])
-@jwt_required() # Exige que o usuário esteja logado/cadastrado
+# REMOVIDO: @jwt_required() -> Agora é uma rota pública
 def process_subscription_route():
     """
-    Recebe o token do cartão do frontend e cria a assinatura.
+    Recebe dados do pagador e token do cartão.
+    Cria o usuário (se não existir) e a assinatura.
     """
-    user_id = get_jwt_identity()
     data = request.get_json()
-    
     card_token = data.get('card_token')
+    payer_data = data.get('payer_data', {})
+
+    email = payer_data.get('email')
+    name = payer_data.get('name')
+    whatsapp = payer_data.get('whatsapp')
     
-    if not card_token:
-        return jsonify({"error": "Token do cartão não fornecido."}), 400
+    if not card_token or not email:
+        return jsonify({"error": "Dados incompletos (Token ou Email faltando)."}), 400
 
-    # Busca o usuário no banco para pegar o e-mail correto
-    user = User.query.get(user_id)
+    # 1. Tenta encontrar o usuário pelo e-mail
+    user = User.query.filter_by(email=email).first()
+    
+    is_new_user = False
+    temp_password = None
+
+    # 2. Se não existir, CRIA O USUÁRIO
     if not user:
-        return jsonify({"error": "Usuário não encontrado."}), 404
+        is_new_user = True
+        # Gera uma senha padrão simples para o primeiro acesso (ou aleatória)
+        # O ideal é enviar por e-mail depois. Por enquanto, vamos padronizar para facilitar o teste.
+        temp_password = "mudar@123" 
+        hashed_password = bcrypt.generate_password_hash(temp_password).decode('utf-8')
+        
+        user = User(
+            name=name or "Novo Usuário",
+            email=email,
+            whatsapp=whatsapp or "",
+            password_hash=hashed_password,
+            status='pending', # Fica pendente até o pagamento aprovar
+            profile='user'
+        )
+        db.session.add(user)
+        try:
+            db.session.commit() # Commita para gerar o ID
+            print(f"Novo usuário criado no checkout: {email}")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao criar usuário: {e}")
+            return jsonify({"error": "Erro ao criar cadastro."}), 500
 
-    # Chama o serviço que criamos no passo anterior
-    # Valor fixo de 24.90 por enquanto
+    # 3. Processa o Pagamento (Assinatura)
+    # Chama o serviço do Mercado Pago
     result = create_subscription(user.email, card_token, amount=24.90)
 
     if result['status'] == 'success':
-        # SUCESSO! Atualiza o usuário no banco
+        # SUCESSO! Ativa o usuário
         try:
             user.status = 'ativo'
-            user.profile = 'premium' # ou o perfil que você usa
-            # Dá 32 dias de acesso (margem de segurança para renovação)
+            user.profile = 'premium'
             user.subscription_valid_until = datetime.utcnow() + timedelta(days=32)
-            user.subscription_id = result['id'] # Salva o ID do MP para cancelar depois se precisar
+            user.subscription_id = result['id']
+            
+            # Se forneceu nome/zap agora e antes estava vazio, atualiza
+            if name: user.name = name
+            if whatsapp: user.whatsapp = whatsapp
             
             db.session.commit()
             
+            msg = "Assinatura realizada com sucesso!"
+            if is_new_user:
+                msg += f" Sua conta foi criada. Senha provisória: {temp_password}"
+            
             return jsonify({
-                "message": "Assinatura realizada com sucesso!",
-                "subscription_id": result['id']
+                "message": msg,
+                "subscription_id": result['id'],
+                "new_user": is_new_user
             }), 200
             
         except Exception as e:
-            print(f"Erro ao atualizar usuário no banco: {e}")
+            print(f"Erro ao atualizar usuário após pagamento: {e}")
             db.session.rollback()
-            return jsonify({"error": "Pagamento aprovado, mas erro ao atualizar conta. Contate suporte."}), 500
+            return jsonify({"error": "Pagamento aprovado, mas erro interno. Contate suporte."}), 500
     else:
-        # ERRO NO PAGAMENTO
+        # FALHA NO PAGAMENTO
         return jsonify({
             "error": "Falha no pagamento.",
             "detail": result.get('detail')

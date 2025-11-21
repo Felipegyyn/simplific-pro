@@ -1,46 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ShieldCheck, Lock } from 'lucide-react';
+import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 
 // INICIALIZA O MERCADO PAGO
-// Substitua pela sua PUBLIC KEY (aquela que começa com APP_USR-...)
+// (Certifique-se de que sua PUBLIC KEY está correta aqui)
 initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
 
 const Checkout = () => {
   const navigate = useNavigate();
   const [amount] = useState(24.90); // Valor da assinatura
-  const [userToken, setUserToken] = useState(null);
+  
+  // Estado para os dados do cliente
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    whatsapp: ''
+  });
 
-  useEffect(() => {
-    // Verifica se o usuário está logado
-    const token = localStorage.getItem('simplific_token');
-    const user = localStorage.getItem('simplific_user');
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    if (!token || !user) {
-      // Se não estiver logado, manda para o login e salva que ele queria fazer checkout
-      alert("Para sua segurança, faça login ou crie uma conta antes de assinar.");
-      navigate('/login');
-    } else {
-      setUserToken(token);
+  const onSubmit = async (mpFormData) => {
+    // Validação básica
+    if (!formData.name || !formData.email || !formData.whatsapp) {
+        alert("Por favor, preencha seus dados pessoais (Nome, E-mail e WhatsApp) antes de pagar.");
+        return;
     }
-  }, [navigate]);
 
-  const onSubmit = async (formData) => {
-    // Callback chamado quando o usuário clica em "Pagar" no formulário do MP
     try {
-      const { token } = formData; // O 'token' do cartão gerado pelo MP
+      const { token } = mpFormData; // Token do cartão gerado pelo Mercado Pago
 
+      // Envia tudo para o backend (Cartão + Dados Pessoais)
       const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}` // Envia o token de login para o backend saber quem é
+          'Content-Type': 'application/json'
+          // REMOVIDO: Authorization Header (Agora é público)
         },
         body: JSON.stringify({
-          card_token: token
+          card_token: token,
+          payer_data: formData // Enviamos os dados do formulário
         }),
       });
 
@@ -48,10 +52,10 @@ const Checkout = () => {
 
       if (response.ok) {
         // SUCESSO!
-        alert("Pagamento Aprovado! Bem-vindo ao Simplific Pro Premium.");
-        navigate('/dashboard'); // Redireciona para o painel
+        // Aqui você pode redirecionar para uma página de "Obrigado" ou "Definir Senha"
+        alert("Pagamento Aprovado! Enviamos os dados de acesso para seu e-mail.");
+        navigate('/login'); 
       } else {
-        // ERRO DO BACKEND
         console.error(data);
         alert("Erro ao processar pagamento: " + (data.error || "Tente novamente."));
       }
@@ -66,7 +70,6 @@ const Checkout = () => {
   };
 
   const onReady = async () => {
-    // O formulário carregou e está pronto
     console.log("Brick pronto");
   };
 
@@ -77,11 +80,52 @@ const Checkout = () => {
       <div className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
-          {/* Coluna da Esquerda: Resumo do Pedido */}
+          {/* Coluna da Esquerda: Dados Pessoais + Resumo */}
           <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Finalizar Assinatura</h1>
-                <p className="text-gray-600">Você está a um passo de transformar sua vida financeira.</p>
+                <p className="text-gray-600">Preencha seus dados para criar sua conta.</p>
+            </div>
+
+            {/* FORMULÁRIO DE DADOS PESSOAIS (NOVO) */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
+                <h3 className="font-bold text-gray-800 border-b pb-2">Seus Dados</h3>
+                
+                <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><User size={16}/> Nome Completo</label>
+                    <input 
+                        type="text" 
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Como você quer ser chamado?"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><Mail size={16}/> E-mail</label>
+                    <input 
+                        type="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Seu melhor e-mail para login"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><Phone size={16}/> WhatsApp</label>
+                    <input 
+                        type="tel" 
+                        name="whatsapp"
+                        value={formData.whatsapp}
+                        onChange={handleInputChange}
+                        placeholder="(00) 00000-0000"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                    />
+                </div>
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
@@ -90,30 +134,20 @@ const Checkout = () => {
                     <span>Assinatura Simplific Pro (Mensal)</span>
                     <span className="font-bold">R$ 24,90</span>
                 </div>
-                <div className="text-sm text-green-600 mb-4">Renovação automática mensal. Cancele quando quiser.</div>
-                
                 <div className="flex justify-between items-center border-t pt-4 text-xl font-bold text-gray-900">
                     <span>Total Hoje:</span>
                     <span>R$ 24,90</span>
                 </div>
             </div>
-
-            <div className="flex items-center gap-3 text-sm text-gray-500 bg-green-50 p-4 rounded-xl border border-green-100">
-                <ShieldCheck className="text-green-600 w-6 h-6" />
-                <div>
-                    <p className="font-bold text-green-800">Pagamento 100% Seguro</p>
-                    <p>Seus dados são processados diretamente pelo Mercado Pago. Nós não armazenamos os números do seu cartão.</p>
-                </div>
-            </div>
           </div>
 
-          {/* Coluna da Direita: Formulário do Mercado Pago */}
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+          {/* Coluna da Direita: Pagamento */}
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 h-fit">
             <div className="flex items-center gap-2 mb-6 text-gray-700 font-medium">
-                <Lock size={18} /> Dados de Pagamento
+                <Lock size={18} /> Dados de Pagamento (Mercado Pago)
             </div>
             
-            {/* O COMPONENTE MÁGICO DO MERCADO PAGO */}
+            {/* Componente do Mercado Pago */}
             <CardPayment
               initialization={{ amount: amount }}
               onSubmit={onSubmit}
@@ -122,16 +156,18 @@ const Checkout = () => {
               customization={{
                 paymentMethods: {
                   minInstallments: 1,
-                  maxInstallments: 1, // Assinatura geralmente é 1x
+                  maxInstallments: 1,
                 },
                 visual: {
-                  style: {
-                    theme: 'default', // 'default', 'dark', 'bootstrap' or 'flat'
-                  },
+                  style: { theme: 'default' },
                   hidePaymentButton: false,
                 },
               }}
             />
+            
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                <ShieldCheck size={14} /> Pagamento processado em ambiente seguro
+            </div>
           </div>
 
         </div>
