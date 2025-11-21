@@ -31,6 +31,7 @@ import Planos from './pages/Planos';
 import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
 import Contato from './pages/Contato';
+import Checkout from './pages/Checkout';
 // --------------------------------------------------
 
 // Serviços
