@@ -45,6 +45,7 @@ from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
 from src.routes.routes_whatsapp import whatsapp_bp
 from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
 from src.routes.chat_bp import chat_bp
+from src.routes.payment_routes import payment_bp
 from apscheduler.schedulers.background import BackgroundScheduler
 from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, verificar_lancamentos_pendentes
 
