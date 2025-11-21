@@ -17,6 +17,13 @@ import {
   Smartphone
 } from 'lucide-react';
 
+import { Smartphone } from 'lucide-react'; // (O último import que já estava lá)
+
+// ▼▼▼ ADICIONE ESTAS LINHAS ▼▼▼
+import dashboardImg from '@/assets/image_745581.png';
+import whatsappImg from '@/assets/image_74563a.png';
+// ▲▲▲ FIM DAS LINHAS ▲▲▲
+
 // --- Componente de FAQ (Pergunta e Resposta) ---
 const FaqItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,7 +48,7 @@ const HomePage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // COLOQUE SEU LINK DO MERCADO PAGO AQUI
-  const CHECKOUT_LINK = "SEU_LINK_MERCADO_PAGO_AQUI"; 
+  const CHECKOUT_LINK = "https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=32b3ed00690942218ea5daaa362ac55d"; 
 
   const handleBuyClick = () => {
     window.location.href = CHECKOUT_LINK;
@@ -127,10 +134,10 @@ const HomePage = () => {
             {/* Placeholder para a imagem do Dashboard/Celular */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-2 shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500">
                <img 
-                 src="/assets/image_745581.png" // AJUSTE O NOME DO ARQUIVO AQUI
-                 alt="Dashboard Simplific Pro" 
-                 className="rounded-xl w-full h-auto shadow-inner"
-               />
+  src={dashboardImg} 
+  alt="Dashboard Simplific Pro" 
+  className="rounded-xl w-full h-auto shadow-inner"
+/>
             </div>
           </div>
         </div>
@@ -212,10 +219,10 @@ const HomePage = () => {
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
             <img 
-              src="/assets/image_74563a.png" // AJUSTE O NOME DO ARQUIVO AQUI (IA)
-              alt="Chat WhatsApp Simplific" 
-              className="rounded-2xl shadow-2xl border-4 border-green-400/30 mx-auto"
-            />
+  src={whatsappImg} 
+  alt="Chat WhatsApp Simplific" 
+  className="rounded-2xl shadow-2xl border-4 border-green-400/30 mx-auto"
+/>
           </div>
           <div className="order-1 md:order-2 space-y-6">
             <div className="inline-block bg-green-800/50 px-3 py-1 rounded-full text-sm font-semibold text-green-200">
