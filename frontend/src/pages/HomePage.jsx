@@ -17,10 +17,7 @@ import {
   Smartphone
 } from 'lucide-react';
 
-// ▼▼▼ ADICIONE ESTAS LINHAS ▼▼▼
-import dashboardImg from '@/assets/image_745581.png';
-import whatsappImg from '@/assets/image_74563a.png';
-// ▲▲▲ FIM DAS LINHAS ▲▲▲
+
 
 // --- Componente de FAQ (Pergunta e Resposta) ---
 const FaqItem = ({ question, answer }) => {
@@ -132,7 +129,7 @@ const HomePage = () => {
             {/* Placeholder para a imagem do Dashboard/Celular */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-2 shadow-2xl transform rotate-2 hover:rotate-0 transition-all duration-500">
                <img 
-  src={dashboardImg} 
+  src="/assets/image_745581.png"  // <-- Caminho direto (começa com /)
   alt="Dashboard Simplific Pro" 
   className="rounded-xl w-full h-auto shadow-inner"
 />
@@ -217,7 +214,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="order-2 md:order-1">
             <img 
-  src={whatsappImg} 
+  src="/assets/image_74563a.png"  // <-- Caminho direto (começa com /)
   alt="Chat WhatsApp Simplific" 
   className="rounded-2xl shadow-2xl border-4 border-green-400/30 mx-auto"
 />
