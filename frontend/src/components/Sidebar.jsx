@@ -1,70 +1,51 @@
 import React, { useState, useRef } from 'react';
-import apiService from '../services/api';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, Settings, BarChart3, Bot, Award 
+  LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
+  Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
+  Settings, BarChart3, Bot, Award 
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
+import { cn } from "@/lib/utils"; // Importando utilitário de classes (se disponível)
 
-// 1. Aceita as novas propriedades para controlar o menu no celular
 const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
-  // 2. Estado separado para controlar o menu no desktop
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
   const navigate = useNavigate();
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
-  // ▼▼▼ COLE O BLOCO ABAIXO ▼▼▼
-const [isUploading, setIsUploading] = useState(false);
-const fileInputRef = useRef(null);
-
-const handleProfilePictureChange = async (event) => {
+  const handleProfilePictureChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     setIsUploading(true);
-
     const formData = new FormData();
     formData.append('profile_picture', file);
 
     try {
-    // Pega o token de autenticação diretamente do localStorage
-    const token = localStorage.getItem('simplific_token');
-    if (!token) {
-        throw new Error('Token de autenticação não encontrado. Faça o login novamente.');
-    }
+      const token = localStorage.getItem('simplific_token');
+      if (!token) throw new Error('Token não encontrado.');
 
-    // Usa a API 'fetch' nativa do navegador para controle total
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile-picture`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile-picture`, {
         method: 'POST',
-        headers: {
-            // NÃO definimos 'Content-Type'. O navegador faz isso
-            // automaticamente para FormData, incluindo o 'boundary' correto.
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
-    });
+      });
 
-    const result = await response.json();
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erro no servidor.');
 
-    if (!response.ok) {
-        // Se a resposta não for OK (ex: 400, 500), lança um erro com a mensagem da API
-        throw new Error(result.error || 'Erro no servidor. Tente novamente.');
+      const updatedUser = { ...user, profile_image_url: result.profile_image_url };
+      localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Erro ao fazer upload:", error);
+      alert(error.message);
+    } finally {
+      setIsUploading(false);
     }
-
-    // Se o upload foi bem-sucedido, atualiza o localStorage e recarrega a página
-    const updatedUser = { ...user, profile_image_url: result.profile_image_url };
-    localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
-
-    window.location.reload();
-
-} catch (error) {
-    console.error("Erro ao fazer upload da foto de perfil:", error);
-    // Exibe a mensagem de erro específica que criamos
-    alert(error.message);
-} finally {
-    setIsUploading(false);
-}
-};
-// ▲▲▲ FIM DO BLOCO ▲▲▲
+  };
 
   const modules = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -92,109 +73,117 @@ const handleProfilePictureChange = async (event) => {
     onLogout();
   };
 
-  // 3. Função para fechar o menu no celular ao clicar em um link
   const handleLinkClick = () => {
-    if (isMobileOpen) {
-      closeMobileMenu();
-    }
+    if (isMobileOpen) closeMobileMenu();
   };
 
   return (
-    // 4. Lógica de classes totalmente refeita para separar mobile e desktop
-    <div className={`
-      fixed inset-y-0 left-0 z-30 
-      flex flex-col bg-white dark:bg-slate-800 h-screen p-4 border-r dark:border-slate-700 
-      transition-transform duration-300 ease-in-out 
-      md:relative md:transition-all 
-      ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-      md:translate-x-0
-      md:${isDesktopOpen ? 'w-64' : 'w-20'}
-    `}>
+    <div 
+      className={cn(
+        // BASE:
+        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
+        // ESTILO:
+        "bg-background/95 backdrop-blur-xl border-border/60", // Efeito de vidro
+        // LÓGICA MOBILE/DESKTOP:
+        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        isDesktopOpen ? "md:w-64" : "md:w-20"
+      )}
+    >
+      {/* BOTÃO TOGGLE (Setinha) */}
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
-        className="absolute -right-3 top-9 bg-white dark:bg-slate-700 border dark:border-slate-600 rounded-full p-1.5 z-10 text-gray-600 dark:text-slate-300 hidden md:block"
+        className="absolute -right-3 top-9 bg-background border border-border rounded-full p-1.5 z-10 text-muted-foreground hover:text-foreground shadow-sm transition-colors hidden md:block"
       >
-        {isDesktopOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+        {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>
 
-      <div className="flex items-center gap-3 mb-8">
-        <img src={logo} alt="Simplific Pro" className="h-8 w-auto" />
-        {isDesktopOpen && <h1 className="text-xl font-bold text-green-800 dark:text-green-400 whitespace-nowrap">Simplific Pro</h1>}
+      {/* LOGO */}
+      <div className={cn("flex items-center gap-3 mb-6 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
+        <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0" />
+        {isDesktopOpen && (
+            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent whitespace-nowrap">
+                Simplific Pro
+            </span>
+        )}
       </div>
 
-      <nav className="flex-1 space-y-2">
+      {/* MENU DE NAVEGAÇÃO */}
+      <nav className="flex-1 space-y-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border">
         {visibleModules.map((module) => (
           <NavLink
             key={module.name}
             to={module.path}
-            onClick={handleLinkClick} // Adicionado para fechar no mobile
+            onClick={handleLinkClick}
             className={({ isActive }) => 
-              `flex items-center p-2 rounded-lg transition-colors duration-200 ${
+              cn(
+                "flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                !isDesktopOpen && "justify-center",
                 isActive 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
-                : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
-              }`
+                  ? "bg-primary/10 text-primary font-medium shadow-sm" // Ativo
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground" // Inativo
+              )
             }
           >
-            <module.icon className="h-5 w-5" />
-            {isDesktopOpen && <span className="ml-4 whitespace-nowrap">{module.name}</span>}
+            <module.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
+            
+            {isDesktopOpen && <span className="whitespace-nowrap text-sm">{module.name}</span>}
+            
+            {/* Tooltip para quando fechado */}
+            {!isDesktopOpen && (
+                <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
+                    {module.name}
+                </span>
+            )}
           </NavLink>
         ))}
       </nav>
 
-{/* ▼▼▼ SUBSTITUA O BLOCO INTEIRO DO PERFIL POR ESTE ▼▼▼ */}
-  <div className="border-t pt-4 dark:border-slate-700">
-    {/* Input de arquivo, invisível para o usuário */}
-    <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleProfilePictureChange}
-        className="hidden"
-        accept="image/png, image/jpeg"
-    />
-    <div 
-        className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 cursor-pointer"
-        onClick={() => !isUploading && fileInputRef.current.click()}
-        title="Alterar foto de perfil"
-    >
-      <div className="relative">
-        {/* Lógica para exibir a imagem ou a inicial */}
-        {user?.profile_image_url ? (
-            <img 
-                src={user.profile_image_url} 
-                alt="Foto de Perfil" 
-                className="h-10 w-10 rounded-full object-cover" 
-            />
-        ) : (
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center font-bold text-gray-600 dark:text-slate-300">
-                {user?.name?.charAt(0).toUpperCase()}
-            </div>
-        )}
+      {/* PERFIL DO USUÁRIO (RODAPÉ) */}
+      <div className="p-4 border-t border-border/60 bg-muted/20 mt-auto">
+        <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleProfilePictureChange}
+            className="hidden"
+            accept="image/png, image/jpeg"
+        />
+        
+        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent/50 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
+          <div className="relative shrink-0">
+            {user?.profile_image_url ? (
+                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-sm border border-border" />
+            ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary border border-primary/20">
+                    {user?.name?.charAt(0).toUpperCase()}
+                </div>
+            )}
+            {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-[1px]">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                </div>
+            )}
+          </div>
 
-        {/* Animação de loading durante o upload */}
-        {isUploading && (
-            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60">
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+          {isDesktopOpen && (
+            <div className="flex-1 overflow-hidden">
+              <p className="font-medium text-sm truncate text-foreground">{user?.name}</p>
+              <p className="text-xs text-muted-foreground truncate">Editar foto</p>
             </div>
-        )}
-      </div>
-
-      {isDesktopOpen && (
-        <div className="ml-4">
-          <p className="font-semibold text-sm whitespace-nowrap text-gray-800 dark:text-slate-200">{user?.name}</p>
-          <p className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap">Simplific Pro</p>
+          )}
         </div>
-      )}
-    </div>
-    <button 
-      onClick={handleLogoutClick}
-      className="flex items-center p-2 mt-2 w-full rounded-lg text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-    >
-      <LogOut className="h-5 w-5" />
-      {isDesktopOpen && <span className="ml-4 whitespace-nowrap">Sair</span>}
-    </button>
-  </div>
-{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
+
+        <button 
+          onClick={handleLogoutClick}
+          className={cn(
+            "flex items-center w-full mt-2 p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
+            !isDesktopOpen && "justify-center"
+          )}
+          title="Sair"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Sair</span>}
+        </button>
+      </div>
     </div>
   );
 };
