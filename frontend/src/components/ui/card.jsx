@@ -10,7 +10,22 @@ function Card({
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        // --- MUDANÇAS AQUI ---
+        // 1. Base: Cor de fundo e texto (mantém o tema)
+        "bg-card text-card-foreground flex flex-col gap-6",
+        
+        // 2. Arredondamento: Aumentei de xl para 2xl (fica mais 'mobile')
+        "rounded-2xl", 
+        
+        // 3. Borda: Removi a borda cinza (border-none) para limpar o visual
+        "border-none", 
+        
+        // 4. Sombra: Uma sombra mais elegante e difusa (estilo elevação)
+        "shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]",
+        
+        // 5. Animação: Um leve movimento para cima ao passar o mouse
+        "transition-all duration-300 hover:-translate-y-1",
+        
         className
       )}
       {...props} />
