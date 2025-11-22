@@ -1,7 +1,7 @@
 import mercadopago
 import os
 
-def create_subscription(user_email, card_token, amount=24.90):
+def create_subscription(user_email, card_token, amount, frequency=1):
     """
     Cria uma assinatura mensal (Preapproval) no Mercado Pago.
     
@@ -27,7 +27,7 @@ def create_subscription(user_email, card_token, amount=24.90):
         "reason": "Assinatura Mensal - Simplific Pro", # O que aparece na fatura
         "payer_email": user_email,
         "auto_recurring": {
-            "frequency": 1,
+            "frequency": frequency,
             "frequency_type": "months",
             "transaction_amount": float(amount),
             "currency_id": "BRL"

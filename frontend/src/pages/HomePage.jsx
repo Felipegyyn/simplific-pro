@@ -33,8 +33,7 @@ const HomePage = () => {
     if (billingCycle === 'monthly') {
         navigate('/checkout');
     } else {
-        if (ANNUAL_CHECKOUT_LINK !== "#") window.location.href = ANNUAL_CHECKOUT_LINK;
-        else alert("Link anual em breve!");
+        navigate('/checkout?plan=annual'); // Envia o parâmetro na URL      
     }
   };
 

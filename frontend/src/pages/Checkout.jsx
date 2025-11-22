@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Lock, User, Mail, Phone, Star } from 'lucide-react';
@@ -10,7 +10,15 @@ initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const [amount] = useState(24.90);
+  const location = useLocation(); // <--- NOVO
+
+  // Lógica para detectar se é anual
+  const searchParams = new URLSearchParams(location.search);
+  const isAnnual = searchParams.get('plan') === 'annual';
+
+  // Define o valor com base na URL
+  const [amount] = useState(isAnnual ? 198.90 : 24.90);
+  const planName = isAnnual ? "Plano Anual" : "Plano Mensal";
   
   const [formData, setFormData] = useState({
     name: '',
@@ -39,7 +47,8 @@ const Checkout = () => {
         },
         body: JSON.stringify({
           card_token: token,
-          payer_data: formData
+          payer_data: formData, 
+          plan_type: isAnnual ? 'annual' : 'monthly' // <--- NOVA LINHA
         }),
       });
 
@@ -97,13 +106,16 @@ const Checkout = () => {
             {/* Resumo */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Resumo do Pedido</h3>
-                <div className="flex justify-between items-center mb-2">
-                    <span>Assinatura Simplific Pro (Mensal)</span>
-                    <span className="font-bold">R$ 24,90</span>
+               <div className="flex justify-between items-center mb-2">
+              <span>Assinatura Simplific Pro ({planName})</span> {/* Usando variável */}
+             <span className="font-bold">R$ {amount.toFixed(2).replace('.', ',')}</span> {/* Usando variável */}
+            </div>
+              <div className="text-sm text-green-600 mb-4">
+                {isAnnual ? "Renovação automática anual." : "Renovação automática mensal."} Cancele quando quiser.
                 </div>
                 <div className="flex justify-between items-center border-t pt-4 text-xl font-bold text-gray-900">
                     <span>Total Hoje:</span>
-                    <span>R$ 24,90</span>
+                    <span>R$ {amount.toFixed(2).replace('.', ',')}</span>
                 </div>
             </div>
 

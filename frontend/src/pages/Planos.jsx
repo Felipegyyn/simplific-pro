@@ -17,12 +17,7 @@ const Planos = () => {
         // 3. Se for mensal, vai para a nossa página interna de Checkout
         navigate('/checkout');
     } else {
-        // Se for anual, continua usando o link externo (se houver)
-        if (ANNUAL_LINK !== "#") {
-             window.location.href = ANNUAL_LINK;
-        } else {
-            alert("Link anual em breve!");
-        }
+        navigate('/checkout?plan=annual'); // Envia o parâmetro na URL
     }
   };
 

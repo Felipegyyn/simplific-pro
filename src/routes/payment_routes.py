@@ -17,6 +17,19 @@ def process_subscription_route():
     data = request.get_json()
     card_token = data.get('card_token')
     payer_data = data.get('payer_data', {})
+    plan_type = data.get('plan_type', 'monthly')
+
+    # ▼▼▼ ADICIONE ESTE BLOCO DE DECISÃO ▼▼▼
+    if plan_type == 'annual':
+        amount = 198.90
+        frequency = 12 # 12 meses
+        days_access = 366 # 1 ano + 1 dia de margem
+    else:
+        # Padrão Mensal
+        amount = 24.90
+        frequency = 1
+        days_access = 32 # 1 mês + 2 dias de margem
+    # ▲▲▲ FIM DO BLOCO ▲▲▲
 
     email = payer_data.get('email')
     name = payer_data.get('name')
@@ -58,14 +71,14 @@ def process_subscription_route():
 
     # 3. Processa o Pagamento (Assinatura)
     # Chama o serviço do Mercado Pago
-    result = create_subscription(user.email, card_token, amount=24.90)
+    result = create_subscription(user.email, card_token, amount=amount, frequency=frequency)
 
     if result['status'] == 'success':
         # SUCESSO! Ativa o usuário
         try:
             user.status = 'ativo'
             user.profile = 'premium'
-            user.subscription_valid_until = datetime.utcnow() + timedelta(days=32)
+            user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
             user.subscription_id = result['id']
             
             # Se forneceu nome/zap agora e antes estava vazio, atualiza
