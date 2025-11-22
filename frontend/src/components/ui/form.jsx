@@ -54,7 +54,8 @@ function FormItem({
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div data-slot="form-item" className={cn("grid gap-2", className)} {...props} />
+      {/* Ajuste: space-y-2 para espaçamento vertical consistente */}
+      <div data-slot="form-item" className={cn("space-y-2 group", className)} {...props} />
     </FormItemContext.Provider>
   );
 }
@@ -69,7 +70,12 @@ function FormLabel({
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn(
+        // Ajuste: Transição suave de cor quando ocorre erro
+        "text-sm font-semibold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 transition-colors duration-300",
+        "data-[error=true]:text-destructive",
+        className
+      )}
       htmlFor={formItemId}
       {...props} />
   );
@@ -104,7 +110,7 @@ function FormDescription({
     <p
       data-slot="form-description"
       id={formDescriptionId}
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-[0.8rem]", className)}
       {...props} />
   );
 }
@@ -124,7 +130,11 @@ function FormMessage({
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn("text-destructive text-sm", className)}
+      className={cn(
+        // Ajuste: Animação 'slide-in' e 'fade-in' para o erro aparecer suavemente
+        "text-[0.8rem] font-medium text-destructive animate-in slide-in-from-top-1 fade-in-0 duration-300",
+        className
+      )}
       {...props}>
       {body}
     </p>

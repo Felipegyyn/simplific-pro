@@ -1,13 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- ADICIONE ISSO
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { CheckCircle, MessageCircle } from 'lucide-react';
 
 // REMOVEMOS O IMPORT DA IMAGEM AQUI
 
 const Inteligencia = () => {
+  const navigate = useNavigate(); // <--- ADICIONE ISSO
   const capabilities = [
     "Registrar receitas e despesas por texto ou áudio",
     "Consultar saldos e status do orçamento em tempo real",
@@ -38,14 +39,12 @@ const Inteligencia = () => {
                 <p className="text-lg text-green-100 mb-8 leading-relaxed">
                     Imagine ter um especialista financeiro disponível 24h por dia para organizar sua vida. Você manda um áudio, ele entende, registra e te aconselha.
                 </p>
-                
-                    <Button 
-                onClick={() => navigate('/checkout')} 
-                size="lg" 
-                className="bg-green-400 text-green-900 hover:bg-green-300 font-bold text-lg h-14 px-8 rounded-xl shadow-lg hover:shadow-green-400/50 transition-all w-full sm:w-auto"
-              >
-                Falar com o Simplific
-              </Button>
+                <Button 
+    onClick={() => navigate('/planos')} 
+    className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-6 h-auto rounded-xl"
+>
+    <MessageCircle className="mr-2" /> Falar com o Simplific
+</Button>
             </div>
             <div className="flex justify-center">
                  {/* AQUI ESTÁ A CORREÇÃO: Caminho direto para a pasta pública */}
