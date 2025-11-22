@@ -37,7 +37,10 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          // ESTILO GLOBAL DO GRÁFICO:
+          // - Fontes menores e suavizadas
+          // - Linhas de grid quase invisíveis
+          "flex aspect-video justify-center text-xs font-medium [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/40 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className
         )}
         {...props}>
@@ -115,7 +118,7 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn("font-medium", labelClassName)}>
+        <div className={cn("font-semibold text-foreground", labelClassName)}>
           {labelFormatter(value, payload)}
         </div>
       );
@@ -125,7 +128,7 @@ function ChartTooltipContent({
       return null
     }
 
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+    return <div className={cn("font-semibold text-foreground", labelClassName)}>{value}</div>;
   }, [
     label,
     labelFormatter,
@@ -145,7 +148,8 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        // MUDANÇAS NO TOOLTIP (Efeito de Vidro e Borda Suave)
+        "grid min-w-[12rem] items-start gap-1.5 rounded-xl border border-border/50 bg-background/95 px-3 py-2.5 text-xs shadow-xl backdrop-blur-md supports-[backdrop-filter]:bg-background/80",
         className
       )}>
       {!nestLabel ? tooltipLabel : null}
@@ -172,7 +176,7 @@ function ChartTooltipContent({
                     !hideIndicator && (
                       <div
                         className={cn("shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)", {
-                          "h-2.5 w-2.5": indicator === "dot",
+                          "h-2.5 w-2.5 shadow-sm": indicator === "dot", // Sombra no dot
                           "w-1": indicator === "line",
                           "w-0 border-[1.5px] border-dashed bg-transparent":
                             indicator === "dashed",
@@ -193,12 +197,13 @@ function ChartTooltipContent({
                     )}>
                     <div className="grid gap-1.5">
                       {nestLabel ? tooltipLabel : null}
-                      <span className="text-muted-foreground">
+                      <span className="text-muted-foreground font-medium">
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
                     {item.value && (
-                      <span className="text-foreground font-mono font-medium tabular-nums">
+                      // MUDANÇA: Fonte Mono para números (tabular-nums alinha os números verticalmente)
+                      <span className="text-foreground font-mono font-semibold tabular-nums">
                         {item.value.toLocaleString()}
                       </span>
                     )}
@@ -243,13 +248,14 @@ function ChartLegendContent({
           <div
             key={item.value}
             className={cn(
-              "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3"
+              // Legend mais moderna
+              "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 text-muted-foreground hover:text-foreground transition-colors font-medium text-xs"
             )}>
             {itemConfig?.icon && !hideIcon ? (
               <itemConfig.icon />
             ) : (
               <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
+                className="h-2 w-2 shrink-0 rounded-full" // Bolinha redonda na legenda
                 style={{
                   backgroundColor: item.color,
                 }} />
