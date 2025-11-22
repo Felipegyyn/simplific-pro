@@ -1,69 +1,115 @@
-import mercadopago
-import os
+from flask import Blueprint, request, jsonify
+from src.models.user import User
+from src.models.db import db
+from src.services.payment_service import create_subscription
+from datetime import datetime, timedelta
 
-def create_subscription(user_email, card_token, amount, frequency=1):
+# --- IMPORTAÇÕES DOS SEUS SERVIÇOS EXISTENTES ---
+from src.services.user_service import create_user_from_purchase, normalize_phone_number
+from src.services.notification_service import send_welcome_credentials
+# ------------------------------------------------
+
+payment_bp = Blueprint('payment', __name__)
+
+@payment_bp.route('/process_subscription', methods=['POST'])
+def process_subscription_route():
     """
-    Cria uma assinatura mensal (Preapproval) no Mercado Pago.
-    
-    Args:
-        user_email (str): Email do usuário (pagador).
-        card_token (str): Token do cartão gerado pelo Frontend (Card Brick).
-        amount (float): Valor da mensalidade.
-        
-    Returns:
-        dict: Resposta do Mercado Pago ou dicionário de erro.
+    1. Recebe dados do frontend.
+    2. Cria usuário via serviço (se não existir).
+    3. Processa pagamento no Mercado Pago.
+    4. Se aprovado: Ativa usuário e envia credenciais (E-mail/Zap).
     """
+    data = request.get_json()
+    card_token = data.get('card_token')
+    payer_data = data.get('payer_data', {})
     
-    # 1. Inicializa o SDK com sua ACCESS TOKEN (que está no Render)
-    access_token = os.getenv("MERCADO_PAGO_ACCESS_TOKEN")
-    if not access_token:
-        print("ERRO: MERCADO_PAGO_ACCESS_TOKEN não configurado.")
-        return {"status": "error", "message": "Erro de configuração no servidor."}
+    # Dados para lógica de planos (Mensal/Anual)
+    plan_type = data.get('plan_type', 'monthly')
 
-    sdk = mercadopago.SDK(access_token)
+    # Extrai dados do formulário
+    email = payer_data.get('email')
+    name = payer_data.get('name')
+    whatsapp_raw = payer_data.get('whatsapp')
+    
+    if not card_token or not email:
+        return jsonify({"error": "Dados incompletos (Token ou Email faltando)."}), 400
 
-    # 2. Prepara os dados da assinatura
-    subscription_data = {
-        "reason": "Assinatura Mensal - Simplific Pro", # O que aparece na fatura
-        "payer_email": user_email,
-        "auto_recurring": {
-            "frequency": frequency,
-            "frequency_type": "months",
-            "transaction_amount": float(amount),
-            "currency_id": "BRL"
-        },
-        "back_url": "https://simplificpro.com/dashboard", # Para onde voltar (opcional)
-        "status": "authorized", # Tenta autorizar imediatamente
-        "card_token_id": card_token # O token mágico que veio do front
-    }
+    # 1. Normaliza o WhatsApp (Garante o +55)
+    whatsapp_normalized = normalize_phone_number(whatsapp_raw)
 
-    try:
-        # 3. Chama a API de Preapproval (Assinaturas)
-        print(f"Criando assinatura para {user_email}...")
-        request_options = mercadopago.config.RequestOptions()
-        request_options.custom_headers = {
-            'x-idempotency-key': card_token # Evita cobrança duplicada se clicar 2x
-        }
+    # 2. Verifica ou Cria o Usuário
+    user = User.query.filter_by(email=email).first()
+    
+    # Variável para guardar as credenciais (senha pura) se for um novo usuário
+    new_user_credentials = None 
+
+    if not user:
+        # --- USA SEU SERVIÇO DE CRIAÇÃO (IGUAL MONETIZZE) ---
+        print(f"Criando novo usuário para: {email}")
+        success, result = create_user_from_purchase(name, email, whatsapp_normalized)
         
-        result = sdk.preapproval().create(subscription_data, request_options)
-        response = result["response"]
-
-        # 4. Verifica se deu certo
-        if result["status"] == 201:
-            print(f"Assinatura criada com sucesso! ID: {response['id']}")
-            return {
-                "status": "success", 
-                "id": response["id"],
-                "status_detail": response["status"]
-            }
+        if success:
+            # 'result' aqui contém o dicionário com a senha provisória em texto puro
+            new_user_credentials = result 
+            # Recarrega o objeto usuário do banco para associar a assinatura
+            user = User.query.filter_by(email=email).first()
         else:
-            print(f"Erro no Mercado Pago: {response}")
-            return {
-                "status": "error", 
-                "message": "Não foi possível processar o pagamento.",
-                "detail": response
-            }
+            # Se falhou ao criar (ex: erro de banco), retorna erro
+            print(f"Erro ao criar usuário: {result}")
+            return jsonify({"error": "Erro ao criar cadastro: " + str(result)}), 500
+    else:
+        # Se o usuário já existe, atualizamos o nome/zap se ele forneceu novos
+        if name: user.name = name
+        if whatsapp_normalized: user.whatsapp = whatsapp_normalized
+        db.session.commit()
 
-    except Exception as e:
-        print(f"Erro crítico ao criar assinatura: {e}")
-        return {"status": "error", "message": str(e)}
+    # 3. Define valores do plano (Mensal vs Anual)
+    if plan_type == 'annual':
+        amount = 198.90
+        frequency = 12
+        days_access = 366
+    else:
+        amount = 24.90
+        frequency = 1
+        days_access = 32
+
+    # 4. Processa o Pagamento no Mercado Pago
+    result_mp = create_subscription(user.email, card_token, amount=amount, frequency=frequency)
+
+    if result_mp['status'] == 'success':
+        # --- SUCESSO! ---
+        try:
+            # Atualiza status e validade
+            user.status = 'ativo'
+            user.profile = 'premium'
+            user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
+            user.subscription_id = result_mp['id']
+            
+            db.session.commit()
+            
+            msg = "Assinatura realizada com sucesso!"
+
+            # --- ENVIO DE CREDENCIAIS (IGUAL MONETIZZE) ---
+            if new_user_credentials:
+                # Se o usuário acabou de ser criado, 'new_user_credentials' tem a senha
+                print(f"Enviando credenciais de boas-vindas para {user.email}...")
+                send_welcome_credentials(new_user_credentials)
+                msg += " Sua conta foi criada e os dados enviados por E-mail e WhatsApp."
+            else:
+                print(f"Usuário {user.email} já existia (recorrência/renovação). Não enviando credenciais.")
+            
+            return jsonify({
+                "message": msg,
+                "subscription_id": result_mp['id']
+            }), 200
+            
+        except Exception as e:
+            print(f"Erro ao atualizar usuário após pagamento: {e}")
+            db.session.rollback()
+            return jsonify({"error": "Pagamento aprovado, mas erro interno ao ativar conta."}), 500
+    else:
+        # FALHA NO PAGAMENTO
+        return jsonify({
+            "error": "Falha no pagamento.",
+            "detail": result_mp.get('detail')
+        }), 400
