@@ -775,16 +775,18 @@ const tutorials = [
                   layout="vertical"
                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                 >
-                  <CartesianGrid stroke="hsl(var(--border))" horizontal={false} />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={false} />
                   <XAxis type="number" hide />
                   <YAxis 
-                    type="category" 
-                    dataKey="name" 
-                    stroke="#999"
-                    fontSize={12}
-                    axisLine={false}
-                    width={100}
-                  />
+                  type="category" 
+                  dataKey="name" 
+                  stroke="#888888" // Cor mais suave
+                  fontSize={12} 
+                  tickLine={false} // Remove os tracinhos
+                  axisLine={false} // Remove a linha vertical preta
+                  width={100} 
+                />
+                
                   <Tooltip
                     contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
                     formatter={(value) => [formatCurrency(value), 'Valor Gasto']}
@@ -811,9 +813,21 @@ const tutorials = [
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={dashboardData.chartData.evolution}>
-                  <CartesianGrid stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#888888" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false} 
+                  />
+                 <YAxis 
+                  stroke="#888888" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false} 
+                  tickFormatter={(value) => `R$${value}`} // Opcional: Formata o eixo Y
+                />
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                   <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={2} />
                   <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={2} />
@@ -856,9 +870,20 @@ const tutorials = [
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <ComposedChart data={pvrData}>
-                  <CartesianGrid stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" fontSize={12} />
-                  <YAxis fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <XAxis 
+  dataKey="month" 
+  stroke="#888888" 
+  fontSize={12} 
+  tickLine={false} 
+  axisLine={false} 
+/>
+                  <YAxis 
+  stroke="#888888" 
+  fontSize={12} 
+  tickLine={false} 
+  axisLine={false} 
+/>
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                   <Legend />
                   <Bar dataKey="planejado" fill="#a78bfa" name="Planejado" radius={[4, 4, 0, 0]} />
