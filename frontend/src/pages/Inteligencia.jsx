@@ -38,7 +38,9 @@ const Inteligencia = () => {
                     Imagine ter um especialista financeiro disponível 24h por dia para organizar sua vida. Você manda um áudio, ele entende, registra e te aconselha.
                 </p>
                 <a href="/planos">
-                    <Button className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-6 h-auto rounded-xl">
+                    <Button 
+                      onClick={() => navigate('/checkout')} 
+                      className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-6 h-auto rounded-xl">
                         <MessageCircle className="mr-2" /> Falar com o Simplific
                     </Button>
                 </a>
