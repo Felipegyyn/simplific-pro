@@ -4,6 +4,7 @@ from src.routes.user import active_user_required
 from datetime import datetime, timedelta
 from src.models.db import db
 from src.models.extended import ScheduleEvent
+from src.models.user import User
 from flask import redirect, url_for
 from src.services.google_calendar_service import get_google_auth_flow, add_event_to_google, delete_event_from_google
 import os
