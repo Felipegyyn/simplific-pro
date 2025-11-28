@@ -28,6 +28,8 @@ class User(db.Model):
     profile_image_url = db.Column(db.String(255), nullable=True, default=None)
     # Adicione esta linha dentro da classe User
     achievements = db.relationship('UserAchievement', back_populates='user', lazy='dynamic', cascade="all, delete-orphan")
+    google_calendar_token = db.Column(db.Text, nullable=True) 
+    google_calendar_refresh_token = db.Column(db.Text, nullable=True)
 
 
     def __repr__(self):

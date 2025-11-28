@@ -4,6 +4,9 @@ from src.routes.user import active_user_required
 from datetime import datetime
 from src.models.db import db
 from src.models.extended import ScheduleEvent
+from flask import redirect, url_for
+from src.services.google_calendar_service import get_google_auth_flow, add_event_to_google, delete_event_from_google
+import os
 
 schedule_bp = Blueprint('schedule', __name__)
 
@@ -60,6 +63,17 @@ def create_schedule_event():
     db.session.add(event)
     db.session.commit()
 
+    # ▼▼▼ INTEGRAÇÃO GOOGLE ▼▼▼
+    # Tenta sincronizar com o Google se o usuário tiver token
+    user = User.query.get(user_id)
+    if user.google_calendar_token:
+        print("Sincronizando com Google Calendar...")
+        google_id = add_event_to_google(user, event)
+        if google_id:
+            event.google_event_id = google_id
+            db.session.commit()
+    # ▲▲▲ FIM INTEGRAÇÃO ▲▲▲
+
     # Adicionei um 'success: True' para alinhar com a checagem no frontend
     return jsonify({'success': True, 'event': event.to_dict()}), 201
 
@@ -112,7 +126,65 @@ def delete_schedule_event(event_id):
     if not event:
         return jsonify({'error': 'Evento não encontrado'}), 404
 
+    if event.google_event_id:
+        user = User.query.get(user_id)
+        delete_event_from_google(user, event.google_event_id)
+
     db.session.delete(event)
     db.session.commit()
 
     return '', 204
+
+
+# --- ROTAS DE AUTENTICAÇÃO GOOGLE ---
+
+@schedule_bp.route('/schedule/google/auth', methods=['GET'])
+@jwt_required()
+def google_auth():
+    """Inicia o fluxo de login com o Google."""
+    user_id = get_jwt_identity()
+
+    # Cria o fluxo
+    flow = get_google_auth_flow()
+
+    # Gera a URL de autorização
+    # state=user_id passa o ID do usuário para sabermos quem é na volta
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        state=str(user_id) 
+    )
+
+    return jsonify({'auth_url': authorization_url})
+
+@schedule_bp.route('/schedule/google/callback', methods=['GET'])
+def google_callback():
+    """Recebe o usuário de volta do Google com o código."""
+    code = request.args.get('code')
+    state = request.args.get('state') # Este é o user_id que passamos antes
+
+    if not code or not state:
+        return "Erro: Código ou estado ausente.", 400
+
+    try:
+        # Troca o código por tokens
+        flow = get_google_auth_flow()
+        flow.fetch_token(code=code)
+        credentials = flow.credentials
+
+        # Salva no banco
+        user = User.query.get(int(state))
+        if user:
+            user.google_calendar_token = credentials.token
+            user.google_calendar_refresh_token = credentials.refresh_token
+            db.session.commit()
+
+            # Redireciona de volta para o Frontend
+            frontend_url = os.getenv("FRONTEND_URL", "https://simplificpro.com")
+            return redirect(f"{frontend_url}/#/schedule?google_connected=success")
+
+        return "Usuário não encontrado.", 404
+
+    except Exception as e:
+        print(f"Erro no callback do Google: {e}")
+        return f"Erro na integração: {str(e)}", 500

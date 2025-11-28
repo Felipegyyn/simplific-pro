@@ -120,6 +120,8 @@ class ScheduleEvent(db.Model):
     time = db.Column(db.String(10), nullable=True)
     type = db.Column(db.String(50), nullable=False)
     priority = db.Column(db.String(50), default='medium')
+
+    google_event_id = db.Column(db.String(255), nullable=True)
     
     # ▼▼▼ CAMPOS ADICIONADOS ▼▼▼
     value = db.Column(db.Float, nullable=True)
