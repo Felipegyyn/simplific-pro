@@ -319,25 +319,6 @@ const Schedule = ({ user, onLogout }) => {
             <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400">Organize seus compromissos e lembretes financeiros</p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-    <Button 
-        variant="outline" 
-        onClick={handleGoogleConnect} 
-        disabled={isSyncing}
-        className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/30"
-    >
-        <Globe className="h-4 w-4 mr-2" />
-        {isSyncing ? 'Conectando...' : 'Conectar Google Agenda'}
-    </Button>
-    <Button 
-        variant="outline" 
-        onClick={handleAppleSync}
-        className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
-    >
-        <Smartphone className="h-4 w-4 mr-2" />
-        Sincronizar iPhone/Outlook
-    </Button>
-  </div>
 
           {/* Cards de Resumo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
@@ -380,18 +361,42 @@ const Schedule = ({ user, onLogout }) => {
           </div>
           
           <Tabs defaultValue="proximos" className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-              <TabsList className="grid w-full sm:w-auto grid-cols-4">
-                <TabsTrigger value="proximos">Próximos ({eventosProximos.length})</TabsTrigger>
-                <TabsTrigger value="hoje">Hoje ({eventosHoje.length})</TabsTrigger>
-                <TabsTrigger value="concluidos">Concluídos ({eventosConcluidos.length})</TabsTrigger>
-                <TabsTrigger value="atrasados">Atrasados ({eventosAtrasados.length})</TabsTrigger>
-              </TabsList>
-              <div className="flex space-x-2">
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button><Plus className="h-4 w-4 mr-2" />Novo Evento</Button>
-                  </DialogTrigger>
+<div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+  <TabsList className="grid w-full xl:w-auto grid-cols-4">
+    <TabsTrigger value="proximos">Próximos</TabsTrigger>
+    <TabsTrigger value="hoje">Hoje</TabsTrigger>
+    <TabsTrigger value="concluidos">Concluídos</TabsTrigger>
+    <TabsTrigger value="atrasados">Atrasados</TabsTrigger>
+  </TabsList>
+  
+  {/* GRUPO DE BOTÕES ALINHADOS NA DIREITA */}
+  <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
+    <Button 
+        variant="outline" 
+        onClick={handleGoogleConnect} 
+        disabled={isSyncing}
+        className="border-green-600 text-green-700 hover:bg-green-50 dark:border-green-500 dark:text-green-400"
+    >
+        <Globe className="h-4 w-4 mr-2" />
+        Google
+    </Button>
+
+    <Button 
+        variant="outline" 
+        onClick={handleAppleSync}
+        className="border-green-600 text-green-700 hover:bg-green-50 dark:border-green-500 dark:text-green-400"
+    >
+        <Smartphone className="h-4 w-4 mr-2" />
+        Apple
+    </Button>
+
+    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-green-600 hover:bg-green-700 text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Evento
+        </Button>
+      </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader><DialogTitle>Novo Evento da Agenda</DialogTitle></DialogHeader>
 

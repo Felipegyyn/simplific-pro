@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.routes.user import active_user_required
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.models.db import db
 from src.models.extended import ScheduleEvent
 from flask import redirect, url_for
