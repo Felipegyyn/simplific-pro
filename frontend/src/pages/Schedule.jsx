@@ -11,14 +11,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { 
   Calendar, Clock, CheckCircle, AlertTriangle, Plus, Edit, Trash2, 
-  DollarSign, Bell, LogOut, ArrowLeft, Filter
+  DollarSign, Bell, LogOut, ArrowLeft, Filter, Globe, Smartphone
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLocation
 import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
 
 const Schedule = ({ user, onLogout }) => {
   const navigate = useNavigate();
+
+  const location = useLocation(); // Hook para ler a URL
+  const [isSyncing, setIsSyncing] = useState(false); // Estado de loading do botão
   
   // Estados para eventos e modal
   const [eventos, setEventos] = useState([]);
@@ -46,6 +49,41 @@ const Schedule = ({ user, onLogout }) => {
     priority: 'média',
     category: ''
   });
+
+  // ▼▼▼ LÓGICA DE SINCRONIZAÇÃO ▼▼▼
+  
+  // 1. Detectar retorno do Google (Sucesso)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('google_connected') === 'success') {
+        alert("✅ Google Agenda conectado com sucesso! Novos eventos serão sincronizados.");
+        navigate('/schedule', { replace: true }); // Limpa a URL
+    }
+  }, [location]);
+
+  // 2. Função Conectar Google
+  const handleGoogleConnect = async () => {
+    try {
+        setIsSyncing(true);
+        const response = await apiService.get('/api/schedule/google/auth');
+        if (response.auth_url) window.location.href = response.auth_url;
+        else alert("Erro ao iniciar conexão com Google.");
+    } catch (error) {
+        console.error("Erro Google Auth:", error);
+        alert("Erro ao conectar com Google Agenda.");
+    } finally {
+        setIsSyncing(false);
+    }
+  };
+
+  // 3. Função Sincronizar Apple/Outlook
+  const handleAppleSync = () => {
+    if (!user?.id) return alert("Erro: ID de usuário não encontrado.");
+    const icsUrl = `${import.meta.env.VITE_API_URL}/api/schedule/feed/${user.id}/calendar.ics`;
+    window.open(icsUrl, '_blank');
+    alert("Arquivo de calendário gerado! Abra-o no seu iPhone ou Outlook para se inscrever.");
+  };
+  // ▲▲▲ FIM LÓGICA DE SINCRONIZAÇÃO ▲▲▲
 
   // Carregar eventos da API
   useEffect(() => {
@@ -280,6 +318,26 @@ const Schedule = ({ user, onLogout }) => {
             <h2 className="text-2xl font-bold dark:text-slate-200">Agenda Financeira</h2>
             <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400">Organize seus compromissos e lembretes financeiros</p>
           </div>
+
+          <div className="flex flex-wrap gap-2">
+    <Button 
+        variant="outline" 
+        onClick={handleGoogleConnect} 
+        disabled={isSyncing}
+        className="border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/30"
+    >
+        <Globe className="h-4 w-4 mr-2" />
+        {isSyncing ? 'Conectando...' : 'Conectar Google Agenda'}
+    </Button>
+    <Button 
+        variant="outline" 
+        onClick={handleAppleSync}
+        className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+    >
+        <Smartphone className="h-4 w-4 mr-2" />
+        Sincronizar iPhone/Outlook
+    </Button>
+  </div>
 
           {/* Cards de Resumo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">

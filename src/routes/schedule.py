@@ -188,3 +188,48 @@ def google_callback():
     except Exception as e:
         print(f"Erro no callback do Google: {e}")
         return f"Erro na integração: {str(e)}", 500
+
+# Em src/routes/schedule.py
+
+# ... (outras rotas) ...
+
+@schedule_bp.route('/schedule/feed/<int:user_id>/calendar.ics')
+def calendar_feed(user_id):
+    """Gera um arquivo ICS compatível com Apple/Outlook."""
+    from src.models.extended import ScheduleEvent
+    from datetime import datetime
+    
+    events = ScheduleEvent.query.filter_by(user_id=user_id).all()
+    
+    # Cabeçalho do arquivo ICS
+    ics_content = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Simplific Pro//Finance Schedule//PT",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        "X-WR-CALNAME:Simplific Financeiro",
+        "X-WR-TIMEZONE:America/Sao_Paulo",
+    ]
+    
+    for event in events:
+        # Formata data (DTSTART/DTEND) para YYYYMMDDTHHMMSS
+        # Ajuste simples assumindo que event.date e event.time existem
+        start_dt = datetime.combine(event.date, datetime.strptime(event.time, "%H:%M").time())
+        end_dt = start_dt + timedelta(hours=1)
+        
+        ics_content.append("BEGIN:VEVENT")
+        ics_content.append(f"UID:simplific-{event.id}@simplificpro.com")
+        ics_content.append(f"DTSTAMP:{datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')}")
+        ics_content.append(f"DTSTART:{start_dt.strftime('%Y%m%dT%H%M%S')}")
+        ics_content.append(f"DTEND:{end_dt.strftime('%Y%m%dT%H%M%S')}")
+        ics_content.append(f"SUMMARY:[Simplific] {event.title}")
+        ics_content.append(f"DESCRIPTION:{event.description or ''}")
+        ics_content.append("END:VEVENT")
+        
+    ics_content.append("END:VCALENDAR")
+    
+    return "\n".join(ics_content), 200, {
+        'Content-Type': 'text/calendar; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="simplific.ics"'
+    }
