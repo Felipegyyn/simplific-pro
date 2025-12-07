@@ -110,7 +110,7 @@ const Login = ({ onLogin }) => {
               </div>
             </div>
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
-              Bem-vindo de volta
+              Bem-vindo de volta ao Simplific
             </CardTitle>
             <p className="text-gray-500 text-sm mt-2">
               Acesse seu painel financeiro inteligente
