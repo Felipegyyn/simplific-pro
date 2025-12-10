@@ -36,12 +36,12 @@ const HomePage = () => {
 
   const pricing = {
     monthly: {
-      oldPrice: "R$ 89,90",
-      price: "24,90",
-      period: "MÊS",
-      description: "Preço congelado de Black Friday.",
-      buttonText: "GARANTIR DESCONTO MENSAL",
-      badge: "60% OFF HOJE"
+      oldPrice: "R$ 24,90", // Mostra o preço original riscado
+      price: "4,90",        // O valor que vai aparecer gigante
+      period: "NO 1º MÊS",  // Deixa claro a condição
+      description: "Depois R$ 24,90/mês. Cancele quando quiser.",
+      buttonText: "TESTAR POR R$ 4,90",
+      badge: "🔥 OFERTA: 1º MÊS QUASE GRÁTIS"
     },
     annual: {
         oldPrice: "R$ 298,80", 
@@ -286,7 +286,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <h2 className="text-4xl font-black text-center mb-16 text-white uppercase tracking-tight">Perguntas de Quem Vai Mudar de Vida</h2>
           <div className="space-y-4 bg-gray-900/50 p-8 border border-gray-800">
-            <FaqItem question="O PREÇO DE BLACK FRIDAY É VITALÍCIO?" answer="Ao garantir o plano ANUAL hoje, você trava esse valor promocional de 4,90 no primeiros mês. E os próximos meses continue acessando por apenas R$ 24,90 por mês.Menos de 1,00 por dia. É a melhor decisão financeira que você pode tomar agora." />
+            <FaqItem question="O PREÇO DE BLACK FRIDAY É VITALÍCIO?" answer="Ao garantir o plano ANUAL hoje, você trava pelos próximos 12 meses. É a melhor decisão financeira que você pode tomar agora." />
             <FaqItem question="MEUS DADOS ESTÃO REALMENTE SEGUROS?" answer="Sim. Nível bancário. Usamos criptografia de ponta a ponta. Nem nós temos acesso às suas senhas ou dados bancários brutos.Você pode solicitar a exclusão dos seus dados quando quiser." />
             <FaqItem question="FUNCIONA NO MEU CELULAR?" answer="Perfeitamente. O painel é um Web App responsivo e a IA do Assessor vive nativamente dentro do seu WhatsApp." />
             <FaqItem question="COMO ATIVO O ASSESSOR IA?" answer="Imediatamente após a compra, você acessa seu painel e conecta seu número de WhatsApp em segundos. É instantâneo." />

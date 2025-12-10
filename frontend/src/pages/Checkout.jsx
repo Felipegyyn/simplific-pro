@@ -12,13 +12,18 @@ const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation(); // <--- NOVO
 
-  // Lógica para detectar se é anual
+// Lógica para detectar se é anual
   const searchParams = new URLSearchParams(location.search);
   const isAnnual = searchParams.get('plan') === 'annual';
 
-  // Define o valor com base na URL
-  const [amount] = useState(isAnnual ? 198.90 : 24.90);
-  const planName = isAnnual ? "Plano Anual" : "Plano Mensal";
+  // ▼▼▼ LÓGICA DE PREÇO PROMOCIONAL (BLACK FRIDAY) ▼▼▼
+  // Se for Anual, mantém 198.90. Se for Mensal, cobra 4.90 (1º mês).
+  const [amount] = useState(isAnnual ? 198.90 : 4.90);
+  
+  const planName = isAnnual 
+    ? "Plano Anual (Black Friday)" 
+    : "Plano Mensal (1º Mês Promo)";
+  // ▲▲▲ FIM LÓGICA PROMOCIONAL ▲▲▲
   
   const [formData, setFormData] = useState({
     name: '',
