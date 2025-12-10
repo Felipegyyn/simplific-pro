@@ -131,23 +131,28 @@ const HomePage = () => {
         </div>
       </header>
 
-    {/* --- FAIXA DE URGÊNCIA (Hazard Style - V3 CORRIGIDA) --- */}
-      <div className="bg-yellow-400 text-black py-5 border-y-4 border-black shadow-[0_0_30px_rgba(234,179,8,0.5)] z-20 relative overflow-visible">
-        <div className="container mx-auto px-4 flex justify-between items-center font-black uppercase tracking-[0.2em] text-sm md:text-lg animate-pulse">
+    {/* --- FAIXA DE URGÊNCIA (Hazard Style - VERSÃO FINAL À PROVA DE FALHAS) --- */}
+      <div className="relative z-20 py-10 overflow-visible"> {/* Container reto com MUITO padding vertical */}
+        
+        {/* CAMADA DE FUNDO INCLINADA (O visual amarelo) */}
+        <div className="absolute inset-0 bg-yellow-400 transform -skew-y-2 border-y-4 border-black shadow-[0_0_40px_rgba(234,179,8,0.6)]"></div>
+
+        {/* CAMADA DE CONTEÚDO (O texto reto por cima) */}
+        <div className="container mx-auto px-4 relative z-10 flex justify-between items-center font-black uppercase tracking-[0.2em] text-sm md:text-lg animate-pulse text-black">
             <span className="flex items-center gap-3 min-w-fit">
-              <Flame size={24} fill="black"/> BLACK DECEMBER
+              <Flame size={26} fill="black"/> BLACK DECEMBER
             </span>
             
-            {/* Bloco Central Ajustado: Margem negativa para compensar a inclinação e não cortar */}
+            {/* Bloco Central Preto */}
             <div className="hidden md:block relative mx-4">
-              <div className="absolute inset-0 bg-black transform -skew-x-12 shadow-xl"></div>
-              <span className="relative z-10 text-yellow-400 px-8 py-1 block">
+              <div className="absolute inset-0 bg-black transform -skew-x-12 shadow-2xl"></div>
+              <span className="relative z-10 text-yellow-400 px-10 py-3 block"> {/* Mais padding no bloco preto também */}
                   PREÇO NUNCA VISTO ANTES
               </span>
             </div>
             
             <span className="flex items-center gap-3 min-w-fit">
-              VAGAS LIMITADAS <Flame size={24} fill="black"/>
+              VAGAS LIMITADAS <Flame size={26} fill="black"/>
             </span>
         </div>
       </div>
@@ -155,7 +160,7 @@ const HomePage = () => {
 
 
 
-      
+
 
       {/* --- BENEFÍCIOS (Black Ops Style) --- */}
       <section id="beneficios" className="py-32 bg-black relative z-20 -mt-10">
