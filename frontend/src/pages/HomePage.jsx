@@ -131,17 +131,24 @@ const HomePage = () => {
         </div>
       </header>
 
-      {/* --- FAIXA DE URGÊNCIA (Hazard Style - CORRIGIDO) --- */}
-      <div className="bg-yellow-400 text-black py-6 overflow-hidden relative skew-y-1 border-y-4 border-black shadow-[0_0_20px_rgba(234,179,8,0.4)] z-20">
+    {/* --- FAIXA DE URGÊNCIA (Hazard Style - V3 CORRIGIDA) --- */}
+      <div className="bg-yellow-400 text-black py-5 border-y-4 border-black shadow-[0_0_30px_rgba(234,179,8,0.5)] z-20 relative overflow-visible">
         <div className="container mx-auto px-4 flex justify-between items-center font-black uppercase tracking-[0.2em] text-sm md:text-lg animate-pulse">
-            <span className="flex items-center gap-3"><Flame size={24} fill="black"/> BLACK DECEMBER</span>
-            
-            {/* O ajuste foi aqui: aumentamos o padding vertical e removemos margens negativas arriscadas */}
-            <span className="hidden md:inline-block bg-black text-yellow-400 px-6 py-2 transform -skew-x-12 shadow-lg">
-                PREÇO NUNCA VISTO ANTES
+            <span className="flex items-center gap-3 min-w-fit">
+              <Flame size={24} fill="black"/> BLACK DECEMBER
             </span>
             
-            <span className="flex items-center gap-3">VAGAS LIMITADAS <Flame size={24} fill="black"/></span>
+            {/* Bloco Central Ajustado: Margem negativa para compensar a inclinação e não cortar */}
+            <div className="hidden md:block relative mx-4">
+              <div className="absolute inset-0 bg-black transform -skew-x-12 shadow-xl"></div>
+              <span className="relative z-10 text-yellow-400 px-8 py-1 block">
+                  PREÇO NUNCA VISTO ANTES
+              </span>
+            </div>
+            
+            <span className="flex items-center gap-3 min-w-fit">
+              VAGAS LIMITADAS <Flame size={24} fill="black"/>
+            </span>
         </div>
       </div>
 
