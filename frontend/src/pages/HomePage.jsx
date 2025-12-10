@@ -36,7 +36,7 @@ const HomePage = () => {
 
   const pricing = {
     monthly: {
-      oldPrice: "R$ 24,90", // Mostra o preço original riscado
+      oldPrice: "R$ 89,90", // Mostra o preço original riscado
       price: "4,90",        // O valor que vai aparecer gigante
       period: "NO 1º MÊS",  // Deixa claro a condição
       description: "Depois R$ 24,90/mês. Cancele quando quiser.",
@@ -175,7 +175,7 @@ const HomePage = () => {
         
         <div className="container mx-auto px-4 grid md:grid-cols-3 gap-8">
           {[
-            { icon: BarChart3, title: "Dashboard Inteligente", desc: "Visualize toda sua situação financiera em tempo real, em uma púnica tela." },
+            { icon: BarChart3, title: "Dashboard Inteligente", desc: "Visualize toda sua situação financiera em tempo real, em uma única tela." },
             { icon: MessageCircle, title: "Simplific IA", desc: "Seu mordomo financeiro disponível 24 horas. No whatsapp e na plataforma." },
             { icon: Target, title: "Metas ambiciosas", desc: "Tramsforme seus maiores sonhos em planos concretos. O Simplific te ajuda e te lembra." },
             { icon: CreditCard, title: "Controle de cartões", desc: "Gerencie todos os seus cartões em um só lugar." },

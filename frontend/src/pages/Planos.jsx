@@ -67,7 +67,7 @@ const Planos = () => {
                     {/* Preço Antigo Riscado */}
                     <div className="mb-2">
                         <span className="text-gray-500 line-through text-lg font-bold">
-                            {isAnnual ? 'R$ 298,80' : 'R$ 24,90'}
+                            {isAnnual ? 'R$ 298,80' : 'R$ 89,90'}
                         </span>
                     </div>
 
@@ -98,7 +98,7 @@ const Planos = () => {
                     </Button>
 
                     <div className="space-y-4 text-left border-t border-gray-800 pt-8">
-                        <div className="flex items-center gap-3 text-gray-300 font-medium"><CheckCircle size={20} className="text-green-500 flex-shrink-0"/> <span>Acesso ilimitado ao Dashboard</span></div>
+                        <div className="flex items-center gap-3 text-gray-300 font-medium"><CheckCircle size={20} className="text-green-500 flex-shrink-0"/> <span>Acesso ilimitado a Plataforma</span></div>
                         <div className="flex items-center gap-3 text-gray-300 font-medium"><CheckCircle size={20} className="text-green-500 flex-shrink-0"/> <span>Assessor IA no WhatsApp (Ilimitado)</span></div>
                         <div className="flex items-center gap-3 text-gray-300 font-medium"><CheckCircle size={20} className="text-green-500 flex-shrink-0"/> <span>Sincronização de Agenda</span></div>
                         <div className="flex items-center gap-3 text-gray-300 font-medium"><ShieldCheck size={20} className="text-green-500 flex-shrink-0"/> <span>Garantia total de 7 dias</span></div>

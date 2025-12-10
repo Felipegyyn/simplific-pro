@@ -21,8 +21,8 @@ const Checkout = () => {
   const [amount] = useState(isAnnual ? 198.90 : 4.90);
   
   const planName = isAnnual 
-    ? "Plano Anual (Black Friday)" 
-    : "Plano Mensal (1º Mês Promo)";
+    ? "Plano Anual" 
+    : "Plano Mensal - 1º mês(24,90 a partir do 2º mês)";
   // ▲▲▲ FIM LÓGICA PROMOCIONAL ▲▲▲
   
   const [formData, setFormData] = useState({
