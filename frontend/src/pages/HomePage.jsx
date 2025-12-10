@@ -177,7 +177,7 @@ const HomePage = () => {
           {[
             { icon: BarChart3, title: "Dashboard Inteligente", desc: "Visualize toda sua situação financiera em tempo real, em uma única tela." },
             { icon: MessageCircle, title: "Simplific IA", desc: "Seu mordomo financeiro disponível 24 horas. No whatsapp e na plataforma." },
-            { icon: Target, title: "Metas ambiciosas", desc: "Tramsforme seus maiores sonhos em planos concretos. O Simplific te ajuda e te lembra." },
+            { icon: Target, title: "Metas ambiciosas", desc: "Transforme seus maiores sonhos em planos concretos. O Simplific te ajuda e te lembra." },
             { icon: CreditCard, title: "Controle de cartões", desc: "Gerencie todos os seus cartões em um só lugar." },
             { icon: Smartphone, title: "Lançamentos inteligentes", desc: "Registre receitas e despesas em segundos. No whatsapp ou na plataforma." },
             { icon: ShieldCheck, title: "Carteira de investimentos", desc: "Acompanhe sua carteira de investimentos. O Simplific integra com as principais corretoras" },
