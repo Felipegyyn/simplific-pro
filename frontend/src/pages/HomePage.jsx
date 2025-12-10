@@ -131,12 +131,17 @@ const HomePage = () => {
         </div>
       </header>
 
-      {/* --- FAIXA DE URGÊNCIA (Hazard Style) --- */}
-      <div className="bg-yellow-400 text-black py-4 overflow-hidden relative skew-y-1 border-y-4 border-black">
+      {/* --- FAIXA DE URGÊNCIA (Hazard Style - CORRIGIDO) --- */}
+      <div className="bg-yellow-400 text-black py-6 overflow-hidden relative skew-y-1 border-y-4 border-black shadow-[0_0_20px_rgba(234,179,8,0.4)] z-20">
         <div className="container mx-auto px-4 flex justify-between items-center font-black uppercase tracking-[0.2em] text-sm md:text-lg animate-pulse">
-            <span className="flex items-center gap-3"><Flame size={20} fill="black"/> BLACK DECEMBER</span>
-            <span className="hidden md:inline bg-black text-yellow-400 px-4 py-1 transform -skew-x-12">PREÇO NUNCA VISTO ANTES</span>
-            <span className="flex items-center gap-3">VAGAS LIMITADAS <Flame size={20} fill="black"/></span>
+            <span className="flex items-center gap-3"><Flame size={24} fill="black"/> BLACK DECEMBER</span>
+            
+            {/* O ajuste foi aqui: aumentamos o padding vertical e removemos margens negativas arriscadas */}
+            <span className="hidden md:inline-block bg-black text-yellow-400 px-6 py-2 transform -skew-x-12 shadow-lg">
+                PREÇO NUNCA VISTO ANTES
+            </span>
+            
+            <span className="flex items-center gap-3">VAGAS LIMITADAS <Flame size={24} fill="black"/></span>
         </div>
       </div>
 
