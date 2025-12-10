@@ -22,7 +22,7 @@ const Checkout = () => {
   
   const planName = isAnnual 
     ? "Plano Anual" 
-    : "Plano Mensal - 1º mês(24,90 a partir do 2º mês)";
+    : "Plano Mensal - 1º mês. 24,90 a partir do 2º mês";
   // ▲▲▲ FIM LÓGICA PROMOCIONAL ▲▲▲
   
   const [formData, setFormData] = useState({

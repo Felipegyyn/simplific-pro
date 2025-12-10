@@ -252,10 +252,16 @@ const HomePage = () => {
                 <span className="text-8xl md:text-[10rem] font-black text-white tracking-tighter leading-none filter drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]">{currentPlan.price.split(',')[0]}</span>
                 <span className="text-4xl font-black text-white">,{currentPlan.price.split(',')[1]}</span>
               </div>
-              <p className="text-green-400 mb-12 font-black uppercase tracking-[0.2em] text-xl">{currentPlan.period}</p>
+              
+                <p className="text-green-400 mb-4 font-black uppercase tracking-[0.2em] text-xl">{currentPlan.period}</p>
 
-              {/* Lista de Benefícios com Ícones Neon */}
-              <div className="grid gap-5 max-w-md mx-auto mb-14 text-left bg-black/50 p-6 border border-green-500/30">
+{/* NOVA LINHA ADICIONADA: DESCRIÇÃO */}
+<p className="text-gray-300 mb-10 text-lg font-medium max-w-xs mx-auto">
+    {currentPlan.description}
+</p>
+
+{/* Lista de Benefícios com Ícones Neon */}
+<div className="grid gap-5 max-w-md mx-auto mb-14 text-left bg-black/50 p-6 border border-green-500/30">
                 <div className="flex items-center gap-4 text-white font-bold text-lg"><Zap className="text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] flex-shrink-0" size={24} fill="currentColor" /> Acesso TOTAL ao Dashboard Black</div>
                 <div className="flex items-center gap-4 text-white font-bold text-lg"><Zap className="text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] flex-shrink-0" size={24} fill="currentColor" /> Assessor IA Ilimitado (WhatsApp)</div>
                 <div className="flex items-center gap-4 text-white font-bold text-lg"><Zap className="text-green-500 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)] flex-shrink-0" size={24} fill="currentColor" /> Sincronização de Agenda Premium</div>
