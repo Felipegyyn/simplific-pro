@@ -89,7 +89,7 @@ const HomePage = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 max-w-xl border-l-8 border-green-500 pl-6 font-medium leading-relaxed">
-              A oferta mais agressiva do ano: tenha seu <strong>Assessor Financeiro com IA</strong> no WhatsApp pelo preço de um café.
+              A oferta mais agressiva do ano: tenha seu <strong>uma plataforma para chamar de SUA e um Assessor Financeiro com IA 24 horas por dia</strong> no WhatsApp pelo preço de um café.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 pt-6">
@@ -175,12 +175,12 @@ const HomePage = () => {
         
         <div className="container mx-auto px-4 grid md:grid-cols-3 gap-8">
           {[
-            { icon: BarChart3, title: "Dashboard Raio-X", desc: "Visão tática total do seu dinheiro em tempo real." },
-            { icon: MessageCircle, title: "IA Tática no WhatsApp", desc: "Seu mordomo financeiro 24/7. Mande áudio, ele resolve." },
-            { icon: Target, title: "Sistema de Metas", desc: "Trave seus objetivos e o sistema te força a cumprir." },
-            { icon: CreditCard, title: "Domínio de Cartões", desc: "Controle absoluto de faturas e limites." },
-            { icon: Smartphone, title: "Operação Mobile", desc: "Poder total na palma da mão, em qualquer lugar." },
-            { icon: ShieldCheck, title: "Criptografia Militar", desc: "Segurança de nível bancário para seus dados." },
+            { icon: BarChart3, title: "Dashboard Inteligente", desc: "Visualize toda sua situação financiera em tempo real, em uma púnica tela." },
+            { icon: MessageCircle, title: "Simplific IA", desc: "Seu mordomo financeiro disponível 24 horas. No whatsapp e na plataforma." },
+            { icon: Target, title: "Metas ambiciosas", desc: "Tramsforme seus maiores sonhos em planos concretos. O Simplific te ajuda e te lembra." },
+            { icon: CreditCard, title: "Controle de cartões", desc: "Gerencie todos os seus cartões em um só lugar." },
+            { icon: Smartphone, title: "Lançamentos inteligentes", desc: "Registre receitas e despesas em segundos. No whatsapp ou na plataforma." },
+            { icon: ShieldCheck, title: "Carteira de investimentos", desc: "Acompanhe sua carteira de investimentos. O Simplific integra com as principais corretoras" },
           ].map((item, index) => (
             <div key={index} className="p-8 rounded-none bg-gradient-to-b from-gray-900 to-black hover:from-green-950 hover:to-black transition-all border-2 border-gray-800 hover:border-green-500 group relative overflow-hidden">
                 {/* Efeito de Scanline ao passar o mouse */}
@@ -286,8 +286,8 @@ const HomePage = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <h2 className="text-4xl font-black text-center mb-16 text-white uppercase tracking-tight">Perguntas de Quem Vai Mudar de Vida</h2>
           <div className="space-y-4 bg-gray-900/50 p-8 border border-gray-800">
-            <FaqItem question="O PREÇO DE BLACK FRIDAY É VITALÍCIO?" answer="Ao garantir o plano ANUAL hoje, você trava esse valor promocional pelos próximos 12 meses. É a melhor decisão financeira que você pode tomar agora." />
-            <FaqItem question="MEUS DADOS ESTÃO REALMENTE SEGUROS?" answer="Sim. Nível bancário. Usamos criptografia de ponta a ponta. Nem nós temos acesso às suas senhas ou dados bancários brutos." />
+            <FaqItem question="O PREÇO DE BLACK FRIDAY É VITALÍCIO?" answer="Ao garantir o plano ANUAL hoje, você trava esse valor promocional de 4,90 no primeiros mês. E os próximos meses continue acessando por apenas R$ 24,90 por mês.Menos de 1,00 por dia. É a melhor decisão financeira que você pode tomar agora." />
+            <FaqItem question="MEUS DADOS ESTÃO REALMENTE SEGUROS?" answer="Sim. Nível bancário. Usamos criptografia de ponta a ponta. Nem nós temos acesso às suas senhas ou dados bancários brutos.Você pode solicitar a exclusão dos seus dados quando quiser." />
             <FaqItem question="FUNCIONA NO MEU CELULAR?" answer="Perfeitamente. O painel é um Web App responsivo e a IA do Assessor vive nativamente dentro do seu WhatsApp." />
             <FaqItem question="COMO ATIVO O ASSESSOR IA?" answer="Imediatamente após a compra, você acessa seu painel e conecta seu número de WhatsApp em segundos. É instantâneo." />
           </div>
