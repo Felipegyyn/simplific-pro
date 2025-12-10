@@ -152,7 +152,7 @@ const HomePage = () => {
             </div>
             
             <span className="flex items-center gap-3 min-w-fit">
-              VAGAS LIMITADAS <Flame size={26} fill="black"/>
+              SOMENTE ESTE MÊS <Flame size={26} fill="black"/>
             </span>
         </div>
       </div>
