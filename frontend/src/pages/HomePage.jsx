@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
-  Zap, Star, Sparkles, Flame, Timer
+  Zap, Star, Sparkles, Flame, Timer, ArrowRight
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
