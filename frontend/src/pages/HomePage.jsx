@@ -36,7 +36,7 @@ const HomePage = () => {
 
   const pricing = {
     monthly: {
-      oldPrice: "R$ 89,90", // Mostra o preço original riscado
+      oldPrice: "R$ 89,90", // Mostra o preço original riscadoo
       price: "4,90",        // O valor que vai aparecer gigante
       period: "NO 1º MÊS",  // Deixa claro a condição
       description: "Depois R$ 24,90/mês. Cancele quando quiser.",
