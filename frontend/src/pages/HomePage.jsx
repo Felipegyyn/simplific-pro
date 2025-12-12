@@ -89,7 +89,7 @@ const HomePage = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 max-w-xl border-l-8 border-green-500 pl-6 font-medium leading-relaxed">
-              A oferta mais agressiva do ano: tenha seu <strong>uma plataforma para chamar de SUA e um Assessor Financeiro com IA 24 horas por dia</strong> no WhatsApp pelo preço de um café.
+              A oferta mais agressiva do ano: tenha <strong>uma plataforma para chamar de SUA e um Assessor Financeiro com IA 24 horas por dia</strong> no WhatsApp pelo preço de um café.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 pt-6">
