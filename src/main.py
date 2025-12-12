@@ -270,12 +270,14 @@ def check_subscriptions_command():
     # 1. Estão com status 'ativo'.
     # 2. Têm uma data de expiração definida.
     # 3. Essa data de expiração já passou do nosso limite de tolerância.
+    # Busca por usuários que devem ser inativados
     users_to_deactivate = User.query.filter(
         func.lower(User.status) == 'ativo',
         User.subscription_valid_until != None,
-        User.subscription_valid_until <= cutoff_date
+        User.subscription_valid_until <= cutoff_date,
+        User.email != 'felipegyyn@gmail.com'  # <--- LINHA DA IMUNIDADE
     ).all()
-
+    
     if not users_to_deactivate:
         print("--- [CRON] Nenhum usuário para inativar hoje. ---")
         return
