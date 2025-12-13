@@ -63,7 +63,9 @@ CORS(
         "https://simplificpro.com",
         "https://www.simplificpro.com",
         "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "https://diagnostico.simplificpro.com.br", # <--- ADICIONE ESSA LINHA AQUI
+        "https://www.diagnostico.simplificpro.com.br" # <--- POR PRECAUÇÃO, ADICIONE COM WWW TAMBÉM
     ],
     supports_credentials=True
 )
