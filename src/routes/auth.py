@@ -51,3 +51,59 @@ def reset_password():
     db.session.delete(reset_token)
     db.session.commit()
     return jsonify({'message': 'Sua senha foi redefinida com sucesso!'}), 200
+
+# --- ROTA DE CAPTURA DE LEADS (ADICIONAR NO FINAL) ---
+
+@auth_bp.route('/register-lead', methods=['POST'])
+def register_lead():
+    """
+    Recebe leads vindos do Diagnóstico ou Landing Pages externas.
+    Cria o usuário com status 'lead' se ele não existir.
+    """
+    data = request.get_json()
+    email = data.get('email')
+    name = data.get('name')
+    whatsapp = data.get('whatsapp')
+
+    if not email:
+        return jsonify({'error': 'Email é obrigatório'}), 400
+
+    # 1. Verifica se o usuário já existe
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        # Se já existe, atualizamos o WhatsApp se for novo e diferente
+        if whatsapp and whatsapp != user.whatsapp:
+            user.whatsapp = whatsapp
+            db.session.commit()
+        return jsonify({'message': 'Lead já existente. Dados atualizados.'}), 200
+
+    # 2. Se não existe, cria um novo "Lead"
+    try:
+        import secrets # Importação local para gerar senha aleatória
+        random_pass = secrets.token_urlsafe(12)
+        
+        # Criamos o objeto User
+        new_lead = User(
+            name=name or "Lead Visitante",
+            email=email,
+            whatsapp=whatsapp,
+            password_hash="temp_hash", # Valor temporário para não quebrar a regra de 'not null'
+            profile='lead',      # Perfil específico para quem ainda não comprou
+            status='prospect',   # Status de prospecto
+            first_login=True     # Força setup se ele logar um dia
+        )
+        
+        # Gera o hash real da senha aleatória
+        new_lead.set_password(random_pass) 
+
+        db.session.add(new_lead)
+        db.session.commit()
+
+        print(f"✅ Novo Lead capturado: {email} vindo do Diagnóstico.")
+        return jsonify({'message': 'Lead cadastrado com sucesso'}), 201
+
+    except Exception as e:
+        print(f"❌ Erro ao salvar Lead: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Erro interno ao salvar lead'}), 500
