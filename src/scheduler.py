@@ -202,7 +202,7 @@ def recover_lost_leads(app):
         # 3. Disparar Mensagens
         # ATENÇÃO: Substitua 'HX_SEU_TEMPLATE_LEAD' pelo SID que vamos criar no Twilio
         # Se preferir usar mensagem direta (sem template), avise que alteramos aqui.
-        recovery_template_sid = "HX_SEU_TEMPLATE_LEAD_RECOVERY" 
+        recovery_template_sid = "HX6557b7f09693b9ae69415f3a85f2f447" 
 
         for lead in leads_perdidos:
             if not lead.whatsapp: continue
