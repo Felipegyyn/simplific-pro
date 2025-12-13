@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify
 import os
 from src.services.user_service import create_user_from_purchase
-from src.services.notification_service import send_welcome_credentials
+from src.services.notification_service import (
+    send_welcome_credentials, 
+    send_payment_failed_notification
+)
 from src.models.user import User
 from src.models.db import db
 from src.services.user_service import create_user_from_purchase, normalize_phone_number
@@ -160,45 +163,39 @@ def mercadopago_webhook():
             # Aqui poderíamos criar o usuário se quiséssemos, mas por segurança vamos apenas logar
             return jsonify({"status": "user_not_found"}), 200
 
-        # --- A MÁQUINA DE VENDAS ENTRA EM AÇÃO ---
+        
+        # --- A MÁQUINA DE VENDAS (MODO ONLY CARDS) ---
 
-        # CENÁRIO 1: APROVADO (Libera Acesso + Boas Vindas)
+        # CENÁRIO 1: APROVADO (Dinheiro na conta -> Libera Acesso)
         if status == 'approved':
-            print(f"✅ Pagamento Aprovado para {user.email}")
+            print(f"✅ Pagamento Cartão Aprovado para {user.email}")
             
-            # Atualiza status
             user.status = 'ativo'
             user.profile = 'premium'
             user.subscription_valid_until = datetime.utcnow().date() + timedelta(days=32)
             db.session.commit()
-
-            # Envia e-mail de boas vindas se for novo (reaproveitando sua lógica)
-            # if user.first_login: ... (podemos implementar depois)
             
-            # [IMAGEM MENTAL: Robô enviando Whats "Parabéns, acesso liberado!"]
-            # send_whatsapp_message(user.whatsapp, "Seu acesso ao Simplific Pro está liberado!") 
+            # Opcional: Se quiser mandar whats de boas vindas aqui também
+            # send_welcome_credentials(...) 
 
-        # CENÁRIO 2: PENDENTE (Recuperação de PIX) 
-        elif status == 'pending' and payment_method == 'pix':
-            print(f"⏳ PIX Gerado mas não pago por {user.email}")
-            
-            # Pega o código Copia e Cola
-            qr_code = payment_data.get('point_of_interaction', {}).get('transaction_data', {}).get('qr_code')
-            
-            if qr_code:
-                print(f"👉 Código PIX para enviar no Whats: {qr_code[:20]}...")
-                # AQUI ENTRA A AUTOMAÇÃO DE RECUPERAÇÃO
-                # send_whatsapp_message(user.whatsapp, f"Oi {user.name}, vi que gerou o PIX! Segue o código: {qr_code}")
-
-        # CENÁRIO 3: REJEITADO (Recuperação de Cartão)
+        # CENÁRIO 2: REJEITADO (O foco da recuperação)
         elif status == 'rejected':
             print(f"🚫 Cartão recusado ({status_detail}) para {user.email}")
-            # AQUI ENTRA A AUTOMAÇÃO DE TROCA DE PAGAMENTO
-            # send_whatsapp_message(user.whatsapp, "Oi, seu cartão não passou. Quer tentar no PIX com desconto?")
+            
+            # Dispara a recuperação pedindo outro cartão
+            send_payment_failed_notification(user.name, user.whatsapp)
+            
+        # CENÁRIO 3: PENDENTE (Em análise de fraude)
+        elif status == 'in_process' or status == 'pending':
+            # No cartão, 'pending' geralmente é análise de risco. 
+            # Não fazemos nada, esperamos virar approved ou rejected.
+            print(f"⏳ Pagamento em análise (Cartão) para {user.email}")
 
         return jsonify({"status": "processed"}), 200
 
     except Exception as e:
+
+
         print(f"❌ Erro Crítico no Webhook MP: {str(e)}")
         # Retornamos 500 para o MP tentar de novo depois
         return jsonify({"error": "Internal Error"}), 500

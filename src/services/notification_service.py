@@ -105,3 +105,40 @@ def send_password_reset_email(user_email, user_name, token):
     except Exception as e:
         print(f"ERRO CRÍTICO ao enviar e-mail de recuperação: {e}")
         return False
+
+# --- MÁQUINA DE VENDAS (VERSÃO ONLY CARDS) ---
+
+def send_payment_failed_notification(name, whatsapp):
+    """Envia aviso de falha de cartão via Template (Seguro)."""
+    if not whatsapp: return False
+    
+    target = f"whatsapp:{whatsapp}"
+    first_name = name.split()[0] if name else "Visitante"
+    
+    # --- PONTO DE ATENÇÃO: SUBSTITUA PELO SID GERADO NO TWILIO ---
+    # Crie o template: "card_failed_v2"
+    card_template_sid = "HX9ef48ae05557d8f5a9d0e9e9e2aac3d6"
+
+    if "HX_" not in card_template_sid:
+         print("⚠️ AVISO: Template de Cartão não configurado. Pule o envio.")
+         return False
+    
+    try:
+        resultado = send_whatsapp_template(
+            to=target,
+            template_sid=card_template_sid,
+            content_variables={
+                "1": first_name # Variável {{1}} do template (Nome)
+            }
+        )
+        
+        if resultado.get('status') == 'success':
+            print(f"✅ WhatsApp Falha Cartão enviado para {whatsapp}.")
+            return True
+        else:
+            print(f"❌ Erro Twilio Cartão: {resultado.get('message')}")
+            return False
+
+    except Exception as e:
+        print(f"❌ Erro Crítico Cartão: {e}")
+        return False
