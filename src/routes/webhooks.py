@@ -6,6 +6,7 @@ from src.models.user import User
 from src.models.db import db
 from src.services.user_service import create_user_from_purchase, normalize_phone_number
 from datetime import datetime
+import requests
 
 
 
@@ -95,3 +96,109 @@ def monetizze_webhook():
 
     # Responde à Monetizze que recebemos e processamos o webhook com sucesso.
     return jsonify({'status': 'success', 'message': 'Webhook processado'}), 200
+
+
+# --- ROTA NOVA: MERCADO PAGO (A MÁQUINA DE VENDAS) ---
+@webhooks_bp.route('/mercadopago', methods=['POST'])
+def mercadopago_webhook():
+    """
+    Recebe notificação do Mercado Pago, consulta os detalhes e age.
+    """
+    # 1. Tenta pegar o ID e o Tópico (pode vir na URL ou no JSON)
+    topic = request.args.get('topic') or request.args.get('type')
+    resource_id = request.args.get('id') or request.args.get('data.id')
+
+    # Fallback: Se não veio na URL, tenta pegar do JSON
+    if not resource_id:
+        data = request.get_json(silent=True)
+        if data:
+            topic = data.get('type')
+            resource_id = data.get('data', {}).get('id')
+
+    print(f"🔔 [MP Webhook] Recebido: Tópico={topic}, ID={resource_id}")
+
+    # Se não for aviso de pagamento, a gente ignora (ex: aviso de teste)
+    if topic != 'payment' or not resource_id:
+        return jsonify({"status": "ignored"}), 200
+
+    try:
+        # 2. Consultar a API do Mercado Pago para ver quem pagou (Segurança)
+        mp_access_token = os.getenv("MERCADO_PAGO_ACCESS_TOKEN")
+        if not mp_access_token:
+            print("❌ ERRO: Token do MP não configurado.")
+            return jsonify({"error": "Config error"}), 500
+
+        headers = {"Authorization": f"Bearer {mp_access_token}"}
+        url_consult = f"https://api.mercadopago.com/v1/payments/{resource_id}"
+        
+        resp_mp = requests.get(url_consult, headers=headers)
+        
+        if resp_mp.status_code != 200:
+            print(f"❌ Erro ao consultar MP: {resp_mp.text}")
+            return jsonify({"status": "error_consulting_mp"}), 200 # Retorna 200 pro MP parar de mandar
+
+        payment_data = resp_mp.json()
+        
+        # 3. Extrair dados vitais
+        status = payment_data.get('status') # approved, pending, rejected
+        status_detail = payment_data.get('status_detail')
+        # AQUI ESTÁ O SEGREDO DO PASSO 1: O 'external_reference' é o email
+        user_email = payment_data.get('external_reference') 
+        payment_method = payment_data.get('payment_method_id')
+        transaction_amount = payment_data.get('transaction_amount')
+        
+        print(f"📊 [MP Análise] User: {user_email} | Status: {status} | Método: {payment_method}")
+
+        if not user_email:
+            print("⚠️ Pagamento sem external_reference (Email). Impossível vincular usuário.")
+            return jsonify({"status": "ok"}), 200
+
+        # 4. Buscar Usuário no Banco
+        user = User.query.filter_by(email=user_email).first()
+        if not user:
+            print(f"⚠️ Usuário {user_email} não encontrado no banco.")
+            # Aqui poderíamos criar o usuário se quiséssemos, mas por segurança vamos apenas logar
+            return jsonify({"status": "user_not_found"}), 200
+
+        # --- A MÁQUINA DE VENDAS ENTRA EM AÇÃO ---
+
+        # CENÁRIO 1: APROVADO (Libera Acesso + Boas Vindas)
+        if status == 'approved':
+            print(f"✅ Pagamento Aprovado para {user.email}")
+            
+            # Atualiza status
+            user.status = 'ativo'
+            user.profile = 'premium'
+            user.subscription_valid_until = datetime.utcnow().date() + timedelta(days=32)
+            db.session.commit()
+
+            # Envia e-mail de boas vindas se for novo (reaproveitando sua lógica)
+            # if user.first_login: ... (podemos implementar depois)
+            
+            # [IMAGEM MENTAL: Robô enviando Whats "Parabéns, acesso liberado!"]
+            # send_whatsapp_message(user.whatsapp, "Seu acesso ao Simplific Pro está liberado!") 
+
+        # CENÁRIO 2: PENDENTE (Recuperação de PIX) 
+        elif status == 'pending' and payment_method == 'pix':
+            print(f"⏳ PIX Gerado mas não pago por {user.email}")
+            
+            # Pega o código Copia e Cola
+            qr_code = payment_data.get('point_of_interaction', {}).get('transaction_data', {}).get('qr_code')
+            
+            if qr_code:
+                print(f"👉 Código PIX para enviar no Whats: {qr_code[:20]}...")
+                # AQUI ENTRA A AUTOMAÇÃO DE RECUPERAÇÃO
+                # send_whatsapp_message(user.whatsapp, f"Oi {user.name}, vi que gerou o PIX! Segue o código: {qr_code}")
+
+        # CENÁRIO 3: REJEITADO (Recuperação de Cartão)
+        elif status == 'rejected':
+            print(f"🚫 Cartão recusado ({status_detail}) para {user.email}")
+            # AQUI ENTRA A AUTOMAÇÃO DE TROCA DE PAGAMENTO
+            # send_whatsapp_message(user.whatsapp, "Oi, seu cartão não passou. Quer tentar no PIX com desconto?")
+
+        return jsonify({"status": "processed"}), 200
+
+    except Exception as e:
+        print(f"❌ Erro Crítico no Webhook MP: {str(e)}")
+        # Retornamos 500 para o MP tentar de novo depois
+        return jsonify({"error": "Internal Error"}), 500

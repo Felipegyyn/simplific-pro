@@ -22,8 +22,10 @@ def create_one_time_payment(user_email, card_token, amount, description):
         "installments": 1,
         "payer": {
             "email": user_email
-        }
+        },
+        "external_reference": user_email  # <--- ADICIONE ESSA LINHA AQUI
     }
+    
 
     try:
         print(f"Criando pagamento avulso de R$ {amount} para {user_email}...")
@@ -55,6 +57,7 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
     subscription_data = {
         "reason": "Assinatura - Simplific Pro",
         "payer_email": user_email,
+        "external_reference": user_email, # <--- ADICIONE ESSA LINHA AQUI
         "auto_recurring": {
             "frequency": frequency,
             "frequency_type": "months",
