@@ -167,4 +167,61 @@ def verificar_lancamentos_pendentes(app):
 
         print("--- [SCHEDULER] Verificação de lançamentos pendentes concluída. ---")
 
+# ▼▼▼ COLE ISSO NO FINAL DO ARQUIVO SCHEDULER.PY ▼▼▼
+
+def recover_lost_leads(app):
+    """
+    ROBÔ CAÇADOR: Busca leads que se cadastraram há 24h e ainda não compraram.
+    Envia mensagem de recuperação via WhatsApp.
+    """
+    with app.app_context():
+        print(f"--- [SCHEDULER] Iniciando recuperação de leads perdidos em {datetime.now()} ---")
+        
+        # 1. Definir a janela de tempo (Quem entrou ontem)
+        # Pegamos quem se cadastrou entre 24h e 48h atrás
+        agora = datetime.utcnow()
+        inicio_janela = agora - timedelta(hours=48)
+        fim_janela = agora - timedelta(hours=24)
+        
+        # 2. Buscar no Banco
+        # Status 'prospect' = Quem veio do diagnóstico e não comprou
+        # Profile 'lead' = Confirmação extra
+        leads_perdidos = User.query.filter(
+            User.status == 'prospect',
+            User.profile == 'lead',
+            User.created_at >= inicio_janela,
+            User.created_at <= fim_janela
+        ).all()
+        
+        if not leads_perdidos:
+            print("--- [SCHEDULER] Nenhum lead para recuperar hoje. ---")
+            return
+
+        print(f"--- [SCHEDULER] Encontrados {len(leads_perdidos)} leads para resgatar! ---")
+
+        # 3. Disparar Mensagens
+        # ATENÇÃO: Substitua 'HX_SEU_TEMPLATE_LEAD' pelo SID que vamos criar no Twilio
+        # Se preferir usar mensagem direta (sem template), avise que alteramos aqui.
+        recovery_template_sid = "HX_SEU_TEMPLATE_LEAD_RECOVERY" 
+
+        for lead in leads_perdidos:
+            if not lead.whatsapp: continue
+            
+            print(f"👉 Enviando resgate para: {lead.email}")
+            
+            try:
+                # Envia usando Template (Seguro)
+                send_whatsapp_template(
+                    to=f"whatsapp:{lead.whatsapp}",
+                    template_sid=recovery_template_sid,
+                    content_variables={
+                        "1": lead.name.split()[0] # Primeiro nome
+                    }
+                )
+                time.sleep(1) # Pausa para não travar a API
+            except Exception as e:
+                print(f"❌ Erro ao enviar para {lead.email}: {e}")
+
+    print("--- [SCHEDULER] Recuperação finalizada. ---")
+
 
