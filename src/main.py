@@ -47,7 +47,7 @@ from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
 from src.routes.chat_bp import chat_bp
 from src.routes.payment_routes import payment_bp
 from apscheduler.schedulers.background import BackgroundScheduler
-from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, verificar_lancamentos_pendentes
+from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, verificar_lancamentos_pendentes, recover_lost_leads
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
@@ -400,6 +400,28 @@ def check_achievements_command():
         db.session.commit()
     
     print("--- [CRON] Verificação de conquistas concluída. ---")
+
+# ▼▼▼ COLE ISTO NO FINAL DO ARQUIVO MAIN.PY ▼▼▼
+
+# Configuração do Agendador (Scheduler)
+# Isso garante que o Robô rode em segundo plano sem travar o site
+if os.environ.get('WERKZEUG_RUN_MAIN') != 'true': # Evita rodar duplicado em modo debug
+    scheduler = BackgroundScheduler()
+    
+    # 1. Lembretes de Agenda (Ex: Boleto vencendo hoje) - Roda todo dia às 08:00
+    scheduler.add_job(func=check_and_send_reminders, args=[app], trigger="cron", hour=8, minute=0)
+    
+    # 2. Resumos Semanais (Ex: Domingo) - Roda Domingo às 09:00
+    scheduler.add_job(func=enviar_resumos_semanais, args=[app], trigger="cron", day_of_week='sun', hour=9, minute=0)
+    
+    # 3. Lançamentos Pendentes (Confirmação) - Roda todo dia às 20:00
+    scheduler.add_job(func=verificar_lancamentos_pendentes, args=[app], trigger="cron", hour=20, minute=0)
+
+    # 4. O ROBÔ CAÇADOR DE LEADS (Recuperação) - Roda todo dia às 09:30
+    scheduler.add_job(func=recover_lost_leads, args=[app], trigger="cron", hour=9, minute=30)
+    
+    scheduler.start()
+    print("--- [SISTEMA] Agendador de tarefas iniciado com sucesso! ---")
 
 
 
