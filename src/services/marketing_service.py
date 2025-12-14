@@ -5,34 +5,29 @@ from facebook_business.adobjects.campaign import Campaign
 
 class MetaAdsService:
     def __init__(self):
-        # O Python vai buscar isso lá nas configurações do Render que você acabou de criar
         self.app_id = os.getenv('META_APP_ID')
         self.app_secret = os.getenv('META_APP_SECRET')
         self.access_token = os.getenv('META_ACCESS_TOKEN')
         self.ad_account_id = os.getenv('META_AD_ACCOUNT_ID')
 
-        # Inicializa a conexão com a API
         if self.app_id and self.access_token:
             try:
                 FacebookAdsApi.init(self.app_id, self.app_secret, self.access_token)
-                print("--- [META ADS] Conexão com Facebook iniciada com sucesso. ---")
+                print("--- [META ADS] Conexão iniciada. ---")
             except Exception as e:
                 print(f"--- [META ADS] ERRO ao conectar: {e} ---")
-        else:
-            print("⚠️ AVISO: Credenciais do Meta Ads não configuradas no Render.")
 
     def get_campaigns(self):
-        """Busca todas as campanhas ativas e métricas com janela VITALÍCIA."""
+        """Busca campanhas com métricas VITALÍCIAS (Lifetime)."""
         if not self.ad_account_id: return []
 
         try:
             account = AdAccount(self.ad_account_id)
-            
-            # Campos da Campanha
             fields = [
                 Campaign.Field.name,
                 Campaign.Field.status,
                 Campaign.Field.daily_budget,
+                Campaign.Field.lifetime_budget,
                 Campaign.Field.id
             ]
             
@@ -46,8 +41,7 @@ class MetaAdsService:
             
             results = []
             for camp in campaigns:
-                # --- A MÁGICA ACONTECE AQUI ---
-                # date_preset='maximum' pega todo o histórico da campanha
+                # Busca insights VITALÍCIOS
                 insights = camp.get_insights(
                     fields=['spend', 'cpc', 'cpm', 'actions', 'clicks', 'impressions'],
                     params={'date_preset': 'maximum'} 
@@ -65,9 +59,14 @@ class MetaAdsService:
                     impressions = 0
                     cpc = 0.0
                 
-                # Tratamento do orçamento
+                # Tratamento de orçamento
+                # Se tiver daily_budget, usa ele. Se não, tenta ver se tem lifetime.
                 daily_budget_cents = camp.get('daily_budget')
-                daily_budget_real = float(daily_budget_cents) / 100 if daily_budget_cents else 0
+                if daily_budget_cents:
+                    daily_budget_real = float(daily_budget_cents) / 100
+                else:
+                    # Se for ABO (Orçamento no AdSet), a campanha vem sem budget
+                    daily_budget_real = 0 
 
                 results.append({
                     'id': camp['id'],
@@ -85,35 +84,33 @@ class MetaAdsService:
         except Exception as e:
             print(f"❌ Erro ao buscar campanhas Meta: {e}")
             return []
-            
+
     def toggle_campaign_status(self, campaign_id, new_status):
         """
-        Muda o status.
-        new_status deve ser 'ACTIVE' ou 'PAUSED'
+        CORREÇÃO: Usa api_update para forçar a mudança no servidor.
         """
         try:
             campaign = Campaign(campaign_id)
-            campaign.update({
+            # api_update envia um POST direto para a API
+            campaign.api_update(params={
                 Campaign.Field.status: new_status
             })
-            print(f"✅ Campanha {campaign_id} atualizada para {new_status}")
+            print(f"✅ Campanha {campaign_id} atualizada via API para {new_status}")
             return True
         except Exception as e:
-            print(f"❌ Erro ao atualizar status da campanha: {e}")
+            print(f"❌ Erro CRÍTICO ao atualizar status da campanha {campaign_id}: {e}")
+            # Aqui podemos ver se o erro é por causa de regras de negócio (ex: AdSet incompleto)
             return False
 
     def update_budget(self, campaign_id, new_budget_brl):
         """
-        Atualiza o orçamento diário.
-        Recebe valor em Reais (ex: 50.00) e converte para Centavos pro Facebook.
+        Atualiza o orçamento diário via api_update.
         """
         try:
             campaign = Campaign(campaign_id)
-            
-            # Converte Reais para Centavos
             budget_cents = int(float(new_budget_brl) * 100)
             
-            campaign.update({
+            campaign.api_update(params={
                 Campaign.Field.daily_budget: budget_cents
             })
             print(f"✅ Orçamento da campanha {campaign_id} atualizado para {budget_cents} cents")
