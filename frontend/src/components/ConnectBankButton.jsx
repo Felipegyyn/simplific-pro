@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PluggyConnect } from 'react-pluggy-connect';
+import apiService from '../services/api'; // <--- Importamos o seu serviço oficial
 
 const ConnectBankButton = () => {
   const [connectToken, setConnectToken] = useState(null);
@@ -9,35 +10,33 @@ const ConnectBankButton = () => {
   const handleStartConnection = async () => {
     setIsConnecting(true);
     try {
-      // Pega o token do usuário logado (ajuste a chave se necessário, ex: 'auth_token')
-      const userToken = localStorage.getItem('token'); 
+      // USAMOS O APISERVICE (Ele já injeta o token/cookie automaticamente)
+      const response = await apiService.post('/api/pluggy/create-token', {});
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/pluggy/create-token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}` // Envia o JWT para o backend saber quem é
-        }
-      });
+      // O apiService geralmente retorna os dados direto (sem precisar de .json())
+      // Se der erro, ele cai no catch.
+      
+      // Ajuste de segurança: Verifica se a resposta veio no formato { accessToken: ... }
+      const token = response.accessToken || response.data?.accessToken;
+      
+      if (token) {
+        setConnectToken(token);
+      } else {
+        throw new Error("Token não encontrado na resposta");
+      }
 
-      if (!response.ok) throw new Error('Erro ao obter token');
-
-      const data = await response.json();
-      setConnectToken(data.accessToken); // Salva o token da Pluggy
     } catch (error) {
-      console.error("Erro:", error);
-      alert("Erro ao iniciar conexão. Tente novamente.");
+      console.error("Erro detalhado:", error);
+      alert("Erro ao iniciar conexão. Tente fazer Logout e Login novamente.");
       setIsConnecting(false);
     }
   };
 
-  // 2. O que acontece quando o usuário termina de conectar no Widget
   const handleSuccess = (itemData) => {
     console.log("Sucesso! Item ID:", itemData.item.id);
     alert(`Conexão realizada com sucesso! ID: ${itemData.item.id}`);
     
-    // AQUI VAMOS CHAMAR A ETAPA 6 (Sincronizar dados)
-    // Por enquanto, só fecha o widget
+    // Aqui vamos implementar a sincronização automática depois
     setConnectToken(null);
     setIsConnecting(false);
   };
@@ -50,11 +49,10 @@ const ConnectBankButton = () => {
 
   return (
     <div>
-      {/* Se já temos o token, mostramos o Widget (invisível ou pop-up) */}
       {connectToken ? (
         <PluggyConnect
           connectToken={connectToken}
-          includeSandbox={true} // True para testes, False para produção
+          includeSandbox={true}
           onSuccess={handleSuccess}
           onError={handleError}
           onClose={() => {
@@ -63,12 +61,11 @@ const ConnectBankButton = () => {
           }}
         />
       ) : (
-        /* Se não, mostramos o botão */
         <button 
           onClick={handleStartConnection}
           disabled={isConnecting}
           style={{
-            backgroundColor: '#00D09C', // Verde Nubank/Pluggy
+            backgroundColor: '#00D09C',
             color: 'white',
             padding: '10px 20px',
             border: 'none',
