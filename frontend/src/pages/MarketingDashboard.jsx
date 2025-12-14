@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'; // Sua instância do Axios
+import api from '../services/api'; 
 import { Megaphone, RefreshCw, Power, AlertCircle, Loader2 } from 'lucide-react';
 
 const MarketingDashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [updating, setUpdating] = useState(null); // ID da campanha sendo atualizada
+  const [updating, setUpdating] = useState(null); 
 
   // 1. Busca as campanhas ao carregar
   useEffect(() => {
@@ -16,12 +16,18 @@ const MarketingDashboard = () => {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/marketing/campaigns');
+      // CORREÇÃO: Adicionado /api no início
+      const response = await api.get('/api/marketing/campaigns');
       setCampaigns(response.data);
       setError('');
     } catch (err) {
       console.error("Erro ao buscar campanhas:", err);
-      setError('Falha ao carregar campanhas. Verifique se você é Admin.');
+      // Se o erro for 403, é permissão. Se for outro, mostramos msg genérica.
+      if (err.response && err.response.status === 403) {
+        setError('Acesso negado: Seu usuário não é Admin.');
+      } else {
+        setError('Falha ao carregar campanhas. Verifique a conexão com o Facebook.');
+      }
     } finally {
       setLoading(false);
     }
@@ -32,8 +38,9 @@ const MarketingDashboard = () => {
     const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
     setUpdating(id);
     try {
-      await api.post(`/marketing/campaigns/${id}/toggle`, { status: newStatus });
-      // Atualiza localmente
+      // CORREÇÃO: Adicionado /api no início
+      await api.post(`/api/marketing/campaigns/${id}/toggle`, { status: newStatus });
+      
       setCampaigns(campaigns.map(c => 
         c.id === id ? { ...c, status: newStatus } : c
       ));
@@ -50,7 +57,8 @@ const MarketingDashboard = () => {
     
     setUpdating(id);
     try {
-      await api.post(`/marketing/campaigns/${id}/budget`, { budget: parseFloat(newBudget) });
+      // CORREÇÃO: Adicionado /api no início
+      await api.post(`/api/marketing/campaigns/${id}/budget`, { budget: parseFloat(newBudget) });
       alert("Orçamento atualizado com sucesso!");
     } catch (err) {
       alert("Erro ao atualizar orçamento. Verifique o console.");
@@ -162,7 +170,7 @@ const MarketingDashboard = () => {
               {campaigns.length === 0 && !error && !loading && (
                 <tr>
                   <td colSpan="5" className="p-8 text-center text-gray-500">
-                    Nenhuma campanha encontrada no Facebook.
+                    Nenhuma campanha encontrada no Facebook ou erro na API.
                   </td>
                 </tr>
               )}
