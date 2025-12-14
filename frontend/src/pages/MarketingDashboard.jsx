@@ -3,12 +3,12 @@ import api from '../services/api';
 import { Megaphone, RefreshCw, Power, AlertCircle, Loader2 } from 'lucide-react';
 
 const MarketingDashboard = () => {
-  const [campaigns, setCampaigns] = useState([]);
+  // Inicializa como array vazio para evitar erros
+  const [campaigns, setCampaigns] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null); 
 
-  // 1. Busca as campanhas ao carregar
   useEffect(() => {
     fetchCampaigns();
   }, []);
@@ -16,34 +16,49 @@ const MarketingDashboard = () => {
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
-      // CORREÇÃO: Adicionado /api no início
-      const response = await api.get('/api/marketing/campaigns');
-      setCampaigns(response.data);
       setError('');
+      
+      console.log("--- [DEBUG] Buscando campanhas... ---");
+      const response = await api.get('/api/marketing/campaigns');
+      
+      console.log("--- [DEBUG] Resposta recebida:", response.data); // <--- OLHE ISSO NO CONSOLE
+
+      // BLINDAGEM: Só atualiza se for um Array. Se não for, assume vazio.
+      if (Array.isArray(response.data)) {
+        setCampaigns(response.data);
+      } else {
+        console.error("ERRO CRÍTICO: Dados recebidos não são uma lista!", response.data);
+        setCampaigns([]); // Força lista vazia para não quebrar a tela
+        setError('Erro: Formato de dados inválido recebido do servidor.');
+      }
+
     } catch (err) {
-      console.error("Erro ao buscar campanhas:", err);
-      // Se o erro for 403, é permissão. Se for outro, mostramos msg genérica.
+      console.error("--- [DEBUG] Erro na requisição:", err);
       if (err.response && err.response.status === 403) {
         setError('Acesso negado: Seu usuário não é Admin.');
+      } else if (err.response && err.response.status === 404) {
+        setError('Erro 404: Rota não encontrada. Verifique o prefixo /api');
       } else {
-        setError('Falha ao carregar campanhas. Verifique a conexão com o Facebook.');
+        setError('Falha ao carregar campanhas. Verifique o console.');
       }
+      setCampaigns([]); // Garante que não quebra no erro
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Função para Ligar/Desligar
   const handleToggle = async (id, currentStatus) => {
     const newStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
     setUpdating(id);
     try {
-      // CORREÇÃO: Adicionado /api no início
       await api.post(`/api/marketing/campaigns/${id}/toggle`, { status: newStatus });
       
-      setCampaigns(campaigns.map(c => 
-        c.id === id ? { ...c, status: newStatus } : c
-      ));
+      // Atualiza localmente apenas se campaigns for um array válido
+      if (Array.isArray(campaigns)) {
+          setCampaigns(campaigns.map(c => 
+            c.id === id ? { ...c, status: newStatus } : c
+          ));
+      }
     } catch (err) {
       alert("Erro ao alterar status no Facebook.");
     } finally {
@@ -51,17 +66,15 @@ const MarketingDashboard = () => {
     }
   };
 
-  // 3. Função para Atualizar Orçamento
   const handleUpdateBudget = async (id, newBudget) => {
     if (!newBudget || newBudget < 5) return alert("Mínimo R$ 5,00");
     
     setUpdating(id);
     try {
-      // CORREÇÃO: Adicionado /api no início
       await api.post(`/api/marketing/campaigns/${id}/budget`, { budget: parseFloat(newBudget) });
       alert("Orçamento atualizado com sucesso!");
     } catch (err) {
-      alert("Erro ao atualizar orçamento. Verifique o console.");
+      alert("Erro ao atualizar orçamento.");
     } finally {
       setUpdating(null);
     }
@@ -77,7 +90,6 @@ const MarketingDashboard = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
@@ -104,7 +116,6 @@ const MarketingDashboard = () => {
         </div>
       )}
 
-      {/* Tabela de Campanhas */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -118,7 +129,8 @@ const MarketingDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {campaigns.map((camp) => (
+              {/* BLINDAGEM EXTRA NO MAP */}
+              {Array.isArray(campaigns) && campaigns.map((camp) => (
                 <tr key={camp.id} className={`hover:bg-gray-50 transition-colors ${updating === camp.id ? 'opacity-50 pointer-events-none' : ''}`}>
                   <td className="p-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -131,7 +143,7 @@ const MarketingDashboard = () => {
                   </td>
                   <td className="p-4 font-medium text-gray-900">{camp.name}</td>
                   <td className="p-4 text-gray-600">
-                    R$ {camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    R$ {camp.total_spend ? camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
                   </td>
                   <td className="p-4">
                     <div className="relative">
@@ -167,20 +179,16 @@ const MarketingDashboard = () => {
                 </tr>
               ))}
               
-              {campaigns.length === 0 && !error && !loading && (
+              {(!Array.isArray(campaigns) || campaigns.length === 0) && !error && !loading && (
                 <tr>
                   <td colSpan="5" className="p-8 text-center text-gray-500">
-                    Nenhuma campanha encontrada no Facebook ou erro na API.
+                    Nenhuma campanha encontrada no Facebook.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
-      
-      <div className="text-center text-xs text-gray-400">
-        * Alterações de orçamento podem levar até 15min para refletir no painel do Facebook.
       </div>
     </div>
   );
