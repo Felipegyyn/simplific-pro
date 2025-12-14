@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import ConnectBankButton from '@/components/ConnectBankButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -457,13 +458,22 @@ const respostaFaturas = await apiService.get(url);
             <TabsContent value="cartoes" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold dark:text-slate-100">Meus Cartões</h3>
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Adicionar Cartão
-                    </Button>
-                  </DialogTrigger>
+
+                {/* ▼▼▼ COMEÇO DA MUDANÇA: Agrupamos os botões aqui ▼▼▼ */}
+                <div className="flex items-center gap-2">
+                  
+                  {/* 1. Botão Automático (Verde) */}
+                  <ConnectBankButton />
+
+                  {/* 2. Botão Manual (Seu botão antigo) */}
+                  <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Manual
+                      </Button>
+                    </DialogTrigger>
+
                   <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                       <DialogTitle>Adicionar Novo Cartão</DialogTitle>
@@ -549,6 +559,7 @@ const respostaFaturas = await apiService.get(url);
                     </form>
                   </DialogContent>
                 </Dialog>
+                </div>
 
 
                 <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
