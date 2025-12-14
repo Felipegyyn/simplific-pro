@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Achievements from './pages/Achievements';
 import Planning from './pages/Planning';
+import MarketingDashboard from './pages/MarketingDashboard';
 import Transactions from './pages/Transactions';
 import CreditCards from './pages/CreditCards';
 import Goals from './pages/Goals';
@@ -171,6 +172,17 @@ return (
                 </AdminRoute>
                 } 
                 />
+
+              {/* Rota de Gestão de Marketing (Protegida) */}
+                <Route 
+                  path="/admin/marketing" 
+                  element={
+                    <AdminRoute user={user}>
+                      <MarketingDashboard />
+                    </AdminRoute>
+                  } 
+                />
+
                 <Route path="/reports" element={<Reports user={user} onLogout={handleLogout} />} />
                 <Route path="/settings" element={<Settings user={user} onLogout={handleLogout} />} />
             </Route>

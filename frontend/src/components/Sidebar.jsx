@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
-  Settings, BarChart3, Bot, Award 
+  Settings, BarChart3, Bot, Award, Megaphone
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; // Importando utilitário de classes (se disponível)
@@ -60,6 +60,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     { name: 'Análise', icon: BarChart3, path: '/analysis' },
     { name: 'Conquistas', icon: Award, path: '/achievements' },
     { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
+    { name: 'Marketing', icon: Megaphone, path: '/admin/marketing', adminOnly: true }, // <--- NOVO ITEM
     { name: 'Configurações', icon: Settings, path: '/settings' }
   ];
 
