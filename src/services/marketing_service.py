@@ -22,13 +22,13 @@ class MetaAdsService:
             print("⚠️ AVISO: Credenciais do Meta Ads não configuradas no Render.")
 
     def get_campaigns(self):
-        """Busca todas as campanhas ativas e seus dados."""
+        """Busca todas as campanhas ativas e métricas com janela VITALÍCIA."""
         if not self.ad_account_id: return []
 
         try:
             account = AdAccount(self.ad_account_id)
             
-            # Campos que queremos buscar
+            # Campos da Campanha
             fields = [
                 Campaign.Field.name,
                 Campaign.Field.status,
@@ -36,23 +36,36 @@ class MetaAdsService:
                 Campaign.Field.id
             ]
             
-            # Busca as campanhas (Status ACTIVE ou PAUSED)
             campaigns = account.get_campaigns(
                 fields=fields, 
                 params={
                     'limit': 50,
-                    'effective_status': ['ACTIVE', 'PAUSED'] # Traz só o que importa
+                    'effective_status': ['ACTIVE', 'PAUSED']
                 }
             )
             
             results = []
             for camp in campaigns:
-                # Busca insights (gastos) APENAS desta campanha
-                insights = camp.get_insights(fields=['spend', 'cpc', 'actions'])
+                # --- A MÁGICA ACONTECE AQUI ---
+                # date_preset='maximum' pega todo o histórico da campanha
+                insights = camp.get_insights(
+                    fields=['spend', 'cpc', 'cpm', 'actions', 'clicks', 'impressions'],
+                    params={'date_preset': 'maximum'} 
+                )
                 
-                spend = insights[0]['spend'] if insights else 0
+                if insights:
+                    data = insights[0]
+                    spend = float(data.get('spend', 0))
+                    clicks = int(data.get('clicks', 0))
+                    impressions = int(data.get('impressions', 0))
+                    cpc = float(data.get('cpc', 0)) if 'cpc' in data else 0.0
+                else:
+                    spend = 0.0
+                    clicks = 0
+                    impressions = 0
+                    cpc = 0.0
                 
-                # Tratamento do orçamento (vem em centavos)
+                # Tratamento do orçamento
                 daily_budget_cents = camp.get('daily_budget')
                 daily_budget_real = float(daily_budget_cents) / 100 if daily_budget_cents else 0
 
@@ -60,8 +73,11 @@ class MetaAdsService:
                     'id': camp['id'],
                     'name': camp['name'],
                     'status': camp['status'],
-                    'daily_budget': daily_budget_real, # Já convertido para Reais
-                    'total_spend': spend
+                    'daily_budget': daily_budget_real,
+                    'total_spend': spend,
+                    'clicks': clicks,
+                    'impressions': impressions,
+                    'cpc': cpc
                 })
                 
             return results
@@ -69,7 +85,7 @@ class MetaAdsService:
         except Exception as e:
             print(f"❌ Erro ao buscar campanhas Meta: {e}")
             return []
-
+            
     def toggle_campaign_status(self, campaign_id, new_status):
         """
         Muda o status.
