@@ -2,6 +2,7 @@ import os
 import sys
 from dotenv import load_dotenv
 from src.routes.marketing_routes import marketing_bp # <--- Adicione isto
+from src.routes.pluggy_routes import pluggy_bp
 load_dotenv()
 import cloudinary
 import cloudinary.uploader
@@ -103,6 +104,7 @@ app.register_blueprint(analysis_bp, url_prefix='/api')
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(marketing_bp, url_prefix='/api/marketing') # <--- Adicione isto
+app.register_blueprint(pluggy_bp, url_prefix='/api/pluggy')
 
 # Adicione esta linha logo acima da sua função
 

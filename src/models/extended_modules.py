@@ -18,6 +18,8 @@ class CreditCard(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     card_number = db.Column(db.String(20))
     last_digits = db.Column(db.String(4))  # <<< ADICIONE ESTA LINHA
+    pluggy_item_id = db.Column(db.String(100), nullable=True)       ### <<< NOVO (ID da Conexão Geral)
+    pluggy_credit_card_id = db.Column(db.String(100), nullable=True) ### <<< NOVO (ID desse cartão específico)
     transactions = db.relationship("CreditCardTransaction", backref="credit_card", lazy=True)
 
 
@@ -31,6 +33,8 @@ class CreditCard(db.Model):
             'closing_day': self.closing_day,
             'due_day': self.due_day,
             'is_active': self.is_active,
+            'last_digits': self.last_digits,
+            'is_pluggy_connected': bool(self.pluggy_item_id), ### <<< NOVO (Para o front saber se é automático)
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
@@ -50,6 +54,8 @@ class CreditCardTransaction(db.Model):
     is_recurring = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    pluggy_transaction_id = db.Column(db.String(150), unique=True, nullable=True) ### <<< NOVO (ID Único da transação)
+
     
     def to_dict(self):
         from src.models.financial import Category
@@ -65,6 +71,7 @@ class CreditCardTransaction(db.Model):
             'installments': self.installments,
             'current_installment': self.current_installment,
             'is_recurring': self.is_recurring,
+            'pluggy_transaction_id': self.pluggy_transaction_id, ### <<< NOVO
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
