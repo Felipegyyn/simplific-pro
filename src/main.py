@@ -1,6 +1,7 @@
 import os
 import sys
 from dotenv import load_dotenv
+from src.routes.marketing_routes import marketing_bp # <--- Adicione isto
 load_dotenv()
 import cloudinary
 import cloudinary.uploader
@@ -12,6 +13,7 @@ cloudinary.config(
 )
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
 
 from flask import Flask, send_from_directory, jsonify, request, Response
 from flask_cors import CORS
@@ -100,6 +102,7 @@ app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(marketing_bp, url_prefix='/api/marketing') # <--- Adicione isto
 
 # Adicione esta linha logo acima da sua função
 
