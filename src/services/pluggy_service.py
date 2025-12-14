@@ -64,3 +64,33 @@ class PluggyService:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         return response.json()['results']
+
+    
+    def fetch_transactions(self, account_id):
+        """
+        Busca as transações de uma conta específica (Account ID).
+        """
+        api_key = self._get_api_key()
+        # Busca transações dos últimos 90 dias (padrão)
+        url = f"{self.BASE_URL}/transactions?accountId={account_id}&from=2024-01-01" 
+        headers = {"X-API-KEY": api_key}
+        
+        all_transactions = []
+        page = 1
+        
+        while True:
+            response = requests.get(f"{url}&page={page}", headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get('results', [])
+            
+            if not results:
+                break
+                
+            all_transactions.extend(results)
+            page += 1
+            
+            if page > data.get('totalPages', 1):
+                break
+                
+        return all_transactions
