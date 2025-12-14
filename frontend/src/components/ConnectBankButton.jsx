@@ -1,50 +1,65 @@
 import React, { useState } from 'react';
 import { PluggyConnect } from 'react-pluggy-connect';
-import apiService from '../services/api'; // <--- Importamos o seu serviço oficial
+import apiService from '../services/api'; 
 
 const ConnectBankButton = () => {
   const [connectToken, setConnectToken] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(''); // Para mostrar "Sincronizando..."
 
-  // 1. Busca o Token no seu Backend
+  // 1. Inicia o processo (Pede o Token)
   const handleStartConnection = async () => {
     setIsConnecting(true);
+    setStatusMessage('Iniciando...');
     try {
-      // USAMOS O APISERVICE (Ele já injeta o token/cookie automaticamente)
       const response = await apiService.post('/api/pluggy/create-token', {});
-
-      // O apiService geralmente retorna os dados direto (sem precisar de .json())
-      // Se der erro, ele cai no catch.
-      
-      // Ajuste de segurança: Verifica se a resposta veio no formato { accessToken: ... }
       const token = response.accessToken || response.data?.accessToken;
       
       if (token) {
         setConnectToken(token);
+        setStatusMessage('');
       } else {
-        throw new Error("Token não encontrado na resposta");
+        throw new Error("Token não veio");
       }
-
     } catch (error) {
-      console.error("Erro detalhado:", error);
-      alert("Erro ao iniciar conexão. Tente fazer Logout e Login novamente.");
+      console.error("Erro:", error);
+      alert("Erro ao iniciar. Tente novamente.");
       setIsConnecting(false);
     }
   };
 
-  const handleSuccess = (itemData) => {
-    console.log("Sucesso! Item ID:", itemData.item.id);
-    alert(`Conexão realizada com sucesso! ID: ${itemData.item.id}`);
-    
-    // Aqui vamos implementar a sincronização automática depois
-    setConnectToken(null);
-    setIsConnecting(false);
+  // 2. O usuário conectou com sucesso! Agora vamos sincronizar.
+  const handleSuccess = async (itemData) => {
+    console.log("Conexão feita! ID:", itemData.item.id);
+    setConnectToken(null); // Fecha o widget visualmente
+    setIsConnecting(true); // Mantém o botão em loading
+    setStatusMessage('Sincronizando dados...');
+
+    try {
+      // CHAMA A ROTA MÁGICA DE SINCRONIZAÇÃO
+      await apiService.post('/api/pluggy/sync', { 
+        itemId: itemData.item.id 
+      });
+
+      alert(`Sucesso! Seus dados foram importados.`);
+      
+      // Recarrega a página para aparecer o cartão novo
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Erro na sincronização:", error);
+      alert("Conexão feita, mas houve um erro ao baixar as transações. Tente novamente mais tarde.");
+    } finally {
+      setIsConnecting(false);
+      setStatusMessage('');
+    }
   };
 
   const handleError = (error) => {
     console.error("Erro no Widget:", error);
     setConnectToken(null);
     setIsConnecting(false);
+    alert("Erro na conexão com o banco.");
   };
 
   return (
@@ -65,16 +80,19 @@ const ConnectBankButton = () => {
           onClick={handleStartConnection}
           disabled={isConnecting}
           style={{
-            backgroundColor: '#00D09C',
+            backgroundColor: isConnecting ? '#ccc' : '#00D09C',
             color: 'white',
             padding: '10px 20px',
             border: 'none',
             borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
+            cursor: isConnecting ? 'wait' : 'pointer',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          {isConnecting ? 'Carregando...' : '+ Conectar Cartão Automático'}
+          {isConnecting ? (statusMessage || 'Carregando...') : '+ Conectar Cartão Automático'}
         </button>
       )}
     </div>
