@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api'; 
 import { 
   Megaphone, RefreshCw, Power, AlertCircle, Loader2, 
-  TrendingUp, MousePointer, DollarSign, BarChart3 
+  TrendingUp, MousePointer, DollarSign, BarChart3, Users, ShoppingCart 
 } from 'lucide-react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
@@ -16,7 +16,7 @@ const MarketingDashboard = () => {
 
   // Estados para KPIs Gerais
   const [totalSpend, setTotalSpend] = useState(0);
-  const [totalClicks, setTotalClicks] = useState(0);
+  const [totalLeads, setTotalLeads] = useState(0); // Novo KPI
   const [avgCPC, setAvgCPC] = useState(0);
 
   useEffect(() => {
@@ -50,12 +50,12 @@ const MarketingDashboard = () => {
   const calculateKPIs = (data) => {
     const spend = data.reduce((acc, curr) => acc + (curr.total_spend || 0), 0);
     const clicks = data.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
+    const leads = data.reduce((acc, curr) => acc + (curr.leads || 0), 0); // Soma leads
     
-    // Cálculo de CPC Médio Ponderado (Gasto Total / Cliques Totais)
     const cpc = clicks > 0 ? spend / clicks : 0;
 
     setTotalSpend(spend);
-    setTotalClicks(clicks);
+    setTotalLeads(leads);
     setAvgCPC(cpc);
   };
 
@@ -139,12 +139,12 @@ const MarketingDashboard = () => {
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                <MousePointer size={24} />
+                <Users size={24} />
             </div>
             <div>
-                <p className="text-sm text-gray-500 font-medium">Total de Cliques</p>
+                <p className="text-sm text-gray-500 font-medium">Total de Leads</p>
                 <h3 className="text-2xl font-bold text-gray-900">
-                    {totalClicks.toLocaleString('pt-BR')}
+                    {totalLeads.toLocaleString('pt-BR')}
                 </h3>
             </div>
         </div>
@@ -174,7 +174,7 @@ const MarketingDashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={campaigns}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                        <XAxis dataKey="name" hide /> {/* Escondemos o nome no eixo X pois é muito longo */}
+                        <XAxis dataKey="name" hide />
                         <YAxis tickFormatter={(val) => `R$${val}`} stroke="#9ca3af" fontSize={12} />
                         <Tooltip 
                             formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Gasto Total']}
@@ -201,8 +201,7 @@ const MarketingDashboard = () => {
                 <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold tracking-wider">
                     <th className="p-4">Status</th>
                     <th className="p-4">Campanha</th>
-                    <th className="p-4 text-right">Cliques</th>
-                    <th className="p-4 text-right">CPC</th>
+                    <th className="p-4 text-center">Resultados</th> {/* COLUNA NOVA */}
                     <th className="p-4 text-right">Gasto Total</th>
                     <th className="p-4 w-40">Orçamento/Dia</th>
                     <th className="p-4 text-center">Ações</th>
@@ -221,10 +220,26 @@ const MarketingDashboard = () => {
                     <td className="p-4 font-medium text-gray-900 max-w-xs truncate" title={camp.name}>
                         {camp.name}
                     </td>
-                    <td className="p-4 text-right text-gray-600">{camp.clicks?.toLocaleString('pt-BR') || 0}</td>
-                    <td className="p-4 text-right text-gray-600">
-                        R$ {camp.cpc ? camp.cpc.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
+                    
+                    {/* --- CÉLULA DE RESULTADOS --- */}
+                    <td className="p-4 text-center">
+                        <div className="flex flex-col items-center gap-1">
+                            {camp.purchases > 0 && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-bold">
+                                    <ShoppingCart size={12} /> {camp.purchases} Vendas
+                                </span>
+                            )}
+                            {camp.leads > 0 && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
+                                    <Users size={12} /> {camp.leads} Leads
+                                </span>
+                            )}
+                            {camp.purchases === 0 && camp.leads === 0 && (
+                                <span className="text-gray-400 text-xs">{camp.clicks} Cliques</span>
+                            )}
+                        </div>
                     </td>
+
                     <td className="p-4 text-right font-bold text-gray-900">
                         R$ {camp.total_spend ? camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
                     </td>

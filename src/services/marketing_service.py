@@ -18,7 +18,7 @@ class MetaAdsService:
                 print(f"--- [META ADS] ERRO ao conectar: {e} ---")
 
     def get_campaigns(self):
-        """Busca campanhas com métricas VITALÍCIAS (Lifetime)."""
+        """Busca campanhas com métricas VITALÍCIAS e RESULTADOS (Leads/Vendas)."""
         if not self.ad_account_id: return []
 
         try:
@@ -47,26 +47,37 @@ class MetaAdsService:
                     params={'date_preset': 'maximum'} 
                 )
                 
+                spend = 0.0
+                clicks = 0
+                cpc = 0.0
+                leads = 0
+                purchases = 0
+                
                 if insights:
                     data = insights[0]
                     spend = float(data.get('spend', 0))
                     clicks = int(data.get('clicks', 0))
-                    impressions = int(data.get('impressions', 0))
                     cpc = float(data.get('cpc', 0)) if 'cpc' in data else 0.0
-                else:
-                    spend = 0.0
-                    clicks = 0
-                    impressions = 0
-                    cpc = 0.0
-                
+                    
+                    # --- LÓGICA DE RESULTADOS ---
+                    # O Facebook retorna uma lista: [{'action_type': 'lead', 'value': '10'}, ...]
+                    actions = data.get('actions', [])
+                    if actions:
+                        for action in actions:
+                            tipo = action.get('action_type', '')
+                            valor = int(action.get('value', 0))
+                            
+                            # Soma Leads (pode vir como 'lead' ou outros eventos personalizados de cadastro)
+                            if 'lead' in tipo: 
+                                leads += valor
+                            
+                            # Soma Compras (purchase, offsite_conversion.fb_pixel_purchase)
+                            if 'purchase' in tipo:
+                                purchases += valor
+
                 # Tratamento de orçamento
-                # Se tiver daily_budget, usa ele. Se não, tenta ver se tem lifetime.
                 daily_budget_cents = camp.get('daily_budget')
-                if daily_budget_cents:
-                    daily_budget_real = float(daily_budget_cents) / 100
-                else:
-                    # Se for ABO (Orçamento no AdSet), a campanha vem sem budget
-                    daily_budget_real = 0 
+                daily_budget_real = float(daily_budget_cents) / 100 if daily_budget_cents else 0
 
                 results.append({
                     'id': camp['id'],
@@ -75,8 +86,9 @@ class MetaAdsService:
                     'daily_budget': daily_budget_real,
                     'total_spend': spend,
                     'clicks': clicks,
-                    'impressions': impressions,
-                    'cpc': cpc
+                    'cpc': cpc,
+                    'leads': leads,          # <--- NOVO
+                    'purchases': purchases   # <--- NOVO
                 })
                 
             return results
