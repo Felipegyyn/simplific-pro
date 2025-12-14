@@ -3,7 +3,6 @@ import api from '../services/api';
 import { Megaphone, RefreshCw, Power, AlertCircle, Loader2 } from 'lucide-react';
 
 const MarketingDashboard = () => {
-  // Inicializa como array vazio para evitar erros
   const [campaigns, setCampaigns] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,15 +20,24 @@ const MarketingDashboard = () => {
       console.log("--- [DEBUG] Buscando campanhas... ---");
       const response = await api.get('/api/marketing/campaigns');
       
-      console.log("--- [DEBUG] Resposta recebida:", response.data); // <--- OLHE ISSO NO CONSOLE
+      // --- CORREÇÃO DO "UNDEFINED" ---
+      // O seu api.js pode estar retornando 'response.data' ou o 'response' puro.
+      // Esta linha garante que pegamos a lista correta em qualquer cenário.
+      const actualData = response.data || response;
 
-      // BLINDAGEM: Só atualiza se for um Array. Se não for, assume vazio.
-      if (Array.isArray(response.data)) {
-        setCampaigns(response.data);
+      console.log("--- [DEBUG] Dados processados:", actualData); 
+
+      if (Array.isArray(actualData)) {
+        setCampaigns(actualData);
       } else {
-        console.error("ERRO CRÍTICO: Dados recebidos não são uma lista!", response.data);
-        setCampaigns([]); // Força lista vazia para não quebrar a tela
-        setError('Erro: Formato de dados inválido recebido do servidor.');
+        console.error("ERRO CRÍTICO: Dados recebidos não são uma lista!", actualData);
+        // Se veio um objeto de erro do backend, tenta mostrar a mensagem
+        if (actualData && actualData.error) {
+            setError(actualData.error);
+        } else {
+            setError('Formato de dados inválido recebido do servidor.');
+        }
+        setCampaigns([]);
       }
 
     } catch (err) {
@@ -37,11 +45,11 @@ const MarketingDashboard = () => {
       if (err.response && err.response.status === 403) {
         setError('Acesso negado: Seu usuário não é Admin.');
       } else if (err.response && err.response.status === 404) {
-        setError('Erro 404: Rota não encontrada. Verifique o prefixo /api');
+        setError('Erro 404: Rota não encontrada (/api/marketing/campaigns).');
       } else {
-        setError('Falha ao carregar campanhas. Verifique o console.');
+        setError('Falha na comunicação com o servidor.');
       }
-      setCampaigns([]); // Garante que não quebra no erro
+      setCampaigns([]); 
     } finally {
       setLoading(false);
     }
@@ -53,7 +61,6 @@ const MarketingDashboard = () => {
     try {
       await api.post(`/api/marketing/campaigns/${id}/toggle`, { status: newStatus });
       
-      // Atualiza localmente apenas se campaigns for um array válido
       if (Array.isArray(campaigns)) {
           setCampaigns(campaigns.map(c => 
             c.id === id ? { ...c, status: newStatus } : c
@@ -129,7 +136,6 @@ const MarketingDashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {/* BLINDAGEM EXTRA NO MAP */}
               {Array.isArray(campaigns) && campaigns.map((camp) => (
                 <tr key={camp.id} className={`hover:bg-gray-50 transition-colors ${updating === camp.id ? 'opacity-50 pointer-events-none' : ''}`}>
                   <td className="p-4">
