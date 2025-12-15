@@ -40,7 +40,7 @@ const HomePage = () => {
       price: "4,90",        // O valor que vai aparecer gigante
       period: "NO 1º MÊS",  // Deixa claro a condição
       description: "Depois R$ 24,90/mês. Cancele quando quiser.",
-      buttonText: "TESTAR POR R$ 4,90",
+      buttonText: "TESTE R$ 4,90",
       badge: "🔥 OFERTA: 1º MÊS QUASE GRÁTIS"
     },
     annual: {
@@ -48,7 +48,7 @@ const HomePage = () => {
         price: "198,90",
         period: "ANO (À VISTA)",
         description: "Apenas R$ 16,57/mês. O menor valor JÁ FEITO.",
-        buttonText: "QUERO A OFERTA ÉPICA ANUAL",
+        buttonText: "OFERTA ÉPICA",
         badge: "🔥 ECONOMIA MÁXIMA: R$ 100 OFF"
       }
   };
