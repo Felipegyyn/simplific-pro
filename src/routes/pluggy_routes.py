@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.services.pluggy_service import PluggyService
 from src.models.db import db
+from src.services.gemini_service import categorize_transaction
 from src.models.extended_modules import CreditCard, CreditCardTransaction, Fatura
 from src.models.financial import Category
 from datetime import datetime, timedelta
@@ -131,9 +132,19 @@ def sync_data():
             # --- 2. Sincronizar Transações ---
             transactions = pluggy_service.fetch_transactions(acc['id'])
             
-            # Busca categoria padrão
+            # --- INTEGRAÇÃO COM IA ---
+            # 1. Carrega todas as categorias disponíveis para a IA escolher
+            all_categories = [{'id': c.id, 'name': c.name} for c in Category.query.all()]
             default_category = Category.query.filter_by(name='Outros').first()
-            cat_id = default_category.id if default_category else 1
+            default_id = default_category.id if default_category else 1
+            
+            # 2. Pergunta para o Gemini qual a categoria dessa transação
+            cat_id = categorize_transaction(tx.get('description'), all_categories)
+            
+            # 3. Se a IA falhar ou devolver nada, usa o padrão "Outros"
+            if not cat_id:
+                cat_id = default_id
+            # -------------------------
 
             faturas_afetadas = set()
 

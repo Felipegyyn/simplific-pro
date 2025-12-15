@@ -165,3 +165,34 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
 # A função categorizar_descricao_transacao foi removida deste arquivo
 # para manter o foco apenas no serviço de assessoria.
 # Ela pertence ao ai_assessor_service.py
+
+# --- Adicione isto no FINAL do arquivo ---
+
+def categorize_transaction(description, categories_list):
+    """
+    Usa IA para escolher a categoria.
+    """
+    try:
+        # Monta lista de opções para a IA
+        options_text = "\n".join([f"ID {c['id']}: {c['name']}" for c in categories_list])
+
+        prompt = f"""
+        Classifique esta transação bancária.
+        TRANSAÇÃO: "{description}"
+        
+        OPÇÕES:
+        {options_text}
+        
+        Responda APENAS com o número do ID da categoria correta. 
+        Se não souber, responda o ID da categoria 'Outros' ou similar.
+        """
+        
+        # Configuração rápida para resposta curta
+        response = model.generate_content(prompt)
+        
+        # Tenta pegar só o número da resposta
+        return int(response.text.strip())
+
+    except Exception as e:
+        print(f"Erro IA na transação '{description}': {e}")
+        return None
