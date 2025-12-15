@@ -46,7 +46,10 @@ def sync_data():
 
         for acc in accounts:
             # Só nos interessa se for cartão de crédito
-            if acc['type'] != 'CREDIT_CARD':
+            print(f"🔎 Analisando conta: {acc['name']} | Tipo: {acc['type']}") # Log para debug
+
+            # Aceita tanto 'CREDIT' quanto 'CREDIT_CARD' para garantir
+            if acc['type'] not in ['CREDIT', 'CREDIT_CARD']:
                 continue
 
             # 2. Verificar se o cartão já existe no nosso banco (pelo ID da Pluggy)
