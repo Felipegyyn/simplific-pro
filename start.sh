@@ -11,4 +11,4 @@ echo "Creating admin user..."
 flask create-admin
 
 echo "Starting Gunicorn server..."
-gunicorn src.main:app
+gunicorn --timeout 600 src.main:app
