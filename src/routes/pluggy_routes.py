@@ -4,7 +4,7 @@ from src.services.pluggy_service import PluggyService
 from src.models.db import db
 from src.models.extended_modules import CreditCard, CreditCardTransaction, Fatura
 from src.models.financial import Category
-from src.services.gemini_service import categorize_transaction # Import da IA
+from src.services.gemini_service import categorize_transaction
 from datetime import datetime
 from sqlalchemy import func
 
@@ -37,7 +37,11 @@ def get_or_create_fatura(user_id, card, transaction_date):
         import calendar
         last_day = calendar.monthrange(ano_ref, mes_ref)[1]
         dia_vencimento = min(card.due_day, last_day)
-        data_vencimento = datetime(ano_ref, mes_ref, dia_vencimento).date()
+        # Ajuste para garantir que a data de vencimento seja válida
+        try:
+            data_vencimento = datetime(ano_ref, mes_ref, dia_vencimento).date()
+        except ValueError:
+             data_vencimento = datetime(ano_ref, mes_ref, last_day).date()
 
         fatura = Fatura(
             user_id=user_id,
@@ -83,7 +87,7 @@ def sync_data():
         contas_processadas = 0
         transacoes_processadas = 0
 
-        # Carrega categorias UMA VEZ para não pesar o banco
+        # Carrega categorias UMA VEZ
         all_categories = [{'id': c.id, 'name': c.name} for c in Category.query.all()]
         default_category = Category.query.filter_by(name='Outros').first()
         default_id = default_category.id if default_category else 1
@@ -121,6 +125,10 @@ def sync_data():
             # 2. Transações
             transactions = pluggy_service.fetch_transactions(acc['id'])
             faturas_afetadas = set()
+            
+            # CONTADOR DE IA PARA PERFORMANCE 🚀
+            ia_usage_count = 0 
+            MAX_IA_CALLS = 5  # Limite de chamadas por cartão nessa sincronização
 
             for tx in transactions:
                 # Verifica duplicidade
@@ -128,15 +136,20 @@ def sync_data():
                 if existe:
                     continue
 
-                # --- AQUI É O LUGAR CERTO DA IA (DENTRO DO LOOP) ---
                 descricao = tx.get('description', 'Compra')
                 
-                # Chama a IA para decidir a categoria
-                cat_id = categorize_transaction(descricao, all_categories)
-                
-                if not cat_id:
+                # --- LÓGICA DE PERFORMANCE ---
+                # Só chama a IA se ainda não atingiu o limite de 5
+                if ia_usage_count < MAX_IA_CALLS:
+                    cat_id = categorize_transaction(descricao, all_categories)
+                    if cat_id:
+                        ia_usage_count += 1
+                    else:
+                        cat_id = default_id
+                else:
+                    # Se já passou de 5, vai direto para "Outros" (Super rápido)
                     cat_id = default_id
-                # ---------------------------------------------------
+                # -----------------------------
 
                 data_tx = datetime.strptime(tx['date'], "%Y-%m-%dT%H:%M:%S.%fZ").date()
                 valor = abs(tx.get('amount', 0))
@@ -179,6 +192,6 @@ def sync_data():
     except Exception as e:
         db.session.rollback()
         import traceback
-        traceback.print_exc() # Imprime o erro completo no log para ajudar
+        traceback.print_exc()
         print(f"❌ Erro na sincronização: {e}")
         return jsonify({'error': str(e)}), 500
