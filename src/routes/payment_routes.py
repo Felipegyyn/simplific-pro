@@ -93,7 +93,7 @@ def process_subscription_route():
     if result_mp['status'] == 'success':
         try:
             user.status = 'ativo'
-            user.profile = 'premium'
+            user.profile = 'usuario'
             user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
             user.subscription_id = result_mp.get('id')
             
