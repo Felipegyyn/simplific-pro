@@ -369,9 +369,9 @@ const Schedule = ({ user, onLogout }) => {
     <TabsTrigger value="atrasados">Atrasados</TabsTrigger>
   </TabsList>
   
-  {/* GRUPO DE BOTÕES ALINHADOS NA DIREITA */}
+  {/* GRUPO DE BOTÕES ALINHADOS NA DIREITA - botão do google comentado até resolver a verificação */}
   <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
-    <Button 
+    {/*<Button 
         variant="outline" 
         onClick={handleGoogleConnect} 
         disabled={isSyncing}
@@ -379,7 +379,7 @@ const Schedule = ({ user, onLogout }) => {
     >
         <Globe className="h-4 w-4 mr-2" />
         Google
-    </Button>
+    </Button>*/}
 
     <Button 
         variant="outline" 

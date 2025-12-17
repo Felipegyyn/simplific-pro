@@ -1,78 +1,65 @@
 import requests
 import os
-import json
+from datetime import datetime, timedelta
 
 class PluggyService:
-    BASE_URL = "https://api.pluggy.ai"
-
     def __init__(self):
-        self.client_id = os.getenv('PLUGGY_CLIENT_ID')
-        self.client_secret = os.getenv('PLUGGY_CLIENT_SECRET')
-        self.api_key = None
+        self.CLIENT_ID = os.getenv('PLUGGY_CLIENT_ID')
+        self.CLIENT_SECRET = os.getenv('PLUGGY_CLIENT_SECRET')
+        self.BASE_URL = 'https://api.pluggy.ai'
+        self._api_key = None
 
     def _get_api_key(self):
-        """
-        Autentica na Pluggy e pega a API Key temporária.
-        """
+        if self._api_key:
+            return self._api_key
+        
         url = f"{self.BASE_URL}/auth"
         payload = {
-            "clientId": self.client_id,
-            "clientSecret": self.client_secret
+            "clientId": self.CLIENT_ID,
+            "clientSecret": self.CLIENT_SECRET
         }
-        headers = {"Content-Type": "application/json"}
-
-        try:
-            response = requests.post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            data = response.json()
-            return data['apiKey']
-        except Exception as e:
-            print(f"Erro ao autenticar na Pluggy: {e}")
-            return None
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        self._api_key = response.json()['apiKey']
+        return self._api_key
 
     def create_connect_token(self, item_id=None):
-        """
-        Gera um token para abrir o Widget no Frontend.
-        Se passar item_id, serve para editar uma conexão existente.
-        """
         api_key = self._get_api_key()
-        if not api_key:
-            raise Exception("Falha na autenticação com a Pluggy")
-
         url = f"{self.BASE_URL}/connect_token"
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-KEY": api_key
-        }
-        
-        # Se for atualização de conexão, enviamos o itemId
-        payload = {"itemId": item_id} if item_id else {}
-
-        response = requests.post(url, json=payload, headers=headers)
+        headers = {"X-API-KEY": api_key}
+        payload = {}
+        if item_id:
+            payload['itemId'] = item_id
+            
+        response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
-        
         return response.json()['accessToken']
 
     def fetch_accounts(self, item_id):
-        """
-        Busca as contas vinculadas a uma conexão (Item).
-        """
         api_key = self._get_api_key()
         url = f"{self.BASE_URL}/accounts?itemId={item_id}"
         headers = {"X-API-KEY": api_key}
-        
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         return response.json()['results']
-
     
-    def fetch_transactions(self, account_id):
-        """
-        Busca as transações de uma conta específica (Account ID).
-        """
+    # --- NOVO MÉTODO: Busca detalhes da conexão (Nome do Banco) ---
+    def fetch_item(self, item_id):
         api_key = self._get_api_key()
-        # Busca transações dos últimos 90 dias (padrão)
-        url = f"{self.BASE_URL}/transactions?accountId={account_id}&from=2024-01-01" 
+        url = f"{self.BASE_URL}/items/{item_id}"
+        headers = {"X-API-KEY": api_key}
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+
+    # --- ATUALIZADO: Busca apenas transações recentes ---
+    def fetch_transactions(self, account_id):
+        api_key = self._get_api_key()
+        
+        # Pega a data de 45 dias atrás (para garantir pegar a fatura aberta inteira)
+        data_inicio = (datetime.now() - timedelta(days=45)).strftime('%Y-%m-%d')
+        
+        url = f"{self.BASE_URL}/transactions?accountId={account_id}&from={data_inicio}"
         headers = {"X-API-KEY": api_key}
         
         all_transactions = []

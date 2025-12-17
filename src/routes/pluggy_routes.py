@@ -13,9 +13,11 @@ pluggy_service = PluggyService()
 
 def get_or_create_fatura(user_id, card, transaction_date):
     """
-    Determina a fatura correta e cria se não existir.
+    Determina a fatura correta e define status (aberta vs paga).
     """
     data_compra = transaction_date
+    
+    # 1. Lógica do Mês de Referência
     if data_compra.day >= card.closing_day:
         if data_compra.month == 12:
             mes_ref = 1
@@ -27,6 +29,7 @@ def get_or_create_fatura(user_id, card, transaction_date):
         mes_ref = data_compra.month
         ano_ref = data_compra.year
 
+    # 2. Busca Fatura Existente
     fatura = Fatura.query.filter_by(
         cartao_id=card.id, 
         mes=mes_ref, 
@@ -37,11 +40,20 @@ def get_or_create_fatura(user_id, card, transaction_date):
         import calendar
         last_day = calendar.monthrange(ano_ref, mes_ref)[1]
         dia_vencimento = min(card.due_day, last_day)
-        # Ajuste para garantir que a data de vencimento seja válida
         try:
             data_vencimento = datetime(ano_ref, mes_ref, dia_vencimento).date()
         except ValueError:
-             data_vencimento = datetime(ano_ref, mes_ref, last_day).date()
+            data_vencimento = datetime(ano_ref, mes_ref, last_day).date()
+
+        # 3. Lógica do Status (Passado = paga, Atual/Futuro = aberta)
+        hoje = datetime.utcnow().date()
+        
+        # Se a fatura é de um mês anterior ao atual, nasce como 'paga'
+        # Se é do mês atual ou futuro, nasce como 'aberta'
+        if (ano_ref < hoje.year) or (ano_ref == hoje.year and mes_ref < hoje.month):
+            status_inicial = 'paga'
+        else:
+            status_inicial = 'aberta' # <--- AJUSTADO AQUI
 
         fatura = Fatura(
             user_id=user_id,
@@ -49,12 +61,12 @@ def get_or_create_fatura(user_id, card, transaction_date):
             valor_total=0.0,
             mes=mes_ref,
             ano=ano_ref,
-            status='em_aberto',
+            status=status_inicial,
             created_at=datetime.utcnow()
         )
         db.session.add(fatura)
         db.session.commit()
-        print(f"📄 Nova fatura criada: {mes_ref}/{ano_ref}")
+        print(f"📄 Nova fatura criada: {mes_ref}/{ano_ref} - Status: {status_inicial}")
 
     return fatura
 
@@ -82,12 +94,20 @@ def sync_data():
 
     try:
         print(f"🔄 Iniciando sincronização para Item: {item_id}")
+        
+        # 1. Busca detalhes da Instituição (Nome do Banco) para arrumar o nome
+        try:
+            item_details = pluggy_service.fetch_item(item_id)
+            bank_name = item_details.get('connector', {}).get('name', '')
+        except:
+            bank_name = ""
+
         accounts = pluggy_service.fetch_accounts(item_id)
         
         contas_processadas = 0
         transacoes_processadas = 0
 
-        # Carrega categorias UMA VEZ
+        # Carrega categorias
         all_categories = [{'id': c.id, 'name': c.name} for c in Category.query.all()]
         default_category = Category.query.filter_by(name='Outros').first()
         default_id = default_category.id if default_category else 1
@@ -98,14 +118,23 @@ def sync_data():
             if acc['type'] not in ['CREDIT', 'CREDIT_CARD']:
                 continue
 
+            # --- Formatação do Nome Bonito ---
+            raw_name = acc['name']
+            # Se o nome do banco não estiver no nome da conta, a gente adiciona
+            if bank_name and bank_name.lower() not in raw_name.lower():
+                final_name = f"{bank_name} - {raw_name}"
+            else:
+                final_name = raw_name
+            # ---------------------------------
+
             # 1. Cartão
             cartao = CreditCard.query.filter_by(pluggy_credit_card_id=acc['id']).first()
 
             if not cartao:
-                print(f"🆕 Criando novo cartão: {acc['name']}")
+                print(f"🆕 Criando novo cartão: {final_name}")
                 cartao = CreditCard(
                     user_id=user_id,
-                    name=f"{acc['name']} (Auto)",
+                    name=final_name, 
                     limit=acc.get('creditData', {}).get('creditLimit', 0),
                     available_limit=acc.get('creditData', {}).get('availableCreditLimit', 0),
                     brand=acc.get('creditData', {}).get('brand', 'Outro'),
@@ -118,7 +147,10 @@ def sync_data():
                 db.session.add(cartao)
                 db.session.commit()
             else:
+                # Atualiza nome e limite se já existir
+                cartao.name = final_name 
                 cartao.available_limit = acc.get('creditData', {}).get('availableCreditLimit', cartao.available_limit)
+                db.session.add(cartao)
             
             contas_processadas += 1
 
@@ -126,20 +158,17 @@ def sync_data():
             transactions = pluggy_service.fetch_transactions(acc['id'])
             faturas_afetadas = set()
             
-            # CONTADOR DE IA PARA PERFORMANCE 🚀
             ia_usage_count = 0 
-            MAX_IA_CALLS = 5  # Limite de chamadas por cartão nessa sincronização
+            MAX_IA_CALLS = 5 
 
             for tx in transactions:
-                # Verifica duplicidade
                 existe = CreditCardTransaction.query.filter_by(pluggy_transaction_id=tx['id']).first()
                 if existe:
                     continue
 
                 descricao = tx.get('description', 'Compra')
                 
-                # --- LÓGICA DE PERFORMANCE ---
-                # Só chama a IA se ainda não atingiu o limite de 5
+                # Performance IA (Limita a 5 chamadas)
                 if ia_usage_count < MAX_IA_CALLS:
                     cat_id = categorize_transaction(descricao, all_categories)
                     if cat_id:
@@ -147,10 +176,8 @@ def sync_data():
                     else:
                         cat_id = default_id
                 else:
-                    # Se já passou de 5, vai direto para "Outros" (Super rápido)
                     cat_id = default_id
-                # -----------------------------
-
+                
                 data_tx = datetime.strptime(tx['date'], "%Y-%m-%dT%H:%M:%S.%fZ").date()
                 valor = abs(tx.get('amount', 0))
 
@@ -172,7 +199,7 @@ def sync_data():
             
             db.session.commit() 
 
-            # 3. Atualizar Totais das Faturas
+            # 3. Atualizar Totais das Faturas Afetadas
             for fat_id in faturas_afetadas:
                 fatura_obj = Fatura.query.get(fat_id)
                 if fatura_obj:
