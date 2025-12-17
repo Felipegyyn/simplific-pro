@@ -45,15 +45,12 @@ def get_or_create_fatura(user_id, card, transaction_date):
         except ValueError:
             data_vencimento = datetime(ano_ref, mes_ref, last_day).date()
 
-        # 3. Lógica do Status (Passado = paga, Atual/Futuro = aberta)
+        # 3. Lógica do Status
         hoje = datetime.utcnow().date()
-        
-        # Se a fatura é de um mês anterior ao atual, nasce como 'paga'
-        # Se é do mês atual ou futuro, nasce como 'aberta'
         if (ano_ref < hoje.year) or (ano_ref == hoje.year and mes_ref < hoje.month):
             status_inicial = 'paga'
         else:
-            status_inicial = 'aberta' # <--- AJUSTADO AQUI
+            status_inicial = 'aberta'
 
         fatura = Fatura(
             user_id=user_id,
@@ -95,7 +92,7 @@ def sync_data():
     try:
         print(f"🔄 Iniciando sincronização para Item: {item_id}")
         
-        # 1. Busca detalhes da Instituição (Nome do Banco) para arrumar o nome
+        # Busca detalhes para o nome do banco
         try:
             item_details = pluggy_service.fetch_item(item_id)
             bank_name = item_details.get('connector', {}).get('name', '')
@@ -112,20 +109,28 @@ def sync_data():
         default_category = Category.query.filter_by(name='Outros').first()
         default_id = default_category.id if default_category else 1
 
+        # LISTA NEGRA: Palavras que indicam pagamento de fatura (Crédito)
+        termos_pagamento = [
+            'pagamento recebido', 
+            'payment received', 
+            'obrigado pelo',
+            'pagamento de fatura', 
+            'crédito de fatura',
+            'pagto fatura'
+        ]
+
         for acc in accounts:
             print(f"🔎 Analisando conta: {acc['name']} | Tipo: {acc['type']}")
             
             if acc['type'] not in ['CREDIT', 'CREDIT_CARD']:
                 continue
 
-            # --- Formatação do Nome Bonito ---
+            # Nome Bonito
             raw_name = acc['name']
-            # Se o nome do banco não estiver no nome da conta, a gente adiciona
             if bank_name and bank_name.lower() not in raw_name.lower():
                 final_name = f"{bank_name} - {raw_name}"
             else:
                 final_name = raw_name
-            # ---------------------------------
 
             # 1. Cartão
             cartao = CreditCard.query.filter_by(pluggy_credit_card_id=acc['id']).first()
@@ -147,7 +152,6 @@ def sync_data():
                 db.session.add(cartao)
                 db.session.commit()
             else:
-                # Atualiza nome e limite se já existir
                 cartao.name = final_name 
                 cartao.available_limit = acc.get('creditData', {}).get('availableCreditLimit', cartao.available_limit)
                 db.session.add(cartao)
@@ -162,13 +166,23 @@ def sync_data():
             MAX_IA_CALLS = 5 
 
             for tx in transactions:
+                # Verifica duplicidade
                 existe = CreditCardTransaction.query.filter_by(pluggy_transaction_id=tx['id']).first()
                 if existe:
                     continue
 
                 descricao = tx.get('description', 'Compra')
-                
-                # Performance IA (Limita a 5 chamadas)
+                descricao_lower = descricao.lower()
+
+                # --- FILTRO DE PAGAMENTOS (AQUI ESTÁ A MÁGICA 🛡️) ---
+                # Se encontrar qualquer termo de pagamento na descrição, PULA essa transação
+                eh_pagamento = any(termo in descricao_lower for termo in termos_pagamento)
+                if eh_pagamento:
+                    print(f"🚫 Ignorando pagamento detectado: {descricao}")
+                    continue
+                # --------------------------------------------------------
+
+                # Performance IA
                 if ia_usage_count < MAX_IA_CALLS:
                     cat_id = categorize_transaction(descricao, all_categories)
                     if cat_id:
@@ -199,7 +213,7 @@ def sync_data():
             
             db.session.commit() 
 
-            # 3. Atualizar Totais das Faturas Afetadas
+            # 3. Atualizar Totais das Faturas
             for fat_id in faturas_afetadas:
                 fatura_obj = Fatura.query.get(fat_id)
                 if fatura_obj:
