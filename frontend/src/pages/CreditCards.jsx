@@ -462,7 +462,7 @@ const respostaFaturas = await apiService.get(url);
                 {/* ▼▼▼ COMEÇO DA MUDANÇA: Agrupamos os botões aqui ▼▼▼ */}
                 <div className="flex items-center gap-2">
                   
-                  {/* 1. Botão Automático (Verde) */}
+                  {/* 1. Botão Automático (Verde) - COMENTADO ATÉ O FIM DOS TESTES */}
                   <ConnectBankButton />
 
                   {/* 2. Botão Manual (Seu botão antigo) */}

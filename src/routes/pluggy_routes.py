@@ -92,7 +92,6 @@ def sync_data():
     try:
         print(f"🔄 Iniciando sincronização para Item: {item_id}")
         
-        # Busca detalhes para o nome do banco
         try:
             item_details = pluggy_service.fetch_item(item_id)
             bank_name = item_details.get('connector', {}).get('name', '')
@@ -109,14 +108,10 @@ def sync_data():
         default_category = Category.query.filter_by(name='Outros').first()
         default_id = default_category.id if default_category else 1
 
-        # LISTA NEGRA: Palavras que indicam pagamento de fatura (Crédito)
         termos_pagamento = [
-            'pagamento recebido', 
-            'payment received', 
-            'obrigado pelo',
-            'pagamento de fatura', 
-            'crédito de fatura',
-            'pagto fatura'
+            'pagamento recebido', 'payment received', 'obrigado pelo', 
+            'pagamento de fatura', 'crédito de fatura', 'pagto fatura',
+            'pagamento em dia', 'antecipação de fatura'
         ]
 
         for acc in accounts:
@@ -132,19 +127,45 @@ def sync_data():
             else:
                 final_name = raw_name
 
+            # --- LÓGICA DE DATAS DINÂMICAS ---
+            credit_data = acc.get('creditData', {})
+            try:
+                # Tenta pegar dia de vencimento real da API
+                if credit_data.get('balanceDueDate'):
+                    venc_str = credit_data['balanceDueDate'] # Ex: 2025-01-01T00...
+                    venc_dt = datetime.strptime(venc_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    dia_vencimento = venc_dt.day
+                else:
+                    dia_vencimento = 10 # Default se a API não mandar nada
+
+                # Tenta pegar dia de fechamento real da API
+                if credit_data.get('balanceCloseDate'):
+                    fech_str = credit_data['balanceCloseDate']
+                    fech_dt = datetime.strptime(fech_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    dia_fechamento = fech_dt.day
+                else:
+                    # Se não vier fechamento, supõe 7 dias antes do vencimento
+                    dia_fechamento = dia_vencimento - 7
+                    if dia_fechamento <= 0: dia_fechamento += 30
+            except Exception as e_date:
+                print(f"⚠️ Erro ao processar datas do cartão: {e_date}")
+                dia_vencimento = 10
+                dia_fechamento = 3
+            # ---------------------------------
+
             # 1. Cartão
             cartao = CreditCard.query.filter_by(pluggy_credit_card_id=acc['id']).first()
 
             if not cartao:
-                print(f"🆕 Criando novo cartão: {final_name}")
+                print(f"🆕 Criando novo cartão: {final_name} (Dia {dia_vencimento})")
                 cartao = CreditCard(
                     user_id=user_id,
                     name=final_name, 
-                    limit=acc.get('creditData', {}).get('creditLimit', 0),
-                    available_limit=acc.get('creditData', {}).get('availableCreditLimit', 0),
-                    brand=acc.get('creditData', {}).get('brand', 'Outro'),
-                    closing_day=25, 
-                    due_day=5,      
+                    limit=credit_data.get('creditLimit', 0),
+                    available_limit=credit_data.get('availableCreditLimit', 0),
+                    brand=credit_data.get('brand', 'Outro'),
+                    closing_day=dia_fechamento, # Data dinâmica
+                    due_day=dia_vencimento,     # Data dinâmica
                     last_digits=acc.get('number', '0000')[-4:],
                     pluggy_item_id=item_id,
                     pluggy_credit_card_id=acc['id']
@@ -152,8 +173,11 @@ def sync_data():
                 db.session.add(cartao)
                 db.session.commit()
             else:
+                # Atualiza nome, limite e dias se mudarem
                 cartao.name = final_name 
-                cartao.available_limit = acc.get('creditData', {}).get('availableCreditLimit', cartao.available_limit)
+                cartao.due_day = dia_vencimento
+                cartao.closing_day = dia_fechamento
+                cartao.available_limit = credit_data.get('availableCreditLimit', cartao.available_limit)
                 db.session.add(cartao)
             
             contas_processadas += 1
@@ -166,7 +190,6 @@ def sync_data():
             MAX_IA_CALLS = 5 
 
             for tx in transactions:
-                # Verifica duplicidade
                 existe = CreditCardTransaction.query.filter_by(pluggy_transaction_id=tx['id']).first()
                 if existe:
                     continue
@@ -174,13 +197,11 @@ def sync_data():
                 descricao = tx.get('description', 'Compra')
                 descricao_lower = descricao.lower()
 
-                # --- FILTRO DE PAGAMENTOS (AQUI ESTÁ A MÁGICA 🛡️) ---
-                # Se encontrar qualquer termo de pagamento na descrição, PULA essa transação
+                # Filtro de Pagamentos
                 eh_pagamento = any(termo in descricao_lower for termo in termos_pagamento)
                 if eh_pagamento:
                     print(f"🚫 Ignorando pagamento detectado: {descricao}")
                     continue
-                # --------------------------------------------------------
 
                 # Performance IA
                 if ia_usage_count < MAX_IA_CALLS:
@@ -213,7 +234,7 @@ def sync_data():
             
             db.session.commit() 
 
-            # 3. Atualizar Totais das Faturas
+            # 3. Atualizar Totais
             for fat_id in faturas_afetadas:
                 fatura_obj = Fatura.query.get(fat_id)
                 if fatura_obj:
