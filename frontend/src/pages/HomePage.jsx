@@ -27,6 +27,15 @@ const HomePage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   const handleBuyClick = () => {
+    // Rastreamento do Pixel
+    if (window.fbq) {
+      window.fbq('track', 'InitiateCheckout', {
+        content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
+        value: billingCycle === 'monthly' ? 4.90 : 198.90,
+        currency: 'BRL'
+      });
+    }
+
     if (billingCycle === 'monthly') {
         navigate('/checkout');
     } else {

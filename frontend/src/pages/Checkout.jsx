@@ -43,6 +43,14 @@ const Checkout = () => {
     }
 
     try {
+      // Rastreamento: Usuário inseriu dados de pagamento e clicou em pagar
+      if (window.fbq) {
+        window.fbq('track', 'AddPaymentInfo', {
+          value: amount,
+          currency: 'BRL'
+        });
+      }
+
       const { token } = mpFormData;
 
       const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
