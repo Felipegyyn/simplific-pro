@@ -54,13 +54,12 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-
-CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 db.init_app(app)

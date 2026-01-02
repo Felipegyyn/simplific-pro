@@ -165,16 +165,16 @@ const Checkout = () => {
             {/* TRAVA DE SEGURANÇA: Só renderiza se tiver valor definido */}
             {amount > 0 && (
               <CardPayment
-                key={amount} // <--- O PULO DO GATO 1: Força recarregar se o preço mudar
+                key={amount} // Mantém o componente estável a menos que o PREÇO mude
                 initialization={{ 
                   amount: amount,
                   payer: {
-                    // O PULO DO GATO 2: Passamos um email de fallback para iniciar o antifraude
-                    // O Mercado Pago atualiza isso depois quando o usuário preencher o form real
-                    email: formData.email || "guest@simplificpro.com", 
+                    // CORREÇÃO AQUI: Usamos um email fixo para a INICIALIZAÇÃO visual.
+                    // Isso impede que o componente quebre enquanto o usuário digita o email real no formulário.
+                    email: "novo_cliente@simplificpro.com", 
                   }
                 }}
-                onSubmit={onSubmit}
+                onSubmit={onSubmit} // O email real vai aqui dentro, na hora de enviar
                 onReady={onReady}
                 onError={onError}
                 customization={{
