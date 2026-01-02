@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_cors import cross_origin # <--- IMPORTANTE: Adicione isso
 from src.models.user import User
 from src.models.db import db
 from src.services.payment_service import create_subscription, create_one_time_payment
@@ -11,9 +12,13 @@ from src.services.notification_service import send_welcome_credentials
 
 payment_bp = Blueprint('payment', __name__)
 
-
-@payment_bp.route('/process_subscription', methods=['POST'])
+@payment_bp.route('/process_subscription', methods=['POST', 'OPTIONS']) # <--- Adicione OPTIONS
+@cross_origin() # <--- O PULO DO GATO: Isso libera o CORS para essa rota específica
 def process_subscription_route():
+    # Se for uma requisição OPTIONS (pre-flight do navegador), retorna OK imediatamente
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
+
     data = request.get_json()
     card_token = data.get('card_token')
     payer_data = data.get('payer_data', {})
@@ -28,7 +33,7 @@ def process_subscription_route():
 
     whatsapp_normalized = normalize_phone_number(whatsapp_raw)
     
-    # Lógica de Usuário (Mantida igual a sua original)
+    # Lógica de Usuário
     user = User.query.filter_by(email=email).first()
     new_user_credentials = None 
 
@@ -44,14 +49,10 @@ def process_subscription_route():
         if whatsapp_normalized: user.whatsapp = whatsapp_normalized
         db.session.commit()
 
-    # --- LÓGICA DA PROMOÇÃO BLACK FRIDAY (R$ 4,90) ---
-    
+    # --- LÓGICA DA PROMOÇÃO ---
     result_mp = None
     
     if plan_type == 'monthly':
-        # MENSAL: Cobrança Híbrida (4,90 agora + 24,90 depois)
-        
-        # 1. Cobra os R$ 4,90 IMEDIATAMENTE (Pagamento Avulso)
         print(f"Iniciando cobrança promocional R$ 4,90 para {email}...")
         payment_result = create_one_time_payment(
             user.email, 
@@ -61,9 +62,7 @@ def process_subscription_route():
         )
 
         if payment_result['status'] == 'success':
-            # 2. Se aprovou, cria a assinatura de R$ 24,90 para DAQUI A 30 DIAS
             start_date_future = datetime.utcnow() + timedelta(days=30)
-            
             print(f"Pagamento R$ 4,90 aprovado! Agendando assinatura R$ 24,90 para {start_date_future}...")
             
             subscription_result = create_subscription(
@@ -71,29 +70,26 @@ def process_subscription_route():
                 card_token, 
                 amount=24.90, 
                 frequency=1,
-                start_date=start_date_future # <--- O PULO DO GATO
+                start_date=start_date_future
             )
             
-            # Mesmo que a assinatura falhe (raro), o usuário pagou o primeiro mês.
-            # Consideramos sucesso para liberar acesso.
             result_mp = {'status': 'success', 'id': subscription_result.get('id', 'pending_sub')}
             days_access = 32
         else:
-            # Se falhou os 4,90, aborta tudo
             result_mp = payment_result
 
     else:
-        # ANUAL: Lógica Padrão (Cobrança Única/Recorrente Anual normal)
+        # ANUAL
         amount = 198.90
         frequency = 12
         days_access = 366
         result_mp = create_subscription(user.email, card_token, amount=amount, frequency=frequency)
 
-    # --- FINALIZAÇÃO (Igual ao original) ---
+    # --- FINALIZAÇÃO ---
     if result_mp['status'] == 'success':
         try:
-            user.status = 'ativo'
-            user.profile = 'usuario'
+            user.status = 'ativo' 
+            user.profile = 'usuario'  
             user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
             user.subscription_id = result_mp.get('id')
             
