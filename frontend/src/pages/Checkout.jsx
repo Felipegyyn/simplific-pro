@@ -156,16 +156,41 @@ const Checkout = () => {
                 <Lock size={18} /> Dados de Pagamento (Mercado Pago)
             </div>
             
-            <CardPayment
-              initialization={{ amount: amount }}
-              onSubmit={onSubmit}
-              onReady={onReady}
-              onError={onError}
-              customization={{
-                paymentMethods: { minInstallments: 1, maxInstallments: 1 },
-                visual: { style: { theme: 'default' }, hidePaymentButton: false },
-              }}
-            />
+           {/* ... dentro da div da Coluna da Direita ... */}
+
+            <div className="flex items-center gap-2 mb-6 text-gray-700 font-medium">
+                <Lock size={18} /> Dados de Pagamento (Mercado Pago)
+            </div>
+            
+            {/* TRAVA DE SEGURANÇA: Só renderiza se tiver valor definido */}
+            {amount > 0 && (
+              <CardPayment
+                key={amount} // <--- O PULO DO GATO 1: Força recarregar se o preço mudar
+                initialization={{ 
+                  amount: amount,
+                  payer: {
+                    // O PULO DO GATO 2: Passamos um email de fallback para iniciar o antifraude
+                    // O Mercado Pago atualiza isso depois quando o usuário preencher o form real
+                    email: formData.email || "guest@simplificpro.com", 
+                  }
+                }}
+                onSubmit={onSubmit}
+                onReady={onReady}
+                onError={onError}
+                customization={{
+                  paymentMethods: { minInstallments: 1, maxInstallments: 1 },
+                  visual: { 
+                    style: { theme: 'default' }, 
+                    hidePaymentButton: false 
+                  },
+                }}
+              />
+            )}
+            
+            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                <ShieldCheck size={14} /> Pagamento processado em ambiente seguro
+            </div>
+
             
             <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
                 <ShieldCheck size={14} /> Pagamento processado em ambiente seguro
