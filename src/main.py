@@ -160,6 +160,23 @@ def create_default_categories():
         print(f"Error creating categories: {e}")
         db.session.rollback()
 
+# --- ADICIONE ISTO NO SEU MAIN.PY ---
+# Solução Nuclear para CORS: Injeta headers manualmente em TODAS as respostas
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, x-idempotency-key"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+    return response
+
+# Se uma requisição OPTIONS bater e não for tratada, o Flask retorna 404 ou 405.
+# Isso garante que o navegador receba um 200 OK com os headers acima.
+@app.route('/api/payment/process_subscription', methods=['OPTIONS'])
+def options_handler():
+    return jsonify({'status': 'ok'}), 200
+# ------------------------------------
+
 # Rotas simples
 @app.route('/')
 def home():

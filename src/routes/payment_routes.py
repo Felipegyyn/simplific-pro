@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from flask_cors import cross_origin # <--- Importação necessária
 from src.models.user import User
 from src.models.db import db
 from src.services.payment_service import create_subscription, create_one_time_payment
@@ -9,11 +8,11 @@ from src.services.notification_service import send_welcome_credentials
 
 payment_bp = Blueprint('payment', __name__)
 
+# ADICIONADO 'OPTIONS' AQUI PARA O NAVEGADOR NÃO RECLAMAR
 @payment_bp.route('/process_subscription', methods=['POST', 'OPTIONS'])
-@cross_origin(origins="*", methods=['POST', 'OPTIONS'], allow_headers=["Content-Type", "Authorization"]) # <--- Força bruta do CORS
 def process_subscription_route():
-    # Se for OPTIONS (verificação do navegador), o @cross_origin já resolve, 
-    # mas por segurança retornamos 200 aqui também.
+    # Se for OPTIONS, retornamos vazio. 
+    # O @app.after_request do main.py vai injetar os headers de permissão na saída.
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
