@@ -165,16 +165,16 @@ const Checkout = () => {
             {/* TRAVA DE SEGURANÇA: Só renderiza se tiver valor definido */}
             {amount > 0 && (
               <CardPayment
-                key={amount} // Mantém o componente estável a menos que o PREÇO mude
+                key={amount} 
                 initialization={{ 
                   amount: amount,
                   payer: {
-                    // CORREÇÃO AQUI: Usamos um email fixo para a INICIALIZAÇÃO visual.
-                    // Isso impede que o componente quebre enquanto o usuário digita o email real no formulário.
+                    // ATENÇÃO: Deixe EXATAMENTE assim, com este e-mail fixo entre aspas.
+                    // NÃO coloque formData.email aqui. O e-mail real vai apenas no onSubmit.
                     email: "novo_cliente@simplificpro.com", 
                   }
                 }}
-                onSubmit={onSubmit} // O email real vai aqui dentro, na hora de enviar
+                onSubmit={onSubmit}
                 onReady={onReady}
                 onError={onError}
                 customization={{

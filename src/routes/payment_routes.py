@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-# from flask_cors import cross_origin  <-- REMOVIDO
+from flask_cors import cross_origin # <--- Importação necessária
 from src.models.user import User
 from src.models.db import db
 from src.services.payment_service import create_subscription, create_one_time_payment
@@ -9,13 +9,16 @@ from src.services.notification_service import send_welcome_credentials
 
 payment_bp = Blueprint('payment', __name__)
 
-@payment_bp.route('/process_subscription', methods=['POST']) # <-- REMOVIDO O 'OPTIONS' e o @cross_origin
+@payment_bp.route('/process_subscription', methods=['POST', 'OPTIONS'])
+@cross_origin(origins="*", methods=['POST', 'OPTIONS'], allow_headers=["Content-Type", "Authorization"]) # <--- Força bruta do CORS
 def process_subscription_route():
-    # <-- REMOVIDO O BLOCO IF OPTIONS...
+    # Se for OPTIONS (verificação do navegador), o @cross_origin já resolve, 
+    # mas por segurança retornamos 200 aqui também.
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
 
     data = request.get_json()
     card_token = data.get('card_token')
-    # ... (o resto do código continua igual) ...
     payer_data = data.get('payer_data', {})
     plan_type = data.get('plan_type', 'monthly')
 
