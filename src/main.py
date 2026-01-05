@@ -54,7 +54,22 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+# --- CONFIGURAÇÃO CORS BLINDADA ---
+# Aceita credenciais apenas dos domínios oficiais.
+# Isso resolve o erro "Failed to fetch" no Dashboard e Transações.
+CORS(app, resources={r"/*": {
+    "origins": [
+        "https://simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000",
+        "https://diagnostico.simplificpro.com.br",
+        "https://www.diagnostico.simplificpro.com.br"
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    "supports_credentials": True
+}})
 
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
@@ -160,8 +175,28 @@ def create_default_categories():
         print(f"Error creating categories: {e}")
         db.session.rollback()
 
-# --- ADICIONE ISTO NO SEU MAIN.PY ---
-# Solução Nuclear para CORS: Injeta headers manualmente em TODAS as respostas
+
+@app.after_request
+def after_request(response):
+    # Se o CORS já adicionou headers, não fazemos nada.
+    # Se faltar o header de origem e a origem for confiável, adicionamos manualmente.
+    origin = request.headers.get('Origin')
+    allowed_origins = [
+        "https://simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000"
+    ]
+    
+    if origin in allowed_origins:
+        # Só adiciona se o Flask-CORS não tiver adicionado
+        if not response.headers.get('Access-Control-Allow-Origin'):
+            response.headers.add('Access-Control-Allow-Origin', origin)
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            
+    return response
 
 # Rotas simples
 @app.route('/')
