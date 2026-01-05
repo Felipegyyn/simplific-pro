@@ -1,12 +1,9 @@
-import React, { useState, useMemo } from 'react'; // <--- IMPORTANTE: useMemo adicionado
+import React, { useState, useEffect, useMemo } from 'react';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ShieldCheck, Lock, User, Mail, Phone, Star } from 'lucide-react';
-
-// INICIALIZA O MERCADO PAGO
-initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
+import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -15,13 +12,19 @@ const Checkout = () => {
   const searchParams = new URLSearchParams(location.search);
   const isAnnual = searchParams.get('plan') === 'annual';
 
-  // Define o valor APENAS UMA VEZ
+  // Define o valor e o plano
   const [amount] = useState(isAnnual ? 198.90 : 4.90);
   
   const planName = isAnnual 
     ? "Plano Anual" 
     : "Plano Mensal - 1º mês. 24,90 a partir do 2º mês";
-  
+
+  // --- CORREÇÃO 1: Inicialização Única ---
+  // O initMercadoPago deve ficar dentro do useEffect para não rodar a cada digitação
+  useEffect(() => {
+    initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,15 +36,13 @@ const Checkout = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- O PULO DO GATO (FIX PARA removeChild) ---
-  // Usamos useMemo para criar essas configurações apenas UMA VEZ.
-  // Assim, quando você digita no formulário, o React NÃO recarrega o Mercado Pago.
+  // --- Configurações Memorizadas (Mantivemos pois estava correto) ---
   const initialization = useMemo(() => ({
     amount: amount,
     payer: {
-      email: "cliente_novo@simplificpro.com", // Email fixo para inicialização visual
+      email: "cliente_novo@simplificpro.com", // Email genérico para renderizar os campos
     },
-  }), [amount]); // Só recria se o PREÇO mudar
+  }), [amount]);
 
   const customization = useMemo(() => ({
     paymentMethods: { minInstallments: 1, maxInstallments: 1 },
@@ -50,48 +51,53 @@ const Checkout = () => {
       hidePaymentButton: false 
     },
   }), []);
-  // ---------------------------------------------
 
   const onSubmit = async (mpFormData) => {
+    // Validação básica antes de enviar
     if (!formData.name || !formData.email || !formData.whatsapp) {
         alert("Por favor, preencha seus dados pessoais (Nome, E-mail e WhatsApp) antes de pagar.");
-        return; // Interrompe o envio se faltar dados
+        // Rejeita a promise para o botão do MP voltar ao estado normal
+        return Promise.reject(); 
     }
 
-    try {
-      const { token } = mpFormData;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { token } = mpFormData;
+        console.log("Enviando pagamento...");
 
-      console.log("Enviando pagamento...");
+        const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            card_token: token,
+            payer_data: formData,
+            plan_type: isAnnual ? 'annual' : 'monthly'
+          }),
+        });
 
-      const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          card_token: token,
-          payer_data: formData, // Aqui vão os dados reais digitados pelo usuário
-          plan_type: isAnnual ? 'annual' : 'monthly'
-        }),
-      });
+        const data = await response.json();
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Pagamento Aprovado! Enviamos os dados de acesso para seu e-mail.");
-        navigate('/login'); 
-      } else {
-        console.error("Erro API:", data);
-        alert("Erro ao processar pagamento: " + (data.error || "Verifique os dados do cartão."));
+        if (response.ok) {
+          alert("Pagamento Aprovado! Enviamos os dados de acesso para seu e-mail.");
+          navigate('/login'); 
+          resolve(); // Avisa o Brick que deu tudo certo
+        } else {
+          console.error("Erro API:", data);
+          alert("Erro ao processar pagamento: " + (data.error || "Verifique os dados do cartão."));
+          reject(); // Avisa o Brick que deu erro
+        }
+      } catch (error) {
+        console.error("Erro Network:", error);
+        alert("Erro de conexão com o servidor. Tente novamente.");
+        reject(); // Avisa o Brick que deu erro de rede
       }
-    } catch (error) {
-      console.error("Erro Network:", error);
-      alert("Erro de conexão com o servidor. Tente novamente.");
-    }
+    });
   };
 
   const onError = async (error) => { console.log("Erro MP Brick:", error); };
-  const onReady = async () => { console.log("Brick pronto"); };
+  const onReady = async () => { console.log("Brick pronto e carregado"); };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -100,7 +106,7 @@ const Checkout = () => {
       <div className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
-          {/* Coluna da Esquerda */}
+          {/* Coluna da Esquerda: Dados Pessoais */}
           <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Finalizar Assinatura</h1>
@@ -147,17 +153,17 @@ const Checkout = () => {
                 <Lock size={18} /> Dados de Pagamento (Mercado Pago)
             </div>
             
-            {/* Componente Blindado com useMemo */}
-            {amount > 0 && (
-              <CardPayment
-                key={amount} 
-                initialization={initialization} // Passando o objeto memorizado
-                customization={customization}   // Passando o objeto memorizado
-                onSubmit={onSubmit}
-                onReady={onReady}
-                onError={onError}
-              />
-            )}
+            {/* --- CORREÇÃO 2: Renderização Estável --- */}
+            {/* Removemos a prop 'key={amount}' para evitar remontagem agressiva */}
+            <div id="payment-brick-container">
+                <CardPayment
+                    initialization={initialization}
+                    customization={customization}
+                    onSubmit={onSubmit}
+                    onReady={onReady}
+                    onError={onError}
+                />
+            </div>
             
             <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
                 <ShieldCheck size={14} /> Pagamento processado em ambiente seguro
