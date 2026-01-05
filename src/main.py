@@ -12,7 +12,7 @@ cloudinary.config(
     api_secret = os.getenv("CLOUDINARY_API_SECRET"),
     secure = True
 )
-# DON'T CHANGE THIS !!!
+# DON'T CHANGE THIS !!!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 
