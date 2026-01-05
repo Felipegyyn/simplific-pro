@@ -103,6 +103,7 @@ const Checkout = () => {
           headers: {
             'Content-Type': 'application/json'
           },
+          credentials: 'include',
           body: JSON.stringify({
             card_token: mpFormData.token,
             payer_data: currentData,
