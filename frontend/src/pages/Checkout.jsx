@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
+
+// --- FIX 1: Inicialização Global (Fora do Componente) ---
+// Isso garante que o SDK carregue apenas uma vez na memória do navegador.
+initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -12,18 +16,11 @@ const Checkout = () => {
   const searchParams = new URLSearchParams(location.search);
   const isAnnual = searchParams.get('plan') === 'annual';
 
-  // Define o valor e o plano
   const [amount] = useState(isAnnual ? 198.90 : 4.90);
   
   const planName = isAnnual 
     ? "Plano Anual" 
     : "Plano Mensal - 1º mês. 24,90 a partir do 2º mês";
-
-  // --- CORREÇÃO 1: Inicialização Única ---
-  // O initMercadoPago deve ficar dentro do useEffect para não rodar a cada digitação
-  useEffect(() => {
-    initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
-  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -36,11 +33,10 @@ const Checkout = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- Configurações Memorizadas (Mantivemos pois estava correto) ---
   const initialization = useMemo(() => ({
     amount: amount,
     payer: {
-      email: "cliente_novo@simplificpro.com", // Email genérico para renderizar os campos
+      email: "cliente_novo@simplificpro.com",
     },
   }), [amount]);
 
@@ -52,11 +48,14 @@ const Checkout = () => {
     },
   }), []);
 
-  const onSubmit = async (mpFormData) => {
-    // Validação básica antes de enviar
+  // --- FIX 2: Callbacks Memorizados ---
+  // O uso de useCallback impede que essas funções sejam recriadas,
+  // o que evita que o Brick do Mercado Pago "pense" que mudou algo e tente recarregar.
+  
+  const onSubmit = useCallback(async (mpFormData) => {
+    // Validação
     if (!formData.name || !formData.email || !formData.whatsapp) {
         alert("Por favor, preencha seus dados pessoais (Nome, E-mail e WhatsApp) antes de pagar.");
-        // Rejeita a promise para o botão do MP voltar ao estado normal
         return Promise.reject(); 
     }
 
@@ -65,6 +64,7 @@ const Checkout = () => {
         const { token } = mpFormData;
         console.log("Enviando pagamento...");
 
+        // A URL deve bater exatamente com seu backend no Render
         const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
           method: 'POST',
           headers: {
@@ -82,22 +82,28 @@ const Checkout = () => {
         if (response.ok) {
           alert("Pagamento Aprovado! Enviamos os dados de acesso para seu e-mail.");
           navigate('/login'); 
-          resolve(); // Avisa o Brick que deu tudo certo
+          resolve(); 
         } else {
           console.error("Erro API:", data);
           alert("Erro ao processar pagamento: " + (data.error || "Verifique os dados do cartão."));
-          reject(); // Avisa o Brick que deu erro
+          reject(); 
         }
       } catch (error) {
         console.error("Erro Network:", error);
-        alert("Erro de conexão com o servidor. Tente novamente.");
-        reject(); // Avisa o Brick que deu erro de rede
+        // Se cair aqui, é 99% de chance de ser o Backend não atualizado (CORS)
+        alert("Erro de conexão com o servidor. Verifique se o backend está online.");
+        reject(); 
       }
     });
-  };
+  }, [formData, isAnnual, navigate]); // Dependências controladas
 
-  const onError = async (error) => { console.log("Erro MP Brick:", error); };
-  const onReady = async () => { console.log("Brick pronto e carregado"); };
+  const onError = useCallback(async (error) => { 
+      console.log("Erro MP Brick:", error); 
+  }, []);
+
+  const onReady = useCallback(async () => { 
+      console.log("Brick pronto e carregado (Callback Único)"); 
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -106,7 +112,7 @@ const Checkout = () => {
       <div className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
-          {/* Coluna da Esquerda: Dados Pessoais */}
+          {/* Coluna da Esquerda */}
           <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Finalizar Assinatura</h1>
@@ -147,14 +153,12 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* Coluna da Direita: Pagamento */}
+          {/* Coluna da Direita */}
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 h-fit sticky top-24">
             <div className="flex items-center gap-2 mb-6 text-gray-700 font-medium">
                 <Lock size={18} /> Dados de Pagamento (Mercado Pago)
             </div>
             
-            {/* --- CORREÇÃO 2: Renderização Estável --- */}
-            {/* Removemos a prop 'key={amount}' para evitar remontagem agressiva */}
             <div id="payment-brick-container">
                 <CardPayment
                     initialization={initialization}
