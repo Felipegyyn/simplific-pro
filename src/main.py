@@ -54,7 +54,20 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+# Precisamos listar explicitamente quem pode acessar.
+CORS(app, resources={r"/*": {
+    "origins": [
+        "https://simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000",
+        "https://diagnostico.simplificpro.com.br",
+        "https://www.diagnostico.simplificpro.com.br"
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    "allow_headers": "*", # Aceita os headers estranhos do Mercado Pago
+    "supports_credentials": True # Permite cookies/tokens
+}})
 
 # ▼▼▼▼▼▼ ADICIONE ESTE BLOCO DE DEBUG AQUI ▼▼▼▼▼▼
 @app.before_request
