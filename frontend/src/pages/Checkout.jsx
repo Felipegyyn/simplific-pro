@@ -1,18 +1,54 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { initMercadoPago, CardPayment } from '@mercadopago/sdk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 
-// Inicialização Global.
+// Inicialização Única
 initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
+
+// --- COMPONENTE ISOLADO DO MERCADO PAGO ---
+// Usamos memo() para que este componente NUNCA renderize novamente
+// a menos que o preço mude. Isso resolve o erro 'removeChild'.
+const PaymentBrick = memo(({ amount, onSubmit, onError, onReady }) => {
+  const initialization = {
+    amount: amount,
+    payer: { email: "cliente@simplificpro.com" },
+  };
+
+  const customization = {
+    paymentMethods: { minInstallments: 1, maxInstallments: 1 },
+    visual: { 
+      style: { theme: 'default' }, 
+      hidePaymentButton: false 
+    },
+  };
+
+  return (
+    <div id="payment-brick-container">
+       <CardPayment
+          initialization={initialization}
+          customization={customization}
+          onSubmit={onSubmit}
+          onReady={onReady}
+          onError={onError}
+       />
+    </div>
+  );
+}, (prevProps, nextProps) => {
+    // Função de comparação customizada: Só atualiza se o valor mudar.
+    // Ignora mudanças nas funções onSubmit/onError
+    return prevProps.amount === nextProps.amount;
+});
 
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const isAnnual = searchParams.get('plan') === 'annual';
+  
+  // Estado fixo do valor
   const [amount] = useState(isAnnual ? 198.90 : 4.90);
   
   const planName = isAnnual 
@@ -25,11 +61,9 @@ const Checkout = () => {
     whatsapp: ''
   });
 
-  // --- A MÁGICA DO REF (CORREÇÃO DO REMOVECHILD) ---
-  // Criamos uma referência que guarda os dados sem causar re-renderização no Brick
+  // Ref para acessar dados sem recriar funções
   const formDataRef = useRef(formData);
 
-  // Sempre que o estado mudar, atualizamos a referência silenciosamente
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
@@ -39,47 +73,28 @@ const Checkout = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const initialization = useMemo(() => ({
-    amount: amount,
-    payer: {
-      email: "cliente_novo@simplificpro.com",
-    },
-  }), [amount]);
-
-  const customization = useMemo(() => ({
-    paymentMethods: { minInstallments: 1, maxInstallments: 1 },
-    visual: { 
-      style: { theme: 'default' }, 
-      hidePaymentButton: false 
-    },
-  }), []);
-
-  // --- CALLBACK SEM DEPENDÊNCIAS ---
-  // Perceba que o array de dependências no final é VAZIO [].
-  // Isso significa que esta função NUNCA muda, logo o Brick nunca recarrega.
+  // Funções de Callback (Estáveis)
   const onSubmit = useCallback(async (mpFormData) => {
-    // Lemos os dados diretamente da referência atual
-    const currentData = formDataRef.current; 
-    const { name, email, whatsapp } = currentData;
-
-    if (!name || !email || !whatsapp) {
-        alert("Por favor, preencha seus dados pessoais (Nome, E-mail e WhatsApp) antes de pagar.");
+    const currentData = formDataRef.current;
+    
+    if (!currentData.name || !currentData.email || !currentData.whatsapp) {
+        alert("Por favor, preencha seus dados pessoais acima antes de pagar.");
         return Promise.reject(); 
     }
 
+    // Console log para debug
+    console.log("Iniciando pagamento para:", currentData.email);
+
     return new Promise(async (resolve, reject) => {
       try {
-        const { token } = mpFormData;
-        console.log("Enviando pagamento...", currentData);
-
         const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            card_token: token,
-            payer_data: currentData, // Usamos os dados do Ref
+            card_token: mpFormData.token,
+            payer_data: currentData,
             plan_type: isAnnual ? 'annual' : 'monthly'
           }),
         });
@@ -87,24 +102,24 @@ const Checkout = () => {
         const data = await response.json();
 
         if (response.ok) {
-          alert("Pagamento Aprovado! Verifique seu e-mail.");
+          alert("Sucesso! Verifique seu e-mail.");
           navigate('/login'); 
           resolve(); 
         } else {
-          console.error("Erro API:", data);
-          alert("Erro: " + (data.error || "Pagamento recusado."));
+          console.error("Erro Backend:", data);
+          alert("Pagamento recusado: " + (data.error || "Verifique o cartão."));
           reject(); 
         }
       } catch (error) {
-        console.error("Erro Crítico de Fetch:", error);
-        alert("Erro de conexão. Verifique o console (F12) para detalhes.");
+        console.error("Erro de Conexão:", error);
+        alert("Não foi possível conectar ao servidor. Tente novamente em instantes.");
         reject(); 
       }
     });
-  }, [isAnnual, navigate]); // Removemos formData das dependências
+  }, [isAnnual, navigate]);
 
-  const onError = useCallback(async (error) => { console.log("Erro Brick:", error); }, []);
-  const onReady = useCallback(async () => { console.log("Brick pronto."); }, []);
+  const onError = useCallback((error) => console.log("Erro Brick:", error), []);
+  const onReady = useCallback(() => console.log("Brick Pronto"), []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -112,7 +127,7 @@ const Checkout = () => {
       <div className="flex-grow container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
-          {/* Formulário de Dados */}
+          {/* Formulário */}
           <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Finalizar Assinatura</h1>
@@ -121,45 +136,37 @@ const Checkout = () => {
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-4">
                 <h3 className="font-bold text-gray-800 border-b pb-2">Seus Dados</h3>
                 <div className="space-y-3">
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><User size={16}/> Nome Completo</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg outline-none" />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><Mail size={16}/> E-mail</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg outline-none" />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2"><Phone size={16}/> WhatsApp</label>
-                        <input type="tel" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} className="w-full p-3 border border-gray-300 rounded-lg outline-none" />
-                    </div>
+                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Nome Completo" className="w-full p-3 border border-gray-300 rounded-lg" />
+                    <input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="E-mail" className="w-full p-3 border border-gray-300 rounded-lg" />
+                    <input type="tel" name="whatsapp" value={formData.whatsapp} onChange={handleInputChange} placeholder="WhatsApp" className="w-full p-3 border border-gray-300 rounded-lg" />
                 </div>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-               <div className="flex justify-between items-center mb-2">
-                  <span>Assinatura Simplific Pro ({planName})</span>
-                  <span className="font-bold">R$ {amount.toFixed(2).replace('.', ',')}</span>
-               </div>
-            </div>
+             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                <div className="flex justify-between font-bold text-lg">
+                   <span>Total:</span>
+                   <span>R$ {amount.toFixed(2).replace('.', ',')}</span>
+                </div>
+                 <p className="text-sm text-gray-500 mt-2">{planName}</p>
+             </div>
           </div>
 
-          {/* Pagamento */}
+          {/* Pagamento (Isolado) */}
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 h-fit sticky top-24">
             <div className="flex items-center gap-2 mb-6 text-gray-700 font-medium">
-                <Lock size={18} /> Dados de Pagamento
+                <Lock size={18} /> Pagamento Seguro
             </div>
-            <div id="payment-brick-container">
-                <CardPayment
-                    initialization={initialization}
-                    customization={customization}
-                    onSubmit={onSubmit}
-                    onReady={onReady}
-                    onError={onError}
-                />
-            </div>
+            
+            {/* Componente Blindado */}
+            <PaymentBrick 
+                amount={amount} 
+                onSubmit={onSubmit} 
+                onError={onError} 
+                onReady={onReady} 
+            />
+            
             <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
-                <ShieldCheck size={14} /> Ambiente Seguro
+                <ShieldCheck size={14} /> Ambiente Criptografado
             </div>
           </div>
 
