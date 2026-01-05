@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_cors import cross_origin # <--- ADICIONADO: Import essencial
 from src.models.user import User
 from src.models.db import db
 from src.services.payment_service import create_subscription, create_one_time_payment
@@ -8,11 +9,12 @@ from src.services.notification_service import send_welcome_credentials
 
 payment_bp = Blueprint('payment', __name__)
 
-# ADICIONADO 'OPTIONS' AQUI PARA O NAVEGADOR NÃO RECLAMAR
+# ADICIONADO @cross_origin PARA FORÇAR A ACEITAÇÃO DA ROTA
 @payment_bp.route('/process_subscription', methods=['POST', 'OPTIONS'])
+@cross_origin() # <--- ADICIONADO: Isso resolve o 'Failed to fetch' e CORS
 def process_subscription_route():
     # Se for OPTIONS, retornamos vazio. 
-    # O @app.after_request do main.py vai injetar os headers de permissão na saída.
+    # O decorator @cross_origin garante os headers corretos aqui.
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
