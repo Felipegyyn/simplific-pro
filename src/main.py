@@ -54,7 +54,21 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(
+    app,
+    origins=[
+        "https://simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000",
+        "https://diagnostico.simplificpro.com.br",
+        "https://www.diagnostico.simplificpro.com.br"
+    ],
+    supports_credentials=True,
+    allow_headers="*",  # Permite tokens e chaves do Mercado Pago
+    expose_headers="*",
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+)
 
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
@@ -178,11 +192,31 @@ def test_identity():
     user_id = get_jwt_identity()
     return jsonify({'user_id': user_id})
 
+# Localize a função @app.after_request e SUBSTITUA por esta:
+
 @app.after_request
 def after_request(response):
-    # Garante que as requisições OPTIONS sempre retornem OK
+    origin = request.headers.get('Origin')
+    allowed_origins = [
+        "https://simplificpro.com",
+        "https://www.simplificpro.com",
+        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+        "http://localhost:3000",
+        "https://diagnostico.simplificpro.com.br",
+        "https://www.diagnostico.simplificpro.com.br"
+    ]
+    
+    # Injeta headers manualmente se a origem for permitida
+    if origin in allowed_origins:
+        response.headers.add('Access-Control-Allow-Origin', origin)
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,X-Idempotency-Key')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        
+    # Garante que as requisições OPTIONS sempre retornem OK 200
     if request.method == 'OPTIONS':
-        response.status_code = 200
+        return Response(status=200)
+        
     return response
 
 # --- SUBSTITUA COMPLETAMENTE A ROTA ANTIGA 'serve_audio' POR ESTA ---
