@@ -85,6 +85,17 @@ const Checkout = () => {
     // Console log para debug
     console.log("Iniciando pagamento para:", currentData.email);
 
+    // ▼▼▼▼▼▼ ADICIONE ISTO ▼▼▼▼▼▼
+    console.log("--- [DEBUG FRONTEND] ---");
+    console.log("URL Alvo:", 'https://simplific-pro-backend.onrender.com/api/payment/process_subscription');
+    console.log("Token:", mpFormData.token);
+    console.log("Payload:", JSON.stringify({
+        card_token: mpFormData.token,
+        payer_data: currentData,
+        plan_type: isAnnual ? 'annual' : 'monthly'
+    }));
+    // ▲▲▲▲▲▲ FIM DO DEBUG ▲▲▲▲▲▲
+
     return new Promise(async (resolve, reject) => {
       try {
         const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
