@@ -54,7 +54,7 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# --- CONFIGURAÇÃO CORS "HARD RESET" ---
+# --- CONFIGURAÇÃO CORS "HARD RESET"- ---
 # 1. Ativamos CORS básico para lidar com OPTIONS automaticamente
 CORS(app) 
 
