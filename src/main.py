@@ -56,6 +56,23 @@ app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'sta
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# ▼▼▼▼▼▼ ADICIONE ESTE BLOCO DE DEBUG AQUI ▼▼▼▼▼▼
+@app.before_request
+def debug_request_info():
+    # Isso vai mostrar no log do Render quem está chamando e qual método (OPTIONS, POST, etc)
+    print(f"\n>>> [DEBUG REQUEST] Recebendo: {request.method} {request.path}")
+    print(f"    Origin recebida: {request.headers.get('Origin')}")
+    print(f"    Headers essenciais: {request.headers.get('Access-Control-Request-Method')}")
+
+@app.after_request
+def debug_response_info(response):
+    # Isso vai mostrar o que seu servidor respondeu e quais headers de permissão enviou
+    print(f"<<< [DEBUG RESPONSE] Status: {response.status}")
+    print(f"    CORS Origin enviado: {response.headers.get('Access-Control-Allow-Origin')}")
+    print(f"    CORS Headers enviado: {response.headers.get('Access-Control-Allow-Headers')}")
+    return response
+# ▲▲▲▲▲▲ FIM DO BLOCO DE DEBUG ▲▲▲▲▲▲
+
 app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
 app.config['JWT_SECRET_KEY'] = 'super-secret'
 
