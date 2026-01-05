@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 
-// Inicialização Global
+// Inicialização Global.
 initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
 
 const Checkout = () => {
