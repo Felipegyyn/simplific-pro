@@ -54,20 +54,34 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# Precisamos listar explicitamente quem pode acessar.
-CORS(app, resources={r"/*": {
-    "origins": [
+# --- CORREÇÃO DE SEGURANÇA MANUAL ---
+# 1. Ativamos o CORS básico para lidar com o preflight (OPTIONS)
+CORS(app) 
+
+# 2. Forçamos o header CORRETO na saída.
+# O navegador exige que 'Access-Control-Allow-Origin' seja EXATO (não pode ser '*')
+# quando estamos enviando cookies ou tokens de pagamento.
+@app.after_request
+def finalize_cors_headers(response):
+    origin = request.headers.get('Origin')
+    
+    # Lista de sites permitidos
+    whitelist = [
         "https://simplificpro.com",
         "https://www.simplificpro.com",
         "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
         "http://localhost:3000",
         "https://diagnostico.simplificpro.com.br",
         "https://www.diagnostico.simplificpro.com.br"
-    ],
-    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    "allow_headers": "*", # Aceita os headers estranhos do Mercado Pago
-    "supports_credentials": True # Permite cookies/tokens
-}})
+    ]
+    
+    if origin in whitelist:
+        response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, Accept, X-Idempotency-Key'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
+    
+    return response
 
 # ▼▼▼▼▼▼ ADICIONE ESTE BLOCO DE DEBUG AQUI ▼▼▼▼▼▼
 @app.before_request
