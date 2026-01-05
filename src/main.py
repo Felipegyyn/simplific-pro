@@ -176,7 +176,7 @@ def test():
 @jwt_required()
 def test_identity():
     user_id = get_jwt_identity()
-    return jsonify({'user_id': user_id}
+    return jsonify({'user_id': user_id})
 
 # --- SUBSTITUA COMPLETAMENTE A ROTA ANTIGA 'serve_audio' POR ESTA ---
 @app.route('/audio/<filename>')
