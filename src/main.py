@@ -67,7 +67,7 @@ CORS(app, resources={r"/*": {
         "https://www.diagnostico.simplificpro.com.br"
     ],
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    "allow_headers": "*",
     "supports_credentials": True
 }})
 
@@ -175,28 +175,6 @@ def create_default_categories():
         print(f"Error creating categories: {e}")
         db.session.rollback()
 
-
-@app.after_request
-def after_request(response):
-    # Se o CORS já adicionou headers, não fazemos nada.
-    # Se faltar o header de origem e a origem for confiável, adicionamos manualmente.
-    origin = request.headers.get('Origin')
-    allowed_origins = [
-        "https://simplificpro.com",
-        "https://www.simplificpro.com",
-        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
-        "http://localhost:3000"
-    ]
-    
-    if origin in allowed_origins:
-        # Só adiciona se o Flask-CORS não tiver adicionado
-        if not response.headers.get('Access-Control-Allow-Origin'):
-            response.headers.add('Access-Control-Allow-Origin', origin)
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-            response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-            response.headers.add('Access-Control-Allow-Credentials', 'true')
-            
-    return response
 
 # Rotas simples
 @app.route('/')
