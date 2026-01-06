@@ -106,47 +106,74 @@ def process_subscription_route():
 
 # --- NOVAS ROTAS: ÁREA DO ASSINANTE ---
 
+# ... imports ...
+
 @payment_bp.route('/subscription_status', methods=['GET'])
 @jwt_required()
 def get_subscription_status_route():
-    """Retorna os detalhes da assinatura do usuário logado."""
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
+    print(f"\n--- [DEBUG ASSINATURA] Checando User ID: {user_id} ---")
+
     if not user:
+        print("--- [DEBUG] Usuário não encontrado no banco.")
         return jsonify({"error": "Usuário não encontrado"}), 404
 
-    # VERIFICAÇÃO PRINCIPAL: O usuário tem dias válidos no banco de dados?
+    # DEBUG: Mostra o que tem no banco de dados
+    print(f"--- [DEBUG] Nome: {user.name}")
+    print(f"--- [DEBUG] Email: {user.email}")
+    print(f"--- [DEBUG] Subscription ID (MP): {user.subscription_id}")
+    print(f"--- [DEBUG] Valid Until (Banco): {user.subscription_valid_until}")
+    print(f"--- [DEBUG] Hoje (UTC): {datetime.utcnow().date()}")
+
+    # VERIFICAÇÃO PRINCIPAL
     is_active_by_date = False
-    if user.subscription_valid_until and user.subscription_valid_until > datetime.utcnow().date():
-        is_active_by_date = True
+    
+    # Verifica se a data existe e se é maior ou igual a hoje
+    if user.subscription_valid_until:
+        # Garante que estamos comparando data com data
+        valid_date = user.subscription_valid_until
+        if isinstance(valid_date, datetime):
+            valid_date = valid_date.date()
+            
+        today = datetime.utcnow().date()
+        
+        if valid_date >= today:
+            is_active_by_date = True
+            print("--- [DEBUG] Status: ATIVO (Por data de validade)")
+        else:
+            print("--- [DEBUG] Status: INATIVO (Data expirou)")
+    else:
+        print("--- [DEBUG] Status: INATIVO (Data é None)")
 
     # Se não tiver data válida e nem ID de assinatura, é Free.
     if not is_active_by_date and not user.subscription_id:
+        print("--- [DEBUG] Resultado Final: INACTIVE (Sem data e sem ID)")
         return jsonify({
             "status": "inactive",
             "message": "Nenhuma assinatura ativa vinculada."
         }), 200
 
-    # Tenta buscar detalhes no Mercado Pago (se houver ID), mas não depende disso para dar o acesso
+    # Busca MP
     mp_data = {}
     if user.subscription_id:
+        print(f"--- [DEBUG] Buscando dados no Mercado Pago para ID: {user.subscription_id}...")
         mp_data = get_subscription_details(user.subscription_id) or {}
+        print(f"--- [DEBUG] Status retornado pelo MP: {mp_data.get('status')}")
 
-    # Define o status visual
-    # Se a data do banco for válida, mostramos como ATIVO, mesmo que o MP diga 'pending' (caso dos 4,90)
     final_status = 'active' if is_active_by_date else 'inactive'
     
-    # Se o MP disser explicitamente que cancelou, respeitamos para mostrar na tela (mas mantemos acesso pela data)
-    mp_status_raw = mp_data.get("status")
-    
-    return jsonify({
-        "status": final_status, # Isso controla se o card verde aparece
-        "mp_status": mp_status_raw, # authorized, paused, cancelled, pending
+    response_payload = {
+        "status": final_status,
+        "mp_status": mp_data.get("status"),
         "next_payment_date": mp_data.get("next_payment_date"),
         "amount": mp_data.get("auto_recurring", {}).get("transaction_amount"),
         "user_valid_until": user.subscription_valid_until
-    }), 200
+    }
+    
+    print(f"--- [DEBUG] Payload de Resposta: {response_payload} ---")
+    return jsonify(response_payload), 200
 
 @payment_bp.route('/cancel_subscription', methods=['POST'])
 @jwt_required()
