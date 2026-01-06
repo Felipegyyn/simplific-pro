@@ -18,7 +18,7 @@ const Settings = () => {
   const { theme, toggleTheme } = useTheme(); 
   const [responseFormat, setResponseFormat] = useState('text'); // 'text' é o padrão inicial
 
-  // ▼▼▼ NOVOS ESTADOS DA ASSINATURA ▼▼▼
+  // ▼▼▼ NOVOS ESTADOS DA ASSINATURA. ▼▼▼
   const [subscription, setSubscription] = useState(null);
   const [loadingSub, setLoadingSub] = useState(false);
   // ▲▲▲ FIM NOVOS ESTADOS ▲▲▲
