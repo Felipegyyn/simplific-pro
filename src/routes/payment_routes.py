@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity # <--- ADICIONADO
 from src.models.user import User
 from src.models.db import db
-from src.services.payment_service import create_subscription, create_one_time_payment
+# <--- ATUALIZADO ABAIXO: Adicionamos get_subscription_details e cancel_subscription_service
+from src.services.payment_service import create_subscription, create_one_time_payment, get_subscription_details, cancel_subscription_service
 from datetime import datetime, timedelta
 from src.services.user_service import create_user_from_purchase, normalize_phone_number
 from src.services.notification_service import send_welcome_credentials
@@ -100,3 +102,61 @@ def process_subscription_route():
             return jsonify({"error": "Erro interno ao ativar conta."}), 500
     else:
         return jsonify({"error": "Falha no pagamento.", "detail": result_mp.get('detail')}), 400
+
+
+# --- NOVAS ROTAS: ÁREA DO ASSINANTE ---
+
+@payment_bp.route('/subscription_status', methods=['GET'])
+@jwt_required()
+def get_subscription_status_route():
+    """Retorna os detalhes da assinatura do usuário logado."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+    if not user.subscription_id:
+        return jsonify({
+            "status": "inactive",
+            "message": "Nenhuma assinatura ativa vinculada."
+        }), 200
+
+    # Busca no Mercado Pago
+    mp_data = get_subscription_details(user.subscription_id)
+    
+    if mp_data:
+        return jsonify({
+            "status": "active",
+            "mp_status": mp_data.get("status"), # authorized, paused, cancelled
+            "next_payment_date": mp_data.get("next_payment_date"),
+            "amount": mp_data.get("auto_recurring", {}).get("transaction_amount"),
+            "user_valid_until": user.subscription_valid_until
+        }), 200
+    else:
+        return jsonify({"error": "Erro ao buscar dados no Mercado Pago"}), 502
+
+@payment_bp.route('/cancel_subscription', methods=['POST'])
+@jwt_required()
+def cancel_subscription_route():
+    """Cancela a renovação automática."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user or not user.subscription_id:
+        return jsonify({"error": "Assinatura não encontrada."}), 400
+
+    # Chama o serviço para cancelar no MP
+    result = cancel_subscription_service(user.subscription_id)
+
+    if result['status'] == 'success':
+        # Nota: Não alteramos o user.status para 'inactive' agora.
+        # O usuário pagou pelo período, então ele continua ativo até a data de expiração.
+        # O Cron Job (check-subscriptions) irá inativá-lo quando a data chegar.
+        
+        return jsonify({
+            "message": "Assinatura cancelada com sucesso. Você ainda tem acesso até o fim do período pago.",
+            "valid_until": user.subscription_valid_until
+        }), 200
+    else:
+        return jsonify({"error": "Falha ao cancelar assinatura.", "detail": result.get('message')}), 500
