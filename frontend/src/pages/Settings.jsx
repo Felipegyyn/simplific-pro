@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; // <-- LINHA ADICIONADA
 import apiService from '../services/api';
 import { useTheme } from '../contexts/ThemeContext'; // 1. Importa o hook do tema
+import { CreditCard, AlertTriangle } from 'lucide-react';
 
 const Settings = () => {
   const [name, setName] = useState('');
@@ -16,6 +17,30 @@ const Settings = () => {
   // 2. Usa o hook para pegar o tema atual e a função para trocá-lo
   const { theme, toggleTheme } = useTheme(); 
   const [responseFormat, setResponseFormat] = useState('text'); // 'text' é o padrão inicial
+
+  // ▼▼▼ NOVOS ESTADOS DA ASSINATURA ▼▼▼
+  const [subscription, setSubscription] = useState(null);
+  const [loadingSub, setLoadingSub] = useState(false);
+  // ▲▲▲ FIM NOVOS ESTADOS ▲▲▲
+
+  useEffect(() => {
+    // Busca os dados do usuário
+    apiService.getCurrentUser().then(user => {
+      setName(user.name || '');
+      setWhatsapp(user.whatsapp || '');
+      setResponseFormat(user.preferred_response_format || 'text');
+    });
+
+    // ▼▼▼ NOVA CHAMADA: BUSCAR ASSINATURA ▼▼▼
+    setLoadingSub(true);
+    apiService.get('/api/payment/subscription_status')
+      .then(data => {
+        setSubscription(data);
+      })
+      .catch(err => console.error("Erro ao buscar assinatura:", err))
+      .finally(() => setLoadingSub(false));
+    // ▲▲▲ FIM NOVA CHAMADA ▲▲▲
+  }, []);
 
   useEffect(() => {
     // Busca os dados do usuário ao carregar a página
@@ -55,6 +80,27 @@ const Settings = () => {
     }
   };
 
+// ▼▼▼ COLE AQUI (ENTRE O handleSave E O return) ▼▼▼
+  const handleCancelSubscription = async () => {
+    // 1. Confirmação de segurança
+    const confirm = window.confirm("Tem certeza que deseja cancelar a renovação automática? Você continuará com acesso até o fim do período pago.");
+    if (!confirm) return;
+
+    try {
+      // 2. Chama a rota de cancelamento no backend
+      const response = await apiService.post('/api/payment/cancel_subscription');
+      
+      alert(response.message || "Assinatura cancelada com sucesso.");
+      
+      // 3. Atualiza o visual para mostrar 'Cancelado' sem precisar dar F5
+      setSubscription(prev => ({ ...prev, mp_status: 'cancelled' }));
+    } catch (error) {
+      console.error("Erro ao cancelar:", error);
+      alert("Erro ao cancelar assinatura. Tente novamente ou contate o suporte.");
+    }
+  };
+  // ▲▲▲ FIM DO CÓDIGO COLADO ▲▲▲
+  
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h1 className="text-2xl font-bold">Configurações</h1>
@@ -97,6 +143,8 @@ const Settings = () => {
           </div>
         </CardContent>
       </Card>
+
+      
       {/* ▼▼▼ COLE TODO ESTE NOVO CARD AQUI ▼▼▼ */}
     <Card>
       <CardHeader>
@@ -125,6 +173,84 @@ const Settings = () => {
       </CardContent>
     </Card>
     {/* ▲▲▲ FIM DO NOVO CARD ▲▲▲ */}
+
+
+      {/* ▼▼▼ NOVO CARD: MINHA ASSINATURA ▼▼▼ */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Minha Assinatura
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loadingSub ? (
+            <p className="text-sm text-gray-500">Carregando informações da assinatura...</p>
+          ) : subscription?.status === 'active' ? (
+            <div className="space-y-6">
+              
+              {/* Status e Próxima Fatura */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-800">Status do Plano</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    {subscription.mp_status === 'cancelled' ? 'Cancelado (Acesso Ativo)' : 'Ativo'}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1">
+                    Válido até: {new Date(subscription.user_valid_until).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+
+                {subscription.mp_status !== 'cancelled' && (
+                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700">Próxima Cobrança</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      R$ {subscription.amount ? subscription.amount.toFixed(2).replace('.', ',') : '0,00'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Data: {new Date(subscription.next_payment_date).toLocaleDateString('pt-BR')}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Botão de Cancelamento (Zona de Perigo) */}
+              {subscription.mp_status !== 'cancelled' && (
+                <div className="border-t pt-4">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                        Zona de Perigo
+                      </p>
+                      <p>Ao cancelar, você perde a renovação automática, mas mantém o acesso até o fim do ciclo.</p>
+                    </div>
+                    <Button 
+                      variant="destructive" 
+                      onClick={handleCancelSubscription}
+                      className="bg-red-100 text-red-700 hover:bg-red-200 border border-red-200"
+                    >
+                      Cancelar Assinatura
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            // Caso não tenha assinatura ativa
+            <div className="text-center py-6 space-y-3">
+              <p className="text-gray-600">Você está utilizando o plano Gratuito.</p>
+              <Button 
+                onClick={() => window.location.href = '/planos'} // Ou navigate('/planos') se usar react-router
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Fazer Upgrade para o PRO
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      {/* ▲▲▲ FIM NOVO CARD ▲▲▲ */}
     </div>
   );
 };
