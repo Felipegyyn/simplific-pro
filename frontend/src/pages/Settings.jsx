@@ -33,15 +33,18 @@ const Settings = () => {
       setResponseFormat(user.preferred_response_format || 'text');
     });
 
-    // ▼▼▼ NOVA CHAMADA: BUSCAR ASSINATURA ▼▼▼
+    
+    // ▼▼▼ BLOCO ATUALIZADO COM DEBUG ▼▼▼
     setLoadingSub(true);
     apiService.get('/api/payment/subscription_status')
       .then(data => {
+        console.log("--- [DEBUG FRONTEND] Resposta da Assinatura:", data); // <--- ADICIONE ISTO
         setSubscription(data);
       })
       .catch(err => console.error("Erro ao buscar assinatura:", err))
       .finally(() => setLoadingSub(false));
-    // ▲▲▲ FIM NOVA CHAMADA ▲▲▲
+    // ▲▲▲ FIM DO BLOCO ▲▲▲
+   
   }, []);
 
   useEffect(() => {
