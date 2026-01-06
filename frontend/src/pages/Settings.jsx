@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom'; // <--- ADICIONE ISSO
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import { useTheme } from '../contexts/ThemeContext'; // 1. Importa o hook do tem
 import { CreditCard, AlertTriangle } from 'lucide-react';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -241,7 +243,7 @@ const Settings = () => {
             <div className="text-center py-6 space-y-3">
               <p className="text-gray-600">Você está utilizando o plano Gratuito.</p>
               <Button 
-                onClick={() => window.location.href = '/planos'} // Ou navigate('/planos') se usar react-router
+                onClick={() => navigate('/planos')} // Ou navigate('/planos') se usar react-router
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Fazer Upgrade para o PRO
