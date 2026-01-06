@@ -116,25 +116,37 @@ def get_subscription_status_route():
     if not user:
         return jsonify({"error": "Usuário não encontrado"}), 404
 
-    if not user.subscription_id:
+    # VERIFICAÇÃO PRINCIPAL: O usuário tem dias válidos no banco de dados?
+    is_active_by_date = False
+    if user.subscription_valid_until and user.subscription_valid_until > datetime.utcnow().date():
+        is_active_by_date = True
+
+    # Se não tiver data válida e nem ID de assinatura, é Free.
+    if not is_active_by_date and not user.subscription_id:
         return jsonify({
             "status": "inactive",
             "message": "Nenhuma assinatura ativa vinculada."
         }), 200
 
-    # Busca no Mercado Pago
-    mp_data = get_subscription_details(user.subscription_id)
+    # Tenta buscar detalhes no Mercado Pago (se houver ID), mas não depende disso para dar o acesso
+    mp_data = {}
+    if user.subscription_id:
+        mp_data = get_subscription_details(user.subscription_id) or {}
+
+    # Define o status visual
+    # Se a data do banco for válida, mostramos como ATIVO, mesmo que o MP diga 'pending' (caso dos 4,90)
+    final_status = 'active' if is_active_by_date else 'inactive'
     
-    if mp_data:
-        return jsonify({
-            "status": "active",
-            "mp_status": mp_data.get("status"), # authorized, paused, cancelled
-            "next_payment_date": mp_data.get("next_payment_date"),
-            "amount": mp_data.get("auto_recurring", {}).get("transaction_amount"),
-            "user_valid_until": user.subscription_valid_until
-        }), 200
-    else:
-        return jsonify({"error": "Erro ao buscar dados no Mercado Pago"}), 502
+    # Se o MP disser explicitamente que cancelou, respeitamos para mostrar na tela (mas mantemos acesso pela data)
+    mp_status_raw = mp_data.get("status")
+    
+    return jsonify({
+        "status": final_status, # Isso controla se o card verde aparece
+        "mp_status": mp_status_raw, # authorized, paused, cancelled, pending
+        "next_payment_date": mp_data.get("next_payment_date"),
+        "amount": mp_data.get("auto_recurring", {}).get("transaction_amount"),
+        "user_valid_until": user.subscription_valid_until
+    }), 200
 
 @payment_bp.route('/cancel_subscription', methods=['POST'])
 @jwt_required()
