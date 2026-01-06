@@ -93,3 +93,42 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+
+# --- NOVAS FUNÇÕES: GERENCIAMENTO DE ASSINATURA ---
+
+def get_subscription_details(subscription_id):
+    """Consulta o status atual da assinatura no Mercado Pago."""
+    sdk = get_mp_sdk()
+    if not sdk: return None
+
+    try:
+        # Busca os dados da preapproval (assinatura)
+        result = sdk.preapproval().get(subscription_id)
+        
+        if result["status"] == 200:
+            return result["response"]
+        else:
+            print(f"Erro ao buscar assinatura {subscription_id}: {result}")
+            return None
+    except Exception as e:
+        print(f"Erro de conexão MP (Get Sub): {e}")
+        return None
+
+def cancel_subscription_service(subscription_id):
+    """Solicita o cancelamento da assinatura no Mercado Pago."""
+    sdk = get_mp_sdk()
+    if not sdk: return {"status": "error", "message": "SDK Indisponível"}
+
+    try:
+        # Atualiza o status para 'cancelled'
+        result = sdk.preapproval().update(subscription_id, {"status": "cancelled"})
+        
+        if result["status"] == 200:
+            return {"status": "success", "response": result["response"]}
+        else:
+            return {"status": "error", "message": "Falha ao cancelar no MP", "detail": result}
+    except Exception as e:
+        print(f"Erro de conexão MP (Cancel Sub): {e}")
+        return {"status": "error", "message": str(e)}
