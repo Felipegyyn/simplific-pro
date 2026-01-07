@@ -206,18 +206,18 @@ const Settings = () => {
                   </p>
                 </div>
 
-                {subscription.mp_status !== 'cancelled' && (
-                  <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                    <p className="text-sm font-medium text-gray-700">Próxima Cobrança</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      R$ {subscription.amount ? subscription.amount.toFixed(2).replace('.', ',') : '0,00'}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Data: {new Date(subscription.next_payment_date).toLocaleDateString('pt-BR')}
-                    </p>
-                  </div>
-                )}
-              </div>
+                {/* Bloco de Valores - Só mostra se não estiver cancelado E SE TIVER DATA */}
+              {subscription.mp_status !== 'cancelled' && subscription.next_payment_date && (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700">Próxima Cobrança</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    R$ {subscription.amount ? subscription.amount.toFixed(2).replace('.', ',') : '0,00'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Data: {new Date(subscription.next_payment_date).toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              )}
 
               {/* Botão de Cancelamento (Zona de Perigo) */}
               {subscription.mp_status !== 'cancelled' && (
