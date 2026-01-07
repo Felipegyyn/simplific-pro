@@ -106,74 +106,48 @@ def process_subscription_route():
 
 # --- NOVAS ROTAS: ÁREA DO ASSINANTE ---
 
-# ... imports ...
-
 @payment_bp.route('/subscription_status', methods=['GET'])
 @jwt_required()
 def get_subscription_status_route():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
-    print(f"\n--- [DEBUG ASSINATURA] Checando User ID: {user_id} ---")
-
     if not user:
-        print("--- [DEBUG] Usuário não encontrado no banco.")
         return jsonify({"error": "Usuário não encontrado"}), 404
 
-    # DEBUG: Mostra o que tem no banco de dados
-    print(f"--- [DEBUG] Nome: {user.name}")
-    print(f"--- [DEBUG] Email: {user.email}")
-    print(f"--- [DEBUG] Subscription ID (MP): {user.subscription_id}")
-    print(f"--- [DEBUG] Valid Until (Banco): {user.subscription_valid_until}")
-    print(f"--- [DEBUG] Hoje (UTC): {datetime.utcnow().date()}")
+    # 1. Busca dados no Mercado Pago
+    mp_data = {}
+    if user.subscription_id:
+        mp_data = get_subscription_details(user.subscription_id) or {}
 
-    # VERIFICAÇÃO PRINCIPAL
-    is_active_by_date = False
+    # 2. Lógica Inteligente para Valores e Datas
+    auto_recurring = mp_data.get("auto_recurring", {})
+    amount = auto_recurring.get("transaction_amount")
     
-    # Verifica se a data existe e se é maior ou igual a hoje
+    # Tenta achar a próxima data. Se não tiver 'next_payment_date', pega o 'start_date'
+    next_payment = mp_data.get("next_payment_date")
+    if not next_payment:
+        next_payment = auto_recurring.get("start_date")
+
+    # 3. Verifica validade pelo Banco de Dados (Soberano)
+    is_active_by_date = False
     if user.subscription_valid_until:
-        # Garante que estamos comparando data com data
+        # Garante comparação correta (Date vs Date)
         valid_date = user.subscription_valid_until
         if isinstance(valid_date, datetime):
             valid_date = valid_date.date()
-            
-        today = datetime.utcnow().date()
-        
-        if valid_date >= today:
+        if valid_date >= datetime.utcnow().date():
             is_active_by_date = True
-            print("--- [DEBUG] Status: ATIVO (Por data de validade)")
-        else:
-            print("--- [DEBUG] Status: INATIVO (Data expirou)")
-    else:
-        print("--- [DEBUG] Status: INATIVO (Data é None)")
-
-    # Se não tiver data válida e nem ID de assinatura, é Free.
-    if not is_active_by_date and not user.subscription_id:
-        print("--- [DEBUG] Resultado Final: INACTIVE (Sem data e sem ID)")
-        return jsonify({
-            "status": "inactive",
-            "message": "Nenhuma assinatura ativa vinculada."
-        }), 200
-
-    # Busca MP
-    mp_data = {}
-    if user.subscription_id:
-        print(f"--- [DEBUG] Buscando dados no Mercado Pago para ID: {user.subscription_id}...")
-        mp_data = get_subscription_details(user.subscription_id) or {}
-        print(f"--- [DEBUG] Status retornado pelo MP: {mp_data.get('status')}")
 
     final_status = 'active' if is_active_by_date else 'inactive'
-    
-    response_payload = {
+
+    return jsonify({
         "status": final_status,
         "mp_status": mp_data.get("status"),
-        "next_payment_date": mp_data.get("next_payment_date"),
-        "amount": mp_data.get("auto_recurring", {}).get("transaction_amount"),
+        "next_payment_date": next_payment, # Agora com fallback para start_date
+        "amount": amount,
         "user_valid_until": user.subscription_valid_until
-    }
-    
-    print(f"--- [DEBUG] Payload de Resposta: {response_payload} ---")
-    return jsonify(response_payload), 200
+    }), 200
 
 @payment_bp.route('/cancel_subscription', methods=['POST'])
 @jwt_required()
