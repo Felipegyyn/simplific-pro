@@ -294,9 +294,6 @@ def list_routes():
 #if os.getenv('FLASK_SKIP_SETUP') != '1':
 with app.app_context():
 
-
-# Execução condicional e SETUP
-with app.app_context():
     # --- ROBÔ DE REPARO DE BANCO DE DADOS ---
     # Isso garante que as colunas existam sem precisar rodar comandos manuais
     from sqlalchemy import text
