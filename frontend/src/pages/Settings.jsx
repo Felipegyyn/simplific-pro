@@ -206,7 +206,7 @@ const Settings = () => {
                   </p>
                 </div>
 
-                {/* Bloco de Valores - Só mostra se não estiver cancelado E SE TIVER DATA */}
+           {/* Bloco de Valores - Só mostra se não estiver cancelado E SE TIVER DATA */}
               {subscription.mp_status !== 'cancelled' && subscription.next_payment_date && (
                 <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
                   <p className="text-sm font-medium text-gray-700">Próxima Cobrança</p>
@@ -218,6 +218,7 @@ const Settings = () => {
                   </p>
                 </div>
               )}
+              </div>
 
               {/* Botão de Cancelamento (Zona de Perigo) */}
               {subscription.mp_status !== 'cancelled' && (
