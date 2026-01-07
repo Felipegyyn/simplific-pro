@@ -293,6 +293,24 @@ def list_routes():
 # Execução condicional para evitar conflito com migrações
 #if os.getenv('FLASK_SKIP_SETUP') != '1':
 with app.app_context():
+
+
+# Execução condicional e SETUP
+with app.app_context():
+    # --- ROBÔ DE REPARO DE BANCO DE DADOS ---
+    # Isso garante que as colunas existam sem precisar rodar comandos manuais
+    from sqlalchemy import text
+    try:
+        print("--- [DB FIX] Verificando colunas de assinatura... ---")
+        # Tenta adicionar as colunas. Se já existirem, o banco ignora ou dá erro que tratamos.
+        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_id VARCHAR(100);"))
+        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_valid_until TIMESTAMP;"))
+        db.session.commit()
+        print("--- [DB FIX] Colunas garantidas com sucesso! ---")
+    except Exception as e:
+        db.session.rollback()
+        print(f"--- [DB FIX] Aviso (provavelmente já existem): {e}")
+
     #create_admin_user()
     #create_default_categories()
 
