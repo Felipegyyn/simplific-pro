@@ -28,9 +28,10 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
             {/* Moldura Neon */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
             
-            <div className="relative bg-black border border-gray-800 rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900/50 transition-colors">
+            {/* CORREÇÃO 1: Adicionado 'relative z-10' para garantir que o conteúdo fique por cima do brilho */}
+            <div className="relative z-10 bg-black border border-gray-800 rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900/50 transition-colors">
                 
-                {/* Imagem com efeito Grayscale -> Color */}
+                {/* Imagem */}
                 <div className="relative w-32 h-32 mb-6 rounded-full overflow-hidden border-4 border-gray-800 group-hover:border-green-500 transition-all duration-500">
                     <img 
                         src={image} 
@@ -42,16 +43,19 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
                 <h3 className="text-2xl font-black text-white uppercase mb-1">{name}</h3>
                 <span className="text-green-500 font-bold text-sm tracking-widest uppercase mb-4 block">{role}</span>
                 
-                {/* Descrição que aparece suavemente */}
                 <p className="text-gray-400 text-sm leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
                     {description}
                 </p>
 
-               {/* Ícone social - Agora com Link Funcional */}
-                <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                   {/* Adicionamos a tag <a> aqui */}
-                   <a href={linkedin} target="_blank" rel="noopener noreferrer">
-                       <Linkedin size={20} className="text-gray-400 hover:text-white cursor-pointer" />
+                {/* CORREÇÃO 2: Ícone sempre visível e com área de toque maior */}
+                <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center">
+                   <a 
+                     href={linkedin} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110" // Área de clique maior
+                   >
+                       <Linkedin size={24} className="text-gray-400 hover:text-white cursor-pointer" />
                    </a>
                 </div>
             </div>
