@@ -47,9 +47,12 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
                     {description}
                 </p>
 
-                {/* Ícone social opcional */}
+               {/* Ícone social - Agora com Link Funcional */}
                 <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                   <Linkedin size={20} className="text-gray-400 hover:text-white cursor-pointer" />
+                   {/* Adicionamos a tag <a> aqui */}
+                   <a href={linkedin} target="_blank" rel="noopener noreferrer">
+                       <Linkedin size={20} className="text-gray-400 hover:text-white cursor-pointer" />
+                   </a>
                 </div>
             </div>
         </div>
@@ -302,6 +305,7 @@ const HomePage = () => {
                     name="Felipe Viana"
                     role="Co-Founder & Finanças"
                     image="/assets/felipe_viana.jpg"
+                    linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" // <--- COLOQUE O LINK DELE AQUI
                     description="Economista especialista em controladoria financeira com mais de 15 anos de mercado. Uniu sua experiência sólida em gestão de patrimônio com a paixão por tecnologia para criar uma solução que democratiza o controle financeiro de alto nível."
                 />
 
@@ -310,6 +314,7 @@ const HomePage = () => {
                     name="Michel Borges"
                     role="Co-Founder & Tecnologia"
                     image="/assets/michel_borges.jpg"
+                    linkedin="//www.linkedin.com/in/michel-borges-14218116a/"
                     description="Publicitário e estrategista apaixonado por vendas e inovação. Acredita que a tecnologia só faz sentido quando simplifica a vida das pessoas. Responsável por transformar a complexidade financeira em uma experiência fluida e intuitiva."
                 />
             </div>
