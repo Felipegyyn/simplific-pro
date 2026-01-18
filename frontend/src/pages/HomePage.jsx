@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
-  Zap, Star, Sparkles, Flame, Timer, ArrowRight, Users, Linkedin
+  Zap, Star, Sparkles, Flame, Timer, ArrowRight, Users, Linkedin, BadgeCheck
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -154,10 +154,39 @@ const HomePage = () => {
             </p>
           </div>
           
-          <div className="relative hidden md:block">
-            <div className="absolute inset-0 bg-green-500/10 blur-3xl rounded-full"></div>
-            <img src="/assets/image_745581.png" alt="Plataforma Simplific Pro" className="relative z-10 rounded-xl shadow-2xl border border-gray-800 transform hover:scale-[1.02] transition-transform duration-700" />
+          {/* MOCKUP DO NOTEBOOK COM VÍDEO (CSS PURO) */}
+          <div className="relative hidden md:block pt-10">
+             {/* Efeito Glow atrás do notebook */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[100px] rounded-full"></div>
+             
+             {/* Estrutura do Notebook */}
+             <div className="relative z-10 transform hover:scale-[1.02] transition-transform duration-700">
+                {/* Tampa do Notebook (Tela) */}
+                <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[172px] max-w-[301px] md:h-[294px] md:max-w-[512px] shadow-2xl">
+                    <div className="rounded-lg overflow-hidden h-full w-full bg-black">
+                        {/* O VÍDEO ENTRA AQUI */}
+                        <video 
+                            className="w-full h-full object-cover" 
+                            autoPlay 
+                            muted 
+                            loop 
+                            playsInline
+                            poster="/assets/dashboard_cover.png" 
+                        >
+                            {/* Salve o vídeo como demo_video.mp4 na pasta public/assets */}
+                            <source src="/assets/demo_video.mp4" type="video/mp4" />
+                            Seu navegador não suporta vídeos.
+                        </video>
+                    </div>
+                </div>
+                
+                {/* Base do Notebook (Teclado/Trackpad) */}
+                <div className="relative mx-auto bg-gray-800 rounded-b-xl rounded-t-sm h-[17px] max-w-[351px] md:h-[21px] md:max-w-[597px] shadow-xl">
+                    <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[56px] h-[5px] md:w-[96px] md:h-[8px] bg-gray-700"></div>
+                </div>
+             </div>
           </div>
+
         </div>
       </header>
 
@@ -370,7 +399,6 @@ const HomePage = () => {
                 {/* Reclame Aqui (NOVO) */}
                 <div className="group flex flex-col items-center space-y-4">
                     <div className="h-9 transition-all duration-500 hover:scale-105">
-                         {/* Certifique-se de salvar a imagem como logo_reclameaqui.png em public/assets */}
                         <img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="h-full object-contain" />
                     </div>
                     <div className="text-center">
