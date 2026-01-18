@@ -114,7 +114,8 @@ const HomePage = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-black to-black pointer-events-none" />
         
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center relative z-10">
-          <div className="space-y-10 relative">
+          {/* ALTERAÇÃO AQUI: Adicionado 'flex flex-col items-center text-center' */}
+          <div className="space-y-10 relative flex flex-col items-center text-center">
             
             <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
@@ -131,7 +132,8 @@ const HomePage = () => {
               O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            {/* ALTERAÇÃO AQUI: Adicionado 'justify-center' */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
                 size="lg" 
@@ -149,7 +151,8 @@ const HomePage = () => {
               </Button>
             </div>
             
-            <p className="text-xs text-gray-500 flex items-center gap-2 mt-4">
+            {/* ALTERAÇÃO AQUI: Adicionado 'justify-center' */}
+            <p className="text-xs text-gray-500 flex items-center justify-center gap-2 mt-4">
                 <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento. Sem letras miúdas.
             </p>
           </div>
