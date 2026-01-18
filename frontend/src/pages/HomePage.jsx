@@ -160,9 +160,8 @@ const HomePage = () => {
              {/* Efeito Glow Fundo */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             {/* Grupo Wrapper: Controla a escala de tudo junto */}
-             {/* No mobile: scale-[0.55], No Desktop: scale-100 */}
-             <div className="relative transform scale-[0.55] sm:scale-75 md:scale-90 lg:scale-100 transition-transform duration-700 origin-center md:origin-top-left">
+             {/* Grupo Wrapper: Escala Aumentada */}
+             <div className="relative transform scale-[0.75] sm:scale-[0.85] md:scale-100 lg:scale-125 transition-transform duration-700 origin-center md:origin-top-left">
                 
                 {/* 1. O NOTEBOOK (Fica atrás) */}
                 <div className="relative z-10 transform translate-x-[-10%] md:translate-x-[-15%]">
@@ -188,7 +187,7 @@ const HomePage = () => {
                 <div className="absolute bottom-0 right-0 z-20 transform translate-x-[15%] md:translate-x-[5%] translate-y-[5%]">
                     {/* Estrutura do iPhone (CSS Puro) */}
                     <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[380px] w-[190px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50">
-                        {/* Notch / Ilha Dinâmica */}
+                        {/* Notch */}
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-black rounded-b-xl z-20"></div>
                         
                         {/* Tela / Vídeo */}
@@ -198,7 +197,6 @@ const HomePage = () => {
                                 autoPlay muted loop playsInline
                                 poster="/assets/mobile_cover.png" 
                             >
-                                {/* Lembre de salvar: mobile_demo.mp4 */}
                                 <source src="/assets/mobile_demo.mp4" type="video/mp4" />
                             </video>
                         </div>
@@ -366,7 +364,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By" & Full Color + RA) --- */}
+      {/* --- SEÇÃO: TECH STACK --- */}
       <section className="py-16 bg-gray-950 border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="text-center mb-10">
@@ -381,7 +379,6 @@ const HomePage = () => {
                 </p>
             </div>
             
-            {/* Ajustado gap e flex-wrap para 4 itens */}
             <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-10 md:gap-16">
                 
                 {/* Meta / WhatsApp */}
@@ -417,7 +414,7 @@ const HomePage = () => {
                     </div>
                 </div>
 
-                {/* Reclame Aqui (NOVO) */}
+                {/* Reclame Aqui */}
                 <div className="group flex flex-col items-center space-y-4">
                     <div className="h-9 transition-all duration-500 hover:scale-105">
                         <img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="h-full object-contain" />
