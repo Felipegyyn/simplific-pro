@@ -214,12 +214,12 @@ const HomePage = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: BarChart3, title: "Visão 360º", desc: "Seu patrimônio, gastos e receitas em uma única tela limpa e intuitiva." },
-              { icon: MessageCircle, title: "IA no WhatsApp", desc: "Converse com suas finanças. Mande áudios, textos ou fotos e a IA registra tudo." },
-              { icon: Target, title: "Metas Reais", desc: "Defina objetivos e o sistema te diz exatamente quanto economizar por dia para chegar lá." },
-              { icon: CreditCard, title: "Gestão de Cartões", desc: "Controle datas de vencimento e limites para nunca mais pagar juros." },
-              { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário." },
-              { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente para você acompanhar a evolução do seu patrimônio." },
+              { icon: BarChart3, title: "Visão 360º", desc: "Seu patrimônio, gastos e receitas em uma única tela limpa e intuitiva. Planeje sua vida financeira com orçamentos claros e intuitivos" },
+              { icon: MessageCircle, title: "IA no WhatsApp", desc: "Converse com suas finanças. Mande áudios, textos ou fotos e o Simplific registra tudo. Receitas, despesas, metas compromissos e tudo relacionado às suas finanças e dia a dia" },
+              { icon: Target, title: "Metas Reais", desc: "Defina objetivos e o sistema te diz exatamente quanto economizar por dia para chegar lá. Tire os sonhos do papel" },
+              { icon: CreditCard, title: "Gestão de Cartões", desc: "Controle datas de vencimento, gastos e limites para nunca mais pagar juros." },
+              { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário. O Simplific te aconselha, orienta e te lembra" },
+              { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente com corretoras para você acompanhar a evolução do seu patrimônio. Simule investimentos e o tempo para a liberdade financeira. Acompanhe tudo no Simplific" },
             ].map((item, index) => (
               <div key={index} className="p-8 bg-gray-900/30 rounded-xl border border-gray-800 hover:border-green-500/50 hover:bg-gray-900 transition-all group">
                   <div className="w-12 h-12 bg-green-900/20 text-green-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><item.icon size={24} /></div>
