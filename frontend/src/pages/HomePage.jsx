@@ -145,7 +145,7 @@ const HomePage = () => {
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
              
              {/* iPhone Centralizado e Otimizado */}
-             <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[450px] w-[220px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
+             <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[500px] w-[250px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-black rounded-b-xl z-20"></div>
                 <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
                     <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
