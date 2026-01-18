@@ -28,7 +28,6 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
             {/* Moldura Neon */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
             
-            {/* CORREÇÃO 1: Adicionado 'relative z-10' para garantir que o conteúdo fique por cima do brilho */}
             <div className="relative z-10 bg-black border border-gray-800 rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900/50 transition-colors">
                 
                 {/* Imagem */}
@@ -47,13 +46,12 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
                     {description}
                 </p>
 
-                {/* CORREÇÃO 2: Ícone sempre visível e com área de toque maior */}
                 <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center">
                    <a 
                      href={linkedin} 
                      target="_blank" 
                      rel="noopener noreferrer"
-                     className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110" // Área de clique maior
+                     className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110" 
                    >
                        <Linkedin size={24} className="text-gray-400 hover:text-white cursor-pointer" />
                    </a>
@@ -111,15 +109,13 @@ const HomePage = () => {
         <Navbar /> 
       </div>
 
-      {/* --- HERO SECTION (Institucional mas Vendedor) --- */}
+      {/* --- HERO SECTION --- */}
       <header className="relative pt-24 pb-40 overflow-hidden">
-        {/* Efeitos de Fundo mais sóbrios */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-black to-black pointer-events-none" />
         
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center relative z-10">
           <div className="space-y-10 relative">
             
-            {/* Badge de Confiança - Menos "Urgente", Mais "Exclusivo" */}
             <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
             </div>
@@ -158,7 +154,6 @@ const HomePage = () => {
             </p>
           </div>
           
-          {/* Imagem Hero "Clean" */}
           <div className="relative hidden md:block">
             <div className="absolute inset-0 bg-green-500/10 blur-3xl rounded-full"></div>
             <img src="/assets/image_745581.png" alt="Plataforma Simplific Pro" className="relative z-10 rounded-xl shadow-2xl border border-gray-800 transform hover:scale-[1.02] transition-transform duration-700" />
@@ -166,12 +161,11 @@ const HomePage = () => {
         </div>
       </header>
 
-      {/* --- FAIXA DE VALIDACAO (Prova Social / Autoridade) --- */}
+      {/* --- FAIXA DE VALIDACAO --- */}
       <div className="border-y border-gray-900 bg-gray-950/50 py-12">
         <div className="container mx-auto px-4 text-center">
             <p className="text-sm text-gray-500 uppercase tracking-widest font-bold mb-8">Porque mais de 1.000 pessoas escolheram o Simplific</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-                {/* Aqui poderiam entrar logos de parceiros ou apenas números */}
                 <div className="flex flex-col items-center">
                     <span className="text-3xl font-black text-white">+15 Anos</span>
                     <span className="text-xs text-gray-500">De experiência dos fundadores</span>
@@ -192,7 +186,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* --- FUNCIONALIDADES (Grid Limpo) --- */}
+      {/* --- FUNCIONALIDADES --- */}
       <section id="beneficios" className="py-32 bg-black relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
@@ -225,7 +219,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- OFERTA (Preço Especial para Novos Assinantes) --- */}
+      {/* --- OFERTA --- */}
       <section id="oferta" className="py-24 bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto px-4 max-w-4xl">
           
@@ -239,7 +233,6 @@ const HomePage = () => {
             </p>
           </div>
 
-          {/* Toggle Sutil */}
           <div className="flex justify-center mb-10">
             <div className="bg-gray-900 p-1 rounded-lg inline-flex relative">
                 <button onClick={() => setBillingCycle('monthly')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
@@ -252,9 +245,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Card da Oferta (Clean & Trustworthy) */}
           <div className="bg-black border border-gray-700 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
-            {/* Faixa de destaque suave */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
             
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
@@ -292,7 +283,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO DOS FUNDADORES (Humanização) --- */}
+      {/* --- SEÇÃO DOS FUNDADORES --- */}
       <section className="py-24 bg-black border-t border-gray-900 relative">
         <div className="container mx-auto px-4">
             <div className="text-center mb-16">
@@ -325,7 +316,7 @@ const HomePage = () => {
         </div>
       </section>
 
-     {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By") --- */}
+      {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By" & Full Color) --- */}
       <section className="py-16 bg-gray-950 border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="text-center mb-10">
@@ -340,11 +331,12 @@ const HomePage = () => {
                 </p>
             </div>
             
-            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24 opacity-80">
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24">
                 
                 {/* Meta / WhatsApp */}
                 <div className="group flex flex-col items-center space-y-4">
-                    <div className="h-10 grayscale group-hover:grayscale-0 transition-all duration-500">
+                    {/* Alterado: Removido grayscale e hover de cor. Agora é colorido por padrão. */}
+                    <div className="h-10 transition-all duration-500 hover:scale-105">
                         <img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" />
                     </div>
                     <div className="text-center">
@@ -355,7 +347,7 @@ const HomePage = () => {
 
                 {/* Twilio */}
                 <div className="group flex flex-col items-center space-y-4">
-                    <div className="h-8 grayscale group-hover:grayscale-0 transition-all duration-500">
+                    <div className="h-8 transition-all duration-500 hover:scale-105">
                         <img src="/assets/logo_twilio.png" alt="Infraestrutura Twilio" className="h-full object-contain" />
                     </div>
                     <div className="text-center">
@@ -366,7 +358,7 @@ const HomePage = () => {
 
                 {/* Google */}
                 <div className="group flex flex-col items-center space-y-4">
-                    <div className="h-8 grayscale group-hover:grayscale-0 transition-all duration-500">
+                    <div className="h-8 transition-all duration-500 hover:scale-105">
                         <img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" />
                     </div>
                     <div className="text-center">
