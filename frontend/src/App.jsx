@@ -33,6 +33,7 @@ import Termos from './pages/Termos';
 import Privacidade from './pages/Privacidade';
 import Contato from './pages/Contato';
 import Checkout from './pages/Checkout';
+import SecurityPage from './pages/SecurityPage'; // <--- 1. IMPORT NOVO AQUI
 // --------------------------------------------------
 
 // Serviços
@@ -125,9 +126,9 @@ const App = () => {
     );
   }
 
-return (
+  return (
     <Router>
-      <ThemeProvider> {/* <-- ADICIONE A TAG DE ABERTURA AQUI */}
+      <ThemeProvider>
         <Routes>
 
         {/* --- NOVO: Rotas Públicas da Landing Page --- */}
@@ -139,6 +140,9 @@ return (
             <Route path="/termos" element={<Termos />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/contato" element={<Contato />} />
+            
+            <Route path="/seguranca" element={<SecurityPage />} /> {/* <--- 2. ROTA NOVA AQUI */}
+
             {/* ------------------------------------------- */}
 
             <Route 
@@ -163,7 +167,7 @@ return (
                 <Route path="/simplific-ia" element={<SimplificIA user={user} onLogout={handleLogout} />} />
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
-                // Para este bloco:
+                
                 <Route 
                 path="/admin" 
                 element={
@@ -192,10 +196,9 @@ return (
                 element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}  
             />
         </Routes>
-         </ThemeProvider> {/* <-- ADICIONE A TAG DE FECHAMENTO AQUI */}
+      </ThemeProvider>
     </Router>
-);
+  );
 };
 
 export default App;
-

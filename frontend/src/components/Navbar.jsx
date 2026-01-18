@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShieldCheck } from 'lucide-react'; // <--- 1. ADICIONEI O SHIELDCHECK AQUI
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -31,6 +31,16 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6">
           <button onClick={() => handleNav('/beneficios')} className="text-gray-600 hover:text-green-600 font-medium">Benefícios</button>
           <button onClick={() => handleNav('/inteligencia')} className="text-gray-600 hover:text-green-600 font-medium">Inteligência</button>
+          
+          {/* --- 2. NOVO BOTÃO SEGURANÇA (DESKTOP) --- */}
+          <button 
+            onClick={() => handleNav('/seguranca')} 
+            className="text-gray-600 hover:text-green-600 font-medium flex items-center gap-1"
+          >
+            <ShieldCheck size={18} /> Segurança
+          </button>
+          {/* ----------------------------------------- */}
+
           <button onClick={() => handleNav('/planos')} className="text-gray-600 hover:text-green-600 font-medium">Planos</button>
           
           <Button 
@@ -58,6 +68,13 @@ const Navbar = () => {
         <div className="md:hidden bg-white border-t p-4 flex flex-col gap-4 shadow-lg">
           <button onClick={() => handleNav('/beneficios')} className="text-left py-2">Benefícios</button>
           <button onClick={() => handleNav('/inteligencia')} className="text-left py-2">Inteligência</button>
+          
+          {/* --- 3. NOVO BOTÃO SEGURANÇA (MOBILE) --- */}
+          <button onClick={() => handleNav('/seguranca')} className="text-left py-2 flex items-center gap-2">
+            <ShieldCheck size={18} className="text-green-600"/> Segurança
+          </button>
+          {/* -------------------------------------- */}
+
           <button onClick={() => handleNav('/planos')} className="text-left py-2">Planos</button>
           <Button onClick={() => navigate('/login')} variant="outline" className="w-full">Área do Cliente</Button>
           <Button onClick={() => handleNav('/planos')} className="w-full bg-green-600 text-white">Quero Assinar</Button>
