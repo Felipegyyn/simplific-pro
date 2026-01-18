@@ -110,33 +110,30 @@ const HomePage = () => {
       </div>
 
       {/* --- HERO SECTION --- */}
-      {/* AUMENTADO PADDING TOP NO MOBILE: pt-32 */}
-      <header className="relative pt-32 pb-40 overflow-hidden">
+      <header className="relative pt-24 pb-40 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-black to-black pointer-events-none" />
         
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
+        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center relative z-10">
           
-          {/* BLOCO DE TEXTO */}
-          {/* Diminuído space-y para 8 no mobile para caber melhor */}
-          <div className="space-y-8 md:space-y-10 relative flex flex-col items-center md:items-start text-center md:text-left">
+          {/* BLOCO DE TEXTO (VOLTOU PARA A ESQUERDA) */}
+          <div className="space-y-10 relative">
             
             <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
             </div>
             
-            {/* DIMINUÍDO FONTE MOBILE: text-4xl (antes era 5xl) */}
-            <h1 className="text-4xl md:text-7xl font-bold leading-tight tracking-tight text-white">
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight tracking-tight text-white">
               Sua vida financeira, <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
                 finalmente organizada.
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed">
+            <p className="text-xl text-gray-400 max-w-xl leading-relaxed">
               O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start w-full md:w-auto">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
                 size="lg" 
@@ -154,22 +151,20 @@ const HomePage = () => {
               </Button>
             </div>
             
-            <p className="text-xs text-gray-500 flex items-center justify-center md:justify-start gap-2 mt-4">
-                <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento.
+            <p className="text-xs text-gray-500 flex items-center gap-2 mt-4">
+                <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento. Sem letras miúdas.
             </p>
           </div>
           
-          {/* --- ECOSSISTEMA DE DISPOSITIVOS --- */}
-          <div className="relative pt-12 flex justify-center items-center">
+          {/* --- ECOSSISTEMA DE DISPOSITIVOS (Centralizado na coluna direita, puxado pra esquerda) --- */}
+          <div className="relative pt-10 flex justify-center items-center">
              
              {/* Efeito Glow Fundo */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             {/* Grupo Wrapper: 
-                 - scale-[1.0]: Aumentado no mobile (era 0.85)
-                 - -translate-x-12: Puxado MAIS para a esquerda no mobile (era 6)
-             */}
-             <div className="relative transform scale-[1.0] sm:scale-[0.90] md:scale-100 lg:scale-125 -translate-x-12 md:translate-x-0 transition-transform duration-700 origin-center md:-ml-12">
+             {/* Grupo Wrapper: Escala Grande + Ajuste de Posição */}
+             {/* Adicionei 'md:-ml-12' para puxar o conjunto para a esquerda no desktop */}
+             <div className="relative transform scale-[0.75] sm:scale-[0.85] md:scale-100 lg:scale-125 transition-transform duration-700 origin-center md:-ml-12">
                 
                 {/* 1. O NOTEBOOK (Fica atrás) */}
                 <div className="relative z-10 transform translate-x-[-10%] md:translate-x-[-15%]">
