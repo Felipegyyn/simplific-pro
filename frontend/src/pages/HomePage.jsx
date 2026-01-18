@@ -164,7 +164,7 @@ const HomePage = () => {
              
              {/* Grupo Wrapper: Escala Grande + Ajuste de Posição */}
              {/* Adicionei 'md:-ml-12' para puxar o conjunto para a esquerda no desktop */}
-             <div className="relative transform scale-[0.75] sm:scale-[0.85] md:scale-100 lg:scale-125 transition-transform duration-700 origin-center md:-ml-12">
+             <div className="relative transform scale-[0.75] sm:scale-[0.75] md:scale-100 lg:scale-125 transition-transform duration-700 origin-center md:-ml-12">
                 
                 {/* 1. O NOTEBOOK (Fica atrás) */}
                 <div className="relative z-10 transform translate-x-[-10%] md:translate-x-[-15%]">
