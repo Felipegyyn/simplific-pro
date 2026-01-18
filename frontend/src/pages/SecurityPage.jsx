@@ -278,7 +278,7 @@ const SecurityPage = () => {
                   </p>
               </div>
               <Button variant="outline" className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
-                  security@simplificpro.com
+                  contato@simplificpro.com
               </Button>
           </div>
       </section>
