@@ -115,8 +115,8 @@ const HomePage = () => {
         
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-16 items-center relative z-10">
           
-          {/* BLOCO DE TEXTO (VOLTOU PARA A ESQUERDA) */}
-          <div className="space-y-10 relative">
+          {/* BLOCO DE TEXTO (Esquerda Desktop / Centro Mobile) */}
+          <div className="space-y-10 relative flex flex-col items-center md:items-start text-center md:text-left">
             
             <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
@@ -133,7 +133,7 @@ const HomePage = () => {
               O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center md:justify-start">
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
                 size="lg" 
@@ -151,20 +151,23 @@ const HomePage = () => {
               </Button>
             </div>
             
-            <p className="text-xs text-gray-500 flex items-center gap-2 mt-4">
+            <p className="text-xs text-gray-500 flex items-center justify-center md:justify-start gap-2 mt-4">
                 <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento. Sem letras miúdas.
             </p>
           </div>
           
-          {/* --- ECOSSISTEMA DE DISPOSITIVOS (Centralizado na coluna direita, puxado pra esquerda) --- */}
+          {/* --- ECOSSISTEMA DE DISPOSITIVOS --- */}
           <div className="relative pt-10 flex justify-center items-center">
              
              {/* Efeito Glow Fundo */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             {/* Grupo Wrapper: Escala Grande + Ajuste de Posição */}
-             {/* Adicionei 'md:-ml-12' para puxar o conjunto para a esquerda no desktop */}
-             <div className="relative transform scale-[0.75] sm:scale-[0.85] md:scale-100 lg:scale-125 transition-transform duration-700 origin-center md:-ml-12">
+             {/* Grupo Wrapper: 
+                 - scale-[0.85]: Aumentado no mobile
+                 - -translate-x-6: Puxado para a esquerda no mobile
+                 - md:translate-x-0: Resetado no desktop
+             */}
+             <div className="relative transform scale-[0.85] sm:scale-[0.90] md:scale-100 lg:scale-125 -translate-x-6 md:translate-x-0 transition-transform duration-700 origin-center md:-ml-12">
                 
                 {/* 1. O NOTEBOOK (Fica atrás) */}
                 <div className="relative z-10 transform translate-x-[-10%] md:translate-x-[-15%]">
