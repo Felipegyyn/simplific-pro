@@ -279,7 +279,7 @@ const HomePage = () => {
                 </div>
 
                 <div className="w-full md:w-auto flex-shrink-0">
-                     <Button 
+                      <Button 
                         onClick={handleBuyClick} 
                         className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-bold text-lg py-8 px-10 rounded-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
                       >
@@ -309,7 +309,7 @@ const HomePage = () => {
                     name="Felipe Viana"
                     role="Co-Founder & Finanças"
                     image="/assets/felipe_viana.jpg"
-                    linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" // <--- COLOQUE O LINK DELE AQUI
+                    linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" 
                     description="Economista especialista em controladoria financeira com mais de 15 anos de mercado. Uniu sua experiência sólida em gestão de patrimônio com a paixão por tecnologia para criar uma solução que democratiza o controle financeiro de alto nível."
                 />
 
@@ -321,6 +321,60 @@ const HomePage = () => {
                     linkedin="//www.linkedin.com/in/michel-borges-14218116a/"
                     description="Publicitário e estrategista apaixonado por vendas e inovação. Acredita que a tecnologia só faz sentido quando simplifica a vida das pessoas. Responsável por transformar a complexidade financeira em uma experiência fluida e intuitiva."
                 />
+            </div>
+        </div>
+      </section>
+
+     {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By") --- */}
+      <section className="py-16 bg-gray-950 border-t border-gray-900">
+        <div className="container mx-auto px-4">
+            <div className="text-center mb-10">
+                <span className="text-green-500 font-bold tracking-widest text-xs uppercase mb-2 block">
+                    Segurança de Nível Global
+                </span>
+                <h3 className="text-2xl font-bold text-white">
+                    Powered by Big Tech
+                </h3>
+                <p className="text-gray-500 text-sm mt-2">
+                    Utilizamos a infraestrutura oficial das maiores empresas de tecnologia do mundo.
+                </p>
+            </div>
+            
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24 opacity-80">
+                
+                {/* Meta / WhatsApp */}
+                <div className="group flex flex-col items-center space-y-4">
+                    <div className="h-10 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" />
+                    </div>
+                    <div className="text-center">
+                        <span className="block text-white font-bold text-sm">WhatsApp Business API</span>
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Integração Oficial</span>
+                    </div>
+                </div>
+
+                {/* Twilio */}
+                <div className="group flex flex-col items-center space-y-4">
+                    <div className="h-8 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <img src="/assets/logo_twilio.png" alt="Infraestrutura Twilio" className="h-full object-contain" />
+                    </div>
+                    <div className="text-center">
+                        <span className="block text-white font-bold text-sm">Infraestrutura Global</span>
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Latência Zero</span>
+                    </div>
+                </div>
+
+                {/* Google */}
+                <div className="group flex flex-col items-center space-y-4">
+                    <div className="h-8 grayscale group-hover:grayscale-0 transition-all duration-500">
+                        <img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" />
+                    </div>
+                    <div className="text-center">
+                        <span className="block text-white font-bold text-sm">Artificial Intelligence</span>
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span>
+                    </div>
+                </div>
+
             </div>
         </div>
       </section>
