@@ -51,31 +51,45 @@ const Beneficios = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-black selection:bg-green-500 selection:text-black">
       
-      <div className="bg-green-50 py-20">
-        <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">Funcionalidades que Transformam</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+      {/* Navbar com fundo escuro para consistência */}
+      <div className="bg-black/90 backdrop-blur-xl sticky top-0 z-50 border-b border-green-900/30">
+        <Navbar /> 
+      </div>
+      
+      {/* Header Section */}
+      <div className="relative pt-24 pb-20 overflow-hidden">
+        {/* Efeito de brilho no fundo */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-black to-black pointer-events-none" />
+        
+        <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Funcionalidades que <span className="text-green-500">Transformam</span>
+            </h1>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
                 Descubra como cada detalhe do Simplific Pro foi desenhado para te dar controle total.
             </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* Grid de Cards */}
+      <div className="container mx-auto px-4 pb-24 grid md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
         {features.map((item, index) => (
-            <div key={index} className="p-6 border border-gray-100 rounded-2xl hover:shadow-lg hover:border-green-200 transition-all bg-white group">
-                <div className="text-green-600 mb-4 bg-green-50 w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div key={index} className="p-6 border border-gray-800 bg-gray-950 rounded-2xl hover:border-green-500/50 hover:bg-gray-900 transition-all group">
+                <div className="text-green-500 mb-4 bg-green-900/20 w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-black">
                     {item.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">{item.description}</p>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-400 leading-relaxed text-sm">{item.description}</p>
             </div>
         ))}
       </div>
 
-      <Footer />
+      {/* Footer com borda superior */}
+      <div className="bg-black border-t border-gray-900 pt-10">
+        <Footer />
+      </div>
     </div>
   );
 };

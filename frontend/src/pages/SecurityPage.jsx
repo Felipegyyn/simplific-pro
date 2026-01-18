@@ -5,8 +5,8 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { 
   ShieldCheck, Lock, Server, EyeOff, FileKey, 
-  Globe, CheckCircle, Smartphone, Database, 
-  Activity, Users, Fingerprint, AlertTriangle, Key
+  CheckCircle, Smartphone, Database, 
+  Activity, Users, Fingerprint, AlertTriangle, Key, BadgeCheck
 } from 'lucide-react';
 
 const SecurityPage = () => {
@@ -21,7 +21,7 @@ const SecurityPage = () => {
       </div>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-20 pb-20 overflow-hidden">
+      <section className="relative pt-20 pb-16 overflow-hidden">
         {/* Background Effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl bg-green-500/10 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
@@ -44,39 +44,91 @@ const SecurityPage = () => {
             </span>
           </h1>
           
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
             Adotamos uma postura de defesa em profundidade. Proteção de nível bancário, transparência radical e privacidade por design.
           </p>
+
         </div>
       </section>
 
-      {/* --- COMPLIANCE STRIP (Badges) --- */}
-      <section className="py-10 border-y border-gray-900 bg-gray-950/50">
+      {/* --- NOVA SEÇÃO: ECOSSISTEMA VERIFICADO (Meta/Twilio) --- */}
+      <section className="py-12 bg-gray-950/80 border-y border-gray-900 mb-10">
         <div className="container mx-auto px-4">
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            <p className="text-center text-xs font-bold text-gray-500 uppercase tracking-widest mb-8">
+                Empresa Auditada e Verificada por
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                
+                {/* Meta Verification Card */}
+                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-blue-500/50 transition-colors group">
+                    <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center shrink-0">
+                        <img src="/assets/logo_meta.png" alt="Meta" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-1">
+                            <h4 className="text-white font-bold text-sm">Meta Business</h4>
+                            <BadgeCheck size={16} className="text-blue-500" />
+                        </div>
+                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Verificação Concluída</span>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Identidade empresarial validada para uso da API Oficial do WhatsApp.</p>
+                    </div>
+                </div>
+
+                {/* Twilio Verification Card */}
+                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-red-500/50 transition-colors group">
+                    <div className="w-12 h-12 bg-white rounded-lg p-1.5 flex items-center justify-center shrink-0">
+                        <img src="/assets/logo_twilio.png" alt="Twilio" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                         <div className="flex items-center gap-1">
+                            <h4 className="text-white font-bold text-sm">Twilio Tech</h4>
+                            <BadgeCheck size={16} className="text-red-500" />
+                        </div>
+                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Parceiro Oficial</span>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Infraestrutura de mensageria de alta confiabilidade e segurança.</p>
+                    </div>
+                </div>
+
+                {/* Google Verification Card */}
+                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-gray-500/50 transition-colors group">
+                    <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center shrink-0">
+                        <img src="/assets/logo_google.png" alt="Google" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                         <div className="flex items-center gap-1">
+                            <h4 className="text-white font-bold text-sm">Google Cloud</h4>
+                            <BadgeCheck size={16} className="text-gray-400" />
+                        </div>
+                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Ambiente Seguro</span>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Servidores blindados com a mesma segurança do Google.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      </section>
+
+      {/* --- COMPLIANCE STRIP (Ícones Técnicos) --- */}
+      <section className="py-8 bg-black">
+        <div className="container mx-auto px-4">
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
                 <div className="flex items-center gap-3">
-                    <ShieldCheck size={32} className="text-green-500" />
+                    <ShieldCheck size={28} className="text-green-500" />
                     <div className="text-left">
                         <div className="text-white font-bold text-sm">LGPD Compliant</div>
                         <div className="text-gray-500 text-[10px] uppercase">Lei 13.709/2018</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Lock size={32} className="text-green-500" />
+                    <Lock size={28} className="text-green-500" />
                     <div className="text-left">
                         <div className="text-white font-bold text-sm">End-to-End</div>
                         <div className="text-gray-500 text-[10px] uppercase">Criptografia</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Server size={32} className="text-green-500" />
-                    <div className="text-left">
-                        <div className="text-white font-bold text-sm">Google Cloud</div>
-                        <div className="text-gray-500 text-[10px] uppercase">Infraestrutura</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Key size={32} className="text-green-500" />
+                    <Key size={28} className="text-green-500" />
                     <div className="text-left">
                         <div className="text-white font-bold text-sm">AES-256</div>
                         <div className="text-gray-500 text-[10px] uppercase">Padrão Militar</div>
@@ -87,7 +139,7 @@ const SecurityPage = () => {
       </section>
 
       {/* --- ARQUITETURA DE DADOS (Jornada) --- */}
-      <section className="py-24 bg-black relative">
+      <section className="py-24 bg-black relative border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="mb-16 text-center md:text-left">
                 <h2 className="text-3xl font-bold text-white mb-4">A Jornada do Dado Seguro</h2>
