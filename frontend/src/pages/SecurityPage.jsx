@@ -51,14 +51,15 @@ const SecurityPage = () => {
         </div>
       </section>
 
-      {/* --- NOVA SEÇÃO: ECOSSISTEMA VERIFICADO (Meta/Twilio) --- */}
+      {/* --- SEÇÃO: ECOSSISTEMA VERIFICADO (Meta/Twilio/Google/Reclame Aqui) --- */}
       <section className="py-12 bg-gray-950/80 border-y border-gray-900 mb-10">
         <div className="container mx-auto px-4">
             <p className="text-center text-xs font-bold text-gray-500 uppercase tracking-widest mb-8">
                 Empresa Auditada e Verificada por
             </p>
             
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {/* GRID ALTERADO PARA 4 COLUNAS EM TELAS GRANDES */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                 
                 {/* Meta Verification Card */}
                 <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-blue-500/50 transition-colors group">
@@ -71,7 +72,7 @@ const SecurityPage = () => {
                             <BadgeCheck size={16} className="text-blue-500" />
                         </div>
                         <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Verificação Concluída</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Identidade empresarial validada para uso da API Oficial do WhatsApp.</p>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Identidade empresarial validada para uso da API Oficial.</p>
                     </div>
                 </div>
 
@@ -86,7 +87,7 @@ const SecurityPage = () => {
                             <BadgeCheck size={16} className="text-red-500" />
                         </div>
                         <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Parceiro Oficial</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Infraestrutura de mensageria de alta confiabilidade e segurança.</p>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Infraestrutura de mensageria de alta confiabilidade.</p>
                     </div>
                 </div>
 
@@ -102,6 +103,22 @@ const SecurityPage = () => {
                         </div>
                         <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Ambiente Seguro</span>
                         <p className="text-gray-500 text-[10px] mt-1 leading-tight">Servidores blindados com a mesma segurança do Google.</p>
+                    </div>
+                </div>
+
+                {/* --- NOVO CARD: RECLAME AQUI --- */}
+                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-green-500/50 transition-colors group">
+                    <div className="w-12 h-12 bg-white rounded-lg p-1 flex items-center justify-center shrink-0">
+                        {/* Certifique-se de salvar a imagem como logo_reclameaqui.png em public/assets */}
+                        <img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                         <div className="flex items-center gap-1">
+                            <h4 className="text-white font-bold text-sm">Reclame Aqui</h4>
+                            <BadgeCheck size={16} className="text-green-500" />
+                        </div>
+                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">RA Verificada</span>
+                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Empresa comprometida com a satisfação do cliente.</p>
                     </div>
                 </div>
 

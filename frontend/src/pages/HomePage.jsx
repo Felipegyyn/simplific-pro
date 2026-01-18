@@ -316,7 +316,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By" & Full Color) --- */}
+      {/* --- SEÇÃO: TECH STACK (Versão Segura "Powered By" & Full Color + RA) --- */}
       <section className="py-16 bg-gray-950 border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="text-center mb-10">
@@ -331,11 +331,11 @@ const HomePage = () => {
                 </p>
             </div>
             
-            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24">
+            {/* Ajustado gap e flex-wrap para 4 itens */}
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-10 md:gap-16">
                 
                 {/* Meta / WhatsApp */}
                 <div className="group flex flex-col items-center space-y-4">
-                    {/* Alterado: Removido grayscale e hover de cor. Agora é colorido por padrão. */}
                     <div className="h-10 transition-all duration-500 hover:scale-105">
                         <img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" />
                     </div>
@@ -367,6 +367,18 @@ const HomePage = () => {
                     </div>
                 </div>
 
+                {/* Reclame Aqui (NOVO) */}
+                <div className="group flex flex-col items-center space-y-4">
+                    <div className="h-9 transition-all duration-500 hover:scale-105">
+                         {/* Certifique-se de salvar a imagem como logo_reclameaqui.png em public/assets */}
+                        <img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="h-full object-contain" />
+                    </div>
+                    <div className="text-center">
+                        <span className="block text-white font-bold text-sm">Reclame Aqui</span>
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">RA Verificada</span>
+                    </div>
+                </div>
+
             </div>
         </div>
       </section>
@@ -391,5 +403,5 @@ const HomePage = () => {
     </div>
   );
 };
-
+ 
 export default HomePage;
