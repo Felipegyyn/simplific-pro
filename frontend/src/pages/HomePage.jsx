@@ -155,12 +155,13 @@ const HomePage = () => {
           </div>
           
           {/* MOCKUP DO NOTEBOOK COM VÍDEO (CSS PURO) */}
-          <div className="relative hidden md:block pt-10">
+          {/* CORREÇÃO AQUI: Removido 'hidden md:block' para aparecer sempre */}
+          <div className="relative pt-10 flex justify-center">
              {/* Efeito Glow atrás do notebook */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[100px] rounded-full"></div>
              
-             {/* Estrutura do Notebook */}
-             <div className="relative z-10 transform hover:scale-[1.02] transition-transform duration-700">
+             {/* Estrutura do Notebook - Com scale no mobile para caber */}
+             <div className="relative z-10 transform scale-[0.65] sm:scale-100 md:hover:scale-[1.02] transition-transform duration-700 origin-top">
                 {/* Tampa do Notebook (Tela) */}
                 <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[172px] max-w-[301px] md:h-[294px] md:max-w-[512px] shadow-2xl">
                     <div className="rounded-lg overflow-hidden h-full w-full bg-black">
@@ -173,7 +174,6 @@ const HomePage = () => {
                             playsInline
                             poster="/assets/dashboard_cover.png" 
                         >
-                            {/* Salve o vídeo como demo_video.mp4 na pasta public/assets */}
                             <source src="/assets/demo_video.mp4" type="video/mp4" />
                             Seu navegador não suporta vídeos.
                         </video>
