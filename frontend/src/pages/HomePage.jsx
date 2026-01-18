@@ -25,34 +25,16 @@ const FaqItem = ({ question, answer }) => {
 const FounderCard = ({ name, role, description, image, linkedin }) => {
     return (
         <div className="group relative w-full max-w-sm mx-auto">
-            {/* Moldura Neon */}
             <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
-            
             <div className="relative z-10 bg-black border border-gray-800 rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900/50 transition-colors">
-                
-                {/* Imagem */}
                 <div className="relative w-32 h-32 mb-6 rounded-full overflow-hidden border-4 border-gray-800 group-hover:border-green-500 transition-all duration-500">
-                    <img 
-                        src={image} 
-                        alt={name} 
-                        className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110"
-                    />
+                    <img src={image} alt={name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110" />
                 </div>
-
                 <h3 className="text-2xl font-black text-white uppercase mb-1">{name}</h3>
                 <span className="text-green-500 font-bold text-sm tracking-widest uppercase mb-4 block">{role}</span>
-                
-                <p className="text-gray-400 text-sm leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
-                    {description}
-                </p>
-
+                <p className="text-gray-400 text-sm leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{description}</p>
                 <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center">
-                   <a 
-                     href={linkedin} 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110" 
-                   >
+                   <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110">
                        <Linkedin size={24} className="text-gray-400 hover:text-white cursor-pointer" />
                    </a>
                 </div>
@@ -73,7 +55,6 @@ const HomePage = () => {
         currency: 'BRL'
       });
     }
-
     if (billingCycle === 'monthly') {
         navigate('/checkout');
     } else {
@@ -104,13 +85,12 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-black font-sans text-gray-100 selection:bg-green-500 selection:text-black overflow-x-hidden">
-      {/* Navbar Deep Black */}
       <div className="bg-black/90 backdrop-blur-xl sticky top-0 z-50 border-b border-green-900/30">
         <Navbar /> 
       </div>
 
       {/* --- HERO SECTION --- */}
-      <header className="relative pt-32 pb-32 md:pt-24 md:pb-40 overflow-hidden">
+      <header className="relative pt-28 pb-32 md:pt-24 md:pb-40 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-black to-black pointer-events-none" />
         
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
@@ -122,6 +102,7 @@ const HomePage = () => {
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
             </div>
             
+            {/* Título: Ajustado tamanho para mobile (text-4xl) */}
             <h1 className="text-4xl md:text-7xl font-bold leading-tight tracking-tight text-white">
               Sua vida financeira, <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
@@ -129,10 +110,12 @@ const HomePage = () => {
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed">
+            {/* Parágrafo: Adicionado 'text-justify' no mobile e 'md:text-left' no desktop */}
+            <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed text-justify md:text-left">
               O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
             </p>
             
+            {/* Botões: flex-col no mobile (um embaixo do outro) e w-full para preencher a largura */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full md:w-auto">
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
@@ -145,7 +128,7 @@ const HomePage = () => {
               <Button 
                 onClick={() => navigate('/login')} 
                 variant="outline" 
-                className="h-16 px-8 rounded-lg border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white font-medium"
+                className="h-16 px-8 rounded-lg border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white font-medium w-full sm:w-auto"
               >
                 Já sou cliente
               </Button>
@@ -156,21 +139,15 @@ const HomePage = () => {
             </p>
           </div>
           
-          {/* --------------------------------------------------
-             VISUAL 1: APENAS CELULAR (Exclusivo MOBILE)
-             --------------------------------------------------
-             'md:hidden' faz sumir no desktop/tablet e aparecer só no celular.
-          */}
-          <div className="relative pt-12 flex justify-center items-center md:hidden">
-             {/* Efeito Glow */}
+          {/* --- VISUAL 1: APENAS CELULAR (Exclusivo MOBILE) --- */}
+          {/* 'md:hidden' garante que só aparece em telas pequenas */}
+          <div className="relative pt-8 flex justify-center items-center md:hidden">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
              
-             {/* iPhone Único (Maior e Centralizado) */}
-             <div className="relative border-gray-900 bg-gray-900 border-[12px] rounded-[3rem] h-[500px] w-[250px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
-                {/* Notch */}
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[25px] w-[80px] bg-black rounded-b-xl z-20"></div>
-                {/* Video */}
-                <div className="rounded-[2.2rem] overflow-hidden h-full w-full bg-black">
+             {/* iPhone Centralizado e Otimizado */}
+             <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[450px] w-[220px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-black rounded-b-xl z-20"></div>
+                <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
                     <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
                         <source src="/assets/mobile_demo.mp4" type="video/mp4" />
                     </video>
@@ -178,19 +155,12 @@ const HomePage = () => {
              </div>
           </div>
 
-          {/* --------------------------------------------------
-             VISUAL 2: ECOSSISTEMA COMPLETO (Exclusivo DESKTOP)
-             --------------------------------------------------
-             'hidden md:flex' faz sumir no mobile e aparecer no desktop.
-          */}
+          {/* --- VISUAL 2: ECOSSISTEMA COMPLETO (Exclusivo DESKTOP) --- */}
+          {/* 'hidden md:flex' garante que só aparece em telas médias/grandes */}
           <div className="hidden md:flex relative justify-center items-center">
-             
-             {/* Efeito Glow Fundo */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             {/* Grupo Wrapper Desktop */}
              <div className="relative transform scale-100 lg:scale-110 transition-transform duration-700 origin-center">
-                
                 {/* Notebook */}
                 <div className="relative z-10 transform translate-x-[-15%]">
                     <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[294px] w-[512px] shadow-2xl">
@@ -216,7 +186,6 @@ const HomePage = () => {
                         </div>
                     </div>
                 </div>
-
              </div>
           </div>
 
