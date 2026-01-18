@@ -154,36 +154,57 @@ const HomePage = () => {
             </p>
           </div>
           
-          {/* MOCKUP DO NOTEBOOK COM VÍDEO (CSS PURO) */}
-          {/* CORREÇÃO AQUI: Removido 'hidden md:block' para aparecer sempre */}
-          <div className="relative pt-10 flex justify-center">
-             {/* Efeito Glow atrás do notebook */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[100px] rounded-full"></div>
+          {/* --- ECOSSISTEMA DE DISPOSITIVOS (NOTEBOOK + CELULAR) --- */}
+          <div className="relative pt-10 flex justify-center items-center">
              
-             {/* Estrutura do Notebook - Com scale no mobile para caber */}
-             <div className="relative z-10 transform scale-[0.65] sm:scale-100 md:hover:scale-[1.02] transition-transform duration-700 origin-top">
-                {/* Tampa do Notebook (Tela) */}
-                <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[172px] max-w-[301px] md:h-[294px] md:max-w-[512px] shadow-2xl">
-                    <div className="rounded-lg overflow-hidden h-full w-full bg-black">
-                        {/* O VÍDEO ENTRA AQUI */}
-                        <video 
-                            className="w-full h-full object-cover" 
-                            autoPlay 
-                            muted 
-                            loop 
-                            playsInline
-                            poster="/assets/dashboard_cover.png" 
-                        >
-                            <source src="/assets/demo_video.mp4" type="video/mp4" />
-                            Seu navegador não suporta vídeos.
-                        </video>
+             {/* Efeito Glow Fundo */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+             
+             {/* Grupo Wrapper: Controla a escala de tudo junto */}
+             {/* No mobile: scale-[0.55], No Desktop: scale-100 */}
+             <div className="relative transform scale-[0.55] sm:scale-75 md:scale-90 lg:scale-100 transition-transform duration-700 origin-center md:origin-top-left">
+                
+                {/* 1. O NOTEBOOK (Fica atrás) */}
+                <div className="relative z-10 transform translate-x-[-10%] md:translate-x-[-15%]">
+                    {/* Tampa do Notebook */}
+                    <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[294px] w-[512px] shadow-2xl">
+                        <div className="rounded-lg overflow-hidden h-full w-full bg-black">
+                            <video 
+                                className="w-full h-full object-cover" 
+                                autoPlay muted loop playsInline
+                                poster="/assets/dashboard_cover.png" 
+                            >
+                                <source src="/assets/demo_video.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
+                    {/* Base do Notebook */}
+                    <div className="relative mx-auto bg-gray-800 rounded-b-xl rounded-t-sm h-[21px] w-[597px] shadow-xl">
+                        <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[96px] h-[8px] bg-gray-700"></div>
                     </div>
                 </div>
-                
-                {/* Base do Notebook (Teclado/Trackpad) */}
-                <div className="relative mx-auto bg-gray-800 rounded-b-xl rounded-t-sm h-[17px] max-w-[351px] md:h-[21px] md:max-w-[597px] shadow-xl">
-                    <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[56px] h-[5px] md:w-[96px] md:h-[8px] bg-gray-700"></div>
+
+                {/* 2. O CELULAR (Fica na frente, à direita) */}
+                <div className="absolute bottom-0 right-0 z-20 transform translate-x-[15%] md:translate-x-[5%] translate-y-[5%]">
+                    {/* Estrutura do iPhone (CSS Puro) */}
+                    <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[380px] w-[190px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50">
+                        {/* Notch / Ilha Dinâmica */}
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-black rounded-b-xl z-20"></div>
+                        
+                        {/* Tela / Vídeo */}
+                        <div className="rounded-[1.8rem] overflow-hidden h-full w-full bg-black">
+                            <video 
+                                className="w-full h-full object-cover" 
+                                autoPlay muted loop playsInline
+                                poster="/assets/mobile_cover.png" 
+                            >
+                                {/* Lembre de salvar: mobile_demo.mp4 */}
+                                <source src="/assets/mobile_demo.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
                 </div>
+
              </div>
           </div>
 
