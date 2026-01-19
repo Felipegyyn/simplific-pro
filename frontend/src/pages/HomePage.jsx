@@ -309,7 +309,7 @@ const HomePage = () => {
                     <div className="text-center"><span className="block text-white font-bold text-sm">Artificial Intelligence</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span></div>
                 </div>
                 <div className="group flex flex-col items-center space-y-4">
-                    <div id="ra-verified-seal"><script type="text/javascript" id="ra-embed-verified-seal" src="https://s3.amazonaws.com/raichu-beta/ra-verified/bundle.js" data-id="UWJISTEzOXlvV09HWFhuOTo0MS04NTEtMDI5LWZlbGlwZS12aWFuYS1kZS1vbGl2ZWlyYQ==" data-target="ra-verified-seal" data-model="compact_3"></script></div>
+                    <div className="h-9 transition-all duration-500 hover:scale-105"><img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="h-full object-contain" /></div>
                     <div className="text-center"><span className="block text-white font-bold text-sm">Reclame Aqui</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">RA Verificada</span></div>
                 </div>
             </div>
