@@ -30,7 +30,7 @@ const Footer = () => {
         <p className="text-sm mb-4">
             Dúvidas? Envie um e-mail para <a href="mailto:contato@simplificpro.com" className="text-green-400 hover:underline">contato@simplificpro.com</a>
         </p>
-        <p className="text-xs opacity-50">© 2025 Simplific Pro - 41.851.029/0001-64. Todos os direitos reservados.</p>
+        <p className="text-xs opacity-50">© 2026 Simplific Pro - 41.851.029/0001-64. Todos os direitos reservados.</p>
       </div>
     </footer>
   );
