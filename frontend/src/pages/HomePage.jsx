@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // 1. Adicionado useEffect
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -46,6 +46,29 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
 const HomePage = () => {
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('monthly');
+
+  // 2. Script do Reclame Aqui
+  useEffect(() => {
+    // Cria o script dinamicamente
+    const script = document.createElement("script");
+    script.src = "https://s3.amazonaws.com/raichu-beta/ra-verified/bundle.js";
+    script.async = true;
+    script.id = "ra-embed-verified-seal";
+    script.setAttribute("data-id", "UWJISTEzOXlvV09HWFhuOTo0MS04NTEtMDI5LWZlbGlwZS12aWFuYS1kZS1vbGl2ZWlyYQ==");
+    script.setAttribute("data-target", "ra-verified-seal");
+    script.setAttribute("data-model", "compact_3");
+    
+    // Adiciona ao corpo da página
+    document.body.appendChild(script);
+
+    // Limpeza ao sair da página (para não duplicar)
+    return () => {
+        const existingScript = document.getElementById("ra-embed-verified-seal");
+        if (existingScript) {
+            document.body.removeChild(existingScript);
+        }
+    };
+  }, []);
 
   const handleBuyClick = () => {
     if (window.fbq) {
@@ -102,7 +125,6 @@ const HomePage = () => {
                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
             </div>
             
-            {/* Título: Ajustado tamanho para mobile (text-4xl) */}
             <h1 className="text-4xl md:text-7xl font-bold leading-tight tracking-tight text-white">
               Sua vida financeira, <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
@@ -110,12 +132,10 @@ const HomePage = () => {
               </span>
             </h1>
             
-            {/* Parágrafo: Adicionado 'text-justify' no mobile e 'md:text-left' no desktop */}
             <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed text-justify md:text-left">
               O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
             </p>
             
-            {/* Botões: flex-col no mobile (um embaixo do outro) e w-full para preencher a largura */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full md:w-auto">
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
@@ -140,11 +160,9 @@ const HomePage = () => {
           </div>
           
           {/* --- VISUAL 1: APENAS CELULAR (Exclusivo MOBILE) --- */}
-          {/* 'md:hidden' garante que só aparece em telas pequenas */}
           <div className="relative pt-8 flex justify-center items-center md:hidden">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
              
-             {/* iPhone Centralizado e Otimizado */}
              <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[500px] w-[250px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-black rounded-b-xl z-20"></div>
                 <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
@@ -156,12 +174,10 @@ const HomePage = () => {
           </div>
 
           {/* --- VISUAL 2: ECOSSISTEMA COMPLETO (Exclusivo DESKTOP) --- */}
-          {/* 'hidden md:flex' garante que só aparece em telas médias/grandes */}
           <div className="hidden md:flex relative justify-center items-center">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             <div className="relative transform scale-100 lg:scale-108 transition-transform duration-700 origin-center">
-                {/* Notebook */}
+             <div className="relative transform scale-100 lg:scale-110 transition-transform duration-700 origin-center">
                 <div className="relative z-10 transform translate-x-[-15%]">
                     <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[294px] w-[512px] shadow-2xl">
                         <div className="rounded-lg overflow-hidden h-full w-full bg-black">
@@ -175,7 +191,6 @@ const HomePage = () => {
                     </div>
                 </div>
 
-                {/* Celular */}
                 <div className="absolute bottom-0 right-0 z-20 transform translate-x-[5%] translate-y-[5%]">
                     <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[380px] w-[190px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50">
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-black rounded-b-xl z-20"></div>
@@ -287,7 +302,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO: TECH STACK --- */}
+      {/* --- SEÇÃO: TECH STACK (Com selo dinâmico do Reclame Aqui) --- */}
       <section className="py-16 bg-gray-950 border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="text-center mb-10">
@@ -308,9 +323,10 @@ const HomePage = () => {
                     <div className="h-8 transition-all duration-500 hover:scale-105"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
                     <div className="text-center"><span className="block text-white font-bold text-sm">Artificial Intelligence</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span></div>
                 </div>
-                <div className="group flex flex-col items-center space-y-4">
-                    <div className="h-9 transition-all duration-500 hover:scale-105"><img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="h-full object-contain" /></div>
-                    <div className="text-center"><span className="block text-white font-bold text-sm">Reclame Aqui</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">RA Verificada</span></div>
+                {/* 3. Reclame Aqui Dinâmico */}
+                <div className="group flex flex-col items-center justify-center">
+                    {/* A div abaixo será preenchida pelo script carregado no useEffect */}
+                    <div id="ra-verified-seal" className="hover:scale-105 transition-transform duration-500"></div>
                 </div>
             </div>
         </div>
