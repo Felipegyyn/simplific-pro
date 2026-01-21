@@ -177,7 +177,7 @@ const HomePage = () => {
           <div className="hidden md:flex relative justify-center items-center">
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
              
-             <div className="relative transform scale-100 lg:scale-110 transition-transform duration-700 origin-center">
+             <div className="relative transform scale-100 lg:scale-108 transition-transform duration-700 origin-center">
                 <div className="relative z-10 transform translate-x-[-15%]">
                     <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[294px] w-[512px] shadow-2xl">
                         <div className="rounded-lg overflow-hidden h-full w-full bg-black">
