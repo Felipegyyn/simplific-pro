@@ -114,7 +114,17 @@ const Checkout = () => {
         const data = await response.json();
 
         if (response.ok) {
-          alert("Sucesso! Verifique seu e-mail.");
+
+          // --- RASTREAMENTO DA VENDA (GOL) ---
+        if (window.fbq) {
+          window.fbq('track', 'Purchase', {
+            value: amount, // Usa o valor real (4.90 ou 198.90)
+            currency: 'BRL',
+            content_name: planName
+          });
+        }
+          
+          alert("Sucesso! Enviamos os dados de acesso para seu e-mail e contato cadastrado. Aproveite!");
           navigate('/login'); 
           resolve(); 
         } else {
