@@ -8,7 +8,7 @@ import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 // Inicialização Única
 initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
 
-// --- COMPONENTE ISOLADO DO MERCADO PAGO ---
+// --- COMPONENTE ISOLADO DO MERCADO PAGO ----
 // Usamos memo() para que este componente NUNCA renderize novamente
 // a menos que o preço mude. Isso resolve o erro 'removeChild'.
 const PaymentBrick = memo(({ amount, onSubmit, onError, onReady }) => {
