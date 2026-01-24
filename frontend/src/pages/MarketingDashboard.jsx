@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api'; 
 import { 
   Megaphone, RefreshCw, Power, AlertCircle, Loader2, 
-  TrendingUp, MousePointer, DollarSign, BarChart3, Users, ShoppingCart, Wallet, Activity
+  TrendingUp, DollarSign, BarChart3, Users, ShoppingCart, Wallet, Activity
 } from 'lucide-react';
 import { 
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, Legend 
@@ -10,7 +10,13 @@ import {
 
 const MarketingDashboard = () => {
   const [campaigns, setCampaigns] = useState([]); 
-  const [accountInfo, setAccountInfo] = useState({ balance: 0, pixel_data: [] });
+  
+  // 1. INICIALIZAÇÃO SEGURA (Garante estrutura inicial)
+  const [accountInfo, setAccountInfo] = useState({ 
+    balance: 0, 
+    pixel_data: [] 
+  });
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null); 
@@ -29,13 +35,22 @@ const MarketingDashboard = () => {
       setLoading(true);
       setError('');
       
-      // 1. Busca Campanhas
+      // Busca Campanhas
       const campResponse = await api.get('/api/marketing/campaigns');
       const campData = campResponse.data || campResponse;
 
-      // 2. Busca Dados da Conta (Saldo + Pixel)
+      // Busca Dados da Conta
       const overviewResponse = await api.get('/api/marketing/overview');
-      setAccountInfo(overviewResponse.data);
+      const overviewData = overviewResponse.data || overviewResponse;
+
+      // 2. SANITIZAÇÃO (Garante que nunca seja null/undefined)
+      // Se a API quebrar ou vier vazia, forçamos um objeto zerado
+      const safeAccountInfo = {
+        balance: overviewData?.balance || 0,
+        pixel_data: Array.isArray(overviewData?.pixel_data) ? overviewData.pixel_data : []
+      };
+      
+      setAccountInfo(safeAccountInfo);
 
       if (Array.isArray(campData)) {
         setCampaigns(campData);
@@ -46,13 +61,15 @@ const MarketingDashboard = () => {
 
     } catch (err) {
       console.error(err);
-      setError('Falha ao carregar dados do Facebook.');
+      setError('Não foi possível sincronizar com o Facebook agora.');
+      // Em caso de erro, mantém o estado anterior ou zero, não define undefined
     } finally {
       setLoading(false);
     }
   };
 
   const calculateKPIs = (data) => {
+    if (!Array.isArray(data)) return;
     const spend = data.reduce((acc, curr) => acc + (curr.total_spend || 0), 0);
     const clicks = data.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
     const leads = data.reduce((acc, curr) => acc + (curr.leads || 0), 0);
@@ -82,19 +99,28 @@ const MarketingDashboard = () => {
     finally { setUpdating(null); }
   };
 
-  // Mock de dados para o gráfico do Pixel (caso a API não retorne histórico detalhado)
-  // O Facebook Graph API para Pixel Stats é complexo, então usaremos dados reais se vierem, ou placeholder visual.
-  const pixelChartData = [
-    { name: 'Seg', PageView: 120, InitiateCheckout: 10, Purchase: 0 },
-    { name: 'Ter', PageView: 150, InitiateCheckout: 12, Purchase: 1 },
-    { name: 'Qua', PageView: 180, InitiateCheckout: 20, Purchase: 1 },
-    { name: 'Qui', PageView: 200, InitiateCheckout: 15, Purchase: 0 },
-    { name: 'Sex', PageView: 250, InitiateCheckout: 25, Purchase: 2 },
-    { name: 'Sab', PageView: 300, InitiateCheckout: 30, Purchase: 1 },
-    { name: 'Dom', PageView: 280, InitiateCheckout: 28, Purchase: 2 },
-  ];
+  // 3. VARIÁVEIS SEGURAS (Evita ler properties of undefined no JSX)
+  // Extraímos os valores aqui fora. Se accountInfo for null, usa 0.
+  const safeBalance = accountInfo?.balance ?? 0;
+  const safePixelData = Array.isArray(accountInfo?.pixel_data) && accountInfo.pixel_data.length > 0
+    ? accountInfo.pixel_data
+    : [
+        { name: 'Seg', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Ter', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Qua', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Qui', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Sex', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Sab', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Dom', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+      ];
 
-  if (loading) return <div className="flex h-screen items-center justify-center bg-gray-50"><Loader2 className="h-10 w-10 animate-spin text-green-600" /></div>;
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <Loader2 className="h-10 w-10 animate-spin text-green-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8 pb-20">
@@ -115,7 +141,7 @@ const MarketingDashboard = () => {
 
       {/* --- KPIS SUPERIORES --- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* NOVO: SALDO DA CONTA */}
+        {/* CARD SALDO (Agora usa a variável safeBalance) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-400/10 rounded-bl-full"></div>
             <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg z-10">
@@ -124,7 +150,7 @@ const MarketingDashboard = () => {
             <div className="z-10">
                 <p className="text-sm text-gray-500 font-medium">Fatura Atual / Saldo</p>
                 <h3 className="text-2xl font-bold text-gray-900">
-                    R$ {accountInfo.balance ? accountInfo.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
+                    R$ {safeBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </h3>
             </div>
         </div>
@@ -162,17 +188,17 @@ const MarketingDashboard = () => {
         </div>
       </div>
 
-      {/* --- ÁREA DE GRÁFICOS (PIXEL + GASTOS) --- */}
+      {/* --- ÁREA DE GRÁFICOS --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* GRÁFICO 1: Eventos do Pixel (NOVO) */}
+        {/* GRÁFICO 1: Eventos do Pixel (Usa safePixelData) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                 <Activity size={20} className="text-blue-500" /> Saúde do Pixel (7 Dias)
             </h3>
             <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={pixelChartData}> {/* Usando dados mockados para garantir visualização imediata */}
+                    <LineChart data={safePixelData}> 
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis dataKey="name" fontSize={12} stroke="#9ca3af" />
                         <YAxis fontSize={12} stroke="#9ca3af" />
@@ -186,7 +212,7 @@ const MarketingDashboard = () => {
             </div>
         </div>
 
-        {/* GRÁFICO 2: Investimento por Campanha */}
+        {/* GRÁFICO 2: Investimento */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
                 <BarChart3 size={20} className="text-gray-400" /> Investimento por Campanha
