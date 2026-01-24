@@ -46,7 +46,7 @@ const DreReport = ({ data, isLoading }) => {
         {/* Despesas */}
         <TableRow className="font-semibold bg-slate-50 dark:bg-slate-800">
           <TableCell>Despesas</TableCell>
-          <TableCell className=" font-mono text-right text-red-600">{formatCurrency(summary.total_despesas)}</TableCell>
+          <TableCell className="text-right text-red-600">{formatCurrency(summary.total_despesas)}</TableCell>
         </TableRow>
         {details.despesas.map((item, index) => (
           <TableRow key={`despesa-${index}`}>
