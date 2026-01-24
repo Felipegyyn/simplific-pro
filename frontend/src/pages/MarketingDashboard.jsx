@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api'; 
 import { 
   Megaphone, RefreshCw, Power, AlertCircle, Loader2, 
-  TrendingUp, DollarSign, BarChart3, Users, ShoppingCart, Wallet, Activity
+  TrendingUp, DollarSign, BarChart3, Users, ShoppingCart, Wallet, Activity, CreditCard
 } from 'lucide-react';
 import { 
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, Legend 
@@ -11,19 +11,19 @@ import {
 const MarketingDashboard = () => {
   const [campaigns, setCampaigns] = useState([]); 
   
-  // 1. INICIALIZAÇÃO SEGURA (Garante estrutura inicial)
+  // Inicialização segura
   const [accountInfo, setAccountInfo] = useState({ 
     balance: 0, 
-    pixel_data: [] 
+    available_funds: 0,
+    daily_chart: [] 
   });
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null); 
 
-  // Estados KPIs
+  // KPIs Gerais
   const [totalSpend, setTotalSpend] = useState(0);
-  const [totalLeads, setTotalLeads] = useState(0);
   const [avgCPC, setAvgCPC] = useState(0);
 
   useEffect(() => {
@@ -35,22 +35,18 @@ const MarketingDashboard = () => {
       setLoading(true);
       setError('');
       
-      // Busca Campanhas
       const campResponse = await api.get('/api/marketing/campaigns');
       const campData = campResponse.data || campResponse;
 
-      // Busca Dados da Conta
       const overviewResponse = await api.get('/api/marketing/overview');
       const overviewData = overviewResponse.data || overviewResponse;
 
-      // 2. SANITIZAÇÃO (Garante que nunca seja null/undefined)
-      // Se a API quebrar ou vier vazia, forçamos um objeto zerado
-      const safeAccountInfo = {
+      // Sanitização
+      setAccountInfo({
         balance: overviewData?.balance || 0,
-        pixel_data: Array.isArray(overviewData?.pixel_data) ? overviewData.pixel_data : []
-      };
-      
-      setAccountInfo(safeAccountInfo);
+        available_funds: overviewData?.available_funds || 0,
+        daily_chart: Array.isArray(overviewData?.daily_chart) ? overviewData.daily_chart : []
+      });
 
       if (Array.isArray(campData)) {
         setCampaigns(campData);
@@ -62,7 +58,6 @@ const MarketingDashboard = () => {
     } catch (err) {
       console.error(err);
       setError('Não foi possível sincronizar com o Facebook agora.');
-      // Em caso de erro, mantém o estado anterior ou zero, não define undefined
     } finally {
       setLoading(false);
     }
@@ -72,10 +67,8 @@ const MarketingDashboard = () => {
     if (!Array.isArray(data)) return;
     const spend = data.reduce((acc, curr) => acc + (curr.total_spend || 0), 0);
     const clicks = data.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
-    const leads = data.reduce((acc, curr) => acc + (curr.leads || 0), 0);
     const cpc = clicks > 0 ? spend / clicks : 0;
     setTotalSpend(spend);
-    setTotalLeads(leads);
     setAvgCPC(cpc);
   };
 
@@ -99,19 +92,15 @@ const MarketingDashboard = () => {
     finally { setUpdating(null); }
   };
 
-  // 3. VARIÁVEIS SEGURAS (Evita ler properties of undefined no JSX)
-  // Extraímos os valores aqui fora. Se accountInfo for null, usa 0.
+  // Valores Seguros
   const safeBalance = accountInfo?.balance ?? 0;
-  const safePixelData = Array.isArray(accountInfo?.pixel_data) && accountInfo.pixel_data.length > 0
-    ? accountInfo.pixel_data
+  const safeFunds = accountInfo?.available_funds ?? 0;
+  
+  // Gráfico agora usa os dados reais de ads, não mais do pixel instável
+  const chartData = (accountInfo?.daily_chart && accountInfo.daily_chart.length > 0) 
+    ? accountInfo.daily_chart 
     : [
-        { name: 'Seg', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Ter', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Qua', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Qui', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Sex', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Sab', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
-        { name: 'Dom', PageView: 0, InitiateCheckout: 0, Purchase: 0 },
+        { name: 'Hoje', Clicks: 0, Leads: 0, Purchases: 0 }
       ];
 
   if (loading) {
@@ -141,20 +130,21 @@ const MarketingDashboard = () => {
 
       {/* --- KPIS SUPERIORES --- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* CARD SALDO (Agora usa a variável safeBalance) */}
+        
+        {/* CARD 1: Fatura Atual (Dívida/Gasto não faturado) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-400/10 rounded-bl-full"></div>
-            <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg z-10">
-                <Wallet size={24} />
+            <div className="p-3 bg-red-50 text-red-600 rounded-lg z-10">
+                <CreditCard size={24} />
             </div>
             <div className="z-10">
-                <p className="text-sm text-gray-500 font-medium">Fatura Atual / Saldo</p>
+                <p className="text-sm text-gray-500 font-medium">Fatura Atual (Devido)</p>
                 <h3 className="text-2xl font-bold text-gray-900">
                     R$ {safeBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </h3>
             </div>
         </div>
 
+        {/* CARD 2: Investimento Total */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="p-3 bg-green-50 text-green-600 rounded-lg">
                 <DollarSign size={24} />
@@ -167,16 +157,25 @@ const MarketingDashboard = () => {
             </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                <Users size={24} />
+        {/* CARD 3: Fundos Disponíveis (NOVO - Substituiu Leads) */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 relative">
+             <div className="absolute top-0 right-0 w-16 h-16 bg-blue-400/10 rounded-bl-full"></div>
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg z-10">
+                <Wallet size={24} />
             </div>
-            <div>
-                <p className="text-sm text-gray-500 font-medium">Total de Leads</p>
-                <h3 className="text-2xl font-bold text-gray-900">{totalLeads}</h3>
+            <div className="z-10">
+                <p className="text-sm text-gray-500 font-medium">Fundos Disponíveis</p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                     {/* Se for 0, mostra traço ou valor */}
+                     {safeFunds > 0 
+                        ? `R$ ${safeFunds.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` 
+                        : (safeBalance > 0 ? "Sob Consulta" : "Pré-pago/Limite") 
+                     }
+                </h3>
             </div>
         </div>
 
+        {/* CARD 4: CPC */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="p-3 bg-purple-50 text-purple-600 rounded-lg">
                 <TrendingUp size={24} />
@@ -191,22 +190,22 @@ const MarketingDashboard = () => {
       {/* --- ÁREA DE GRÁFICOS --- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* GRÁFICO 1: Eventos do Pixel (Usa safePixelData) */}
+        {/* GRÁFICO 1: Performance Recente (7 Dias) */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <Activity size={20} className="text-blue-500" /> Saúde do Pixel (7 Dias)
+                <Activity size={20} className="text-blue-500" /> Performance da Conta (7 Dias)
             </h3>
             <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={safePixelData}> 
+                    <LineChart data={chartData}> 
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis dataKey="name" fontSize={12} stroke="#9ca3af" />
                         <YAxis fontSize={12} stroke="#9ca3af" />
                         <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                         <Legend />
-                        <Line type="monotone" dataKey="PageView" stroke="#3b82f6" strokeWidth={2} dot={false} />
-                        <Line type="monotone" dataKey="InitiateCheckout" stroke="#eab308" strokeWidth={2} dot={false} />
-                        <Line type="monotone" dataKey="Purchase" stroke="#22c55e" strokeWidth={3} activeDot={{ r: 8 }} />
+                        <Line type="monotone" dataKey="Clicks" stroke="#9ca3af" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Leads" stroke="#3b82f6" strokeWidth={2} activeDot={{ r: 6 }} />
+                        <Line type="monotone" dataKey="Purchases" stroke="#22c55e" strokeWidth={3} activeDot={{ r: 8 }} />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
@@ -234,8 +233,8 @@ const MarketingDashboard = () => {
             </div>
         </div>
       </div>
-
-      {/* --- TABELA DETALHADA --- */}
+      
+      {/* ... TABELA DETALHADA (MANTENHA O CÓDIGO DA TABELA IGUAL AO ANTERIOR) ... */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900">Detalhamento das Campanhas</h3>
