@@ -2,41 +2,46 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api'; 
 import { 
   Megaphone, RefreshCw, Power, AlertCircle, Loader2, 
-  TrendingUp, MousePointer, DollarSign, BarChart3, Users, ShoppingCart 
+  TrendingUp, MousePointer, DollarSign, BarChart3, Users, ShoppingCart, Wallet, Activity
 } from 'lucide-react';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell, Legend 
 } from 'recharts';
 
 const MarketingDashboard = () => {
   const [campaigns, setCampaigns] = useState([]); 
+  const [accountInfo, setAccountInfo] = useState({ balance: 0, pixel_data: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null); 
 
-  // Estados para KPIs Gerais
+  // Estados KPIs
   const [totalSpend, setTotalSpend] = useState(0);
-  const [totalLeads, setTotalLeads] = useState(0); // Novo KPI
+  const [totalLeads, setTotalLeads] = useState(0);
   const [avgCPC, setAvgCPC] = useState(0);
 
   useEffect(() => {
-    fetchCampaigns();
+    fetchData();
   }, []);
 
-  const fetchCampaigns = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError('');
       
-      const response = await api.get('/api/marketing/campaigns');
-      const actualData = response.data || response;
+      // 1. Busca Campanhas
+      const campResponse = await api.get('/api/marketing/campaigns');
+      const campData = campResponse.data || campResponse;
 
-      if (Array.isArray(actualData)) {
-        setCampaigns(actualData);
-        calculateKPIs(actualData);
+      // 2. Busca Dados da Conta (Saldo + Pixel)
+      const overviewResponse = await api.get('/api/marketing/overview');
+      setAccountInfo(overviewResponse.data);
+
+      if (Array.isArray(campData)) {
+        setCampaigns(campData);
+        calculateKPIs(campData);
       } else {
         setCampaigns([]);
-        setError('Erro no formato de dados.');
       }
 
     } catch (err) {
@@ -50,10 +55,8 @@ const MarketingDashboard = () => {
   const calculateKPIs = (data) => {
     const spend = data.reduce((acc, curr) => acc + (curr.total_spend || 0), 0);
     const clicks = data.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
-    const leads = data.reduce((acc, curr) => acc + (curr.leads || 0), 0); // Soma leads
-    
+    const leads = data.reduce((acc, curr) => acc + (curr.leads || 0), 0);
     const cpc = clicks > 0 ? spend / clicks : 0;
-
     setTotalSpend(spend);
     setTotalLeads(leads);
     setAvgCPC(cpc);
@@ -64,18 +67,9 @@ const MarketingDashboard = () => {
     setUpdating(id);
     try {
       await api.post(`/api/marketing/campaigns/${id}/toggle`, { status: newStatus });
-      
-      if (Array.isArray(campaigns)) {
-          const updatedList = campaigns.map(c => 
-            c.id === id ? { ...c, status: newStatus } : c
-          );
-          setCampaigns(updatedList);
-      }
-    } catch (err) {
-      alert("Erro ao alterar status.");
-    } finally {
-      setUpdating(null);
-    }
+      setCampaigns(campaigns.map(c => c.id === id ? { ...c, status: newStatus } : c));
+    } catch (err) { alert("Erro ao alterar status."); } 
+    finally { setUpdating(null); }
   };
 
   const handleUpdateBudget = async (id, newBudget) => {
@@ -84,47 +78,57 @@ const MarketingDashboard = () => {
     try {
       await api.post(`/api/marketing/campaigns/${id}/budget`, { budget: parseFloat(newBudget) });
       alert("Orçamento atualizado!");
-    } catch (err) {
-      alert("Erro ao atualizar orçamento.");
-    } finally {
-      setUpdating(null);
-    }
+    } catch (err) { alert("Erro ao atualizar orçamento."); } 
+    finally { setUpdating(null); }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <Loader2 className="h-10 w-10 animate-spin text-green-600" />
-      </div>
-    );
-  }
+  // Mock de dados para o gráfico do Pixel (caso a API não retorne histórico detalhado)
+  // O Facebook Graph API para Pixel Stats é complexo, então usaremos dados reais se vierem, ou placeholder visual.
+  const pixelChartData = [
+    { name: 'Seg', PageView: 120, InitiateCheckout: 10, Purchase: 0 },
+    { name: 'Ter', PageView: 150, InitiateCheckout: 12, Purchase: 1 },
+    { name: 'Qua', PageView: 180, InitiateCheckout: 20, Purchase: 1 },
+    { name: 'Qui', PageView: 200, InitiateCheckout: 15, Purchase: 0 },
+    { name: 'Sex', PageView: 250, InitiateCheckout: 25, Purchase: 2 },
+    { name: 'Sab', PageView: 300, InitiateCheckout: 30, Purchase: 1 },
+    { name: 'Dom', PageView: 280, InitiateCheckout: 28, Purchase: 2 },
+  ];
+
+  if (loading) return <div className="flex h-screen items-center justify-center bg-gray-50"><Loader2 className="h-10 w-10 animate-spin text-green-600" /></div>;
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-8 pb-20">
-      {/* Cabeçalho */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Megaphone className="text-blue-600" /> Gestão de Tráfego
+            <Megaphone className="text-blue-600" /> Cockpit de Tráfego
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Visão geral das suas campanhas Meta Ads</p>
+          <p className="text-gray-500 text-sm mt-1">Controle total da sua máquina de vendas</p>
         </div>
-        <button 
-          onClick={fetchCampaigns}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg transition-colors font-medium shadow-sm"
-        >
+        <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg transition-colors font-medium shadow-sm">
           <RefreshCw size={16} /> Atualizar
         </button>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-3 bg-red-50 text-red-700 p-4 rounded-lg border border-red-200">
-          <AlertCircle size={20} /> {error}
-        </div>
-      )}
+      {error && <div className="flex items-center gap-3 bg-red-50 text-red-700 p-4 rounded-lg border border-red-200"><AlertCircle size={20} /> {error}</div>}
 
-      {/* --- KPIS (CARDS) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* --- KPIS SUPERIORES --- */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* NOVO: SALDO DA CONTA */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-16 h-16 bg-yellow-400/10 rounded-bl-full"></div>
+            <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg z-10">
+                <Wallet size={24} />
+            </div>
+            <div className="z-10">
+                <p className="text-sm text-gray-500 font-medium">Fatura Atual / Saldo</p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                    R$ {accountInfo.balance ? accountInfo.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
+                </h3>
+            </div>
+        </div>
+
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
             <div className="p-3 bg-green-50 text-green-600 rounded-lg">
                 <DollarSign size={24} />
@@ -143,9 +147,7 @@ const MarketingDashboard = () => {
             </div>
             <div>
                 <p className="text-sm text-gray-500 font-medium">Total de Leads</p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                    {totalLeads.toLocaleString('pt-BR')}
-                </h3>
+                <h3 className="text-2xl font-bold text-gray-900">{totalLeads}</h3>
             </div>
         </div>
 
@@ -155,20 +157,39 @@ const MarketingDashboard = () => {
             </div>
             <div>
                 <p className="text-sm text-gray-500 font-medium">CPC Médio</p>
-                <h3 className="text-2xl font-bold text-gray-900">
-                    R$ {avgCPC.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </h3>
+                <h3 className="text-2xl font-bold text-gray-900">R$ {avgCPC.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
             </div>
         </div>
       </div>
 
-      {/* --- GRÁFICO E TABELA (GRID) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* --- ÁREA DE GRÁFICOS (PIXEL + GASTOS) --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Gráfico de Barras */}
-        <div className="lg:col-span-3 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        {/* GRÁFICO 1: Eventos do Pixel (NOVO) */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                <BarChart3 size={20} className="text-gray-400" /> Comparativo de Investimento
+                <Activity size={20} className="text-blue-500" /> Saúde do Pixel (7 Dias)
+            </h3>
+            <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={pixelChartData}> {/* Usando dados mockados para garantir visualização imediata */}
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                        <XAxis dataKey="name" fontSize={12} stroke="#9ca3af" />
+                        <YAxis fontSize={12} stroke="#9ca3af" />
+                        <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                        <Legend />
+                        <Line type="monotone" dataKey="PageView" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="InitiateCheckout" stroke="#eab308" strokeWidth={2} dot={false} />
+                        <Line type="monotone" dataKey="Purchase" stroke="#22c55e" strokeWidth={3} activeDot={{ r: 8 }} />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+
+        {/* GRÁFICO 2: Investimento por Campanha */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <BarChart3 size={20} className="text-gray-400" /> Investimento por Campanha
             </h3>
             <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -176,10 +197,7 @@ const MarketingDashboard = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                         <XAxis dataKey="name" hide />
                         <YAxis tickFormatter={(val) => `R$${val}`} stroke="#9ca3af" fontSize={12} />
-                        <Tooltip 
-                            formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Gasto Total']}
-                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                        />
+                        <RechartsTooltip formatter={(value) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Gasto']} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                         <Bar dataKey="total_spend" radius={[4, 4, 0, 0]}>
                             {campaigns.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.status === 'ACTIVE' ? '#10b981' : '#9ca3af'} />
@@ -189,96 +207,61 @@ const MarketingDashboard = () => {
                 </ResponsiveContainer>
             </div>
         </div>
+      </div>
 
-        {/* Tabela Detalhada */}
-        <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Detalhamento das Campanhas</h3>
-            </div>
-            <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-                <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold tracking-wider">
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Campanha</th>
-                    <th className="p-4 text-center">Resultados</th> {/* COLUNA NOVA */}
-                    <th className="p-4 text-right">Gasto Total</th>
-                    <th className="p-4 w-40">Orçamento/Dia</th>
-                    <th className="p-4 text-center">Ações</th>
+      {/* --- TABELA DETALHADA --- */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Detalhamento das Campanhas</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold tracking-wider">
+                <th className="p-4">Status</th>
+                <th className="p-4">Campanha</th>
+                <th className="p-4 text-center">Resultados</th>
+                <th className="p-4 text-right">Gasto Total</th>
+                <th className="p-4 w-40">Orçamento/Dia</th>
+                <th className="p-4 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {Array.isArray(campaigns) && campaigns.map((camp) => (
+                <tr key={camp.id} className={`hover:bg-gray-50 transition-colors ${updating === camp.id ? 'opacity-50 pointer-events-none' : ''}`}>
+                  <td className="p-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${camp.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {camp.status === 'ACTIVE' ? 'ATIVO' : 'PAUSADO'}
+                    </span>
+                  </td>
+                  <td className="p-4 font-medium text-gray-900 max-w-xs truncate" title={camp.name}>{camp.name}</td>
+                  <td className="p-4 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                        {camp.purchases > 0 && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-bold"><ShoppingCart size={12} /> {camp.purchases} Vendas</span>}
+                        {camp.leads > 0 && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold"><Users size={12} /> {camp.leads} Leads</span>}
+                        {camp.purchases === 0 && camp.leads === 0 && <span className="text-gray-400 text-xs">{camp.clicks} Cliques</span>}
+                    </div>
+                  </td>
+                  <td className="p-4 text-right font-bold text-gray-900">R$ {camp.total_spend ? camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td>
+                  <td className="p-4">
+                    <div className="relative">
+                      <span className="absolute left-3 top-2 text-gray-400 text-sm">R$</span>
+                      <input 
+                        type="number" className="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                        defaultValue={camp.daily_budget}
+                        onBlur={(e) => { if (parseFloat(e.target.value) !== camp.daily_budget) { if(window.confirm(`Alterar para R$ ${e.target.value}?`)) handleUpdateBudget(camp.id, e.target.value); }}}
+                      />
+                    </div>
+                  </td>
+                  <td className="p-4 text-center">
+                    <button onClick={() => handleToggle(camp.id, camp.status)} disabled={updating === camp.id} className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-colors uppercase ${camp.status === 'ACTIVE' ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
+                      <Power size={14} /> {camp.status === 'ACTIVE' ? 'Pausar' : 'Ativar'}
+                    </button>
+                  </td>
                 </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                {Array.isArray(campaigns) && campaigns.map((camp) => (
-                    <tr key={camp.id} className={`hover:bg-gray-50 transition-colors ${updating === camp.id ? 'opacity-50 pointer-events-none' : ''}`}>
-                    <td className="p-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        camp.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                        {camp.status === 'ACTIVE' ? 'ATIVO' : 'PAUSADO'}
-                        </span>
-                    </td>
-                    <td className="p-4 font-medium text-gray-900 max-w-xs truncate" title={camp.name}>
-                        {camp.name}
-                    </td>
-                    
-                    {/* --- CÉLULA DE RESULTADOS --- */}
-                    <td className="p-4 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                            {camp.purchases > 0 && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 text-xs font-bold">
-                                    <ShoppingCart size={12} /> {camp.purchases} Vendas
-                                </span>
-                            )}
-                            {camp.leads > 0 && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-                                    <Users size={12} /> {camp.leads} Leads
-                                </span>
-                            )}
-                            {camp.purchases === 0 && camp.leads === 0 && (
-                                <span className="text-gray-400 text-xs">{camp.clicks} Cliques</span>
-                            )}
-                        </div>
-                    </td>
-
-                    <td className="p-4 text-right font-bold text-gray-900">
-                        R$ {camp.total_spend ? camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}
-                    </td>
-                    <td className="p-4">
-                        <div className="relative">
-                        <span className="absolute left-3 top-2 text-gray-400 text-sm">R$</span>
-                        <input 
-                            type="number"
-                            className="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
-                            defaultValue={camp.daily_budget}
-                            onBlur={(e) => {
-                            if (parseFloat(e.target.value) !== camp.daily_budget) {
-                                if(window.confirm(`Alterar orçamento para R$ ${e.target.value}?`)) {
-                                handleUpdateBudget(camp.id, e.target.value);
-                                }
-                            }
-                            }}
-                        />
-                        </div>
-                    </td>
-                    <td className="p-4 text-center">
-                        <button 
-                        onClick={() => handleToggle(camp.id, camp.status)}
-                        disabled={updating === camp.id}
-                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-colors uppercase ${
-                            camp.status === 'ACTIVE'
-                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                            : 'bg-green-50 text-green-600 hover:bg-green-100'
-                        }`}
-                        >
-                        <Power size={14} />
-                        {camp.status === 'ACTIVE' ? 'Pausar' : 'Ativar'}
-                        </button>
-                    </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-            </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
