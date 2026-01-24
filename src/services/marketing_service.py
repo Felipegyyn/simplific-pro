@@ -11,7 +11,6 @@ class MetaAdsService:
         self.app_secret = os.getenv('META_APP_SECRET')
         self.access_token = os.getenv('META_ACCESS_TOKEN')
         self.ad_account_id = os.getenv('META_AD_ACCOUNT_ID')
-        # ID do Pixel Mestre que você configurou
         self.pixel_id = '1112555667491819' 
 
         if self.app_id and self.access_token:
@@ -33,31 +32,34 @@ class MetaAdsService:
         try:
             # 1. BUSCAR SALDO DA CONTA
             account = AdAccount(self.ad_account_id)
-            account_data = account.api_get(fields=['balance', 'currency', 'amount_spent'])
+            # Adicionei 'spend_cap' e 'amount_spent' para garantir
+            account_data = account.api_get(fields=['balance', 'currency', 'spend_cap'])
             
-            # O Facebook retorna o balance em centavos (ex: 1500 = R$ 15,00)
-            # Em contas pós-pagas, 'balance' é o quanto você deve.
-            # Em contas pré-pagas, a lógica varia, mas geralmente é saldo devedor.
             if 'balance' in account_data:
+                # O Facebook retorna centavos, dividimos por 100
                 data['balance'] = float(account_data['balance']) / 100
             
             data['currency'] = account_data.get('currency', 'BRL')
 
-            # 2. BUSCAR DADOS DO PIXEL (Últimos 7 dias)
-            # Nota: A API de Stats do Pixel nem sempre está disponível para todas as contas via API direta.
-            # Se der erro, retornamos lista vazia para não quebrar o front.
+            # 2. BUSCAR DADOS DO PIXEL (CORREÇÃO AQUI)
             try:
                 pixel = AdsPixel(self.pixel_id)
-                # Buscamos estatísticas agregadas
-                stats = pixel.get_stats(params={
+                params = {
                     'aggregation': 'event',
-                    'start_time': int(time.time()) - (7 * 24 * 60 * 60), # 7 dias atrás
+                    'start_time': int(time.time()) - (7 * 24 * 60 * 60), # 7 dias
                     'end_time': int(time.time())
-                })
+                }
                 
-                # A API retorna dados brutos, vamos tentar simplificar para o front
-                # Se a API direta falhar ou vier vazia, o front vai mostrar zerado, mas não quebra.
-                data['pixel_data'] = stats
+                # O Facebook retorna um 'Cursor' (Objeto complexo)
+                stats_cursor = pixel.get_stats(params=params)
+                
+                # --- CORREÇÃO DO ERRO JSON SERIALIZABLE ---
+                clean_stats = []
+                for entry in stats_cursor:
+                    # .export_all_data() converte o objeto do Facebook em um Dicionário Python puro
+                    clean_stats.append(entry.export_all_data())
+                
+                data['pixel_data'] = clean_stats
                 
             except Exception as e:
                 print(f"⚠️ Erro ao buscar Pixel Stats: {e}")
@@ -69,7 +71,7 @@ class MetaAdsService:
         return data
 
     def get_campaigns(self):
-        """Busca campanhas (Código mantido da versão anterior)"""
+        """Busca campanhas"""
         if not self.ad_account_id: return []
         try:
             account = AdAccount(self.ad_account_id)
@@ -78,6 +80,7 @@ class MetaAdsService:
             
             results = []
             for camp in campaigns:
+                # Busca insights básicos
                 insights = camp.get_insights(fields=['spend', 'cpc', 'actions', 'clicks'], params={'date_preset': 'maximum'})
                 
                 spend, clicks, cpc, leads, purchases = 0.0, 0, 0.0, 0, 0
