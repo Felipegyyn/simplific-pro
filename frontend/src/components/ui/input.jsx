@@ -12,26 +12,28 @@ function Input({
       type={type}
       data-slot="input"
       className={cn(
-        // BASE:
-        // - h-11: Altura maior (padrão mobile moderno)
-        // - rounded-xl: Bordas arredondadas suaves
-        // - bg-transparent: Mantém fundo transparente (ou mude para bg-gray-50 se quiser fundo cinza)
-        // - px-4: Mais espaçamento lateral interno
-        "flex h-11 w-full min-w-0 rounded-xl border border-input bg-transparent px-4 py-2 text-base shadow-sm transition-all duration-200 outline-none md:text-sm",
+        // --- BASE & DIMENSÕES ---
+        "flex h-12 w-full rounded-xl border px-4 py-2 text-base md:text-sm transition-all duration-300",
         
-        // PLACEHOLDER & ARQUIVO:
-        "file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground",
+        // --- MATERIAL (DARK GLASS) ---
+        // Fundo escuro sutil + borda quase invisível
+        "bg-zinc-900/50 border-white/10 text-white shadow-sm",
+        "placeholder:text-zinc-500", // Placeholder discreto
+
+        // --- ESTADO DE FOCO (NEON) ---
+        "outline-none",
+        "focus-visible:border-green-500/50", // A borda fica verde sutil
+        "focus-visible:ring-4 focus-visible:ring-green-500/10", // Um anel de luz verde expande
+        "focus-visible:bg-zinc-900/80", // O fundo fica um pouco mais sólido para facilitar leitura
+
+        // --- INPUT DE ARQUIVO (FILE) ---
+        "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-zinc-400",
         
-        // ESTADO DE FOCO (Onde a mágica acontece):
-        // - ring-ring/30: Um anel de foco mais suave e transparente
-        // - border-primary: A borda muda de cor para a cor principal
-        "focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:border-primary",
-        
-        // ESTADOS DESABILITADOS:
+        // --- DESABILITADO ---
         "disabled:cursor-not-allowed disabled:opacity-50",
         
-        // ESTADO DE ERRO:
-        "aria-invalid:border-destructive aria-invalid:ring-destructive/20",
+        // --- ESTADO DE ERRO (Vermelho Neon) ---
+        "aria-invalid:border-red-500/50 aria-invalid:ring-red-500/10",
         
         className
       )}

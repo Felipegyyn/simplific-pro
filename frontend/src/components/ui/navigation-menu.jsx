@@ -33,7 +33,7 @@ function NavigationMenuList({
   return (
     <NavigationMenuPrimitive.List
       data-slot="navigation-menu-list"
-      className={cn("group flex flex-1 list-none items-center justify-center gap-1", className)}
+      className={cn("group flex flex-1 list-none items-center justify-center gap-2", className)} // Aumentei gap para 2
       {...props} />
   );
 }
@@ -51,12 +51,12 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  // MUDANÇAS AQUI:
-  // - rounded-full: Formato pílula
-  // - h-10: Um pouco mais alto
-  // - font-semibold: Texto mais forte
-  // - hover:bg-accent/50: Hover mais suave
-  "group inline-flex h-10 w-max items-center justify-center rounded-full bg-background px-4 py-2 text-sm font-semibold transition-colors hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+  // ESTILO DOS BOTÕES PRINCIPAIS DO MENU
+  // - rounded-full: Cápsula
+  // - bg-transparent: Fundo limpo por padrão
+  // - hover:bg-white/10: Vidro leve ao passar o mouse
+  // - font-medium: Peso de fonte elegante
+  "group inline-flex h-9 w-max items-center justify-center rounded-full bg-transparent px-4 py-2 text-sm font-medium transition-all hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-white/10 data-[state=open]:bg-white/10 text-gray-300"
 )
 
 function NavigationMenuTrigger({
@@ -71,7 +71,7 @@ function NavigationMenuTrigger({
       {...props}>
       {children}{" "}
       <ChevronDownIcon
-        className="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180"
+        className="relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180 text-gray-500 group-hover:text-green-400"
         aria-hidden="true" />
     </NavigationMenuPrimitive.Trigger>
   );
@@ -86,7 +86,7 @@ function NavigationMenuContent({
       data-slot="navigation-menu-content"
       className={cn(
         "data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 top-0 left-0 w-full p-2 pr-2.5 md:absolute md:w-auto",
-        "group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95 group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95 group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-xl group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-200 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none",
+        "group-data-[viewport=false]/navigation-menu:bg-[#09090b]/90 group-data-[viewport=false]/navigation-menu:text-white group-data-[viewport=false]/navigation-menu:backdrop-blur-xl", // Fallback seguro
         className
       )}
       {...props} />
@@ -103,12 +103,18 @@ function NavigationMenuViewport({
       <NavigationMenuPrimitive.Viewport
         data-slot="navigation-menu-viewport"
         className={cn(
-          // MUDANÇAS NO DROPDOWN (Viewport):
-          // - rounded-2xl: Curvas modernas
-          // - border-border/50: Borda mais suave
-          // - shadow-xl: Sombra profunda estilo iOS
-          // - bg-popover/95 + backdrop-blur: Efeito de vidro
-          "origin-top-center bg-popover/95 backdrop-blur-md text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-2xl border border-border/50 shadow-xl md:w-[var(--radix-navigation-menu-viewport-width)]",
+          // --- A CAIXA QUE ABRE (DROPDOWN) ---
+          "origin-top-center relative mt-2 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-[1.5rem] border border-white/10 shadow-2xl md:w-[var(--radix-navigation-menu-viewport-width)]",
+          
+          // Efeito Vidro Profundo
+          "bg-[#09090b]/80 backdrop-blur-2xl",
+          
+          // Sombra Neon Sutil
+          "shadow-black/50 ring-1 ring-white/5",
+          
+          // Animações de Entrada/Saída
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 transition-all duration-300",
+          
           className
         )}
         {...props} />
@@ -124,10 +130,11 @@ function NavigationMenuLink({
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        // MUDANÇAS NOS LINKS INTERNOS:
-        // - rounded-lg: Curvas internas mais suaves
-        // - hover:bg-accent/50: Hover sutil
-        "data-[active=true]:focus:bg-accent data-[active=true]:hover:bg-accent data-[active=true]:bg-accent/50 data-[active=true]:text-accent-foreground hover:bg-accent/50 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-1 rounded-lg p-2 text-sm transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4",
+        // ESTILO DOS LINKS DENTRO DO DROPDOWN
+        "flex flex-col gap-1 rounded-xl p-3 text-sm transition-all outline-none",
+        "text-gray-400 hover:text-white",
+        "hover:bg-white/5 focus:bg-white/5", // Hover sutil
+        "active:scale-95", // Feedback de clique
         className
       )}
       {...props} />
@@ -147,7 +154,7 @@ function NavigationMenuIndicator({
       )}
       {...props}>
       <div
-        className="bg-border relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md" />
+        className="bg-[#09090b] border-t border-l border-white/10 relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md" />
     </NavigationMenuPrimitive.Indicator>
   );
 }

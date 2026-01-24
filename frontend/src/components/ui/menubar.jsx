@@ -12,10 +12,12 @@ function Menubar({
     <MenubarPrimitive.Root
       data-slot="menubar"
       className={cn(
-        // BASE:
-        "flex h-10 items-center gap-1 p-1",
-        // ESTILO:
-        "bg-background border border-border/60 rounded-xl shadow-sm",
+        // BASE (Barra Principal):
+        "flex h-11 items-center gap-1 p-1.5",
+        
+        // ESTILO CÁPSULA FLUTUANTE:
+        "rounded-2xl border border-white/5 bg-[#09090b]/80 backdrop-blur-xl shadow-lg shadow-black/20",
+        
         className
       )}
       {...props} />
@@ -54,12 +56,15 @@ function MenubarTrigger({
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
       className={cn(
-        // GATILHO (Botão do menu):
+        // GATILHO (Botão):
         "flex items-center px-3 py-1.5 text-sm font-medium outline-none cursor-default select-none",
-        // ESTILO:
-        "rounded-lg transition-colors",
-        "focus:bg-accent/50 focus:text-accent-foreground", 
-        "data-[state=open]:bg-accent/50 data-[state=open]:text-accent-foreground",
+        
+        // ESTILO INTERATIVO:
+        "rounded-xl transition-all duration-200 text-gray-400",
+        "hover:bg-white/10 hover:text-white", // Hover de vidro
+        "focus:bg-white/10 focus:text-white", 
+        "data-[state=open]:bg-white/15 data-[state=open]:text-white", // Estado Aberto
+        
         className
       )}
       {...props} />
@@ -81,11 +86,13 @@ function MenubarContent({
         alignOffset={alignOffset}
         sideOffset={sideOffset}
         className={cn(
-          // ANIMAÇÕES PADRÃO:
+          // ANIMAÇÕES:
           "z-50 min-w-[12rem] overflow-hidden origin-[var(--radix-menubar-content-transform-origin)] data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          // ESTILO PREMIUM (DROPDOWN):
-          "rounded-xl border border-border/50 p-1 shadow-xl",
-          "bg-popover/95 backdrop-blur-md text-popover-foreground", // Efeito Vidro
+          
+          // ESTILO DROPDOWN (VIDRO PROFUNDO):
+          "rounded-xl border border-white/10 p-1.5 shadow-2xl shadow-black/50",
+          "bg-[#09090b]/90 backdrop-blur-2xl text-gray-200",
+          
           className
         )}
         {...props} />
@@ -105,16 +112,19 @@ function MenubarItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        // ITEM DO MENU:
-        "relative flex cursor-default select-none items-center gap-2 px-2 py-1.5 text-sm outline-none",
-        // ESTILO:
+        // ITEM INDIVIDUAL:
+        "relative flex cursor-default select-none items-center gap-2 px-3 py-2 text-sm outline-none",
         "rounded-lg transition-colors",
-        "focus:bg-accent/50 focus:text-accent-foreground", // Hover suave
+        
+        // HOVER SUAVE:
+        "focus:bg-white/10 focus:text-white", 
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[inset]:pl-8",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // VARIANTE DESTRUTIVA (Ex: Sair/Excluir):
-        "data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20",
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 text-gray-400 focus:text-white",
+        
+        // VARIANTE DESTRUTIVA (Ex: Sair):
+        "data-[variant=destructive]:text-red-400 data-[variant=destructive]:focus:bg-red-500/10 data-[variant=destructive]:focus:text-red-300",
+        
         className
       )}
       {...props} />
@@ -132,7 +142,7 @@ function MenubarCheckboxItem({
       data-slot="menubar-checkbox-item"
       className={cn(
         "relative flex cursor-default select-none items-center gap-2 rounded-lg py-1.5 pr-2 pl-8 text-sm outline-none",
-        "focus:bg-accent/50 focus:text-accent-foreground",
+        "focus:bg-white/10 focus:text-white",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
@@ -140,7 +150,7 @@ function MenubarCheckboxItem({
       checked={checked}
       {...props}>
       <span
-        className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+        className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center text-green-400">
         <MenubarPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </MenubarPrimitive.ItemIndicator>
@@ -160,14 +170,14 @@ function MenubarRadioItem({
       data-slot="menubar-radio-item"
       className={cn(
         "relative flex cursor-default select-none items-center gap-2 rounded-lg py-1.5 pr-2 pl-8 text-sm outline-none",
-        "focus:bg-accent/50 focus:text-accent-foreground",
+        "focus:bg-white/10 focus:text-white",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}>
       <span
-        className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+        className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center text-green-400">
         <MenubarPrimitive.ItemIndicator>
           <CircleIcon className="size-2 fill-current" />
         </MenubarPrimitive.ItemIndicator>
@@ -186,7 +196,7 @@ function MenubarLabel({
     <MenubarPrimitive.Label
       data-slot="menubar-label"
       data-inset={inset}
-      className={cn("px-2 py-1.5 text-sm font-semibold text-foreground/70 data-[inset]:pl-8", className)}
+      className={cn("px-2 py-1.5 text-xs font-bold tracking-widest uppercase text-gray-500 data-[inset]:pl-8", className)}
       {...props} />
   );
 }
@@ -198,7 +208,7 @@ function MenubarSeparator({
   return (
     <MenubarPrimitive.Separator
       data-slot="menubar-separator"
-      className={cn("-mx-1 my-1 h-px bg-border/50", className)}
+      className={cn("-mx-1 my-1 h-px bg-white/10", className)}
       {...props} />
   );
 }
@@ -210,7 +220,7 @@ function MenubarShortcut({
   return (
     <span
       data-slot="menubar-shortcut"
-      className={cn("ml-auto text-xs tracking-widest text-muted-foreground", className)}
+      className={cn("ml-auto text-xs tracking-widest text-gray-600", className)}
       {...props} />
   );
 }
@@ -233,14 +243,14 @@ function MenubarSubTrigger({
       data-inset={inset}
       className={cn(
         "flex cursor-default select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none",
-        "focus:bg-accent/50 focus:text-accent-foreground",
-        "data-[state=open]:bg-accent/50 data-[state=open]:text-accent-foreground",
+        "focus:bg-white/10 focus:text-white",
+        "data-[state=open]:bg-white/10 data-[state=open]:text-white",
         "data-[inset]:pl-8",
         className
       )}
       {...props}>
       {children}
-      <ChevronRightIcon className="ml-auto h-4 w-4 text-muted-foreground" />
+      <ChevronRightIcon className="ml-auto h-4 w-4 text-gray-500" />
     </MenubarPrimitive.SubTrigger>
   );
 }
@@ -254,9 +264,9 @@ function MenubarSubContent({
       data-slot="menubar-sub-content"
       className={cn(
         "z-50 min-w-[8rem] overflow-hidden origin-[var(--radix-menubar-content-transform-origin)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        // ESTILO SUBMENU (Mesmo do principal):
-        "rounded-xl border border-border/50 p-1 shadow-xl",
-        "bg-popover/95 backdrop-blur-md text-popover-foreground",
+        // ESTILO SUBMENU (Igual ao Dropdown):
+        "rounded-xl border border-white/10 p-1 shadow-2xl shadow-black/50",
+        "bg-[#09090b]/90 backdrop-blur-2xl text-gray-200",
         className
       )}
       {...props} />
