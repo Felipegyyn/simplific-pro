@@ -8,7 +8,7 @@ from src.services.notification_service import (
 from src.models.user import User
 from src.models.db import db
 from src.services.user_service import create_user_from_purchase, normalize_phone_number
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 
 
