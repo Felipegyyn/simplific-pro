@@ -553,20 +553,25 @@ def confirm_transaction(transaction_id):
 @transactions_bp.route('/<int:transaction_id>', methods=['DELETE', 'OPTIONS'])
 def delete_transaction(transaction_id):
     if request.method == 'OPTIONS':
-        return '', 200  # Resposta para o preflight, sem autenticação
+        return '', 200  
 
-    verify_jwt_in_request()  # Agora só valida para DELETE
+    verify_jwt_in_request() 
     user_id = get_jwt_identity()
     transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
     
     if not transaction:
         return jsonify({'error': 'Lançamento não encontrado'}), 404
     
-    #if transaction.status == 'confirmada':
-         #return jsonify({'error': 'Não é possível excluir lançamento confirmado'}), 400
+    # REMOVIDO A TRAVA DE CONFIRMADO CONFORME SOLICITADO ANTERIORMENTE
+    # if transaction.status == 'confirmada':
+    #      return jsonify({'error': 'Não é possível excluir lançamento confirmado'}), 400
 
-    # If it's a parent transaction, delete all child transactions too
-    if transaction.parent_transaction_id is None and transaction.installments > 1:
+    # --- CORREÇÃO DO ERRO AQUI ---
+    # Garantimos que installments seja tratado como 1 se vier None (nulo) do banco
+    num_installments = transaction.installments or 1
+
+    # Se for uma transação pai e tiver mais de 1 parcela, deleta as filhas
+    if transaction.parent_transaction_id is None and num_installments > 1:
         child_transactions = Transaction.query.filter_by(parent_transaction_id=transaction.id).all()
         for child in child_transactions:
             db.session.delete(child)
@@ -575,8 +580,6 @@ def delete_transaction(transaction_id):
     db.session.commit()
     
     return '', 204
-
-# ▼▼▼ ADICIONE ESTA NOVA ROTA AO FINAL DO ARQUIVO financial.py ▼▼▼
 
 from sqlalchemy import func, extract
 
