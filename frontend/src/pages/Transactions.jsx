@@ -304,12 +304,21 @@ const carregarCategoriasAntesDeAbrir = async () => {
   };
 
   // Função para excluir transação
-  const excluirTransacao = async (id) => {
-    if (confirm('Tem certeza que deseja excluir esta transação?')) {
+  const excluirTransacao = async (transacao) => {
+    // Define a mensagem base
+    let mensagem = 'Tem certeza que deseja excluir esta transação?';
+
+    // Se estiver confirmada, muda a mensagem para a de segurança
+    if (transacao.status === 'confirmada') {
+      mensagem = 'Este lançamento está confirmado. Tem certeza que deseja excluir?';
+    }
+
+    // O confirm do navegador exibe "OK" (Sim) e "Cancelar" (Não) nativamente
+    if (window.confirm(mensagem)) {
       try {
-        await apiService.delete(`/api/transactions/${id}`);
+        await apiService.delete(`/api/transactions/${transacao.id}`);
         await loadTransacoes(); // Recarregar lista
-        eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
+        eventService.emit('transactionsChanged');
       } catch (error) {
         console.error('Erro ao excluir transação:', error);
         alert('Erro ao excluir transação. Tente novamente.');
@@ -871,14 +880,16 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => excluirTransacao(transacao.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                              
                           </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                          // Passamos o objeto 'transacao' inteiro agora, não só o ID
+                            onClick={() => excluirTransacao(transacao)} 
+                          >
+                        <Trash2 className="h-4 w-4" />  
+                          </Button>               
                         </div>
                       </div>
                     )

@@ -562,8 +562,8 @@ def delete_transaction(transaction_id):
     if not transaction:
         return jsonify({'error': 'Lançamento não encontrado'}), 404
     
-    if transaction.status == 'confirmada':
-         return jsonify({'error': 'Não é possível excluir lançamento confirmado'}), 400
+    #if transaction.status == 'confirmada':
+         #return jsonify({'error': 'Não é possível excluir lançamento confirmado'}), 400
 
     # If it's a parent transaction, delete all child transactions too
     if transaction.parent_transaction_id is None and transaction.installments > 1:
