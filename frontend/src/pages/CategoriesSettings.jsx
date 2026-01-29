@@ -45,7 +45,7 @@ const CategoriesSettings = () => {
     try {
       const token = localStorage.getItem('simplific_token');
       // Ajuste a rota '/api/financial/categories' se o seu blueprint for diferente
-      const response = await fetch(`${API_URL}/api/financial/categories`, {
+      const response = await fetch(`${API_URL}/api/categories`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -98,7 +98,7 @@ const CategoriesSettings = () => {
       let response;
       if (editingCategory) {
         // EDITAR (PUT)
-        response = await fetch(`${API_URL}/api/financial/categories/${editingCategory.id}`, {
+        response = await fetch(`${API_URL}/api/categories/${editingCategory.id}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({ 
@@ -108,7 +108,7 @@ const CategoriesSettings = () => {
         });
       } else {
         // CRIAR (POST)
-        response = await fetch(`${API_URL}/api/financial/categories`, {
+        response = await fetch(`${API_URL}/api/categories`, {
           method: 'POST',
           headers,
           body: JSON.stringify(formData)
@@ -136,7 +136,7 @@ const CategoriesSettings = () => {
 
     try {
       const token = localStorage.getItem('simplific_token');
-      const response = await fetch(`${API_URL}/api/financial/categories/${id}`, {
+      const response = await fetch(`${API_URL}/api/categories/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
