@@ -3,19 +3,24 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
-  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Tags, Circle
+  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Circle,
+  MessageCircle, Tags // <--- Adicionei MessageCircle e Tags (caso tenha esquecido antes)
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
 
 const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
-  // Estado para controlar quais menus estão expandidos
-  // Iniciamos com 'Resumo' e 'Lançamentos' abertos por padrão se quiser, ou vazio {}
-  const [openMenus, setOpenMenus] = useState({ 'Resumo': true, 'Lançamentos': true }); 
+  
+  // Controle dos menus abertos
+  const [openMenus, setOpenMenus] = useState({ 
+    'Resumo': true, 
+    'Lançamentos': true,
+    'Assessor Simplific': true 
+  }); 
   
   const navigate = useNavigate();
-  const location = useLocation(); // Para saber onde estamos e manter o menu aberto
+  const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -23,9 +28,9 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const menuStructure = [
     {
       title: 'Resumo',
-      icon: LayoutDashboard, // Ícone do Pai
+      icon: LayoutDashboard,
       items: [
-        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }, // Ícone do Filho (opcional, pode ser bolinha)
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Balanço Geral', path: '/reports', icon: FileText },
         { name: 'Análise', path: '/analysis', icon: BarChart3 },
       ]
@@ -52,6 +57,13 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       icon: Bot,
       items: [
         { name: 'Simplific IA', path: '/simplific-ia', icon: Bot },
+        // --- NOVO ITEM WHATSAPP ---
+        { 
+            name: 'Whatsapp Assessor', 
+            path: 'https://wa.me/551151991373', // Link direto
+            icon: MessageCircle,
+            isExternal: true // Flag para identificar link externo
+        },
       ]
     },
     {
@@ -83,13 +95,11 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   // --- LÓGICA DE INTERAÇÃO ---
 
   const toggleMenu = (title) => {
-    // Se a sidebar estiver fechada e clicarmos num menu, forçamos a abertura da sidebar
     if (!isDesktopOpen) {
       setIsDesktopOpen(true);
       setOpenMenus(prev => ({ ...prev, [title]: true }));
       return;
     }
-
     setOpenMenus(prev => ({
       ...prev,
       [title]: !prev[title]
@@ -105,7 +115,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     if (isMobileOpen) closeMobileMenu();
   };
 
-  // Upload de Foto (Mantido igual)
   const handleProfilePictureChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -164,8 +173,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border pb-4">
         {visibleMenu.map((group) => {
           const isOpen = openMenus[group.title];
-          // Verifica se algum filho está ativo para destacar o Pai se estiver fechado
-          const isChildActive = group.items.some(item => location.pathname === item.path);
+          // Verifica se algum filho está ativo (apenas para rotas internas)
+          const isChildActive = group.items.some(item => !item.isExternal && location.pathname === item.path);
 
           return (
             <div key={group.title} className="space-y-1">
@@ -175,7 +184,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 className={cn(
                   "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  // Se fechado e um filho está ativo, destaca o pai levemente
                   (!isOpen && isChildActive) || isOpen ? "text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
@@ -201,31 +209,49 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 )}
               </button>
 
-              {/* SUBMENUS (FILHOS) - Só renderiza se aberto E sidebar aberta */}
+              {/* SUBMENUS (FILHOS) */}
               {isDesktopOpen && isOpen && (
                 <div className="space-y-1 ml-4 border-l border-border/50 pl-2 animate-in slide-in-from-top-2 duration-200">
-                  {group.items.map((item) => (
-                    <NavLink
-                      key={item.name}
-                      to={item.path}
-                      onClick={handleLinkClick}
-                      className={({ isActive }) => 
-                        cn(
-                          "flex items-center p-2 rounded-lg transition-colors text-sm",
-                          isActive 
-                            ? "bg-primary/10 text-primary font-medium" 
-                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-                        )
-                      }
-                    >
-                      {/* Ponto ou Ícone pequeno para o filho */}
-                      {/* <Circle className="h-1.5 w-1.5 mr-3 fill-current opacity-70" />  <-- Se preferir bolinhas use essa linha */}
-                      {/* Se preferir os ícones específicos do submenu, use a linha abaixo: */}
-                       <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+                  {group.items.map((item) => {
+                    // SE FOR LINK EXTERNO (WHATSAPP)
+                    if (item.isExternal) {
+                      return (
+                        <a
+                          key={item.name}
+                          href={item.path}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "flex items-center p-2 rounded-lg transition-colors text-sm",
+                            "text-muted-foreground hover:text-green-600 hover:bg-green-50" // Estilo especial (verde) no hover
+                          )}
+                        >
+                          <item.icon className="h-4 w-4 mr-3 opacity-70" />
+                          <span>{item.name}</span>
+                        </a>
+                      );
+                    }
 
-                      <span>{item.name}</span>
-                    </NavLink>
-                  ))}
+                    // SE FOR LINK INTERNO (NAVLINK PADRÃO)
+                    return (
+                      <NavLink
+                        key={item.name}
+                        to={item.path}
+                        onClick={handleLinkClick}
+                        className={({ isActive }) => 
+                          cn(
+                            "flex items-center p-2 rounded-lg transition-colors text-sm",
+                            isActive 
+                              ? "bg-primary/10 text-primary font-medium" 
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                          )
+                        }
+                      >
+                         <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+                        <span>{item.name}</span>
+                      </NavLink>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -233,7 +259,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         })}
       </nav>
 
-      {/* FOOTER / PERFIL */}
+      {/* FOOTER */}
       <div className="p-4 border-t border-border/60 bg-muted/20 mt-auto">
         <input
             type="file"
