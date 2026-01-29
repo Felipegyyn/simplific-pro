@@ -6,7 +6,7 @@ import {
   Settings, BarChart3, Bot, Award, Megaphone
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
-import { cn } from "@/lib/utils"; // Importando utilitário de classes (se disponível)
+import { cn } from "@/lib/utils"; 
 
 const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
@@ -47,27 +47,59 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     }
   };
 
-  const modules = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { name: 'Balanço Geral', icon: FileText, path: '/reports' },
-    { name: 'Planejamento', icon: Target, path: '/planning' },
-    { name: 'Lançamentos', icon: DollarSign, path: '/transactions' },
-    { name: 'Cartões', icon: CreditCard, path: '/credit-cards' },
-    { name: 'Metas', icon: Target, path: '/goals' },
-    { name: 'Investimentos', icon: TrendingUp, path: '/investments' },
-    { name: 'Agenda', icon: Calendar, path: '/schedule' },
-    { name: 'Simplific IA', icon: Bot, path: '/simplific-ia' },
-    { name: 'Análise', icon: BarChart3, path: '/analysis' },
-    { name: 'Conquistas', icon: Award, path: '/achievements' },
-    { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
-    { name: 'Marketing', icon: Megaphone, path: '/admin/marketing', adminOnly: true }, // <--- NOVO ITEM
-    { name: 'Configurações', icon: Settings, path: '/settings' }
+  // --- ESTRUTURA DE MENUS E SUBMENUS ---
+  const menuGroups = [
+    {
+      title: 'Resumo',
+      items: [
+        { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { name: 'Balanço Geral', icon: FileText, path: '/reports' },
+        { name: 'Análise', icon: BarChart3, path: '/analysis' },
+      ]
+    },
+    {
+      title: 'Lançamentos',
+      items: [
+        { name: 'Lançamentos', icon: DollarSign, path: '/transactions' },
+        { name: 'Planejamento', icon: Target, path: '/planning' },
+        { name: 'Metas', icon: Target, path: '/goals' },
+        { name: 'Cartões', icon: CreditCard, path: '/credit-cards' },
+      ]
+    },
+    {
+      title: 'Investimentos',
+      items: [
+        { name: 'Investimentos', icon: TrendingUp, path: '/investments' },
+      ]
+    },
+    {
+      title: 'Assessor Simplific',
+      items: [
+        { name: 'Simplific IA', icon: Bot, path: '/simplific-ia' },
+      ]
+    },
+    {
+      title: 'Compromissos',
+      items: [
+        { name: 'Agenda', icon: Calendar, path: '/schedule' },
+      ]
+    },
+    {
+      title: 'Configurações e outros',
+      items: [
+        { name: 'Conquistas', icon: Award, path: '/achievements' },
+        { name: 'Configurações', icon: Settings, path: '/settings' },
+        { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
+        { name: 'Marketing', icon: Megaphone, path: '/admin/marketing', adminOnly: true },
+      ]
+    }
   ];
 
-  const visibleModules = modules.filter(module => {
-    if (!module.adminOnly) return true;
-    return user?.profile === 'admin';
-  });
+  // Filtra grupos e itens baseado na permissão (admin)
+  const filteredGroups = menuGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => !item.adminOnly || user?.profile === 'admin')
+  })).filter(group => group.items.length > 0);
 
   const handleLogoutClick = () => {
     navigate('/login');
@@ -84,7 +116,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         // BASE:
         "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
         // ESTILO:
-        "bg-background/95 backdrop-blur-xl border-border/60", // Efeito de vidro
+        "bg-background/95 backdrop-blur-xl border-border/60", 
         // LÓGICA MOBILE/DESKTOP:
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         isDesktopOpen ? "md:w-64" : "md:w-20"
@@ -108,34 +140,48 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         )}
       </div>
 
-      {/* MENU DE NAVEGAÇÃO */}
-      <nav className="flex-1 space-y-1 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border">
-        {visibleModules.map((module) => (
-          <NavLink
-            key={module.name}
-            to={module.path}
-            onClick={handleLinkClick}
-            className={({ isActive }) => 
-              cn(
-                "flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
-                !isDesktopOpen && "justify-center",
-                isActive 
-                  ? "bg-primary/10 text-primary font-medium shadow-sm" // Ativo
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground" // Inativo
-              )
-            }
-          >
-            <module.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
-            
-            {isDesktopOpen && <span className="whitespace-nowrap text-sm">{module.name}</span>}
-            
-            {/* Tooltip para quando fechado */}
-            {!isDesktopOpen && (
-                <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
-                    {module.name}
-                </span>
+      {/* MENU DE NAVEGAÇÃO AGRUPADO */}
+      <nav className="flex-1 space-y-6 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border">
+        {filteredGroups.map((group) => (
+          <div key={group.title} className="space-y-1">
+            {/* Título do Grupo (Apenas Desktop Aberto) */}
+            {isDesktopOpen && (
+              <h3 className="px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
+                {group.title}
+              </h3>
             )}
-          </NavLink>
+            
+            {/* Itens do Submenu */}
+            <div className="space-y-1">
+              {group.items.map((module) => (
+                <NavLink
+                  key={module.name}
+                  to={module.path}
+                  onClick={handleLinkClick}
+                  className={({ isActive }) => 
+                    cn(
+                      "flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                      !isDesktopOpen && "justify-center",
+                      isActive 
+                        ? "bg-primary/10 text-primary font-medium shadow-sm" // Ativo
+                        : "text-muted-foreground hover:bg-accent hover:text-foreground" // Inativo
+                    )
+                  }
+                >
+                  <module.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
+                  
+                  {isDesktopOpen && <span className="whitespace-nowrap text-sm">{module.name}</span>}
+                  
+                  {/* Tooltip para quando fechado */}
+                  {!isDesktopOpen && (
+                      <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
+                          {module.name}
+                      </span>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          </div>
         ))}
       </nav>
 
