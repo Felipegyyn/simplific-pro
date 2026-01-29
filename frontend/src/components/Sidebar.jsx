@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
-  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Circle
+  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Tags, Circle
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
@@ -65,6 +65,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       title: 'Configurações e outros',
       icon: Settings,
       items: [
+        { name: 'Categorias', path: '/categories', icon: Tags },
         { name: 'Conquistas', path: '/achievements', icon: Award },
         { name: 'Configurações', path: '/settings', icon: Settings },
         { name: 'Admin', path: '/admin', icon: Users, adminOnly: true },

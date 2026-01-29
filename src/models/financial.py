@@ -7,6 +7,9 @@ class Category(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         name = db.Column(db.String(100), nullable=False)
         type = db.Column(db.String(20), nullable=False)  # 'entrada' or 'saida'
+
+        color = db.Column(db.String(7), default='#808080')
+
         user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -15,6 +18,7 @@ class Category(db.Model):
                 'id': self.id,
                 'name': self.name,
                 'type': self.type,
+                'color': self.color or '#808080',
                 'user_id': self.user_id,
                 'created_at': self.created_at.isoformat() if self.created_at else None
             }

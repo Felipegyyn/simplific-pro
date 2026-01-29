@@ -24,6 +24,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import CategoriesSettings from './pages/CategoriesSettings';
 
 // --- NOVO: Importando as Páginas da Landing Page ---
 import Beneficios from './pages/Beneficios';
@@ -167,6 +168,7 @@ const App = () => {
                 <Route path="/simplific-ia" element={<SimplificIA user={user} onLogout={handleLogout} />} />
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
+                <Route path="/categories" element={<CategoriesSettings user={user} />} />
                 
                 <Route 
                 path="/admin" 

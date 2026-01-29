@@ -29,18 +29,20 @@ def get_categories():
 
 @financial_bp.route('/categories', methods=['POST', 'OPTIONS'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def create_category():
     user_id = get_jwt_identity()
     data = request.json
     
     name = data.get('name')
     type = data.get('type')  # 'entrada' or 'saida'
+    color = data.get('color', '#808080') # <--- NOVO: Pega a cor ou usa cinza padrão
+    
     if not name:
         return jsonify({'error': 'Nome é obrigatório'}), 400
     
     if type not in ['entrada', 'saida']:
-        return jsonify({'error': 'Tipo deve ser "entrada" ou "saida"'}), 400#
+        return jsonify({'error': 'Tipo deve ser "entrada" ou "saida"'}), 400
     
     # Check if category already exists for this user
     existing = Category.query.filter_by(user_id=user_id, name=name, type=type).first()
@@ -50,6 +52,7 @@ def create_category():
     category = Category(
         name=name,
         type=type,
+        color=color, # <--- NOVO: Salva a cor
         user_id=user_id
     )
     
@@ -57,6 +60,62 @@ def create_category():
     db.session.commit()
     
     return jsonify(category.to_dict()), 201
+
+# --- NOVAS ROTAS DE GESTÃO DE CATEGORIAS ---
+
+@financial_bp.route('/categories/<int:category_id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_category(category_id):
+    user_id = get_jwt_identity()
+    data = request.json
+    
+    # Busca a categoria garantindo que é do usuário
+    category = Category.query.filter_by(id=category_id, user_id=user_id).first()
+    
+    if not category:
+        return jsonify({'error': 'Categoria não encontrada'}), 404
+        
+    # Atualiza apenas o que foi enviado
+    if 'name' in data:
+        category.name = data['name']
+    if 'color' in data:
+        category.color = data['color']
+        
+    db.session.commit()
+    return jsonify(category.to_dict()), 200
+
+
+@financial_bp.route('/categories/<int:category_id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_category(category_id):
+    user_id = get_jwt_identity()
+    
+    category = Category.query.filter_by(id=category_id, user_id=user_id).first()
+    
+    if not category:
+        return jsonify({'error': 'Categoria não encontrada'}), 404
+        
+    # --- TRAVA DE SEGURANÇA ---
+    # Verifica se existem Transações ou Planejamentos usando essa categoria.
+    # Se excluir uma categoria em uso, o histórico financeiro quebra ou dá erro 500.
+    
+    has_transactions = Transaction.query.filter_by(category_id=category_id).first()
+    has_planning = Planning.query.filter_by(category_id=category_id).first()
+    
+    # Se você tiver importado CreditCardTransaction, verifique também:
+    # has_card_tx = CreditCardTransaction.query.filter_by(category_id=category_id).first()
+    
+    if has_transactions or has_planning:
+        return jsonify({
+            'error': 'Não é possível excluir esta categoria pois existem lançamentos ou planejamentos vinculados a ela. Edite os lançamentos antes de excluir.'
+        }), 400
+        
+    db.session.delete(category)
+    db.session.commit()
+    
+    return '', 204
 
 # Planning routes
 @financial_bp.route('/planning', methods=['GET'])
