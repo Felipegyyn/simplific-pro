@@ -1,105 +1,99 @@
 import React, { useState, useRef } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
-  Settings, BarChart3, Bot, Award, Megaphone
+  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Circle
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
 
 const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
+  // Estado para controlar quais menus estão expandidos
+  // Iniciamos com 'Resumo' e 'Lançamentos' abertos por padrão se quiser, ou vazio {}
+  const [openMenus, setOpenMenus] = useState({ 'Resumo': true, 'Lançamentos': true }); 
+  
   const navigate = useNavigate();
+  const location = useLocation(); // Para saber onde estamos e manter o menu aberto
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  const handleProfilePictureChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append('profile_picture', file);
-
-    try {
-      const token = localStorage.getItem('simplific_token');
-      if (!token) throw new Error('Token não encontrado.');
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile-picture`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Erro no servidor.');
-
-      const updatedUser = { ...user, profile_image_url: result.profile_image_url };
-      localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
-      window.location.reload();
-
-    } catch (error) {
-      console.error("Erro ao fazer upload:", error);
-      alert(error.message);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  // --- ESTRUTURA DE MENUS E SUBMENUS ---
-  const menuGroups = [
+  // --- ESTRUTURA DOS DADOS ---
+  const menuStructure = [
     {
       title: 'Resumo',
+      icon: LayoutDashboard, // Ícone do Pai
       items: [
-        { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-        { name: 'Balanço Geral', icon: FileText, path: '/reports' },
-        { name: 'Análise', icon: BarChart3, path: '/analysis' },
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }, // Ícone do Filho (opcional, pode ser bolinha)
+        { name: 'Balanço Geral', path: '/reports', icon: FileText },
+        { name: 'Análise', path: '/analysis', icon: BarChart3 },
       ]
     },
     {
       title: 'Lançamentos',
+      icon: DollarSign,
       items: [
-        { name: 'Lançamentos', icon: DollarSign, path: '/transactions' },
-        { name: 'Planejamento', icon: Target, path: '/planning' },
-        { name: 'Metas', icon: Target, path: '/goals' },
-        { name: 'Cartões', icon: CreditCard, path: '/credit-cards' },
+        { name: 'Lançamentos', path: '/transactions', icon: DollarSign },
+        { name: 'Planejamento', path: '/planning', icon: Target },
+        { name: 'Metas', path: '/goals', icon: Target },
+        { name: 'Cartões', path: '/credit-cards', icon: CreditCard },
       ]
     },
     {
       title: 'Investimentos',
+      icon: TrendingUp,
       items: [
-        { name: 'Investimentos', icon: TrendingUp, path: '/investments' },
+        { name: 'Investimentos', path: '/investments', icon: TrendingUp },
       ]
     },
     {
       title: 'Assessor Simplific',
+      icon: Bot,
       items: [
-        { name: 'Simplific IA', icon: Bot, path: '/simplific-ia' },
+        { name: 'Simplific IA', path: '/simplific-ia', icon: Bot },
       ]
     },
     {
       title: 'Compromissos',
+      icon: Calendar,
       items: [
-        { name: 'Agenda', icon: Calendar, path: '/schedule' },
+        { name: 'Agenda', path: '/schedule', icon: Calendar },
       ]
     },
     {
       title: 'Configurações e outros',
+      icon: Settings,
       items: [
-        { name: 'Conquistas', icon: Award, path: '/achievements' },
-        { name: 'Configurações', icon: Settings, path: '/settings' },
-        { name: 'Admin', icon: Users, path: '/admin', adminOnly: true },
-        { name: 'Marketing', icon: Megaphone, path: '/admin/marketing', adminOnly: true },
+        { name: 'Conquistas', path: '/achievements', icon: Award },
+        { name: 'Configurações', path: '/settings', icon: Settings },
+        { name: 'Admin', path: '/admin', icon: Users, adminOnly: true },
+        { name: 'Marketing', path: '/admin/marketing', icon: Megaphone, adminOnly: true },
       ]
     }
   ];
 
-  // Filtra grupos e itens baseado na permissão (admin)
-  const filteredGroups = menuGroups.map(group => ({
+  // Filtra itens baseados na permissão
+  const visibleMenu = menuStructure.map(group => ({
     ...group,
     items: group.items.filter(item => !item.adminOnly || user?.profile === 'admin')
   })).filter(group => group.items.length > 0);
+
+  // --- LÓGICA DE INTERAÇÃO ---
+
+  const toggleMenu = (title) => {
+    // Se a sidebar estiver fechada e clicarmos num menu, forçamos a abertura da sidebar
+    if (!isDesktopOpen) {
+      setIsDesktopOpen(true);
+      setOpenMenus(prev => ({ ...prev, [title]: true }));
+      return;
+    }
+
+    setOpenMenus(prev => ({
+      ...prev,
+      [title]: !prev[title]
+    }));
+  };
 
   const handleLogoutClick = () => {
     navigate('/login');
@@ -110,19 +104,44 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     if (isMobileOpen) closeMobileMenu();
   };
 
+  // Upload de Foto (Mantido igual)
+  const handleProfilePictureChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+    try {
+      const token = localStorage.getItem('simplific_token');
+      if (!token) throw new Error('Token não encontrado.');
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile-picture`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Erro no servidor.');
+      const updatedUser = { ...user, profile_image_url: result.profile_image_url };
+      localStorage.setItem('simplific_user', JSON.stringify(updatedUser));
+      window.location.reload();
+    } catch (error) {
+      console.error("Erro ao fazer upload:", error);
+      alert(error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div 
       className={cn(
-        // BASE:
         "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
-        // ESTILO:
         "bg-background/95 backdrop-blur-xl border-border/60", 
-        // LÓGICA MOBILE/DESKTOP:
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         isDesktopOpen ? "md:w-64" : "md:w-20"
       )}
     >
-      {/* BOTÃO TOGGLE (Setinha) */}
+      {/* TOGGLE BUTTON */}
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
         className="absolute -right-3 top-9 bg-background border border-border rounded-full p-1.5 z-10 text-muted-foreground hover:text-foreground shadow-sm transition-colors hidden md:block"
@@ -131,7 +150,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       </button>
 
       {/* LOGO */}
-      <div className={cn("flex items-center gap-3 mb-6 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
+      <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
         <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0" />
         {isDesktopOpen && (
             <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent whitespace-nowrap">
@@ -140,52 +159,80 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         )}
       </div>
 
-      {/* MENU DE NAVEGAÇÃO AGRUPADO */}
-      <nav className="flex-1 space-y-6 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border">
-        {filteredGroups.map((group) => (
-          <div key={group.title} className="space-y-1">
-            {/* Título do Grupo (Apenas Desktop Aberto) */}
-            {isDesktopOpen && (
-              <h3 className="px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 mb-2">
-                {group.title}
-              </h3>
-            )}
-            
-            {/* Itens do Submenu */}
-            <div className="space-y-1">
-              {group.items.map((module) => (
-                <NavLink
-                  key={module.name}
-                  to={module.path}
-                  onClick={handleLinkClick}
-                  className={({ isActive }) => 
-                    cn(
-                      "flex items-center p-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
-                      !isDesktopOpen && "justify-center",
-                      isActive 
-                        ? "bg-primary/10 text-primary font-medium shadow-sm" // Ativo
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground" // Inativo
-                    )
-                  }
-                >
-                  <module.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
-                  
-                  {isDesktopOpen && <span className="whitespace-nowrap text-sm">{module.name}</span>}
-                  
-                  {/* Tooltip para quando fechado */}
-                  {!isDesktopOpen && (
-                      <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
-                          {module.name}
-                      </span>
-                  )}
-                </NavLink>
-              ))}
+      {/* MENU ACCORDION */}
+      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border pb-4">
+        {visibleMenu.map((group) => {
+          const isOpen = openMenus[group.title];
+          // Verifica se algum filho está ativo para destacar o Pai se estiver fechado
+          const isChildActive = group.items.some(item => location.pathname === item.path);
+
+          return (
+            <div key={group.title} className="space-y-1">
+              {/* BOTÃO DO GRUPO (PAI) */}
+              <button
+                onClick={() => toggleMenu(group.title)}
+                className={cn(
+                  "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
+                  !isDesktopOpen && "justify-center",
+                  // Se fechado e um filho está ativo, destaca o pai levemente
+                  (!isOpen && isChildActive) || isOpen ? "text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                )}
+              >
+                <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
+                
+                {isDesktopOpen && (
+                  <>
+                    <span className="flex-1 text-left text-sm">{group.title}</span>
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200 opacity-50", 
+                        isOpen ? "transform rotate-180" : ""
+                      )} 
+                    />
+                  </>
+                )}
+
+                {/* Tooltip quando Sidebar fechada */}
+                {!isDesktopOpen && (
+                  <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
+                    {group.title}
+                  </span>
+                )}
+              </button>
+
+              {/* SUBMENUS (FILHOS) - Só renderiza se aberto E sidebar aberta */}
+              {isDesktopOpen && isOpen && (
+                <div className="space-y-1 ml-4 border-l border-border/50 pl-2 animate-in slide-in-from-top-2 duration-200">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.name}
+                      to={item.path}
+                      onClick={handleLinkClick}
+                      className={({ isActive }) => 
+                        cn(
+                          "flex items-center p-2 rounded-lg transition-colors text-sm",
+                          isActive 
+                            ? "bg-primary/10 text-primary font-medium" 
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        )
+                      }
+                    >
+                      {/* Ponto ou Ícone pequeno para o filho */}
+                      {/* <Circle className="h-1.5 w-1.5 mr-3 fill-current opacity-70" />  <-- Se preferir bolinhas use essa linha */}
+                      {/* Se preferir os ícones específicos do submenu, use a linha abaixo: */}
+                       <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+
+                      <span>{item.name}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
-      {/* PERFIL DO USUÁRIO (RODAPÉ) */}
+      {/* FOOTER / PERFIL */}
       <div className="p-4 border-t border-border/60 bg-muted/20 mt-auto">
         <input
             type="file"
