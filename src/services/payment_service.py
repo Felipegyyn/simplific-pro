@@ -9,9 +9,13 @@ def get_mp_sdk():
         return None
     return mercadopago.SDK(access_token)
 
-# --- NOVA FUNÇÃO: COBRANÇA AVULSA ---
-def create_one_time_payment(user_email, card_token, amount, description):
-    """Cria uma cobrança única (ex: R$ 4,90 do primeiro mês)."""
+# --- FUNÇÃO ATUALIZADA: AGORA ACEITA PARCELAS ---
+def create_one_time_payment(user_email, card_token, amount, description, installments=1):
+    """
+    Cria uma cobrança única.
+    Args:
+        installments (int): Número de parcelas (Padrão 1).
+    """
     sdk = get_mp_sdk()
     if not sdk: return {"status": "error", "message": "Erro SDK"}
 
@@ -19,20 +23,24 @@ def create_one_time_payment(user_email, card_token, amount, description):
         "transaction_amount": float(amount),
         "token": card_token,
         "description": description,
-        "installments": 1,
+        "installments": int(installments), # <-- Agora usa o valor passado
         "payer": {
             "email": user_email
         },
-        "external_reference": user_email  # <--- ADICIONE ESSA LINHA AQUI
+        "external_reference": user_email
     }
-    
 
     try:
-        print(f"Criando pagamento avulso de R$ {amount} para {user_email}...")
+        print(f"Criando pagamento avulso de R$ {amount} ({installments}x) para {user_email}...")
         payment_response = sdk.payment().create(payment_data)
+        
+        # Verificação de segurança caso a resposta venha vazia
+        if "response" not in payment_response:
+             return {"status": "error", "message": "Sem resposta do MP", "detail": payment_response}
+
         response = payment_response["response"]
 
-        if payment_response["status"] == 201 and response["status"] == "approved":
+        if payment_response["status"] == 201 and response.get("status") == "approved":
             return {"status": "success", "id": response["id"]}
         else:
             return {
@@ -44,12 +52,10 @@ def create_one_time_payment(user_email, card_token, amount, description):
         print(f"Erro pagamento avulso: {e}")
         return {"status": "error", "message": str(e)}
 
-# --- FUNÇÃO MODIFICADA: ASSINATURA ---
+# --- FUNÇÃO ASSINATURA (MANTIDA COM PEQUENO AJUSTE) ---
 def create_subscription(user_email, card_token, amount, frequency=1, start_date=None):
     """
-    Cria uma assinatura.
-    Args:
-        start_date (datetime): Se fornecido, a assinatura só começa a cobrar nesta data.
+    Cria uma assinatura recorrente.
     """
     sdk = get_mp_sdk()
     if not sdk: return {"status": "error", "message": "Erro SDK"}
@@ -57,7 +63,7 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
     subscription_data = {
         "reason": "Assinatura - Simplific Pro",
         "payer_email": user_email,
-        "external_reference": user_email, # <--- ADICIONE ESSA LINHA AQUI
+        "external_reference": user_email,
         "auto_recurring": {
             "frequency": frequency,
             "frequency_type": "months",
@@ -69,21 +75,21 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
         "card_token_id": card_token
     }
 
-    # Se tiver data de início futura (para a promo de R$ 4,90), adicionamos aqui
+    # Lógica para agendar o início da cobrança recorrente (ex: daqui 30 dias)
     if start_date:
-        # Formato ISO 8601 (YYYY-MM-DDTHH:MM:SS.000-03:00)
-        # Adicionamos o fuso horário ou 'Z'
         subscription_data["auto_recurring"]["start_date"] = start_date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
     try:
         request_options = mercadopago.config.RequestOptions()
-        # Se for assinatura futura, o idempotency key deve ser diferente do pagamento avulso
-        # para não dar conflito se usarmos o mesmo token
         request_options.custom_headers = {
             'x-idempotency-key': f"sub_{card_token}_{datetime.now().timestamp()}" 
         }
         
         result = sdk.preapproval().create(subscription_data, request_options)
+        
+        if "response" not in result:
+             return {"status": "error", "message": "Sem resposta do MP na assinatura"}
+
         response = result["response"]
 
         if result["status"] == 201:
@@ -94,41 +100,22 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-
-
-# --- NOVAS FUNÇÕES: GERENCIAMENTO DE ASSINATURA ---
-
 def get_subscription_details(subscription_id):
-    """Consulta o status atual da assinatura no Mercado Pago."""
     sdk = get_mp_sdk()
     if not sdk: return None
-
     try:
-        # Busca os dados da preapproval (assinatura)
         result = sdk.preapproval().get(subscription_id)
-        
-        if result["status"] == 200:
-            return result["response"]
-        else:
-            print(f"Erro ao buscar assinatura {subscription_id}: {result}")
-            return None
-    except Exception as e:
-        print(f"Erro de conexão MP (Get Sub): {e}")
+        if result["status"] == 200: return result["response"]
+        return None
+    except Exception:
         return None
 
 def cancel_subscription_service(subscription_id):
-    """Solicita o cancelamento da assinatura no Mercado Pago."""
     sdk = get_mp_sdk()
     if not sdk: return {"status": "error", "message": "SDK Indisponível"}
-
     try:
-        # Atualiza o status para 'cancelled'
         result = sdk.preapproval().update(subscription_id, {"status": "cancelled"})
-        
-        if result["status"] == 200:
-            return {"status": "success", "response": result["response"]}
-        else:
-            return {"status": "error", "message": "Falha ao cancelar no MP", "detail": result}
+        if result["status"] == 200: return {"status": "success", "response": result["response"]}
+        return {"status": "error", "message": "Falha ao cancelar no MP"}
     except Exception as e:
-        print(f"Erro de conexão MP (Cancel Sub): {e}")
         return {"status": "error", "message": str(e)}

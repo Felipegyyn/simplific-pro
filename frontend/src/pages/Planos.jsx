@@ -7,14 +7,14 @@ import { CheckCircle, ShieldCheck, Zap, ArrowRight, Star, Flame } from 'lucide-r
 
 const Planos = () => {
   const navigate = useNavigate();
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  // 1. Padrão agora é 'annual' para priorizar o ticket maior
+  const [billingCycle, setBillingCycle] = useState('annual');
 
   const handleSubscribe = () => {
-    // Rastreamento do Pixel
     if (window.fbq) {
       window.fbq('track', 'InitiateCheckout', {
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
-        value: billingCycle === 'monthly' ? 4.90 : 198.90,
+        value: billingCycle === 'monthly' ? 13.45 : 199.00,
         currency: 'BRL'
       });
     }
@@ -27,6 +27,30 @@ const Planos = () => {
   };
 
   const isAnnual = billingCycle === 'annual';
+
+  // 2. Objeto de configuração visual idêntico à Home Page
+  const pricing = {
+    annual: {
+        oldPrice: "R$ 358,80",
+        priceDisplay: "198,90",
+        priceSuffix: "/ano",
+        headerText: "MELHOR CUSTO-BENEFÍCIO",
+        headerColor: "bg-yellow-400 text-black",
+        subDetail: "Equivalente a R$ 16,58/mês. Parcelável em até 12x.",
+        buttonText: "QUERO O PLANO ANUAL"
+      },
+    monthly: {
+      oldPrice: "R$ 29,90",
+      priceDisplay: "13,45",        
+      priceSuffix: " no 1º mês",  
+      headerText: "OFERTA BLACK: 1º MÊS PROMOCIONAL",
+      headerColor: "bg-green-600 text-black",
+      subDetail: "A partir do 2º mês R$ 29,90 mensais.",
+      buttonText: "TESTAR POR R$ 13,45"
+    }
+  };
+
+  const currentPlan = pricing[billingCycle];
 
   return (
     <div className="min-h-screen flex flex-col bg-black font-sans text-gray-100">
@@ -44,65 +68,71 @@ const Planos = () => {
                 A oportunidade de ter um Assessor Financeiro com IA pelo menor preço da história.
             </p>
 
-            {/* Toggle Black */}
+            {/* Toggle Black (Botões de Alternância) */}
             <div className="flex justify-center mb-12">
-                <div className="bg-slate-900 border border-gray-800 p-1 rounded-full flex items-center relative shadow-lg">
-                    <button 
-                        onClick={() => setBillingCycle('monthly')}
-                        className={`px-8 py-3 rounded-full text-sm font-bold transition-all ${!isAnnual ? 'bg-green-500 text-black shadow-lg shadow-green-500/30' : 'text-gray-400 hover:text-white'}`}
-                    >
-                        MENSAL
-                    </button>
+                <div className="bg-gray-900 border border-gray-800 p-1 rounded-lg inline-flex relative shadow-lg">
+                    {/* Botão ANUAL (Esquerda - Invertido para destaque) */}
                     <button 
                         onClick={() => setBillingCycle('annual')}
-                        className={`px-8 py-3 rounded-full text-sm font-bold transition-all flex items-center ${isAnnual ? 'bg-green-500 text-black shadow-lg shadow-green-500/30' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-8 py-3 rounded-md text-sm font-bold transition-all flex items-center ${isAnnual ? 'bg-green-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                     >
                         ANUAL
-                        {isAnnual && <span className="ml-2 text-[10px] bg-black text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-400 font-black animate-pulse">R$ 100 OFF</span>}
+                        <span className="ml-2 text-[10px] bg-white text-green-700 px-2 py-0.5 rounded-full font-black border border-green-600">-45%</span>
+                    </button>
+                    
+                    {/* Botão MENSAL (Direita) */}
+                    <button 
+                        onClick={() => setBillingCycle('monthly')}
+                        className={`px-8 py-3 rounded-md text-sm font-bold transition-all ${!isAnnual ? 'bg-gray-700 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                    >
+                        MENSAL
                     </button>
                 </div>
             </div>
 
             {/* Card de Preço Black Edition */}
-            <div className="bg-slate-900 max-w-lg mx-auto rounded-3xl shadow-2xl overflow-hidden border-2 border-green-500 relative transform hover:scale-[1.01] transition-transform duration-300">
-                
-                {/* Faixa Superior */}
-                <div className={`p-4 text-center font-black tracking-widest text-sm uppercase flex items-center justify-center gap-2 ${isAnnual ? 'bg-yellow-400 text-black' : 'bg-green-600 text-black'}`}>
+            <div className="bg-slate-900 max-w-lg mx-auto rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-800 relative transform hover:scale-[1.01] transition-transform duration-300">
+                {/* Borda Gradient no topo */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
+
+                {/* Faixa Superior Dinâmica */}
+                <div className={`p-4 text-center font-black tracking-widest text-sm uppercase flex items-center justify-center gap-2 ${currentPlan.headerColor}`}>
                     <Flame size={18} fill="black" />
-                    {isAnnual ? 'MELHOR CUSTO-BENEFÍCIO' : 'OFERTA BLACK: 1º MÊS PROMOCIONAL'}
+                    {currentPlan.headerText}
                 </div>
 
                 <div className="p-10 relative">
                     {/* Preço Antigo Riscado */}
                     <div className="mb-2">
                         <span className="text-gray-500 line-through text-lg font-bold">
-                            {isAnnual ? 'R$ 298,80' : 'R$ 89,90'}
+                            {currentPlan.oldPrice}
                         </span>
                     </div>
 
+                    {/* Preço Principal */}
                     <div className="flex justify-center items-baseline gap-1 mb-2">
                         <span className="text-3xl text-gray-500 font-bold">R$</span>
-                        {/* ▼▼▼ AQUI ESTÁ A LÓGICA DO PREÇO 4,90 ▼▼▼ */}
                         <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">
-                            {isAnnual ? '198,90' : '4,90'}
+                            {currentPlan.priceDisplay}
                         </span>
                     </div>
                     
-                    <p className="text-green-400 font-bold mb-8 uppercase tracking-wider">
-                        {isAnnual ? 'POR ANO (À VISTA)' : 'NO 1º MÊS (DEPOIS R$ 24,90)'}
+                    {/* Sufixo (ex: "no 1º mês") */}
+                    <p className="text-gray-400 font-bold mb-4 text-lg">
+                        {currentPlan.priceSuffix}
                     </p>
 
-                    {isAnnual && (
-                        <div className="bg-black/50 border border-green-500/30 text-green-400 px-4 py-3 rounded-xl mb-8 text-sm font-bold inline-block">
-                            <Star size={14} className="inline mr-1 fill-green-400"/> Economia de R$ 100,00 no ano
-                        </div>
-                    )}
+                    {/* Detalhe Extra (ex: Valor da parcela ou valor futuro) */}
+                    <div className="bg-black/40 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl mb-8 text-sm font-bold inline-block w-full">
+                        {isAnnual && <Star size={14} className="inline mr-1 fill-green-400 mb-0.5"/>} 
+                        {currentPlan.subDetail}
+                    </div>
 
                     <Button 
                         onClick={handleSubscribe}
-                        className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-8 h-auto rounded-xl shadow-[0_0_30px_rgba(34,197,94,0.4)] mb-8 uppercase tracking-wide"
+                        className="w-full bg-white hover:bg-gray-200 text-black font-black text-xl py-8 h-auto rounded-xl shadow-xl mb-8 uppercase tracking-wide transition-all hover:-translate-y-1"
                     >
-                        {isAnnual ? 'QUERO O PLANO ANUAL' : 'TESTAR POR R$ 4,90'}
+                        {currentPlan.buttonText}
                         <ArrowRight className="ml-2" strokeWidth={3} />
                     </Button>
 

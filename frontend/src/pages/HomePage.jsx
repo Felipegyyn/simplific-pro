@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // 1. Adicionado useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
-  Zap, Star, Sparkles, Flame, Timer, ArrowRight, Users, Linkedin, BadgeCheck
+  ArrowRight, Linkedin
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -45,11 +45,10 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  // 1. ALTERAÇÃO: 'annual' agora é o padrão
+  const [billingCycle, setBillingCycle] = useState('annual');
 
-  // 2. Script do Reclame Aqui
   useEffect(() => {
-    // Cria o script dinamicamente
     const script = document.createElement("script");
     script.src = "https://s3.amazonaws.com/raichu-beta/ra-verified/bundle.js";
     script.async = true;
@@ -58,10 +57,8 @@ const HomePage = () => {
     script.setAttribute("data-target", "ra-verified-seal");
     script.setAttribute("data-model", "compact_3");
     
-    // Adiciona ao corpo da página
     document.body.appendChild(script);
 
-    // Limpeza ao sair da página (para não duplicar)
     return () => {
         const existingScript = document.getElementById("ra-embed-verified-seal");
         if (existingScript) {
@@ -71,13 +68,15 @@ const HomePage = () => {
   }, []);
 
   const handleBuyClick = () => {
+    // Rastreamento do Pixel (Valores Atualizados)
     if (window.fbq) {
       window.fbq('track', 'InitiateCheckout', {
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
-        value: billingCycle === 'monthly' ? 4.90 : 198.90,
+        value: billingCycle === 'monthly' ? 13.45 : 199.00,
         currency: 'BRL'
       });
     }
+    // Redirecionamento
     if (billingCycle === 'monthly') {
         navigate('/checkout');
     } else {
@@ -85,23 +84,24 @@ const HomePage = () => {
     }
   };
 
+  // 2. ALTERAÇÃO: Objeto de Preços Atualizado com a nova lógica visual
   const pricing = {
-    monthly: {
-      oldPrice: "R$ 89,90",
-      price: "4,90",        
-      period: "NO 1º MÊS",  
-      description: "Condição exclusiva para novos membros. Depois R$ 24,90/mês.",
-      buttonText: "ATIVAR ACESSO POR R$ 4,90",
-      badge: "💎 WELCOME OFFER: INICIE QUASE GRÁTIS"
-    },
     annual: {
-        oldPrice: "R$ 298,80", 
-        price: "198,90",
-        period: "ANO (À VISTA)",
-        description: "Equivalente a R$ 16,57/mês. O menor valor histórico.",
+        oldPrice: "R$ 358,80", // (29,90 * 12)
+        priceDisplay: "16,58",
+        priceSuffix: "/mês",
+        subDetail: "No plano anual de R$ 199,00 à vista",
         buttonText: "GARANTIR OFERTA ANUAL",
-        badge: "💎 SMART CHOICE: R$ 100 OFF"
-      }
+        badge: "💎 MELHOR ESCOLHA: 45% OFF"
+      },
+    monthly: {
+      oldPrice: "R$ 29,90",
+      priceDisplay: "13,45",        
+      priceSuffix: " no 1º mês",  
+      subDetail: "A partir do 2º mês R$ 29,90",
+      buttonText: "COMEÇAR MENSAL",
+      badge: "TESTE SEM COMPROMISSO"
+    }
   };
 
   const currentPlan = pricing[billingCycle];
@@ -142,7 +142,7 @@ const HomePage = () => {
                 size="lg" 
                 className="bg-green-600 hover:bg-green-500 text-white font-bold text-lg h-16 px-10 rounded-lg shadow-lg shadow-green-900/20 transition-all w-full sm:w-auto"
               >
-                Começar Teste (R$ 4,90) <ArrowRight className="ml-2" />
+                Ver Oferta Especial <ArrowRight className="ml-2" />
               </Button>
 
               <Button 
@@ -161,9 +161,9 @@ const HomePage = () => {
           
           {/* --- VISUAL 1: APENAS CELULAR (Exclusivo MOBILE) --- */}
           <div className="relative pt-8 flex justify-center items-center md:hidden">
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
-             
-             <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[520px] w-[270px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
+              
+              <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[520px] w-[270px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-black rounded-b-xl z-20"></div>
                 <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
                     <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
@@ -246,7 +246,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- OFERTA --- */}
+      {/* --- OFERTA (ATUALIZADA) --- */}
       <section id="oferta" className="py-24 bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
@@ -254,32 +254,50 @@ const HomePage = () => {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Comece sem compromisso</h2>
             <p className="text-gray-400">Preparamos uma condição especial para você conhecer a plataforma.</p>
           </div>
+          
           <div className="flex justify-center mb-10">
             <div className="bg-gray-900 p-1 rounded-lg inline-flex relative">
-                <button onClick={() => setBillingCycle('monthly')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>Mensal</button>
-                <button onClick={() => setBillingCycle('annual')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-green-600 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>Anual<span className="bg-white text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-black">-30%</span></button>
+                {/* 3. ALTERAÇÃO: Lógica dos botões invertida para refletir a escolha */}
+                <button onClick={() => setBillingCycle('annual')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-green-600 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
+                    Anual
+                    <span className="bg-white text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-black">-45%</span>
+                </button>
+                <button onClick={() => setBillingCycle('monthly')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
+                    Mensal
+                </button>
             </div>
           </div>
-          <div className="bg-black border border-gray-700 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+
+          <div className="bg-black border border-gray-700 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
             <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="text-left space-y-4 flex-1">
-                    <div className="inline-block bg-green-900/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase">{billingCycle === 'monthly' ? 'Trial Estendido' : 'Melhor Escolha'}</div>
+                    <div className="inline-block bg-green-900/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase">
+                        {currentPlan.badge}
+                    </div>
                     <div>
-                        <p className="text-gray-400 text-sm line-through font-medium">{currentPlan.oldPrice}</p>
+                        <p className="text-gray-400 text-sm line-through font-medium mb-1">{currentPlan.oldPrice}</p>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-5xl font-bold text-white">R$ {currentPlan.price}</span>
-                            <span className="text-gray-500 font-medium">/{billingCycle === 'monthly' ? '1º mês' : 'ano'}</span>
+                            <span className="text-xl font-bold text-gray-400">R$</span>
+                            <span className="text-6xl font-bold text-white tracking-tighter">{currentPlan.priceDisplay}</span>
+                            <span className="text-gray-500 font-medium text-lg">{currentPlan.priceSuffix}</span>
                         </div>
                     </div>
-                    <p className="text-gray-300 font-medium text-lg border-l-4 border-green-500 pl-4">{currentPlan.description}</p>
-                    <div className="flex gap-4 text-sm text-gray-500">
+                    
+                    {/* 4. ALTERAÇÃO: Texto Pequeno e Descritivo */}
+                    <p className="text-gray-300 font-medium text-lg border-l-4 border-green-500 pl-4 py-1">
+                        {currentPlan.subDetail}
+                    </p>
+
+                    <div className="flex gap-4 text-sm text-gray-500 pt-2">
                         <span className="flex items-center gap-1"><CheckCircle size={16} className="text-green-600" /> Acesso Imediato</span>
-                        <span className="flex items-center gap-1"><CheckCircle size={16} className="text-green-600" /> Cancelamento Online</span>
+                        <span className="flex items-center gap-1"><CheckCircle size={16} className="text-green-600" /> Compra Segura</span>
                     </div>
                 </div>
                 <div className="w-full md:w-auto flex-shrink-0">
-                      <Button onClick={handleBuyClick} className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-bold text-lg py-8 px-10 rounded-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">{currentPlan.buttonText} <ArrowRight className="ml-2" /></Button>
+                      <Button onClick={handleBuyClick} className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-bold text-lg py-8 px-10 rounded-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                          {currentPlan.buttonText} <ArrowRight className="ml-2" />
+                      </Button>
                       <p className="text-center text-xs text-gray-600 mt-3">Pagamento seguro via Mercado Pago</p>
                 </div>
             </div>
@@ -302,7 +320,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- SEÇÃO: TECH STACK (Com selo dinâmico do Reclame Aqui) --- */}
+      {/* --- SEÇÃO: TECH STACK --- */}
       <section className="py-16 bg-gray-950 border-t border-gray-900">
         <div className="container mx-auto px-4">
             <div className="text-center mb-10">
@@ -323,21 +341,21 @@ const HomePage = () => {
                     <div className="h-8 transition-all duration-500 hover:scale-105"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
                     <div className="text-center"><span className="block text-white font-bold text-sm">Artificial Intelligence</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span></div>
                 </div>
-                {/* 3. Reclame Aqui Dinâmico */}
+                {/* Reclame Aqui Dinâmico */}
                 <div className="group flex flex-col items-center justify-center">
-                    {/* A div abaixo será preenchida pelo script carregado no useEffect */}
                     <div id="ra-verified-seal" className="hover:scale-105 transition-transform duration-500"></div>
                 </div>
             </div>
         </div>
       </section>
 
-      {/* --- FAQ --- */}
+      {/* --- FAQ ATUALIZADO --- */}
       <section className="py-24 bg-gray-950/50 border-t border-gray-900">
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-3xl font-bold text-center mb-12 text-white">Dúvidas Frequentes</h2>
           <div className="space-y-4">
-            <FaqItem question="O valor de R$ 4,90 é recorrente?" answer="Não. Este é um valor especial para o seu primeiro mês de uso, para que você possa testar a plataforma sem barreiras. Após 30 dias, a assinatura renova pelo valor padrão de R$ 24,90 mensais (menos de R$ 1 por dia)." />
+            <FaqItem question="O valor de R$ 13,45 é recorrente?" answer="Não. Este é um valor especial para o seu primeiro mês de uso (quase 60% de desconto), para que você possa testar a plataforma sem barreiras. Após 30 dias, a assinatura renova pelo valor padrão de R$ 29,90 mensais." />
+            <FaqItem question="Posso parcelar o plano anual?" answer="Sim! O plano anual de R$ 199,00 oferece o maior desconto (apenas R$ 16,58/mês) e você pode parcelá-lo em até 12x no cartão de crédito." />
             <FaqItem question="Meus dados bancários ficam salvos?" answer="Nós não temos acesso às suas senhas bancárias e não realizamos movimentações. O Simplific apenas lê e organiza as informações para você. Usamos criptografia de ponta a ponta com segurança nível bancário." />
             <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a mágica. Você pode registrar gastos, consultar saldo e pedir relatórios apenas mandando áudios ou textos para nossa IA no WhatsApp. O Dashboard serve para quando você quiser uma visão mais profunda." />
             <FaqItem question="Como cancelo se não gostar?" answer="Diretamente pelo seu painel, com um clique. Sem ligar para ninguém, sem burocracia. Queremos que você fique pelos resultados, não por obrigação." />
