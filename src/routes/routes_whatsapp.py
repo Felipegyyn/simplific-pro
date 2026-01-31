@@ -250,7 +250,24 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     historico_chat = sessao.get('chat_history', [])
     historico_chat.append({"role": "user", "content": mensagem_usuario})
 
-    texto_para_usuario, acao_a_executar = get_ai_response(usuario.id, historico_chat)
+    # ▼▼▼ NOVA LÓGICA DE NOME (Rayany vs Felipe) ▼▼▼
+    # 1. Normaliza o número de quem enviou a mensagem agora
+    numero_envio = normalizar_numero(from_number)
+    
+    # 2. Define o nome padrão como o do titular
+    nome_exibicao = usuario.name 
+    
+    # 3. Se o número de envio bater com o secundário cadastrado, troca o nome
+    if usuario.secondary_whatsapp and numero_envio == usuario.secondary_whatsapp:
+        nome_exibicao = usuario.secondary_name or "Parceiro(a)"
+    # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
+
+    # 4. Chama a IA passando o nome correto (nome_usuario_personalizado)
+    texto_para_usuario, acao_a_executar = get_ai_response(
+        usuario.id, 
+        historico_chat, 
+        nome_usuario_personalizado=nome_exibicao # <--- AQUI A MÁGICA ACONTECE
+    )
 
     resposta_final = texto_para_usuario
     if acao_a_executar:
@@ -270,9 +287,6 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
         return "Desculpe, não consegui processar isso. Pode tentar de novo?"
 
     return resposta_final
-
-# Em src/routes/whatsapp_routes.py
-# Substitua a função inteira por esta versão com a indentação corrigida
 
 def executar_acao_simplific(user_id, acao, from_number):
     """

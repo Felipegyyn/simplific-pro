@@ -26,13 +26,19 @@ from src.models.financial import Category
 
 
 
-def get_ai_response(user_id, historico_chat):
+def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     """
     Função principal que orquestra a conversa com o assessor Simplific.
+    Agora aceita um nome personalizado para contas compartilhadas.
     """
     usuario = User.query.get(user_id)
     if not usuario:
         return "Usuário não encontrado.", None
+
+    # --- DECISÃO DO NOME ---
+    # Se veio um nome personalizado (do WhatsApp secundário), usa ele.
+    # Senão, usa o nome do cadastro principal.
+    nome_final = nome_usuario_personalizado if nome_usuario_personalizado else usuario.name
 
     # --- PASSO 1: Montar o "Dossiê Financeiro" ---
     # Chamamos cada função de resumo que criamos na Fase 2
@@ -56,8 +62,8 @@ def get_ai_response(user_id, historico_chat):
     )
 
     # --- PASSO 2: Construir o Prompt e Chamar o Gemini ---
-    # Usamos a função da Fase 1 para construir o prompt mestre
-    prompt = construir_prompt_assessor(usuario.name, contexto_financeiro_completo, historico_chat)
+    # Usamos o 'nome_final' para o bot saber com quem está falando
+    prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
         # Envia o prompt para o modelo Gemini
@@ -103,17 +109,14 @@ def get_ai_response(user_id, historico_chat):
 
     # --- PASSO 4: Executar a Ação (se houver) ---
     if acao_a_executar:
-        # Aqui poderíamos chamar uma função para executar a ação,
-        # mas por enquanto vamos apenas retornar a ação para a rota do WhatsApp lidar com ela.
-        # Isso mantém nosso serviço focado apenas na lógica da IA.
+        # A ação será retornada para o controller (route) executar
         pass
 
     if not texto_para_usuario and not acao_a_executar:
         print("AVISO: get_ai_response está retornando uma resposta vazia. Forçando mensagem de erro.")
-        texto_para_usuario = "OPa! Não consegui entender sua solicitação no momento. Pode tentar reformular?"
+        texto_para_usuario = "Opa! Não consegui entender sua solicitação no momento. Pode tentar reformular?"
 
     return texto_para_usuario, acao_a_executar
-
 
 # ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO ▼▼▼
 
