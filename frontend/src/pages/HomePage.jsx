@@ -90,7 +90,7 @@ const HomePage = () => {
         oldPrice: "R$ 358,80", // (29,90 * 12)
         priceDisplay: "16,58",
         priceSuffix: "/mês",
-        subDetail: "No plano anual de R$ 199,00 à vista",
+        subDetail: "No plano anual. Ou R$ 199,00 à vista",
         buttonText: "GARANTIR OFERTA ANUAL",
         badge: "💎 MELHOR ESCOLHA: 45% OFF"
       },

@@ -7,7 +7,7 @@ import { CheckCircle, ShieldCheck, Zap, ArrowRight, Star, Flame } from 'lucide-r
 
 const Planos = () => {
   const navigate = useNavigate();
-  // 1. Padrão agora é 'annual' para priorizar o ticket maior
+  // Mantemos 'annual' como padrão para focar na venda de maior valor
   const [billingCycle, setBillingCycle] = useState('annual');
 
   const handleSubscribe = () => {
@@ -28,15 +28,16 @@ const Planos = () => {
 
   const isAnnual = billingCycle === 'annual';
 
-  // 2. Objeto de configuração visual idêntico à Home Page
+  // --- CONFIGURAÇÃO DE PREÇOS ATUALIZADA ---
   const pricing = {
     annual: {
-        oldPrice: "R$ 358,80",
-        priceDisplay: "198,90",
-        priceSuffix: "/ano",
+        oldPrice: "R$ 29,90", // Comparativo mensal padrão
+        priceDisplay: "16,58", // Foco no valor mensal equivalente
+        priceSuffix: "/mês",
         headerText: "MELHOR CUSTO-BENEFÍCIO",
         headerColor: "bg-yellow-400 text-black",
-        subDetail: "Equivalente a R$ 16,58/mês. Parcelável em até 12x.",
+        // Texto secundário explicando o total
+        subDetail: "No plano anual de R$ 199,00 (parcele em até 12x)", 
         buttonText: "QUERO O PLANO ANUAL"
       },
     monthly: {
@@ -112,16 +113,14 @@ const Planos = () => {
                     {/* Preço Principal */}
                     <div className="flex justify-center items-baseline gap-1 mb-2">
                         <span className="text-3xl text-gray-500 font-bold">R$</span>
-                        <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">
+                        <span className="text-8xl font-black text-white tracking-tighter">
                             {currentPlan.priceDisplay}
+                        </span>
+                        <span className="text-gray-400 font-bold text-xl self-end mb-4">
+                            {currentPlan.priceSuffix}
                         </span>
                     </div>
                     
-                    {/* Sufixo (ex: "no 1º mês") */}
-                    <p className="text-gray-400 font-bold mb-4 text-lg">
-                        {currentPlan.priceSuffix}
-                    </p>
-
                     {/* Detalhe Extra (ex: Valor da parcela ou valor futuro) */}
                     <div className="bg-black/40 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl mb-8 text-sm font-bold inline-block w-full">
                         {isAnnual && <Star size={14} className="inline mr-1 fill-green-400 mb-0.5"/>} 
