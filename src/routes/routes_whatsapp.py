@@ -29,6 +29,7 @@ from src.services.investments_service import buscar_dados_ativo
 from src.services.goals_service import get_user_goals, add_value_to_goal
 from src.services.credit_card_service import get_card_limit_details, process_card_payment
 from src.models.extended_modules import Fatura, CreditCard
+from sqlalchemy import or_  # <--- ADICIONE ISSO PARA PERMITIR A BUSCA DUPLA
 from src.services.credit_card_service import process_card_transaction
 from src.models.db import db
 from twilio.twiml.messaging_response import MessagingResponse
@@ -189,21 +190,28 @@ def receive_message():
         resp.message("Ok! Ação anterior cancelada. 👋\nEm que posso te ajudar agora?")
         return str(resp) # Retorno rápido
 
-    # ▼▼▼ ESTE É O BLOCO QUE FALTAVA ▼▼▼
-    # 4. Validação do usuário (rápida, pode ficar aqui)
+    # 4. Validação do usuário (BUSCA DUPLA: Titular ou Secundário)
     numero_normalizado = normalizar_numero(from_number)
-    usuario = User.query.filter_by(whatsapp=numero_normalizado).first()
+    
+    # AQUI ESTÁ A MÁGICA:
+    # Procura um usuário onde o whats titular SEJA o número 
+    # OU o whats secundário SEJA o número.
+    usuario = User.query.filter(
+        or_(
+            User.whatsapp == numero_normalizado, 
+            User.secondary_whatsapp == numero_normalizado
+        )
+    ).first()
 
     if not usuario:
         resp = MessagingResponse()
-        resp.message('Opa! 📲 Não encontrei seu número em nossa base. Verifique se o número está cadastrado corretamente no seu perfil do Simplific Pro.')
+        resp.message('Opa! 📲 Não encontrei seu número em nossa base (nem como titular, nem como adicional). Verifique seu cadastro na plataforma.')
         return str(resp) # Retorno rápido
     
     if usuario.status != 'ativo':
         resp = MessagingResponse()
-        resp.message("Sua conta Simplific Pro está inativa. Para reativá-la, por favor, acesse a plataforma ou entre em contato com o suporte.")
+        resp.message("Sua conta Simplific Pro está inativa. Entre em contato com o suporte.")
         return str(resp) # Retorno rápido
-    # ▲▲▲ FIM DO BLOCO QUE FALTAVA ▲▲▲
 
     # --- A GRANDE MUDANÇA (COM INDENTAÇÃO CORRIGIDA) ---
     

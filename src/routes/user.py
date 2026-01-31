@@ -232,11 +232,8 @@ def test_identity():
 
 @user_bp.route('/profile', methods=['GET', 'PUT', 'OPTIONS'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def manage_profile():
-    # A requisição OPTIONS (preflight) será tratada automaticamente pelo Flask-CORS
-    # se a rota estiver configurada com 'OPTIONS' no methods.
-    # Mas para garantir, podemos deixar essa verificação manual.
     if request.method == 'OPTIONS':
         return '', 200
 
@@ -253,15 +250,31 @@ def manage_profile():
         data = request.json
         name = data.get('name')
         whatsapp = data.get('whatsapp')
+        
+        # --- NOVOS CAMPOS ---
+        secondary_name = data.get('secondary_name')
+        secondary_whatsapp = data.get('secondary_whatsapp')
 
         if not name:
-            return jsonify({'error': 'O nome é obrigatório.'}), 400
+            return jsonify({'error': 'O nome do titular é obrigatório.'}), 400
 
+        # Atualiza titular
         user.name = name
         user.whatsapp = whatsapp
-        db.session.commit()
-
-        return jsonify(user.to_dict())
+        
+        # Atualiza conta compartilhada
+        user.secondary_name = secondary_name
+        user.secondary_whatsapp = secondary_whatsapp
+        
+        try:
+            db.session.commit()
+            return jsonify(user.to_dict())
+        except Exception as e:
+            db.session.rollback()
+            # Tratamento básico para erro de duplicidade (se o número já existir em outra conta)
+            if 'unique constraint' in str(e).lower():
+                return jsonify({'error': 'Este número de WhatsApp já está cadastrado em outra conta.'}), 400
+            return jsonify({'error': 'Erro ao salvar dados.'}), 500
 
 # ▼▼▼ COLE TODO ESTE BLOCO NO FINAL DO ARQUIVO ▼▼▼
 @user_bp.route('/user/preference', methods=['PUT'])

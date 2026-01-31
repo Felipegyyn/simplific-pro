@@ -33,6 +33,9 @@ class User(db.Model):
     google_calendar_token = db.Column(db.Text, nullable=True) 
     google_calendar_refresh_token = db.Column(db.Text, nullable=True)
 
+    secondary_name = db.Column(db.String(150), nullable=True)
+    secondary_whatsapp = db.Column(db.String(30), unique=True, nullable=True)
+
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -54,6 +57,8 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'whatsapp': self.whatsapp,
+            'secondary_name': self.secondary_name,
+            'secondary_whatsapp': self.secondary_whatsapp,
             'profile': self.profile,
             'status': self.status,
             'first_login': self.first_login,
