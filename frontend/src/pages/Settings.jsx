@@ -116,7 +116,7 @@ const Settings = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="whatsapp">WhatsApp Principal</Label>
-            <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ex: 5511999999999" />
+            <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="Ex: +5511999999999" />
           </div>
         </CardContent>
       </Card>
