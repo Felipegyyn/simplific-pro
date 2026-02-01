@@ -19,6 +19,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings'; 
 import Analysis from './pages/Analysis'; 
 import SimplificIA from './pages/SimplificIA';
+import AdvisorFeatures from './pages/AdvisorFeatures';
 import MainLayout from './components/MainLayout'; 
 import { Outlet } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext'; 
@@ -171,6 +172,7 @@ const App = () => {
                 <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
                 <Route path="/categories" element={<CategoriesSettings user={user} />} />
                 <Route path="/contacts" element={<Contacts />} />
+                <Route path="/advisor-features" element={<AdvisorFeatures />} />
                 
                 <Route 
                 path="/admin" 

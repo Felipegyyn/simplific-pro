@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
   Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Circle,
-  MessageCircle, Tags // <--- Adicionei MessageCircle e Tags (caso tenha esquecido antes)
+  MessageCircle, Tags, Sparkles, Layout  // <--- Adicionei MessageCircle e Tags (caso tenha esquecido antes)
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
@@ -64,6 +64,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             icon: MessageCircle,
             isExternal: true // Flag para identificar link externo
         },
+        { name: 'Funcionalidades Assessor', path: '/advisor-features', icon: Sparkles },
       ]
     },
     {
