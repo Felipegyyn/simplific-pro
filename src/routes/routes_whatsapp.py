@@ -1470,7 +1470,7 @@ def handle_consultar_contato(user_id, nome_busca):
         return f"Encontrei este contato na sua agenda: {dados}. Posso prosseguir com o agendamento?"
     else:
         # Retorna mensagem instruindo a IA a pedir os dados
-        return f"Não encontrei nenhum contato chamado '{nome_busca}'. Por favor, pergunte ao usuário o E-mail e o WhatsApp (opcional) para cadastrá-lo agora."
+        return f"Opa! encontrei o contato chamado '{nome_busca}'. Por favor, me informe o nome, e-mail e o WhatsApp(opcional) para eu cadastrar ele aqui rapidinho. Pode enviar tudo em uma mensagem só que eu entendo. 🫡😎"
 
 def handle_cadastrar_contato(user_id, dados):
     """
