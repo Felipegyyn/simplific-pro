@@ -101,7 +101,7 @@ const Settings = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
       <h1 className="text-2xl font-bold">Configurações</h1>
       
       {/* CARD 1: PERFIL TITULAR */}
