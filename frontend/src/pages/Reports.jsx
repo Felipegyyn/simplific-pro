@@ -163,7 +163,7 @@ useEffect(() => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-50 dark:bg-slate-900">
+    <div className="sm:p-6 bg-gray-50 dark:bg-slate-900">
       
       {/* cabeçalho novo */}
       <PageHeader user={user} onLogout={onLogout} />
