@@ -3,8 +3,8 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
-  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, Circle,
-  MessageCircle, Tags, Sparkles, Layout  // <--- Adicionei MessageCircle e Tags (caso tenha esquecido antes)
+  Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, 
+  MessageCircle, Tags, Sparkles 
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
@@ -24,11 +24,12 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // --- ESTRUTURA DOS DADOS ---
+  // --- ESTRUTURA DOS DADOS (COM CORES) ---
   const menuStructure = [
     {
       title: 'Resumo',
       icon: LayoutDashboard,
+      color: 'text-blue-500', // Azul para Resumo
       items: [
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Balanço Geral', path: '/reports', icon: FileText },
@@ -38,6 +39,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Lançamentos',
       icon: DollarSign,
+      color: 'text-green-500', // Verde para Dinheiro
       items: [
         { name: 'Lançamentos', path: '/transactions', icon: DollarSign },
         { name: 'Planejamento', path: '/planning', icon: Target },
@@ -48,6 +50,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Investimentos',
       icon: TrendingUp,
+      color: 'text-purple-500', // Roxo para Investimentos
       items: [
         { name: 'Investimentos', path: '/investments', icon: TrendingUp },
       ]
@@ -55,14 +58,14 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Assessor Simplific',
       icon: Bot,
+      color: 'text-indigo-500', // Indigo (Tech) para IA
       items: [
         { name: 'Simplific IA', path: '/simplific-ia', icon: Bot },
-        // --- NOVO ITEM WHATSAPP ---
         { 
             name: 'Whatsapp Assessor', 
-            path: 'https://wa.me/551151991373', // Link direto
+            path: 'https://wa.me/551151991373', 
             icon: MessageCircle,
-            isExternal: true // Flag para identificar link externo
+            isExternal: true 
         },
         { name: 'Funcionalidades Assessor', path: '/advisor-features', icon: Sparkles },
       ]
@@ -70,6 +73,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Compromissos',
       icon: Calendar,
+      color: 'text-pink-500', // Rosa para Agenda
       items: [
         { name: 'Agenda', path: '/schedule', icon: Calendar },
         { name: 'Contatos', path: '/contacts', icon: Users },
@@ -78,6 +82,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Configurações e outros',
       icon: Settings,
+      color: 'text-orange-500', // Laranja para Configs
       items: [
         { name: 'Categorias', path: '/categories', icon: Tags },
         { name: 'Conquistas', path: '/achievements', icon: Award },
@@ -175,7 +180,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border pb-4">
         {visibleMenu.map((group) => {
           const isOpen = openMenus[group.title];
-          // Verifica se algum filho está ativo (apenas para rotas internas)
           const isChildActive = group.items.some(item => !item.isExternal && location.pathname === item.path);
 
           return (
@@ -186,10 +190,19 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 className={cn(
                   "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen ? "text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  (!isOpen && isChildActive) || isOpen ? "bg-accent/50 text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
-                <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "")} />
+                {/* ÍCONE COM COR DINÂMICA */}
+                <group.icon 
+                    className={cn(
+                        "h-5 w-5 shrink-0 transition-colors", 
+                        isDesktopOpen ? "mr-3" : "",
+                        // Se estiver fechado ou não selecionado, mantém a cor original definida no menuStructure
+                        // Se quiser que fique cinza quando inativo, remova a classe `group.color` daqui e coloque uma condição
+                        group.color 
+                    )} 
+                />
                 
                 {isDesktopOpen && (
                   <>
@@ -203,7 +216,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                   </>
                 )}
 
-                {/* Tooltip quando Sidebar fechada */}
                 {!isDesktopOpen && (
                   <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
                     {group.title}
@@ -215,7 +227,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
               {isDesktopOpen && isOpen && (
                 <div className="space-y-1 ml-4 border-l border-border/50 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => {
-                    // SE FOR LINK EXTERNO (WHATSAPP)
                     if (item.isExternal) {
                       return (
                         <a
@@ -225,7 +236,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           rel="noopener noreferrer"
                           className={cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            "text-muted-foreground hover:text-green-600 hover:bg-green-50" // Estilo especial (verde) no hover
+                            "text-muted-foreground hover:text-green-600 hover:bg-green-50"
                           )}
                         >
                           <item.icon className="h-4 w-4 mr-3 opacity-70" />
@@ -234,7 +245,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                       );
                     }
 
-                    // SE FOR LINK INTERNO (NAVLINK PADRÃO)
                     return (
                       <NavLink
                         key={item.name}
@@ -249,7 +259,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           )
                         }
                       >
-                         <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+                          <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
                         <span>{item.name}</span>
                       </NavLink>
                     );
