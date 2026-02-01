@@ -236,9 +236,9 @@ const HomePage = () => {
               { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário. O Simplific te aconselha, orienta e te lembra" },
               { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente com corretoras para você acompanhar a evolução do seu patrimônio. Simule investimentos e o tempo para a liberdade financeira. Acompanhe tudo no Simplific" },
               // --- NOVAS FUNCIONALIDADES ---
-              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge, sócio ou quem você quiser também interaja com a IA na mesma conta." },
-              { icon: Calendar, title: "Agenda Integrada", desc: "Conecte sua agenda do Google. O Simplific visualiza seus compromissos e ajuda a organizar sua rotina financeira e pessoal em um só lugar." },
-              { icon: Video, title: "Agendamento Automático", desc: "Peça para a IA: 'Marque uma reunião com o Carlos'. Ela cria o evento, gera o link do Google Meet e envia o convite por WhatsApp para o contato." },
+              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge, sócio ou quem você quiser também interaja com o Simplific na mesma conta." },
+              { icon: Calendar, title: "Agenda Integrada", desc: "Conecte sua agenda do Google, IOS e Outlook. O Simplific visualiza seus compromissos e ajuda a organizar sua rotina financeira e pessoal em um só lugar." },
+              { icon: Video, title: "Agendamento Automático", desc: "Peça para o Simplific: 'Marque uma reunião com o Carlos'. Ela cria o evento, gera o link do Google Meet e envia o convite por E-mail e WhatsApp para o contato." },
             ].map((item, index) => (
               <div key={index} className="p-8 bg-gray-900/30 rounded-xl border border-gray-800 hover:border-green-500/50 hover:bg-gray-900 transition-all group">
                   <div className="w-12 h-12 bg-green-900/20 text-green-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><item.icon size={24} /></div>

@@ -8,7 +8,9 @@ import threading
 import traceback
 from src.services.whatsapp_service import (
     send_whatsapp_media, 
-    send_whatsapp_message,  # <--- ADICIONE ESTA
+    send_whatsapp_message,
+    send_whatsapp_template,
+    template_sids,
     user_sessions, 
     remover_sessao
 )
@@ -1502,11 +1504,10 @@ def handle_cadastrar_contato(user_id, dados):
 def handle_agendar_reuniao_meet(dados, user_id):
     """
     1. Cria evento no Google Calendar com Meet.
-    2. Envia convite por WhatsApp usando TEMPLATE para garantir a entrega.
+    2. Envia convite por WhatsApp usando TEMPLATE SID (Jeito Profissional).
     """
     user = User.query.get(user_id)
     
-    # 1. Prepara dados para o objeto de evento
     class EventoSimples:
         def __init__(self, title, date_str, time_str, desc):
             self.title = title
@@ -1524,7 +1525,7 @@ def handle_agendar_reuniao_meet(dados, user_id):
 
     attendee_email = dados.get('attendee_email')
 
-    # 2. Chama o serviço do Google
+    # Chama o serviço do Google
     resultado_google = add_event_to_google(
         user, 
         evento, 
@@ -1538,35 +1539,36 @@ def handle_agendar_reuniao_meet(dados, user_id):
     meet_link = resultado_google.get('meet_link')
     data_formatada = datetime.strptime(evento.date, '%Y-%m-%d').strftime('%d/%m/%Y')
     
-    # 3. Disparar WhatsApp para o convidado usando Lógica de Template
-    # O texto deve bater EXATAMENTE com o modelo cadastrado na Twilio:
-    # "Olá {{1}}. {{2}} agendou uma reunião com você para o dia {{3}} às {{4}}. Link de acesso: {{5}}"
-    
+    # Lógica de Envio via Template
     status_envio = ""
     
     if attendee_email:
-        # Tenta achar o contato pelo email para pegar o zap
         contato = Contact.query.filter_by(user_id=user_id, email=attendee_email).first()
         
         if contato and contato.whatsapp:
-            # Montamos a mensagem preenchendo as variáveis
-            # Var 1: Nome do Convidado
-            # Var 2: Nome do Usuário (Simplific)
-            # Var 3: Data
-            # Var 4: Hora
-            # Var 5: Link
-            
-            msg_template = (
-                f"Olá {contato.name}. {user.name} agendou uma reunião com você para o dia {data_formatada} às {evento.time}. Link de acesso: {meet_link}"
+            # Prepara as variáveis para o Template
+            # Template: "Olá {{1}}. {{2}} agendou uma reunião... dia {{3}} às {{4}}. Link: {{5}}..."
+            variaveis = {
+                '1': contato.name,      # Nome do convidado
+                '2': user.name,         # Nome do usuário (Simplific)
+                '3': data_formatada,    # Data
+                '4': evento.time,       # Hora
+                '5': meet_link          # Link
+            }
+
+            # Usa a função profissional do seu service
+            resultado_envio = send_whatsapp_template(
+                to=contato.whatsapp, 
+                template_sid=template_sids['convite_reuniao'], 
+                content_variables=variaveis
             )
 
-            try:
-                # Ao enviar o texto exato do template aprovado, o Twilio reconhece e entrega.
-                send_whatsapp_message(contato.whatsapp, msg_template)
+            if resultado_envio.get('status') == 'success':
                 status_envio = f"✅ Convite oficial enviado para o WhatsApp de {contato.name}."
-            except Exception as e:
-                print(f"Erro envio zap template: {e}")
-                status_envio = f"⚠️ O convite foi criado, mas houve um erro ao enviar o WhatsApp para {contato.name}."
+            else:
+                erro = resultado_envio.get('message') or resultado_envio.get('error_message')
+                print(f"Erro Template Twilio: {erro}")
+                status_envio = f"⚠️ O convite foi criado, mas houve um erro ao enviar o WhatsApp (Erro Twilio: {erro})."
 
         else:
             status_envio = f"⚠️ Não encontrei o WhatsApp do contato ({attendee_email}) para enviar o convite."
