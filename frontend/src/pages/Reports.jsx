@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import PageHeader from '@/components/PageHeader';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -163,34 +164,9 @@ useEffect(() => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 dark:bg-slate-900">
-      {/* Header */}
-     <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700 print:hidden">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">Relatórios Avançados</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-slate-400">
-                Bem-vindo, {user.name}
-              </span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
-        
-      </header>
+      
+      {/* cabeçalho novo */}
+      <PageHeader user={user} onLogout={onLogout} />
 
       {/* Main Content */}
       
