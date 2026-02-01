@@ -447,7 +447,7 @@ const tutorials = [
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
+    <div className="p-2 min-h-screen bg-gray-50/50 flex flex-col font-sans">
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
