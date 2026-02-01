@@ -236,7 +236,7 @@ const HomePage = () => {
               { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário. O Simplific te aconselha, orienta e te lembra" },
               { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente com corretoras para você acompanhar a evolução do seu patrimônio. Simule investimentos e o tempo para a liberdade financeira. Acompanhe tudo no Simplific" },
               // --- NOVAS FUNCIONALIDADES ---
-              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge ou sócio também interaja com a IA na mesma conta." },
+              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge, sócio ou quem você quiser também interaja com a IA na mesma conta." },
               { icon: Calendar, title: "Agenda Integrada", desc: "Conecte sua agenda do Google. O Simplific visualiza seus compromissos e ajuda a organizar sua rotina financeira e pessoal em um só lugar." },
               { icon: Video, title: "Agendamento Automático", desc: "Peça para a IA: 'Marque uma reunião com o Carlos'. Ela cria o evento, gera o link do Google Meet e envia o convite por WhatsApp para o contato." },
             ].map((item, index) => (
