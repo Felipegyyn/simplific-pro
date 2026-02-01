@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { 
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
-  ArrowRight, Linkedin
+  ArrowRight, Linkedin, Users, Calendar, Video // <--- ÍCONES NOVOS ADICIONADOS
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -220,7 +220,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* --- FUNCIONALIDADES --- */}
+      {/* --- FUNCIONALIDADES (ATUALIZADA) --- */}
       <section id="beneficios" className="py-32 bg-black relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
@@ -235,6 +235,10 @@ const HomePage = () => {
               { icon: CreditCard, title: "Gestão de Cartões", desc: "Controle datas de vencimento, gastos e limites para nunca mais pagar juros." },
               { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário. O Simplific te aconselha, orienta e te lembra" },
               { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente com corretoras para você acompanhar a evolução do seu patrimônio. Simule investimentos e o tempo para a liberdade financeira. Acompanhe tudo no Simplific" },
+              // --- NOVAS FUNCIONALIDADES ---
+              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge ou sócio também interaja com a IA na mesma conta." },
+              { icon: Calendar, title: "Agenda Integrada", desc: "Conecte sua agenda do Google. O Simplific visualiza seus compromissos e ajuda a organizar sua rotina financeira e pessoal em um só lugar." },
+              { icon: Video, title: "Agendamento Automático", desc: "Peça para a IA: 'Marque uma reunião com o Carlos'. Ela cria o evento, gera o link do Google Meet e envia o convite por WhatsApp para o contato." },
             ].map((item, index) => (
               <div key={index} className="p-8 bg-gray-900/30 rounded-xl border border-gray-800 hover:border-green-500/50 hover:bg-gray-900 transition-all group">
                   <div className="w-12 h-12 bg-green-900/20 text-green-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><item.icon size={24} /></div>
