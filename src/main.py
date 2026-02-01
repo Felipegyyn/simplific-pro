@@ -21,6 +21,7 @@ from flask_cors import CORS
 from src.models.gamification import Achievement, UserAchievement
 from flask_migrate import Migrate
 from src.routes.user_routes import user_api_bp
+from src.routes.contacts import contacts_bp
 from src.services.achievement_service import check_all_achievements_for_user
 from datetime import datetime, timedelta
 from src.routes.visual_report_routes import visual_report_bp
@@ -136,6 +137,7 @@ app.register_blueprint(analysis_bp, url_prefix='/api')
 app.register_blueprint(chat_bp, url_prefix='/api')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(marketing_bp, url_prefix='/api/marketing') # <--- Adicione isto
+app.register_blueprint(contacts_bp, url_prefix='/api/contacts')
 app.register_blueprint(pluggy_bp, url_prefix='/api/pluggy')
 
 # Adicione esta linha logo acima da sua função

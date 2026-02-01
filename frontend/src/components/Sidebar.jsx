@@ -71,6 +71,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       icon: Calendar,
       items: [
         { name: 'Agenda', path: '/schedule', icon: Calendar },
+        { name: 'Contatos', path: '/contacts', icon: Users },
       ]
     },
     {

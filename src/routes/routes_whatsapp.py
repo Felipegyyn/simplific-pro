@@ -16,6 +16,9 @@ from src.services.schedule_service import criar_evento_agenda, buscar_resumo_age
 from src.services.visual_report_service import generate_visual_report
 from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
 from src.services.tts_service import texto_para_audio # <-- ADICIONE
+from src.models.contact import Contact  # <--- NOVO: Modelo de Contatos
+from src.services.user_service import normalize_phone_number # <--- NOVO: Para salvar o zap do contato certo
+from src.services.google_calendar_service import add_event_to_google # <--- NOVO: Para criar o Meet
 from src.services.investments_service import processar_investimento_whatsapp, buscar_dados_ativo, gerar_resumo_carteira
 import locale
 from src.utils.formatters import format_currency_brl
@@ -334,14 +337,25 @@ def executar_acao_simplific(user_id, acao, from_number):
             return formatar_resumo_agenda(resumo) # Precisaremos criar esta função de formatação
 
         elif tipo_acao == 'cadastrar_evento_agenda':
-            success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
-            if success:
-                # Retorna None para usar a resposta amigável do Simplific
-                return None
+            # Verifica se é uma reunião com Meet (novo fluxo)
+            if dados_acao.get('create_meet'):
+                return handle_agendar_reuniao_meet(dados_acao, user_id)
             else:
-                return message # Retorna a mensagem de erro
+                # Fluxo antigo (lembrete simples)
+                success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
+                if success:
+                    return None
+                else:
+                    return message
 
-        # ▼▼▼ COLE O NOVO BLOCO elif DENTRO DE executar_acao_simplific ▼▼▼
+        # ▼▼▼ NOVAS AÇÕES DE CONTATO ▼▼▼
+        elif tipo_acao == 'consultar_contato':
+            nome_busca = dados_acao.get('nome')
+            return handle_consultar_contato(user_id, nome_busca)
+
+        elif tipo_acao == 'cadastrar_contato':
+            return handle_cadastrar_contato(user_id, dados_acao)
+        # ▲▲▲ FIM DAS NOVAS AÇÕES ▲▲▲
 
         elif tipo_acao == 'simular_cenario_financeiro':
             # 1. Chama o nosso novo motor de simulação com os dados extraídos pela IA
@@ -1433,3 +1447,133 @@ def formatar_resultado_simulacao(resultado):
     return "Não foi possível formatar o resultado da simulação."
 
 # ▲▲▲ FIM DA FUNÇÃO ▲▲▲
+
+# ▼▼▼ COLE NO FINAL DO ARQUIVO routes_whatsapp.py ▼▼▼
+
+def handle_consultar_contato(user_id, nome_busca):
+    """
+    Busca um contato no banco de dados pelo nome (busca parcial).
+    """
+    if not nome_busca:
+        return "Preciso de um nome para buscar."
+
+    # Busca case-insensitive
+    contato = Contact.query.filter(
+        Contact.user_id == user_id, 
+        Contact.name.ilike(f'%{nome_busca}%')
+    ).first()
+
+    if contato:
+        dados = f"nome: {contato.name}, email: {contato.email or 'N/A'}, whatsapp: {contato.whatsapp or 'N/A'}"
+        return f"Encontrei este contato na sua agenda: {dados}. Posso prosseguir com o agendamento?"
+    else:
+        # Retorna mensagem instruindo a IA a pedir os dados
+        return f"Não encontrei nenhum contato chamado '{nome_busca}'. Por favor, pergunte ao usuário o E-mail e o WhatsApp (opcional) para cadastrá-lo agora."
+
+def handle_cadastrar_contato(user_id, dados):
+    """
+    Cadastra um novo contato recebido via chat.
+    """
+    nome = dados.get('name')
+    email = dados.get('email')
+    whatsapp = dados.get('whatsapp')
+
+    if not nome:
+        return "O nome é obrigatório para cadastrar."
+
+    # Normaliza o zap se vier
+    whatsapp_norm = normalize_phone_number(whatsapp) if whatsapp else None
+
+    # Verifica se já existe
+    existente = Contact.query.filter_by(user_id=user_id, name=nome).first()
+    if existente:
+        # Atualiza dados faltantes
+        if email and not existente.email: existente.email = email
+        if whatsapp_norm and not existente.whatsapp: existente.whatsapp = whatsapp_norm
+        db.session.commit()
+        return f"Atualizei os dados do contato existente '{nome}'. Podemos agendar agora?"
+
+    novo_contato = Contact(user_id=user_id, name=nome, email=email, whatsapp=whatsapp_norm)
+    db.session.add(novo_contato)
+    db.session.commit()
+
+    return f"Contato '{nome}' cadastrado com sucesso! Agora posso agendar a reunião."
+
+def handle_agendar_reuniao_meet(dados, user_id):
+    """
+    1. Cria evento no Google Calendar com Meet.
+    2. Envia convite por WhatsApp usando TEMPLATE para garantir a entrega.
+    """
+    user = User.query.get(user_id)
+    
+    # 1. Prepara dados para o objeto de evento
+    class EventoSimples:
+        def __init__(self, title, date_str, time_str, desc):
+            self.title = title
+            self.date = date_str
+            self.time = time_str
+            self.description = desc
+            self.type = 'reuniao'
+
+    evento = EventoSimples(
+        title=dados.get('title'),
+        date_str=dados.get('event_date'),
+        time_str=dados.get('time', '10:00'),
+        desc="Agendado via Simplific Pro"
+    )
+
+    attendee_email = dados.get('attendee_email')
+
+    # 2. Chama o serviço do Google
+    resultado_google = add_event_to_google(
+        user, 
+        evento, 
+        attendee_email=attendee_email, 
+        create_meet=True
+    )
+
+    if not resultado_google:
+        return "Tive um problema para conectar com o Google Agenda. Verifique se sua integração está ativa."
+
+    meet_link = resultado_google.get('meet_link')
+    data_formatada = datetime.strptime(evento.date, '%Y-%m-%d').strftime('%d/%m/%Y')
+    
+    # 3. Disparar WhatsApp para o convidado usando Lógica de Template
+    # O texto deve bater EXATAMENTE com o modelo cadastrado na Twilio:
+    # "Olá {{1}}. {{2}} agendou uma reunião com você para o dia {{3}} às {{4}}. Link de acesso: {{5}}"
+    
+    status_envio = ""
+    
+    if attendee_email:
+        # Tenta achar o contato pelo email para pegar o zap
+        contato = Contact.query.filter_by(user_id=user_id, email=attendee_email).first()
+        
+        if contato and contato.whatsapp:
+            # Montamos a mensagem preenchendo as variáveis
+            # Var 1: Nome do Convidado
+            # Var 2: Nome do Usuário (Simplific)
+            # Var 3: Data
+            # Var 4: Hora
+            # Var 5: Link
+            
+            msg_template = (
+                f"Olá {contato.name}. {user.name} agendou uma reunião com você para o dia {data_formatada} às {evento.time}. Link de acesso: {meet_link}"
+            )
+
+            try:
+                # Ao enviar o texto exato do template aprovado, o Twilio reconhece e entrega.
+                send_whatsapp_message(contato.whatsapp, msg_template)
+                status_envio = f"✅ Convite oficial enviado para o WhatsApp de {contato.name}."
+            except Exception as e:
+                print(f"Erro envio zap template: {e}")
+                status_envio = f"⚠️ O convite foi criado, mas houve um erro ao enviar o WhatsApp para {contato.name}."
+
+        else:
+            status_envio = f"⚠️ Não encontrei o WhatsApp do contato ({attendee_email}) para enviar o convite."
+    
+    return (
+        f"✅ *Reunião Agendada com Sucesso!* \n\n"
+        f"🔗 *Link:* {meet_link}\n"
+        f"📧 E-mail do Google enviado.\n"
+        f"{status_envio}"
+    )

@@ -80,6 +80,12 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     
     # CAPACIDADE DE AÇÃO (TOOL CALLING)
     - **Você possui uma ferramenta interna integrada com o Yahoo Finance para consultar preços de ativos em tempo real (ações, moedas, etc.). Use-a sempre que o usuário pedir uma cotação.**
+    - **REGRAS PARA AGENDAMENTO DE REUNIÕES (IMPORTANTE):**
+    1. Se o usuário pedir para agendar uma reunião com alguém (ex: "com o Carlos"), PRIMEIRO verifique se você tem o contato salvo usando `consultar_contato`.
+    2. Se a ação `consultar_contato` não retornar nada (ou se você ainda não buscou), NÃO invente dados. Peça ao usuário o E-mail e o WhatsApp da pessoa.
+    3. Assim que o usuário fornecer os dados, use `cadastrar_contato`.
+    4. Com o contato identificado (e o e-mail em mãos), pergunte: "Deseja gerar um link do Google Meet para essa reunião?".
+    5. Se o usuário responder SIM, use `cadastrar_evento_agenda` preenchendo os campos `"create_meet": true` e `"attendee_email"`.
     - Você tem acesso a ferramentas internas para executar ações. Se, e SOMENTE SE, a última mensagem do usuário pedir para executar uma ação concreta (como registrar um gasto ou consultar um preço), você DEVE usar a ferramenta correspondente incluindo um bloco `[ACTION]` no final da sua resposta.
     - O bloco `[ACTION]` deve conter um único objeto JSON válido, sem quebras de linha.
     - A resposta em texto para o usuário deve vir PRIMEIRO, de forma natural, confirmando a ação.
@@ -146,6 +152,17 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
             - Extraia o "periodo" da mensagem do usuário (ex: "setembro", "mês passado"). Se nenhum for mencionado, use "este mês".
             - Exemplo 1: "meu resumo visual" -> `[ACTION]{{"type": "gerar_resumo_visual", "data": {{"periodo": "este mês"}}}}`
             - Exemplo 2: "gera o infográfico de outubro" -> `[ACTION]{{"type": "gerar_resumo_visual", "data": {{"periodo": "outubro"}}}}`
+        
+        - "consultar_contato": Para buscar dados de uma pessoa na agenda. Use sempre que o usuário mencionar um nome para reunião.
+            - Exemplo: `[ACTION]{{"type": "consultar_contato", "data": {{"nome": "Carlos"}}}}`
+
+        - "cadastrar_contato": Para salvar um novo contato.
+            - Exemplo: `[ACTION]{{"type": "cadastrar_contato", "data": {{"name": "Carlos", "email": "carlos@email.com", "whatsapp": "11999999999"}}}}`
+
+        - "cadastrar_evento_agenda": Para agendar compromissos. (ATUALIZADO)
+            - Agora aceita parâmetros extras para reuniões: "attendee_email" (string) e "create_meet" (boolean).
+            - Exemplo Simples: `[ACTION]{{"type": "cadastrar_evento_agenda", "data": {{"title": "Pagar a conta", "event_date": "2025-08-15"}}}}`
+            - Exemplo com Meet: `[ACTION]{{"type": "cadastrar_evento_agenda", "data": {{"title": "Reunião com Carlos", "event_date": "2025-08-15", "time": "10:00", "attendee_email": "carlos@email.com", "create_meet": true}}}}`
 
     # EXEMPLO DE INTERAÇÃO IDEAL
     - Usuário: "quanto gastei com iFood esse mês?"
@@ -153,6 +170,9 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     
     - Usuário: "paguei a fatura do meu cartão nubank"
     - Sua Resposta: "Ótima notícia, {nome_usuario}! Manter as contas em dia é fundamental para sua saúde financeira. Vou registrar o pagamento da fatura do seu cartão Nubank agora mesmo. 👍 [ACTION]{{"type": "pay_credit_card_bill", "data": {{"card_name": "nubank"}}}}"
+
+    - Usuário: "Marca uma reunião com o Kleber amanhã as 10h"
+    - Sua Resposta: "Vou verificar se tenho o contato do Kleber... [ACTION]{{"type": "consultar_contato", "data": {{"nome": "Kleber"}}}}"
 
     # HISTÓRICO DA CONVERSA ATUAL
     {historico_formatado}

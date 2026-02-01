@@ -1,5 +1,6 @@
 import os
 import datetime
+import uuid # <--- NOVO IMPORT
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -19,9 +20,7 @@ def get_google_auth_flow(redirect_uri=None):
         }
     }
     
-    # Se não passar redirect_uri, tenta adivinhar (usado para gerar o link de login)
     if not redirect_uri:
-        # IMPORTANTE: Em produção, isso deve ser a URL exata cadastrada no Google
         base_url = os.getenv("BASE_URL", "https://simplific-pro-backend.onrender.com")
         redirect_uri = f"{base_url}/api/schedule/google/callback"
 
@@ -47,18 +46,27 @@ def get_calendar_service(user):
 
     return build('calendar', 'v3', credentials=creds)
 
-def add_event_to_google(user, schedule_event):
-    """Envia um evento do Simplific para o Google Calendar."""
+# --- FUNÇÃO ATUALIZADA COM MEET E CONVIDADOS ---
+def add_event_to_google(user, schedule_event, attendee_email=None, create_meet=False):
+    """
+    Envia um evento do Simplific para o Google Calendar.
+    Args:
+        attendee_email (str): Email do convidado (opcional). O Google enviará o convite.
+        create_meet (bool): Se True, gera um link do Google Meet.
+    """
     service = get_calendar_service(user)
     if not service:
         return None
 
-    # Formata a data e hora para o padrão do Google (ISO 8601)
-    # Supondo que schedule_event.time seja string "HH:MM" e date seja objeto date
+    # Formata a data e hora (ISO 8601)
     start_datetime_str = f"{schedule_event.date}T{schedule_event.time}:00"
     
-    # Define duração padrão de 1 hora
-    start_dt = datetime.datetime.strptime(start_datetime_str, "%Y-%m-%dT%H:%M:%S")
+    try:
+        start_dt = datetime.datetime.strptime(start_datetime_str, "%Y-%m-%dT%H:%M:%S")
+    except ValueError:
+        # Fallback caso venha com formato diferente
+        return None
+
     end_dt = start_dt + datetime.timedelta(hours=1)
     
     event_body = {
@@ -75,16 +83,43 @@ def add_event_to_google(user, schedule_event):
         'reminders': {
             'useDefault': False,
             'overrides': [
-                {'method': 'email', 'minutes': 24 * 60}, # Email 1 dia antes
+                {'method': 'email', 'minutes': 24 * 60},
                 {'method': 'popup', 'minutes': 30},
             ],
         },
-        'colorId': '2' if schedule_event.type == 'pagamento' else '10' # Verde ou Laranja
+        'colorId': '2' if schedule_event.type == 'pagamento' else '10'
     }
 
+    # 1. Adicionar Convidado (Dispara e-mail nativo do Google)
+    if attendee_email:
+        event_body['attendees'] = [{'email': attendee_email}]
+
+    # 2. Configurar Google Meet
+    if create_meet:
+        event_body['conferenceData'] = {
+            'createRequest': {
+                'requestId': str(uuid.uuid4()), # ID único para a requisição
+                'conferenceSolutionKey': {'type': 'hangoutsMeet'}
+            }
+        }
+
     try:
-        event = service.events().insert(calendarId='primary', body=event_body).execute()
-        return event.get('id')
+        # conferenceDataVersion=1 é OBRIGATÓRIO para criar o Meet
+        event = service.events().insert(
+            calendarId='primary', 
+            body=event_body,
+            conferenceDataVersion=1 
+        ).execute()
+        
+        # Extrai o link do Meet (se foi criado)
+        meet_link = event.get('hangoutLink')
+        
+        # Retorna um dicionário com ID e Link
+        return {
+            'id': event.get('id'),
+            'meet_link': meet_link
+        }
+
     except Exception as e:
         print(f"Erro ao criar evento no Google: {e}")
         return None

@@ -11,6 +11,7 @@ import MarketingDashboard from './pages/MarketingDashboard';
 import Transactions from './pages/Transactions';
 import CreditCards from './pages/CreditCards';
 import Goals from './pages/Goals';
+import Contacts from './pages/Contacts';
 import Investments from './pages/Investments';
 import Schedule from './pages/Schedule';
 import AdminPanel from './pages/AdminPanel';
@@ -169,6 +170,7 @@ const App = () => {
                 <Route path="/achievements" element={<Achievements />} />
                 <Route path="/analysis" element={<Analysis user={user} onLogout={handleLogout} />} />
                 <Route path="/categories" element={<CategoriesSettings user={user} />} />
+                <Route path="/contacts" element={<Contacts />} />
                 
                 <Route 
                 path="/admin" 
