@@ -251,7 +251,7 @@ const handleSubmit = (e) => {
     return `${day}/${month}/${year}`;
   };
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
       {/* Header */}
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
         
