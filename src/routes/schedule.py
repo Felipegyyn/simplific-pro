@@ -151,7 +151,8 @@ def google_auth():
     # Gera a URL de autorização
     # state=user_id passa o ID do usuário para sabermos quem é na volta
     authorization_url, state = flow.authorization_url(
-        access_type='offline',
+        access_type='offline',      # Pede acesso para quando user estiver offline
+        prompt='consent',           # <--- OBRIGATÓRIO: Força o Google a gerar o Refresh Token
         include_granted_scopes='true',
         state=str(user_id) 
     )

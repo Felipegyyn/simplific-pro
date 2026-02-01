@@ -26,7 +26,7 @@ import locale
 from src.utils.formatters import format_currency_brl
 from src.services.simulation_service import run_financial_simulation
 from src.services.transcription_service import transcrever_audio_de_url # <-- ADICIONE ESTA LINHA
-from src.models.extended import Investment
+from src.models.extended import Investment, ScheduleEvent
 from src.services.schedule_service import get_agenda_summary, create_agenda_event_from_whatsapp
 from src.services.transacoes_service import buscar_transacoes_por_status
 from src.services.reports_service import buscar_resumo_planejamento
@@ -1504,10 +1504,12 @@ def handle_cadastrar_contato(user_id, dados):
 def handle_agendar_reuniao_meet(dados, user_id):
     """
     1. Cria evento no Google Calendar com Meet.
-    2. Envia convite por WhatsApp usando TEMPLATE SID (Jeito Profissional).
+    2. Salva o evento no Banco de Dados do Simplific (CORREÇÃO).
+    3. Envia convite por WhatsApp usando TEMPLATE.
     """
     user = User.query.get(user_id)
     
+    # 1. Prepara dados
     class EventoSimples:
         def __init__(self, title, date_str, time_str, desc):
             self.title = title
@@ -1525,7 +1527,7 @@ def handle_agendar_reuniao_meet(dados, user_id):
 
     attendee_email = dados.get('attendee_email')
 
-    # Chama o serviço do Google
+    # 2. Chama o serviço do Google
     resultado_google = add_event_to_google(
         user, 
         evento, 
@@ -1537,26 +1539,44 @@ def handle_agendar_reuniao_meet(dados, user_id):
         return "Tive um problema para conectar com o Google Agenda. Verifique se sua integração está ativa."
 
     meet_link = resultado_google.get('meet_link')
+    google_event_id = resultado_google.get('id') # ID do evento no Google
     data_formatada = datetime.strptime(evento.date, '%Y-%m-%d').strftime('%d/%m/%Y')
     
-    # Lógica de Envio via Template
+    # --- CORREÇÃO: SALVAR NO BANCO DE DADOS LOCAL ---
+    try:
+        novo_evento_db = ScheduleEvent(
+            user_id=user.id,
+            title=evento.title,
+            description=f"{evento.description}\nLink do Meet: {meet_link}", # Salva o link na descrição
+            date=datetime.strptime(evento.date, '%Y-%m-%d').date(),
+            time=evento.time,
+            type='reuniao',
+            category='Reunião', # Categoria padrão
+            google_event_id=google_event_id # VÍNCULO IMPORTANTE
+        )
+        db.session.add(novo_evento_db)
+        db.session.commit()
+        print(f"Evento '{evento.title}' salvo no banco local com sucesso.")
+    except Exception as e:
+        print(f"ERRO CRÍTICO ao salvar evento no banco local: {e}")
+        # Não retornamos erro aqui para não confundir o usuário, já que no Google foi criado.
+    # ------------------------------------------------
+
+    # 3. Disparar WhatsApp (Template)
     status_envio = ""
     
     if attendee_email:
         contato = Contact.query.filter_by(user_id=user_id, email=attendee_email).first()
         
         if contato and contato.whatsapp:
-            # Prepara as variáveis para o Template
-            # Template: "Olá {{1}}. {{2}} agendou uma reunião... dia {{3}} às {{4}}. Link: {{5}}..."
             variaveis = {
-                '1': contato.name,      # Nome do convidado
-                '2': user.name,         # Nome do usuário (Simplific)
-                '3': data_formatada,    # Data
-                '4': evento.time,       # Hora
-                '5': meet_link          # Link
+                '1': contato.name,      
+                '2': user.name,         
+                '3': data_formatada,    
+                '4': evento.time,       
+                '5': meet_link          
             }
 
-            # Usa a função profissional do seu service
             resultado_envio = send_whatsapp_template(
                 to=contato.whatsapp, 
                 template_sid=template_sids['convite_reuniao'], 
@@ -1567,7 +1587,6 @@ def handle_agendar_reuniao_meet(dados, user_id):
                 status_envio = f"✅ Convite oficial enviado para o WhatsApp de {contato.name}."
             else:
                 erro = resultado_envio.get('message') or resultado_envio.get('error_message')
-                print(f"Erro Template Twilio: {erro}")
                 status_envio = f"⚠️ O convite foi criado, mas houve um erro ao enviar o WhatsApp (Erro Twilio: {erro})."
 
         else:
@@ -1579,3 +1598,8 @@ def handle_agendar_reuniao_meet(dados, user_id):
         f"📧 E-mail do Google enviado.\n"
         f"{status_envio}"
     )
+
+@whatsapp_bp.route('/whatsapp_status', methods=['POST'])
+def whatsapp_status():
+    """Rota apenas para receber status da Twilio e não dar erro 404"""
+    return "OK", 200
