@@ -1,12 +1,13 @@
 import React from 'react';
-// Navbar e Footer removidos para manter o padrão "Dashboard Logado"
+import PageHeader from '@/components/PageHeader'; // <--- IMPORTAR
 import { 
   Wallet, TrendingUp, MessageCircle, 
   CreditCard, Sparkles, Mic, BarChart3, Video, UserPlus 
 } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description, commands, color }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1">
+  // ... (código do card continua igual)
+   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1">
     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${color}`}>
       <Icon size={24} className="text-white" />
     </div>
@@ -29,13 +30,18 @@ const FeatureCard = ({ icon: Icon, title, description, commands, color }) => (
   </div>
 );
 
-const AdvisorFeatures = () => {
+// ADICIONE AS PROPS user E onLogout
+const AdvisorFeatures = ({ user, onLogout }) => {
   return (
-    // Container ajustado para o padrão do Dashboard (sem Navbar externa)
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto font-sans">
+    <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
       
-      {/* Cabeçalho Interno */}
-      <div className="text-center mb-12 mt-4">
+      {/* ▼▼▼ NOVO CABEÇALHO ▼▼▼ */}
+      <PageHeader user={user} onLogout={onLogout} />
+      {/* ▲▲▲ FIM DO CABEÇALHO ▲▲▲ */}
+
+      <div className="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+        {/* ... (O RESTO DO CONTEÚDO CONTINUA IGUAL) ... */}
+         <div className="text-center mb-12 mt-4">
         <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-6">
           <Sparkles size={16} /> Inteligência Artificial Simplific
         </div>
@@ -163,7 +169,7 @@ const AdvisorFeatures = () => {
           </div>
         </div>
       </div>
-
+      </div>
     </div>
   );
 };
