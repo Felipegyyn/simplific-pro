@@ -6,7 +6,7 @@ import {
   Wallet, PieChart, ArrowLeftCircle, ArrowDownCircle, 
   ArrowUpCircle, ShoppingBag, Package, Box, 
   FileSpreadsheet, Scale, ShoppingCart, Truck, 
-  ClipboardList, CheckSquare, FileCheck, Landmark, Briefcase
+  ClipboardList, CheckSquare, FileCheck, Landmark, Briefcase, Target, Tags
 } from 'lucide-react';
 import { cn } from "@/lib/utils"; 
 
@@ -26,6 +26,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       color: 'text-cyan-400',
       items: [
         { name: 'Visão Geral', path: '/business', icon: LayoutDashboard }, 
+        { name: 'Planejamento', path: '/business/planning', icon: Target },
         { name: 'Fluxo de Caixa', path: '/business/cash-flow', icon: Wallet },
         { name: 'Contas a Pagar', path: '/business/payables', icon: ArrowDownCircle },
         { name: 'Contas a Receber', path: '/business/receivables', icon: ArrowUpCircle },
@@ -70,6 +71,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       color: 'text-slate-400',
       items: [
         { name: 'Dados da Empresa', path: '/business/settings/company', icon: Building2 },
+        { name: 'Categorias Fin.', path: '/business/settings/categories', icon: Tags },
         { name: 'Sócios e Acessos', path: '/business/settings/team', icon: Users },
         { name: 'Contas Correntes', path: '/business/settings/bank-accounts', icon: Landmark },
       ]
