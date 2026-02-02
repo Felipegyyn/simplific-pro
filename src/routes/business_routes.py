@@ -190,6 +190,37 @@ def create_category():
     db.session.commit()
     return jsonify(new_cat.to_dict()), 201
 
+
+@business_bp.route('/business/categories/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_category(id):
+    user_id = get_jwt_identity()
+    category = BusinessCategory.query.filter_by(id=id, user_id=user_id).first()
+    if not category: return jsonify({'error': 'Categoria não encontrada'}), 404
+
+    data = request.json
+    if 'name' in data: category.name = data['name']
+    if 'type' in data: category.type = data['type']
+    if 'parent_id' in data: 
+        category.parent_id = data['parent_id'] if data['parent_id'] != 'root' else None
+    
+    db.session.commit()
+    return jsonify(category.to_dict()), 200
+
+@business_bp.route('/business/categories/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_category(id):
+    user_id = get_jwt_identity()
+    category = BusinessCategory.query.filter_by(id=id, user_id=user_id).first()
+    if not category: return jsonify({'error': 'Categoria não encontrada'}), 404
+    
+    # Opcional: Verificar se está em uso antes de deletar
+    db.session.delete(category)
+    db.session.commit()
+    return '', 204
+
 # ==========================================
 # ROTAS DE PLANEJAMENTO (ORÇAMENTO)
 # ==========================================
@@ -286,3 +317,46 @@ def delete_planning(id):
     db.session.delete(budget)
     db.session.commit()
     return '', 204
+
+
+# ... (GET, POST, DELETE de planning já existem. Adicione estes:)
+
+# EDITAR CABEÇALHO DO PLANEJAMENTO
+@business_bp.route('/business/planning/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_planning_header(id):
+    user_id = get_jwt_identity()
+    budget = BusinessBudget.query.filter_by(id=id, user_id=user_id).first()
+    if not budget: return jsonify({'error': 'Orçamento não encontrado'}), 404
+
+    data = request.json
+    # Permitimos editar apenas campos não estruturais para não quebrar os meses
+    if 'name' in data: budget.name = data['name']
+    if 'company_id' in data: budget.company_id = data['company_id']
+    if 'category_id' in data: budget.category_id = data['category_id']
+    if 'subcategory_id' in data: budget.subcategory_id = data['subcategory_id']
+    
+    db.session.commit()
+    return jsonify(budget.to_dict()), 200
+
+# EDITAR VALOR DE UM MÊS ESPECÍFICO (ITEM)
+@business_bp.route('/business/planning/item/<int:item_id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_planning_item(item_id):
+    # Nota: Aqui buscamos pelo ID do Item, mas validamos se o budget pertence ao usuário
+    item = BusinessBudgetItem.query.get(item_id)
+    if not item: return jsonify({'error': 'Item não encontrado'}), 404
+    
+    # Segurança: Verifica se o dono do budget é o usuário logado
+    user_id = get_jwt_identity()
+    if item.budget.user_id != user_id:
+         return jsonify({'error': 'Acesso negado'}), 403
+
+    data = request.json
+    if 'value' in data:
+        item.value = float(data['value'])
+    
+    db.session.commit()
+    return jsonify(item.to_dict()), 200

@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Search, Tags, Edit, Trash2, FolderTree, Loader2 } from 'lucide-react';
-import apiService from '../../services/api'; // <--- Import do API Service
+import apiService from '../../services/api';
 
 const BusinessCategories = ({ user, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,8 +24,8 @@ const BusinessCategories = ({ user, onLogout }) => {
   
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({ name: '', type: 'saida', parent_id: 'root' });
+  const [editingId, setEditingId] = useState(null); // ID sendo editado
 
-  // --- 1. CARREGAR DADOS ---
   const loadData = async () => {
     setIsLoading(true);
     try {
@@ -38,14 +38,29 @@ const BusinessCategories = ({ user, onLogout }) => {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
-  // Pais disponíveis (Apenas categorias Raiz para serem pais)
   const rootCategories = categories.filter(c => c.parent_id === null);
 
-  // --- 2. SALVAR ---
+  // --- ABRIR NOVO ---
+  const handleOpenNew = () => {
+      setEditingId(null);
+      setFormData({ name: '', type: 'saida', parent_id: 'root' });
+      setIsModalOpen(true);
+  }
+
+  // --- ABRIR EDIÇÃO ---
+  const handleEdit = (cat) => {
+      setEditingId(cat.id);
+      setFormData({
+          name: cat.name,
+          type: cat.type,
+          parent_id: cat.parent_id ? cat.parent_id.toString() : 'root'
+      });
+      setIsModalOpen(true);
+  }
+
+  // --- SALVAR (CREATE OR UPDATE) ---
   const handleSave = async () => {
     if (!formData.name) return alert('Nome é obrigatório');
     
@@ -54,15 +69,19 @@ const BusinessCategories = ({ user, onLogout }) => {
       const payload = {
         name: formData.name,
         type: formData.type,
-        // Se for 'root', manda null, senão manda o ID numérico
         parent_id: formData.parent_id === 'root' ? null : parseInt(formData.parent_id)
       };
       
-      await apiService.post('/api/business/categories', payload);
+      if (editingId) {
+          // PUT
+          await apiService.put(`/api/business/categories/${editingId}`, payload);
+      } else {
+          // POST
+          await apiService.post('/api/business/categories', payload);
+      }
       
-      await loadData(); // Recarrega a lista
+      await loadData();
       setIsModalOpen(false);
-      setFormData({ name: '', type: 'saida', parent_id: 'root' });
     } catch (error) {
       console.error("Erro ao salvar:", error);
       alert("Erro ao salvar categoria.");
@@ -71,14 +90,17 @@ const BusinessCategories = ({ user, onLogout }) => {
     }
   };
 
-  // --- 3. DELETAR (Opcional, mas bom ter) ---
-  /* const handleDelete = async (id) => {
-    if(confirm("Deseja excluir?")) {
-        await apiService.delete(`/api/business/categories/${id}`);
-        loadData();
+  // --- DELETAR ---
+  const handleDelete = async (id) => {
+    if(confirm("Tem certeza que deseja excluir esta categoria?")) {
+        try {
+            await apiService.delete(`/api/business/categories/${id}`);
+            setCategories(prev => prev.filter(c => c.id !== id));
+        } catch (error) {
+            alert("Erro ao excluir. Verifique se não há orçamentos vinculados.");
+        }
     }
-  } 
-  */
+  }
 
   const filteredList = categories.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -92,7 +114,7 @@ const BusinessCategories = ({ user, onLogout }) => {
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Plano de Contas</h1>
             <p className="text-slate-500 text-sm">Categorias e Subcategorias.</p>
           </div>
-          <Button onClick={() => setIsModalOpen(true)} className="bg-cyan-600 hover:bg-cyan-700 text-white gap-2">
+          <Button onClick={handleOpenNew} className="bg-cyan-600 hover:bg-cyan-700 text-white gap-2">
             <Plus size={18} /> Nova Categoria
           </Button>
         </div>
@@ -118,14 +140,11 @@ const BusinessCategories = ({ user, onLogout }) => {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                 <TableRow>
-                   <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2"/> Carregando...</TableCell>
-                 </TableRow>
+                 <TableRow><TableCell colSpan={4} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2"/> Carregando...</TableCell></TableRow>
               ) : filteredList.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                        {/* Se tiver parent_id, é subcategoria (mostra recuado) */}
                         {cat.parent_id ? <FolderTree size={16} className="text-slate-400 ml-4" /> : <Tags size={16} className="text-cyan-600" />}
                         {cat.name}
                     </div>
@@ -139,7 +158,14 @@ const BusinessCategories = ({ user, onLogout }) => {
                     {cat.parent_name ? `Sub de: ${cat.parent_name}` : 'Principal'}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon"><Edit size={16} /></Button>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon" onClick={() => handleEdit(cat)}>
+                            <Edit size={16} className="text-slate-500 hover:text-cyan-600"/>
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(cat.id)}>
+                            <Trash2 size={16} className="text-slate-500 hover:text-red-600"/>
+                        </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -151,8 +177,7 @@ const BusinessCategories = ({ user, onLogout }) => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nova Categoria</DialogTitle>
-            <DialogDescription>Adicione ao plano de contas.</DialogDescription>
+            <DialogTitle>{editingId ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
@@ -171,13 +196,12 @@ const BusinessCategories = ({ user, onLogout }) => {
                     </Select>
                 </div>
                 <div className="space-y-2">
-                    <Label>Categoria Pai (Opcional)</Label>
+                    <Label>Categoria Pai</Label>
                     <Select value={formData.parent_id} onValueChange={v => setFormData({...formData, parent_id: v})}>
                         <SelectTrigger><SelectValue placeholder="Nenhuma (Raiz)" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="root">Nenhuma (É Principal)</SelectItem>
-                            {/* Filtra apenas categorias do mesmo tipo para serem pai */}
-                            {rootCategories.filter(c => c.type === formData.type).map(c => (
+                            {rootCategories.filter(c => c.type === formData.type && c.id !== editingId).map(c => (
                                 <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                             ))}
                         </SelectContent>
