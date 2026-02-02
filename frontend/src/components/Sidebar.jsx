@@ -13,12 +13,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
   
   // Controle dos menus abertos
-  const [openMenus, setOpenMenus] = useState({ 
-    'Resumo': true, 
-    'Lançamentos': true,
-    'Assessor Simplific': true,
-    'Simplific Empresas': true // <--- 2. ESTADO INICIAL ADICIONADO
-  }); 
+ const [openMenus, setOpenMenus] = useState({});
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,15 +51,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         { name: 'Investimentos', path: '/investments', icon: TrendingUp },
       ]
     },
-    // ▼▼▼ 3. NOVO GRUPO: SIMPLIFIC EMPRESAS ▼▼▼
-    {
-      title: 'Simplific Empresas',
-      icon: Building2,
-      color: 'text-cyan-500', // Cor Ciano
-      items: [
-        { name: 'Acessar Empresa', path: '/business', icon: Briefcase, adminOnly: true },
-      ]
-    },
+
     // ▲▲▲ FIM DO NOVO GRUPO ▲▲▲
     {
       title: 'Assessor Simplific',
@@ -101,7 +88,17 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         { name: 'Admin', path: '/admin', icon: Users, adminOnly: true },
         { name: 'Marketing', path: '/admin/marketing', icon: Megaphone, adminOnly: true },
       ]
-    }
+    },
+
+        // ▼▼▼ 3. NOVO GRUPO: SIMPLIFIC EMPRESAS ▼▼▼
+    {
+      title: 'Simplific Empresas',
+      icon: Building2,
+      color: 'text-cyan-500', // Cor Ciano
+      items: [
+        { name: 'Acessar Empresa', path: '/business', icon: Briefcase, adminOnly: true },
+      ]
+    },
   ];
 
   // Filtra itens baseados na permissão
