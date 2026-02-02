@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
   Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, 
-  MessageCircle, Tags, Sparkles 
+  MessageCircle, Tags, Sparkles, Building2, Briefcase // <--- 1. ÍCONES ADICIONADOS
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
@@ -16,7 +16,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [openMenus, setOpenMenus] = useState({ 
     'Resumo': true, 
     'Lançamentos': true,
-    'Assessor Simplific': true 
+    'Assessor Simplific': true,
+    'Simplific Empresas': true // <--- 2. ESTADO INICIAL ADICIONADO
   }); 
   
   const navigate = useNavigate();
@@ -24,12 +25,12 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // --- ESTRUTURA DOS DADOS (COM CORES) ---
+  // --- ESTRUTURA DOS DADOS ---
   const menuStructure = [
     {
       title: 'Resumo',
       icon: LayoutDashboard,
-      color: 'text-blue-500', // Azul para Resumo
+      color: 'text-blue-500',
       items: [
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Balanço Geral', path: '/reports', icon: FileText },
@@ -39,7 +40,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Lançamentos',
       icon: DollarSign,
-      color: 'text-green-500', // Verde para Dinheiro
+      color: 'text-green-500',
       items: [
         { name: 'Lançamentos', path: '/transactions', icon: DollarSign },
         { name: 'Planejamento', path: '/planning', icon: Target },
@@ -50,15 +51,25 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Investimentos',
       icon: TrendingUp,
-      color: 'text-purple-500', // Roxo para Investimentos
+      color: 'text-purple-500',
       items: [
         { name: 'Investimentos', path: '/investments', icon: TrendingUp },
       ]
     },
+    // ▼▼▼ 3. NOVO GRUPO: SIMPLIFIC EMPRESAS ▼▼▼
+    {
+      title: 'Simplific Empresas',
+      icon: Building2,
+      color: 'text-cyan-500', // Cor Ciano
+      items: [
+        { name: 'Acessar Empresa', path: '/business', icon: Briefcase, adminOnly: true },
+      ]
+    },
+    // ▲▲▲ FIM DO NOVO GRUPO ▲▲▲
     {
       title: 'Assessor Simplific',
       icon: Bot,
-      color: 'text-indigo-500', // Indigo (Tech) para IA
+      color: 'text-indigo-500',
       items: [
         { name: 'Simplific IA', path: '/simplific-ia', icon: Bot },
         { 
@@ -73,7 +84,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Compromissos',
       icon: Calendar,
-      color: 'text-pink-500', // Rosa para Agenda
+      color: 'text-pink-500',
       items: [
         { name: 'Agenda', path: '/schedule', icon: Calendar },
         { name: 'Contatos', path: '/contacts', icon: Users },
@@ -82,7 +93,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Configurações e outros',
       icon: Settings,
-      color: 'text-orange-500', // Laranja para Configs
+      color: 'text-orange-500',
       items: [
         { name: 'Categorias', path: '/categories', icon: Tags },
         { name: 'Conquistas', path: '/achievements', icon: Award },
@@ -98,8 +109,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     ...group,
     items: group.items.filter(item => !item.adminOnly || user?.profile === 'admin')
   })).filter(group => group.items.length > 0);
-
-  // --- LÓGICA DE INTERAÇÃO ---
 
   const toggleMenu = (title) => {
     if (!isDesktopOpen) {
@@ -158,7 +167,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         isDesktopOpen ? "md:w-64" : "md:w-20"
       )}
     >
-      {/* TOGGLE BUTTON */}
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
         className="absolute -right-3 top-9 bg-background border border-border rounded-full p-1.5 z-10 text-muted-foreground hover:text-foreground shadow-sm transition-colors hidden md:block"
@@ -166,7 +174,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>
 
-      {/* LOGO */}
       <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
         <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0" />
         {isDesktopOpen && (
@@ -176,7 +183,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         )}
       </div>
 
-      {/* MENU ACCORDION */}
       <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border pb-4">
         {visibleMenu.map((group) => {
           const isOpen = openMenus[group.title];
@@ -184,7 +190,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
 
           return (
             <div key={group.title} className="space-y-1">
-              {/* BOTÃO DO GRUPO (PAI) */}
               <button
                 onClick={() => toggleMenu(group.title)}
                 className={cn(
@@ -193,13 +198,10 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                   (!isOpen && isChildActive) || isOpen ? "bg-accent/50 text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
-                {/* ÍCONE COM COR DINÂMICA */}
                 <group.icon 
                     className={cn(
                         "h-5 w-5 shrink-0 transition-colors", 
                         isDesktopOpen ? "mr-3" : "",
-                        // Se estiver fechado ou não selecionado, mantém a cor original definida no menuStructure
-                        // Se quiser que fique cinza quando inativo, remova a classe `group.color` daqui e coloque uma condição
                         group.color 
                     )} 
                 />
@@ -223,7 +225,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 )}
               </button>
 
-              {/* SUBMENUS (FILHOS) */}
               {isDesktopOpen && isOpen && (
                 <div className="space-y-1 ml-4 border-l border-border/50 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => {
@@ -271,7 +272,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         })}
       </nav>
 
-      {/* FOOTER */}
       <div className="p-4 border-t border-border/60 bg-muted/20 mt-auto">
         <input
             type="file"
@@ -280,7 +280,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             className="hidden"
             accept="image/png, image/jpeg"
         />
-        
         <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent/50 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
           <div className="relative shrink-0">
             {user?.profile_image_url ? (
@@ -296,7 +295,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 </div>
             )}
           </div>
-
           {isDesktopOpen && (
             <div className="flex-1 overflow-hidden">
               <p className="font-medium text-sm truncate text-foreground">{user?.name}</p>
@@ -304,7 +302,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             </div>
           )}
         </div>
-
         <button 
           onClick={handleLogoutClick}
           className={cn(

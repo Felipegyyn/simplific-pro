@@ -12,6 +12,7 @@ import Transactions from './pages/Transactions';
 import CreditCards from './pages/CreditCards';
 import Goals from './pages/Goals';
 import Contacts from './pages/Contacts';
+import BusinessAccess from './pages/empresas/BusinessAccess';
 import Investments from './pages/Investments';
 import Schedule from './pages/Schedule';
 import AdminPanel from './pages/AdminPanel';
@@ -202,6 +203,15 @@ const App = () => {
                 element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}  
             />
         </Routes>
+
+        <Route 
+    path="/business" 
+    element={
+        <AdminRoute user={user}>
+            <BusinessAccess user={user} onLogout={handleLogout} />
+        </AdminRoute>
+    } 
+/>
       </ThemeProvider>
     </Router>
   );
