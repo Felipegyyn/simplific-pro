@@ -7,17 +7,17 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
 } from '@/components/ui/table';
 import { 
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter 
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription 
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Search, Building2, User, MapPin, Phone, Mail, Trash2, Edit, Loader2 } from 'lucide-react';
-import apiService from '../../services/api'; // <--- IMPORTANTE: Import do serviço
+import apiService from '../../services/api'; // Importamos a instância da classe
 
 const Stakeholders = ({ user, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // Estado de carregamento
-  const [isSaving, setIsSaving] = useState(false); // Estado de salvamento
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   
   const initialFormState = {
     type: 'pj', 
@@ -31,17 +31,17 @@ const Stakeholders = ({ user, onLogout }) => {
     complement: ''
   };
   const [formData, setFormData] = useState(initialFormState);
-  const [stakeholders, setStakeholders] = useState([]); // Começa vazio
+  const [stakeholders, setStakeholders] = useState([]); 
 
-  // --- 1. CARREGAR DADOS DA API ---
+  // --- 1. CARREGAR DADOS ---
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const data = await apiService.getStakeholders();
+      // MUDANÇA AQUI: Usamos o método genérico .get() passando a URL direta
+      const data = await apiService.get('/api/business/stakeholders');
       setStakeholders(data);
     } catch (error) {
       console.error("Erro ao carregar stakeholders:", error);
-      // Aqui você poderia adicionar um Toast de erro
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +64,9 @@ const Stakeholders = ({ user, onLogout }) => {
 
     setIsSaving(true);
     try {
-      // --- 2. ENVIAR PARA API ---
-      await apiService.createStakeholder(formData);
+      // MUDANÇA AQUI: Usamos o método genérico .post() passando a URL direta
+      await apiService.post('/api/business/stakeholders', formData);
       
-      // Recarrega a lista e fecha o modal
       await loadData();
       setFormData(initialFormState);
       setIsModalOpen(false);
@@ -82,10 +81,9 @@ const Stakeholders = ({ user, onLogout }) => {
   const handleDelete = async (id) => {
     if (confirm("Tem certeza que deseja remover este cadastro?")) {
       try {
-        // --- 3. DELETAR NA API ---
-        await apiService.deleteStakeholder(id);
+        // MUDANÇA AQUI: Usamos o método genérico .delete() passando a URL com ID
+        await apiService.delete(`/api/business/stakeholders/${id}`);
         
-        // Remove da lista visualmente (mais rápido que recarregar tudo)
         setStakeholders(prev => prev.filter(s => s.id !== id));
       } catch (error) {
         console.error("Erro ao deletar:", error);
@@ -203,6 +201,9 @@ const Stakeholders = ({ user, onLogout }) => {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Novo Cadastro</DialogTitle>
+            <DialogDescription>
+              Preencha os dados abaixo para cadastrar um novo cliente ou fornecedor.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-6 py-4">
