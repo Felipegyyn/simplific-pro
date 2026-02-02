@@ -3,45 +3,75 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Settings, Users, LogOut, 
   ChevronLeft, ChevronRight, ChevronDown, Building2, 
-  Wallet, PieChart, ArrowLeftCircle // Ícones novos
+  Wallet, PieChart, ArrowLeftCircle, ArrowDownCircle, 
+  ArrowUpCircle, ShoppingBag, Package, Box, 
+  FileSpreadsheet, Scale, ShoppingCart, Truck, 
+  ClipboardList, CheckSquare, FileCheck, Landmark, Briefcase
 } from 'lucide-react';
-import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
 
 const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
+  // Estado inicial vazio = todos fechados
   const [openMenus, setOpenMenus] = useState({});
+  
   const navigate = useNavigate();
   const location = useLocation();
-  const fileInputRef = useRef(null); // Mantivemos caso queira mudar logo da empresa futuramente
 
   // --- ESTRUTURA DOS DADOS (EMPRESARIAL) ---
   const menuStructure = [
     {
       title: 'Gestão',
       icon: LayoutDashboard,
-      color: 'text-cyan-500',
+      color: 'text-cyan-400',
       items: [
-        { name: 'Visão Geral', path: '/business', icon: LayoutDashboard }, // Aponta para BusinessAccess
+        { name: 'Visão Geral', path: '/business', icon: LayoutDashboard }, 
         { name: 'Fluxo de Caixa', path: '/business/cash-flow', icon: Wallet },
+        { name: 'Contas a Pagar', path: '/business/payables', icon: ArrowDownCircle },
+        { name: 'Contas a Receber', path: '/business/receivables', icon: ArrowUpCircle },
+        { name: 'Fornecedores/Clientes', path: '/business/stakeholders', icon: Users },
+      ]
+    },
+    {
+      title: 'Vendas',
+      icon: ShoppingBag,
+      color: 'text-emerald-400',
+      items: [
+        { name: 'Venda de Serviço', path: '/business/sales/service', icon: Briefcase },
+        { name: 'Venda de Produto', path: '/business/sales/product', icon: Package },
+        { name: 'Estoque', path: '/business/inventory', icon: Box },
+      ]
+    },
+    {
+      title: 'Suprimentos',
+      icon: Truck,
+      color: 'text-amber-400',
+      items: [
+        { name: 'Pedido de Compra', path: '/business/purchase-request', icon: ClipboardList },
+        { name: 'Aprovações', path: '/business/approvals', icon: CheckSquare },
+        { name: 'Ord. Compra/Serviço', path: '/business/orders', icon: FileCheck },
       ]
     },
     {
       title: 'Relatórios',
       icon: FileText,
-      color: 'text-blue-500',
+      color: 'text-violet-400',
       items: [
-        { name: 'DRE Gerencial', path: '/business/dre', icon: FileText },
-        { name: 'Análise Vertical', path: '/business/analysis', icon: PieChart },
+        { name: 'DRE Gerencial', path: '/business/reports/dre', icon: FileText },
+        { name: 'Análise Vertical', path: '/business/reports/analysis', icon: PieChart },
+        { name: 'Extrato Bancário', path: '/business/reports/statement', icon: FileSpreadsheet },
+        { name: 'Saldos', path: '/business/reports/balances', icon: Scale },
+        { name: 'Relatório de Compras', path: '/business/reports/purchasing', icon: ShoppingCart },
       ]
     },
     {
       title: 'Configurações',
       icon: Settings,
-      color: 'text-slate-500',
+      color: 'text-slate-400',
       items: [
-        { name: 'Dados da Empresa', path: '/business/settings', icon: Building2 },
-        { name: 'Sócios e Acessos', path: '/business/team', icon: Users },
+        { name: 'Dados da Empresa', path: '/business/settings/company', icon: Building2 },
+        { name: 'Sócios e Acessos', path: '/business/settings/team', icon: Users },
+        { name: 'Contas Correntes', path: '/business/settings/bank-accounts', icon: Landmark },
       ]
     }
   ];
@@ -60,7 +90,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   return (
     <div className={cn(
         "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
-        "bg-slate-900 text-slate-100 border-slate-800", // Fundo Escuro para diferenciar da PF
+        "bg-slate-900 text-slate-100 border-slate-800", // Tema Escuro Corporativo
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         isDesktopOpen ? "md:w-64" : "md:w-20"
       )}
@@ -74,12 +104,12 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
 
       {/* HEADER EMPRESA */}
       <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
-        <div className="bg-cyan-500/20 p-2 rounded-lg">
+        <div className="bg-cyan-500/20 p-2 rounded-lg shrink-0">
              <Building2 className="h-6 w-6 text-cyan-400" />
         </div>
         {isDesktopOpen && (
-            <div>
-                <span className="block text-sm font-bold text-white whitespace-nowrap">Minha Empresa</span>
+            <div className="overflow-hidden">
+                <span className="block text-sm font-bold text-white whitespace-nowrap truncate">Minha Empresa</span>
                 <span className="text-xs text-slate-400">Simplific PJ</span>
             </div>
         )}
@@ -104,14 +134,14 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "", group.color)} />
                 {isDesktopOpen && (
                   <>
-                    <span className="flex-1 text-left text-sm">{group.title}</span>
-                    <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isOpen ? "rotate-180" : "")} />
+                    <span className="flex-1 text-left text-sm truncate">{group.title}</span>
+                    <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50 shrink-0", isOpen ? "rotate-180" : "")} />
                   </>
                 )}
               </button>
 
               {isDesktopOpen && isOpen && (
-                <div className="space-y-1 ml-4 border-l border-slate-700 pl-2">
+                <div className="space-y-1 ml-4 border-l border-slate-700 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => (
                       <NavLink
                         key={item.name}
@@ -123,8 +153,8 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           )
                         }
                       >
-                        <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
-                        <span>{item.name}</span>
+                        <item.icon className="h-4 w-4 mr-3 opacity-70 shrink-0" /> 
+                        <span className="truncate">{item.name}</span>
                       </NavLink>
                     ))}
                 </div>
@@ -147,7 +177,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
           title="Voltar para Pessoa Física"
         >
           <ArrowLeftCircle className="h-5 w-5 shrink-0" />
-          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Voltar para Pessoal</span>}
+          {isDesktopOpen && <span className="ml-3 text-sm font-medium truncate">Voltar para Pessoal</span>}
         </button>
 
         <button 
