@@ -12,7 +12,6 @@ import Transactions from './pages/Transactions';
 import CreditCards from './pages/CreditCards';
 import Goals from './pages/Goals';
 import Contacts from './pages/Contacts';
-import BusinessAccess from './pages/empresas/BusinessAccess';
 import Investments from './pages/Investments';
 import Schedule from './pages/Schedule';
 import AdminPanel from './pages/AdminPanel';
@@ -28,6 +27,10 @@ import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CategoriesSettings from './pages/CategoriesSettings';
+
+//--- IMPORTS EMPRESARIAIS
+import BusinessAccess from './pages/empresas/BusinessAccess';
+import Stakeholders from './pages/empresas/Stakeholders';
 
 // --- NOVO: Importando as Páginas da Landing Page ---
 import Beneficios from './pages/Beneficios';
