@@ -48,6 +48,8 @@ from src.routes.extended_simple import extended_bp
 from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
 from src.routes.routes_whatsapp import whatsapp_bp
 from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
+from src.routes.business_routes import business_bp # <--- 1. Rota Empresarial
+from src.models.business import Stakeholder # <--- 2. Modelo Empresarial
 from src.routes.chat_bp import chat_bp
 from src.routes.payment_routes import payment_bp
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -139,6 +141,9 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(marketing_bp, url_prefix='/api/marketing') # <--- Adicione isto
 app.register_blueprint(contacts_bp, url_prefix='/api/contacts')
 app.register_blueprint(pluggy_bp, url_prefix='/api/pluggy')
+
+# Registro dos blueprints Empresariais
+app.register_blueprint(business_bp, url_prefix='/api')
 
 # Adicione esta linha logo acima da sua função
 
