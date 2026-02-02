@@ -11,13 +11,14 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Search, Building2, User, MapPin, Phone, Mail, Trash2, Edit, Loader2 } from 'lucide-react';
-import apiService from '../../services/api'; // Importamos a instância da classe
+import apiService from '../../services/api';
 
 const Stakeholders = ({ user, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [editingId, setEditingId] = useState(null); // <--- NOVO: ID de edição
   
   const initialFormState = {
     type: 'pj', 
@@ -33,11 +34,9 @@ const Stakeholders = ({ user, onLogout }) => {
   const [formData, setFormData] = useState(initialFormState);
   const [stakeholders, setStakeholders] = useState([]); 
 
-  // --- 1. CARREGAR DADOS ---
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // MUDANÇA AQUI: Usamos o método genérico .get() passando a URL direta
       const data = await apiService.get('/api/business/stakeholders');
       setStakeholders(data);
     } catch (error) {
@@ -51,9 +50,32 @@ const Stakeholders = ({ user, onLogout }) => {
     loadData();
   }, []);
 
-  // --- HANDLERS ---
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // --- FUNÇÃO PARA ABRIR O MODAL DE NOVO CADASTRO ---
+  const handleOpenNew = () => {
+    setEditingId(null); // Garante que não é edição
+    setFormData(initialFormState); // Limpa o formulário
+    setIsModalOpen(true);
+  };
+
+  // --- FUNÇÃO PARA ABRIR O MODAL DE EDIÇÃO ---
+  const handleEdit = (item) => {
+    setEditingId(item.id); // Salva o ID que está sendo editado
+    setFormData({
+      type: item.type || 'pj',
+      name: item.name || '',
+      tax_id: item.tax_id || '',
+      phone: item.phone || '',
+      email: item.email || '',
+      zip: item.zip_code || '', // Note que no banco pode vir como zip_code
+      address: item.address || '',
+      number: item.number || '',
+      complement: item.complement || ''
+    });
+    setIsModalOpen(true);
   };
 
   const handleSave = async () => {
@@ -64,12 +86,18 @@ const Stakeholders = ({ user, onLogout }) => {
 
     setIsSaving(true);
     try {
-      // MUDANÇA AQUI: Usamos o método genérico .post() passando a URL direta
-      await apiService.post('/api/business/stakeholders', formData);
+      if (editingId) {
+        // --- MODO EDIÇÃO (PUT) ---
+        await apiService.put(`/api/business/stakeholders/${editingId}`, formData);
+      } else {
+        // --- MODO CRIAÇÃO (POST) ---
+        await apiService.post('/api/business/stakeholders', formData);
+      }
       
       await loadData();
-      setFormData(initialFormState);
       setIsModalOpen(false);
+      setEditingId(null); // Reseta o ID de edição
+      setFormData(initialFormState); // Reseta o form
     } catch (error) {
       console.error("Erro ao salvar:", error);
       alert("Erro ao salvar o cadastro. Verifique os dados.");
@@ -81,9 +109,7 @@ const Stakeholders = ({ user, onLogout }) => {
   const handleDelete = async (id) => {
     if (confirm("Tem certeza que deseja remover este cadastro?")) {
       try {
-        // MUDANÇA AQUI: Usamos o método genérico .delete() passando a URL com ID
         await apiService.delete(`/api/business/stakeholders/${id}`);
-        
         setStakeholders(prev => prev.filter(s => s.id !== id));
       } catch (error) {
         console.error("Erro ao deletar:", error);
@@ -109,7 +135,7 @@ const Stakeholders = ({ user, onLogout }) => {
             <p className="text-slate-500 dark:text-slate-400 text-sm">Gerencie seus parceiros de negócios.</p>
           </div>
           <Button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleOpenNew} // <--- Atualizado para usar a função que limpa
             className="bg-cyan-600 hover:bg-cyan-700 text-white gap-2"
           >
             <Plus size={18} /> Novo Cadastro
@@ -174,7 +200,13 @@ const Stakeholders = ({ user, onLogout }) => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-cyan-600">
+                        {/* BOTÃO EDITAR AGORA FUNCIONA */}
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-slate-500 hover:text-cyan-600"
+                            onClick={() => handleEdit(item)}
+                        >
                           <Edit size={16} />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-red-600" onClick={() => handleDelete(item.id)}>
@@ -200,14 +232,15 @@ const Stakeholders = ({ user, onLogout }) => {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Novo Cadastro</DialogTitle>
+            <DialogTitle>{editingId ? 'Editar Cadastro' : 'Novo Cadastro'}</DialogTitle>
             <DialogDescription>
-              Preencha os dados abaixo para cadastrar um novo cliente ou fornecedor.
+              {editingId ? 'Altere os dados abaixo.' : 'Preencha os dados abaixo para cadastrar um novo cliente ou fornecedor.'}
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-6 py-4">
             
+            {/* TIPO DE PESSOA */}
             <div className="grid grid-cols-2 gap-4">
                <div 
                  onClick={() => handleInputChange('type', 'pj')}
@@ -308,7 +341,7 @@ const Stakeholders = ({ user, onLogout }) => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
             <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-700 text-white">
-              {isSaving ? 'Salvando...' : 'Salvar Cadastro'}
+              {isSaving ? 'Salvando...' : (editingId ? 'Salvar Alterações' : 'Salvar Cadastro')}
             </Button>
           </DialogFooter>
         </DialogContent>

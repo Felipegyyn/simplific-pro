@@ -31,6 +31,7 @@ import CategoriesSettings from './pages/CategoriesSettings';
 //--- IMPORTS EMPRESARIAIS
 import BusinessAccess from './pages/empresas/BusinessAccess';
 import Stakeholders from './pages/empresas/Stakeholders';
+import CompanySettings from './pages/empresas/CompanySettings';
 
 // --- NOVO: Importando as Páginas da Landing Page ---
 import Beneficios from './pages/Beneficios';
@@ -197,6 +198,8 @@ const App = () => {
                   } 
                 />
 
+
+                {/*Rotas protegidas empresairias*/} 
                 <Route 
                   path="/business" 
                   element={
@@ -212,6 +215,15 @@ const App = () => {
                   <AdminRoute user={user}>
                     <Stakeholders user={user} onLogout={handleLogout} />
                   </AdminRoute>
+                } 
+              />
+
+              <Route 
+                path="/business/settings/company" 
+                element={
+                <AdminRoute user={user}>
+                  <CompanySettings user={user} onLogout={handleLogout} />
+                </AdminRoute>
                 } 
               />
 
