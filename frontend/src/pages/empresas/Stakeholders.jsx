@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import PageHeaderBusiness from '@/components/PageHeaderBusiness'; // <--- Import novo
+import React, { useState, useEffect } from 'react';
+import PageHeaderBusiness from '@/components/PageHeaderBusiness';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,22 +9,20 @@ import {
 import { 
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter 
 } from '@/components/ui/dialog';
-import { 
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
-} from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Search, Building2, User, MapPin, Phone, Mail, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, Building2, User, MapPin, Phone, Mail, Trash2, Edit, Loader2 } from 'lucide-react';
+import apiService from '../../services/api'; // <--- IMPORTANTE: Import do serviço
 
 const Stakeholders = ({ user, onLogout }) => {
-  // --- ESTADOS ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true); // Estado de carregamento
+  const [isSaving, setIsSaving] = useState(false); // Estado de salvamento
   
-  // Estado do Formulário
   const initialFormState = {
-    type: 'pj', // pj ou pf
+    type: 'pj', 
     name: '',
-    tax_id: '', // CPF ou CNPJ
+    tax_id: '',
     phone: '',
     email: '',
     zip: '',
@@ -33,50 +31,72 @@ const Stakeholders = ({ user, onLogout }) => {
     complement: ''
   };
   const [formData, setFormData] = useState(initialFormState);
+  const [stakeholders, setStakeholders] = useState([]); // Começa vazio
 
-  // Dados Mockados (Simulando Banco de Dados)
-  const [stakeholders, setStakeholders] = useState([
-    { id: 1, type: 'pj', name: 'Tech Solutions LTDA', tax_id: '12.345.678/0001-90', phone: '(11) 98888-7777', email: 'contato@tech.com', city: 'São Paulo' },
-    { id: 2, type: 'pf', name: 'Carlos Consultor', tax_id: '123.456.789-00', phone: '(62) 99999-8888', email: 'carlos@gmail.com', city: 'Goiânia' },
-  ]);
+  // --- 1. CARREGAR DADOS DA API ---
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await apiService.getStakeholders();
+      setStakeholders(data);
+    } catch (error) {
+      console.error("Erro ao carregar stakeholders:", error);
+      // Aqui você poderia adicionar um Toast de erro
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // --- MÁSCARAS E HANDLERS ---
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // --- HANDLERS ---
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const formatTaxId = (value) => {
-    // Apenas visual simples, ideal usar lib de mask no futuro
-    return value.replace(/\D/g, ''); 
-  };
-
-  const handleSave = () => {
-    if (!formData.name || !formData.tax_id) {
-      alert("Por favor, preencha pelo menos Nome e Documento.");
+  const handleSave = async () => {
+    if (!formData.name) {
+      alert("Por favor, preencha o Nome/Razão Social.");
       return;
     }
 
-    const newStakeholder = {
-      id: Date.now(),
-      ...formData,
-      city: 'Local' // Simplificação para o exemplo
-    };
-
-    setStakeholders([...stakeholders, newStakeholder]);
-    setFormData(initialFormState);
-    setIsModalOpen(false);
-  };
-
-  const handleDelete = (id) => {
-    if (confirm("Tem certeza que deseja remover este cadastro?")) {
-      setStakeholders(stakeholders.filter(s => s.id !== id));
+    setIsSaving(true);
+    try {
+      // --- 2. ENVIAR PARA API ---
+      await apiService.createStakeholder(formData);
+      
+      // Recarrega a lista e fecha o modal
+      await loadData();
+      setFormData(initialFormState);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert("Erro ao salvar o cadastro. Verifique os dados.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // Filtro de Busca
+  const handleDelete = async (id) => {
+    if (confirm("Tem certeza que deseja remover este cadastro?")) {
+      try {
+        // --- 3. DELETAR NA API ---
+        await apiService.deleteStakeholder(id);
+        
+        // Remove da lista visualmente (mais rápido que recarregar tudo)
+        setStakeholders(prev => prev.filter(s => s.id !== id));
+      } catch (error) {
+        console.error("Erro ao deletar:", error);
+        alert("Erro ao excluir.");
+      }
+    }
+  };
+
   const filteredList = stakeholders.filter(item => 
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.tax_id.includes(searchTerm)
+    (item.tax_id && item.tax_id.includes(searchTerm))
   );
 
   return (
@@ -85,7 +105,6 @@ const Stakeholders = ({ user, onLogout }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
         
-        {/* CABEÇALHO DA PÁGINA */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Fornecedores e Clientes</h1>
@@ -99,7 +118,6 @@ const Stakeholders = ({ user, onLogout }) => {
           </Button>
         </div>
 
-        {/* FILTRO E BUSCA */}
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
           <CardContent className="p-4">
             <div className="relative">
@@ -114,7 +132,6 @@ const Stakeholders = ({ user, onLogout }) => {
           </CardContent>
         </Card>
 
-        {/* TABELA DE DADOS */}
         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
           <Table>
             <TableHeader className="bg-slate-50 dark:bg-slate-900">
@@ -126,7 +143,15 @@ const Stakeholders = ({ user, onLogout }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredList.length > 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-32 text-center text-slate-500">
+                    <div className="flex justify-center items-center gap-2">
+                        <Loader2 className="animate-spin" /> Carregando dados...
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredList.length > 0 ? (
                 filteredList.map((item) => (
                   <TableRow key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/50">
                     <TableCell>
@@ -141,12 +166,12 @@ const Stakeholders = ({ user, onLogout }) => {
                       </div>
                     </TableCell>
                     <TableCell className="text-slate-600 dark:text-slate-300 font-mono text-sm">
-                      {item.tax_id}
+                      {item.tax_id || '-'}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1 text-sm text-slate-600 dark:text-slate-300">
-                        <span className="flex items-center gap-1"><Phone size={12} /> {item.phone}</span>
-                        <span className="flex items-center gap-1"><Mail size={12} /> {item.email}</span>
+                        {item.phone && <span className="flex items-center gap-1"><Phone size={12} /> {item.phone}</span>}
+                        {item.email && <span className="flex items-center gap-1"><Mail size={12} /> {item.email}</span>}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -174,7 +199,6 @@ const Stakeholders = ({ user, onLogout }) => {
 
       </div>
 
-      {/* --- MODAL DE CADASTRO --- */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -183,7 +207,6 @@ const Stakeholders = ({ user, onLogout }) => {
           
           <div className="grid gap-6 py-4">
             
-            {/* TIPO DE PESSOA */}
             <div className="grid grid-cols-2 gap-4">
                <div 
                  onClick={() => handleInputChange('type', 'pj')}
@@ -201,7 +224,6 @@ const Stakeholders = ({ user, onLogout }) => {
                </div>
             </div>
 
-            {/* DADOS PRINCIPAIS */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{formData.type === 'pj' ? 'Razão Social' : 'Nome Completo'}</Label>
@@ -221,7 +243,6 @@ const Stakeholders = ({ user, onLogout }) => {
               </div>
             </div>
 
-            {/* CONTATO */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Telefone / WhatsApp</Label>
@@ -241,7 +262,6 @@ const Stakeholders = ({ user, onLogout }) => {
               </div>
             </div>
 
-            {/* ENDEREÇO */}
             <div className="space-y-4 pt-2 border-t">
               <h3 className="text-sm font-semibold text-slate-500 flex items-center gap-2">
                 <MapPin size={16} /> Endereço
@@ -286,7 +306,9 @@ const Stakeholders = ({ user, onLogout }) => {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Cadastro</Button>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-700 text-white">
+              {isSaving ? 'Salvando...' : 'Salvar Cadastro'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
