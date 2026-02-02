@@ -195,13 +195,22 @@ const App = () => {
                 />
 
                 <Route 
-    path="/business" 
-    element={
-        <AdminRoute user={user}>
-            <BusinessAccess user={user} onLogout={handleLogout} />
-        </AdminRoute>
-    } 
-/>
+                  path="/business" 
+                  element={
+                  <AdminRoute user={user}>
+                    <BusinessAccess user={user} onLogout={handleLogout} />
+                  </AdminRoute>
+                  } 
+                />
+
+              <Route 
+                path="/business/stakeholders" 
+                element={
+                  <AdminRoute user={user}>
+                    <Stakeholders user={user} onLogout={handleLogout} />
+                  </AdminRoute>
+                } 
+              />
 
                 <Route path="/reports" element={<Reports user={user} onLogout={handleLogout} />} />
                 <Route path="/settings" element={<Settings user={user} onLogout={handleLogout} />} />
