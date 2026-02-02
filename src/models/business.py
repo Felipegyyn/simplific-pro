@@ -81,3 +81,83 @@ class Company(db.Model):
             'numero': self.numero,
             'complemento': self.complemento
         }
+
+# ... (Mantenha imports e classes Stakeholder e Company existentes) ...
+
+# ▼▼▼ NOVAS CLASSES PARA GESTÃO FINANCEIRA PJ ▼▼▼
+
+class BusinessCategory(db.Model):
+    __tablename__ = 'business_categories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(20), nullable=False) # 'entrada' ou 'saida'
+    parent_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
+    
+    # Relacionamento para pegar subcategorias facilmente
+    subcategories = db.relationship('BusinessCategory', 
+        backref=db.backref('parent', remote_side=[id]),
+        lazy='dynamic'
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'parent_id': self.parent_id,
+            'parent_name': self.parent.name if self.parent else None
+        }
+
+class BusinessBudget(db.Model):
+    __tablename__ = 'business_budgets'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
+    
+    name = db.Column(db.String(200), nullable=False) # Ex: Planejamento Marketing 2026
+    
+    category_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=False)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
+    
+    start_date = db.Column(db.String(10), nullable=False) # 'YYYY-MM'
+    period_months = db.Column(db.Integer, default=12)
+    
+    base_value = db.Column(db.Float)
+    is_replicated = db.Column(db.Boolean, default=True)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento com os itens mensais (cascade delete garante que se apagar o plano, apaga os meses)
+    items = db.relationship('BusinessBudgetItem', backref='budget', cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'company_id': self.company_id,
+            'category_id': self.category_id,
+            'subcategory_id': self.subcategory_id,
+            'start_date': self.start_date,
+            'total_value': sum(item.value for item in self.items), # Calcula total na hora
+            'items': [i.to_dict() for i in self.items]
+        }
+
+class BusinessBudgetItem(db.Model):
+    __tablename__ = 'business_budget_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    budget_id = db.Column(db.Integer, db.ForeignKey('business_budgets.id'), nullable=False)
+    
+    month_date = db.Column(db.Date, nullable=False) # A data específica do mês (01/MM/YYYY)
+    value = db.Column(db.Float, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'month': self.month_date.strftime('%Y-%m'),
+            'value': self.value
+        }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PageHeaderBusiness from '@/components/PageHeaderBusiness';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,40 +13,72 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Search, Tags, Edit, Trash2, FolderTree } from 'lucide-react';
+import { Plus, Search, Tags, Edit, Trash2, FolderTree, Loader2 } from 'lucide-react';
+import apiService from '../../services/api'; // <--- Import do API Service
 
 const BusinessCategories = ({ user, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   
-  // Mock de Categorias
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Receita Operacional', type: 'entrada', parent: null },
-    { id: 2, name: 'Venda de Serviços', type: 'entrada', parent: 1 },
-    { id: 3, name: 'Despesas Administrativas', type: 'saida', parent: null },
-    { id: 4, name: 'Aluguel', type: 'saida', parent: 3 },
-    { id: 5, name: 'Energia Elétrica', type: 'saida', parent: 3 },
-  ]);
-
+  const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({ name: '', type: 'saida', parent_id: 'root' });
 
-  // Pais disponíveis (Categorias Raiz)
-  const rootCategories = categories.filter(c => c.parent === null);
+  // --- 1. CARREGAR DADOS ---
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await apiService.get('/api/business/categories');
+      setCategories(data);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleSave = () => {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Pais disponíveis (Apenas categorias Raiz para serem pais)
+  const rootCategories = categories.filter(c => c.parent_id === null);
+
+  // --- 2. SALVAR ---
+  const handleSave = async () => {
     if (!formData.name) return alert('Nome é obrigatório');
     
-    const newCat = {
-      id: Date.now(),
-      name: formData.name,
-      type: formData.type,
-      parent: formData.parent_id === 'root' ? null : parseInt(formData.parent_id)
-    };
-    
-    setCategories([...categories, newCat]);
-    setIsModalOpen(false);
-    setFormData({ name: '', type: 'saida', parent_id: 'root' });
+    setIsSaving(true);
+    try {
+      const payload = {
+        name: formData.name,
+        type: formData.type,
+        // Se for 'root', manda null, senão manda o ID numérico
+        parent_id: formData.parent_id === 'root' ? null : parseInt(formData.parent_id)
+      };
+      
+      await apiService.post('/api/business/categories', payload);
+      
+      await loadData(); // Recarrega a lista
+      setIsModalOpen(false);
+      setFormData({ name: '', type: 'saida', parent_id: 'root' });
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert("Erro ao salvar categoria.");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  // --- 3. DELETAR (Opcional, mas bom ter) ---
+  /* const handleDelete = async (id) => {
+    if(confirm("Deseja excluir?")) {
+        await apiService.delete(`/api/business/categories/${id}`);
+        loadData();
+    }
+  } 
+  */
 
   const filteredList = categories.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -74,9 +106,9 @@ const BusinessCategories = ({ user, onLogout }) => {
           </CardContent>
         </Card>
 
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-950 shadow-sm overflow-hidden">
           <Table>
-            <TableHeader className="bg-slate-50">
+            <TableHeader className="bg-slate-50 dark:bg-slate-900">
               <TableRow>
                 <TableHead>Nome</TableHead>
                 <TableHead>Tipo</TableHead>
@@ -85,11 +117,16 @@ const BusinessCategories = ({ user, onLogout }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredList.map((cat) => (
+              {isLoading ? (
+                 <TableRow>
+                   <TableCell colSpan={4} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2"/> Carregando...</TableCell>
+                 </TableRow>
+              ) : filteredList.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                        {cat.parent ? <FolderTree size={16} className="text-slate-400 ml-4" /> : <Tags size={16} className="text-cyan-600" />}
+                        {/* Se tiver parent_id, é subcategoria (mostra recuado) */}
+                        {cat.parent_id ? <FolderTree size={16} className="text-slate-400 ml-4" /> : <Tags size={16} className="text-cyan-600" />}
                         {cat.name}
                     </div>
                   </TableCell>
@@ -99,11 +136,10 @@ const BusinessCategories = ({ user, onLogout }) => {
                     </span>
                   </TableCell>
                   <TableCell className="text-sm text-slate-500">
-                    {cat.parent ? 'Subcategoria' : 'Categoria Principal'}
+                    {cat.parent_name ? `Sub de: ${cat.parent_name}` : 'Principal'}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon"><Edit size={16} /></Button>
-                    <Button variant="ghost" size="icon" className="text-red-500"><Trash2 size={16} /></Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -114,7 +150,10 @@ const BusinessCategories = ({ user, onLogout }) => {
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Nova Categoria</DialogTitle><DialogDescription>Adicione ao plano de contas.</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Nova Categoria</DialogTitle>
+            <DialogDescription>Adicione ao plano de contas.</DialogDescription>
+          </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
                 <Label>Nome</Label>
@@ -137,6 +176,7 @@ const BusinessCategories = ({ user, onLogout }) => {
                         <SelectTrigger><SelectValue placeholder="Nenhuma (Raiz)" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="root">Nenhuma (É Principal)</SelectItem>
+                            {/* Filtra apenas categorias do mesmo tipo para serem pai */}
                             {rootCategories.filter(c => c.type === formData.type).map(c => (
                                 <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                             ))}
@@ -146,7 +186,9 @@ const BusinessCategories = ({ user, onLogout }) => {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleSave} className="bg-cyan-600 text-white">Salvar</Button>
+            <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-600 text-white">
+                {isSaving ? 'Salvando...' : 'Salvar'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
