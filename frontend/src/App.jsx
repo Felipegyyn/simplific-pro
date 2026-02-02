@@ -238,7 +238,7 @@ const App = () => {
               <Route 
               path="/business/planning" 
               element={<AdminRoute user={user}><BusinessPlanning user={user} onLogout={handleLogout} /></AdminRoute>} 
-              >
+              />
 
                 <Route path="/reports" element={<Reports user={user} onLogout={handleLogout} />} />
                 <Route path="/settings" element={<Settings user={user} onLogout={handleLogout} />} />
