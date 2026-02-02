@@ -1,10 +1,14 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder
+from src.models.business import Stakeholder, Company
 from src.routes.user import active_user_required
 
 business_bp = Blueprint('business', __name__)
+
+# ==========================================
+# ROTAS DE STAKEHOLDERS (CLIENTES/FORNECEDORES)
+# ==========================================
 
 # --- LISTAR TODOS ---
 @business_bp.route('/business/stakeholders', methods=['GET'])
@@ -82,3 +86,72 @@ def update_stakeholder(id):
     
     db.session.commit()
     return jsonify(stakeholder.to_dict()), 200
+
+
+# ==========================================
+# ROTAS DE COMPANIES (MINHAS EMPRESAS)
+# ==========================================
+
+@business_bp.route('/business/companies', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_companies():
+    user_id = get_jwt_identity()
+    companies = Company.query.filter_by(user_id=user_id).order_by(Company.razao_social).all()
+    return jsonify([c.to_dict() for c in companies]), 200
+
+@business_bp.route('/business/companies', methods=['POST'])
+@jwt_required()
+@active_user_required
+def create_company():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    if not data.get('razao_social') or not data.get('cnpj'):
+        return jsonify({'error': 'Razão Social e CNPJ são obrigatórios'}), 400
+
+    new_company = Company(
+        user_id=user_id,
+        razao_social=data.get('razao_social'),
+        cnpj=data.get('cnpj'),
+        cnae=data.get('cnae'),
+        data_abertura=data.get('data_abertura'),
+        situacao=data.get('situacao', 'ativa'),
+        representante=data.get('representante'),
+        telefone=data.get('telefone'),
+        cep=data.get('cep'),
+        endereco=data.get('endereco'),
+        numero=data.get('numero'),
+        complemento=data.get('complemento')
+    )
+
+    db.session.add(new_company)
+    db.session.commit()
+    return jsonify(new_company.to_dict()), 201
+
+@business_bp.route('/business/companies/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_company(id):
+    user_id = get_jwt_identity()
+    company = Company.query.filter_by(id=id, user_id=user_id).first()
+    if not company: return jsonify({'error': 'Empresa não encontrada'}), 404
+
+    data = request.json
+    for key, value in data.items():
+        if hasattr(company, key) and key not in ['id', 'user_id', 'created_at']:
+            setattr(company, key, value)
+    
+    db.session.commit()
+    return jsonify(company.to_dict()), 200
+
+@business_bp.route('/business/companies/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_company(id):
+    user_id = get_jwt_identity()
+    company = Company.query.filter_by(id=id, user_id=user_id).first()
+    if not company: return jsonify({'error': 'Empresa não encontrada'}), 404
+    db.session.delete(company)
+    db.session.commit()
+    return '', 204

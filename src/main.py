@@ -49,7 +49,7 @@ from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
 from src.routes.routes_whatsapp import whatsapp_bp
 from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
 from src.routes.business_routes import business_bp # <--- 1. Rota Empresarial
-from src.models.business import Stakeholder # <--- 2. Modelo Empresarial
+from src.models.business import Stakeholder, Company  # <--- 2. Modelo Empresarial
 from src.routes.chat_bp import chat_bp
 from src.routes.payment_routes import payment_bp
 from apscheduler.schedulers.background import BackgroundScheduler
