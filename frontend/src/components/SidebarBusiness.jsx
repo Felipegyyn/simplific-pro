@@ -1,0 +1,169 @@
+import React, { useState, useRef } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import {
+  LayoutDashboard, FileText, Settings, Users, LogOut, 
+  ChevronLeft, ChevronRight, ChevronDown, Building2, 
+  Wallet, PieChart, ArrowLeftCircle // Ícones novos
+} from 'lucide-react';
+import logo from '../assets/LOGO.png';
+import { cn } from "@/lib/utils"; 
+
+const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
+  const [isDesktopOpen, setIsDesktopOpen] = useState(true);
+  const [openMenus, setOpenMenus] = useState({});
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fileInputRef = useRef(null); // Mantivemos caso queira mudar logo da empresa futuramente
+
+  // --- ESTRUTURA DOS DADOS (EMPRESARIAL) ---
+  const menuStructure = [
+    {
+      title: 'Gestão',
+      icon: LayoutDashboard,
+      color: 'text-cyan-500',
+      items: [
+        { name: 'Visão Geral', path: '/business', icon: LayoutDashboard }, // Aponta para BusinessAccess
+        { name: 'Fluxo de Caixa', path: '/business/cash-flow', icon: Wallet },
+      ]
+    },
+    {
+      title: 'Relatórios',
+      icon: FileText,
+      color: 'text-blue-500',
+      items: [
+        { name: 'DRE Gerencial', path: '/business/dre', icon: FileText },
+        { name: 'Análise Vertical', path: '/business/analysis', icon: PieChart },
+      ]
+    },
+    {
+      title: 'Configurações',
+      icon: Settings,
+      color: 'text-slate-500',
+      items: [
+        { name: 'Dados da Empresa', path: '/business/settings', icon: Building2 },
+        { name: 'Sócios e Acessos', path: '/business/team', icon: Users },
+      ]
+    }
+  ];
+
+  const toggleMenu = (title) => {
+    if (!isDesktopOpen) {
+      setIsDesktopOpen(true);
+      setOpenMenus(prev => ({ ...prev, [title]: true }));
+      return;
+    }
+    setOpenMenus(prev => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  const handleLinkClick = () => { if (isMobileOpen) closeMobileMenu(); };
+
+  return (
+    <div className={cn(
+        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
+        "bg-slate-900 text-slate-100 border-slate-800", // Fundo Escuro para diferenciar da PF
+        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        isDesktopOpen ? "md:w-64" : "md:w-20"
+      )}
+    >
+      <button 
+        onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
+        className="absolute -right-3 top-9 bg-slate-800 border border-slate-700 rounded-full p-1.5 z-10 text-slate-400 hover:text-white shadow-sm transition-colors hidden md:block"
+      >
+        {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+      </button>
+
+      {/* HEADER EMPRESA */}
+      <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
+        <div className="bg-cyan-500/20 p-2 rounded-lg">
+             <Building2 className="h-6 w-6 text-cyan-400" />
+        </div>
+        {isDesktopOpen && (
+            <div>
+                <span className="block text-sm font-bold text-white whitespace-nowrap">Minha Empresa</span>
+                <span className="text-xs text-slate-400">Simplific PJ</span>
+            </div>
+        )}
+      </div>
+
+      {/* NAVEGAÇÃO */}
+      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 pb-4">
+        {menuStructure.map((group) => {
+          const isOpen = openMenus[group.title];
+          const isChildActive = group.items.some(item => location.pathname === item.path);
+
+          return (
+            <div key={group.title} className="space-y-1">
+              <button
+                onClick={() => toggleMenu(group.title)}
+                className={cn(
+                  "w-full flex items-center p-3 rounded-xl transition-all duration-200 group select-none hover:bg-slate-800",
+                  !isDesktopOpen && "justify-center",
+                  (!isOpen && isChildActive) || isOpen ? "bg-slate-800 text-white" : "text-slate-400"
+                )}
+              >
+                <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "", group.color)} />
+                {isDesktopOpen && (
+                  <>
+                    <span className="flex-1 text-left text-sm">{group.title}</span>
+                    <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isOpen ? "rotate-180" : "")} />
+                  </>
+                )}
+              </button>
+
+              {isDesktopOpen && isOpen && (
+                <div className="space-y-1 ml-4 border-l border-slate-700 pl-2">
+                  {group.items.map((item) => (
+                      <NavLink
+                        key={item.name}
+                        to={item.path}
+                        onClick={handleLinkClick}
+                        className={({ isActive }) => cn(
+                            "flex items-center p-2 rounded-lg transition-colors text-sm",
+                            isActive ? "bg-cyan-500/10 text-cyan-400 font-medium" : "text-slate-400 hover:text-white hover:bg-slate-800"
+                          )
+                        }
+                      >
+                        <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+                        <span>{item.name}</span>
+                      </NavLink>
+                    ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </nav>
+
+      {/* FOOTER - VOLTAR PARA PESSOAL */}
+      <div className="p-4 border-t border-slate-800 bg-slate-900/50 mt-auto space-y-2">
+        
+        {/* Botão de Voltar ao Contexto Pessoal */}
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className={cn(
+            "flex items-center w-full p-3 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm",
+            !isDesktopOpen && "justify-center"
+          )}
+          title="Voltar para Pessoa Física"
+        >
+          <ArrowLeftCircle className="h-5 w-5 shrink-0" />
+          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Voltar para Pessoal</span>}
+        </button>
+
+        <button 
+          onClick={() => { navigate('/login'); onLogout(); }}
+          className={cn(
+            "flex items-center w-full p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors",
+            !isDesktopOpen && "justify-center"
+          )}
+          title="Sair"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Sair</span>}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SidebarBusiness;
