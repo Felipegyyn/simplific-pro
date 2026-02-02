@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PageHeader from '@/components/PageHeader';
+import PageHeaderBusiness from '@/components/PageHeaderBusiness'; // <--- Import novo
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -81,7 +81,7 @@ const Stakeholders = ({ user, onLogout }) => {
 
   return (
     <div className="bg-gray-50 dark:bg-slate-900 min-h-screen pb-20">
-      <PageHeader user={user} onLogout={onLogout} />
+      <PageHeaderBusiness user={user} onLogout={onLogout} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
         

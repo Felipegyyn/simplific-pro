@@ -1,5 +1,5 @@
 import React from 'react';
-import PageHeader from '@/components/PageHeader';
+import PageHeaderBusiness from '@/components/PageHeaderBusiness';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building2 } from 'lucide-react';
 
@@ -7,7 +7,7 @@ const BusinessAccess = ({ user, onLogout }) => {
   return (
     <div className="bg-gray-50 dark:bg-slate-900 min-h-screen pb-20">
       {/* Reutilizamos o PageHeader para manter o padrão */}
-      <PageHeader user={user} onLogout={onLogout} />
+      <PageHeaderBusiness user={user} onLogout={onLogout} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <Card className="border-cyan-200 bg-cyan-50/50 dark:bg-cyan-900/10">
