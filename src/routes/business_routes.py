@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem
+from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount
 from datetime import date, timedelta
 import calendar
 from src.routes.user import active_user_required
@@ -368,3 +368,78 @@ def update_planning_item(item_id):
     item.value = float(request.json['value'])
     db.session.commit()
     return jsonify(item.to_dict()), 200
+
+# ==========================================
+# ROTAS DE CONTAS BANCÁRIAS
+# ==========================================
+
+@business_bp.route('/business/bank-accounts', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_bank_accounts():
+    user_id = get_jwt_identity()
+    accounts = BusinessBankAccount.query.filter_by(user_id=user_id).all()
+    return jsonify([acc.to_dict() for acc in accounts]), 200
+
+@business_bp.route('/business/bank-accounts', methods=['POST'])
+@jwt_required()
+@active_user_required
+def create_bank_account():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    if not data.get('company_id') or not data.get('bank_name'):
+        return jsonify({'error': 'Empresa e Banco são obrigatórios'}), 400
+
+    new_account = BusinessBankAccount(
+        user_id=user_id,
+        company_id=data['company_id'],
+        bank_name=data['bank_name'],
+        account_type=data.get('account_type', 'corrente'),
+        agency=data.get('agency'),
+        account_number=data.get('account_number'),
+        open_date=data.get('open_date'),
+        notes=data.get('notes')
+    )
+
+    db.session.add(new_account)
+    db.session.commit()
+    return jsonify(new_account.to_dict()), 201
+
+@business_bp.route('/business/bank-accounts/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_bank_account(id):
+    user_id = get_jwt_identity()
+    account = BusinessBankAccount.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not account:
+        return jsonify({'error': 'Conta não encontrada'}), 404
+
+    data = request.json
+    
+    # Atualiza campos se eles vierem no JSON
+    if 'company_id' in data: account.company_id = data['company_id']
+    if 'bank_name' in data: account.bank_name = data['bank_name']
+    if 'account_type' in data: account.account_type = data['account_type']
+    if 'agency' in data: account.agency = data['agency']
+    if 'account_number' in data: account.account_number = data['account_number']
+    if 'open_date' in data: account.open_date = data['open_date']
+    if 'notes' in data: account.notes = data['notes']
+
+    db.session.commit()
+    return jsonify(account.to_dict()), 200
+
+@business_bp.route('/business/bank-accounts/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_bank_account(id):
+    user_id = get_jwt_identity()
+    account = BusinessBankAccount.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not account:
+        return jsonify({'error': 'Conta não encontrada'}), 404
+
+    db.session.delete(account)
+    db.session.commit()
+    return '', 204

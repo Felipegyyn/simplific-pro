@@ -190,3 +190,38 @@ class BusinessBudgetItem(db.Model):
             'month': self.month_date.strftime('%Y-%m'),
             'value': self.value
         }
+
+
+class BusinessBankAccount(db.Model):
+    __tablename__ = 'business_bank_accounts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
+    
+    bank_name = db.Column(db.String(100), nullable=False)
+    account_type = db.Column(db.String(50), default='corrente') # corrente, controle, aplicacao
+    
+    agency = db.Column(db.String(20))
+    account_number = db.Column(db.String(30))
+    
+    open_date = db.Column(db.String(10)) # YYYY-MM-DD
+    notes = db.Column(db.Text)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento para pegar o nome da empresa facilmente
+    company = db.relationship('Company', foreign_keys=[company_id])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'company_id': self.company_id,
+            'company_name': self.company.razao_social if self.company else 'N/A',
+            'bank_name': self.bank_name,
+            'account_type': self.account_type,
+            'agency': self.agency,
+            'account_number': self.account_number,
+            'open_date': self.open_date,
+            'notes': self.notes
+        }
