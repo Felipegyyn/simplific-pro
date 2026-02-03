@@ -35,6 +35,7 @@ import CompanySettings from './pages/empresas/CompanySettings';
 import BusinessCategories from './pages/empresas/BusinessCategories';
 import BusinessPlanning from './pages/empresas/BusinessPlanning';
 import BankAccounts from './pages/empresas/BankAccounts';
+import BusinessPayables from './pages/empresas/BusinessPayables';
 
 // --- NOVO: Importando as Páginas da Landing Page ---
 import Beneficios from './pages/Beneficios';
@@ -245,6 +246,15 @@ const App = () => {
                 path="/business/settings/bank-accounts" 
                 element={<AdminRoute user={user}><BankAccounts user={user} onLogout={handleLogout} /></AdminRoute>} 
               />
+
+              <Route 
+                path="/business/payables" 
+                element={<AdminRoute user={user}><BusinessPayables user={user} onLogout={handleLogout} /></AdminRoute>} 
+              />
+
+
+
+
 
                 <Route path="/reports" element={<Reports user={user} onLogout={handleLogout} />} />
                 <Route path="/settings" element={<Settings user={user} onLogout={handleLogout} />} />
