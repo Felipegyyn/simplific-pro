@@ -8,10 +8,7 @@ import { ShieldCheck, Lock, User, Mail, Phone } from 'lucide-react';
 // Inicialização Única
 initMercadoPago('APP_USR-24f00d18-dd10-431f-930c-e309aba17683', { locale: 'pt-BR' });
 
-// --- COMPONENTE ISOLADO DO MERCADO PAGO ----
-// Usamos memo() para que este componente NUNCA renderize novamente
-// a menos que o preço mude. Isso resolve o erro 'removeChild'.
-// --- ALTERAÇÃO 1: Adicionamos 'maxInstallments' nas props e na configuração ---
+// --- SUBSTITUA O COMPONENTE PaymentBrick ATUAL POR ESTE ---
 const PaymentBrick = memo(({ amount, maxInstallments, onSubmit, onError, onReady }) => {
   const initialization = {
     amount: amount,
@@ -21,7 +18,7 @@ const PaymentBrick = memo(({ amount, maxInstallments, onSubmit, onError, onReady
   const customization = {
     paymentMethods: { 
         minInstallments: 1, 
-        maxInstallments: maxInstallments // <--- AGORA É DINÂMICO
+        maxInstallments: maxInstallments
     },
     visual: { 
       style: { theme: 'default' }, 
@@ -31,6 +28,15 @@ const PaymentBrick = memo(({ amount, maxInstallments, onSubmit, onError, onReady
 
   return (
     <div id="payment-brick-container">
+       {/* --- NOVO: Aviso Visual de Parcelamento (Aumenta a conversão) --- */}
+       {maxInstallments > 1 && (
+         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-center text-center">
+            <span className="text-green-800 text-sm font-semibold">
+               💳 Opção de parcelamento em até {maxInstallments}x disponível
+            </span>
+         </div>
+       )}
+
        <CardPayment
           initialization={initialization}
           customization={customization}
@@ -41,7 +47,6 @@ const PaymentBrick = memo(({ amount, maxInstallments, onSubmit, onError, onReady
     </div>
   );
 }, (prevProps, nextProps) => {
-    // Atualiza se o preço OU o número de parcelas mudar
     return prevProps.amount === nextProps.amount && prevProps.maxInstallments === nextProps.maxInstallments;
 });
 
