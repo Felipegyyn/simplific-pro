@@ -771,3 +771,65 @@ def update_receivable(id):
 
     db.session.commit()
     return jsonify(rec.to_dict()), 200
+
+# No final de src/routes/business_routes.py
+
+# ... (Rotas anteriores)
+
+# 5. EXCLUIR VENDA (Estorna Estoque + Apaga Parcelas)
+@business_bp.route('/business/sales/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_sale(id):
+    user_id = get_jwt_identity()
+    sale = BusinessSale.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not sale:
+        return jsonify({'error': 'Venda não encontrada'}), 404
+
+    # Trava de Segurança: Não excluir se tiver recebimento
+    if any(r.status == 'recebido' for r in sale.receivables):
+        return jsonify({'error': 'Não é possível excluir vendas com parcelas já recebidas. Estorne os recebimentos primeiro.'}), 400
+
+    # Estorno de Estoque (Se houve baixa)
+    if sale.product_id:
+        prod = InventoryProduct.query.get(sale.product_id)
+        if prod:
+            # Registra movimento de entrada (devolução)
+            move = InventoryMovement(
+                user_id=user_id,
+                product_id=prod.id,
+                type='entrada',
+                quantity=sale.quantity,
+                reason=f'estorno_venda_#{sale.id}'
+            )
+            prod.current_stock += sale.quantity
+            db.session.add(move)
+
+    db.session.delete(sale) # O cascade apaga os receivables automaticamente
+    db.session.commit()
+    return '', 204
+
+# 6. MANUTENÇÃO AVANÇADA DA PARCELA
+@business_bp.route('/business/receivables/<int:id>/maintenance', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def maintenance_receivable(id):
+    user_id = get_jwt_identity()
+    rec = BusinessReceivable.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not rec: return jsonify({'error': 'Conta não encontrada'}), 404
+
+    data = request.json
+    
+    # Permite alterar valor (desconto/acréscimo), data e status
+    if 'value' in data: rec.value = float(data['value'])
+    if 'due_date' in data: rec.due_date = data['due_date']
+    if 'status' in data: rec.status = data['status']
+    
+    # Se quiser remover a multa automática calculada, pode zerar as configs da parcela
+    if data.get('remove_penalty'):
+        rec.apply_penalty = False
+
+    db.session.commit()
+    return jsonify(rec.to_dict()), 200

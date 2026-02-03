@@ -401,8 +401,12 @@ class BusinessSale(db.Model):
     
     # Uma venda tem várias parcelas (recebíveis)
     receivables = db.relationship('BusinessReceivable', backref='sale', cascade="all, delete-orphan")
+# Em src/models/business.py inside BusinessSale class
 
     def to_dict(self):
+        # Verifica se existe alguma parcela com status 'recebido'
+        has_paid_installments = any(r.status == 'recebido' for r in self.receivables)
+        
         return {
             'id': self.id,
             'client_name': self.client.name if self.client else 'Cliente Removido',
@@ -410,7 +414,9 @@ class BusinessSale(db.Model):
             'quantity': self.quantity,
             'total_value': self.total_value,
             'payment_terms': self.payment_terms,
-            'date': self.created_at.strftime('%Y-%m-%d')
+            'date': self.created_at.strftime('%Y-%m-%d'),
+            # Flag para o Frontend saber se pode liberar os botões
+            'can_modify': not has_paid_installments 
         }
 
 class BusinessReceivable(db.Model):

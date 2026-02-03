@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-    Plus, Loader2, Search, Box, FileText, Calendar, DollarSign
+    Plus, Loader2, Search, Box, Trash2, Ban, ShoppingBag, X, Calendar
 } from 'lucide-react';
 import apiService from '../../services/api';
 
@@ -22,45 +22,23 @@ const BusinessSales = ({ user, onLogout }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
-  // Dados para seleção
   const [companies, setCompanies] = useState([]);
   const [clients, setClients] = useState([]); 
   const [products, setProducts] = useState([]); 
-  const [salesHistory, setSalesHistory] = useState([]); // Histórico resumido
+  const [salesHistory, setSalesHistory] = useState([]); 
 
+  // Filtros
   const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState({ start: '', end: '' });
 
-  // Formulário
   const initialForm = {
-      company_id: '',
-      client_id: '',
-      
-      // Estoque
-      use_inventory: false,
-      product_id: '',
-      product_sku: '',
-      quantity: 1,
-      
-      // Financeiro
-      total_value: '',
-      payment_terms: 'vista', // vista, parcelado
-      installment_count: 2,
-      periodicity: 'mensal', // mensal, quinzenal, semestral, anual
-      
-      first_due_date: '',
-      payment_method: 'pix',
-      doc_nf: '',
-      
-      // Configuração de Atraso
-      apply_penalty: false,
-      fine_percent: 2.00,
-      interest_percent: 1.00, // % Mensal
-      
-      notes: ''
+      company_id: '', client_id: '', use_inventory: false, product_id: '', product_sku: '', quantity: 1,
+      total_value: '', payment_terms: 'vista', installment_count: 2, periodicity: 'mensal',
+      first_due_date: '', payment_method: 'pix', doc_nf: '',
+      apply_penalty: false, fine_percent: 2.00, interest_percent: 1.00, notes: ''
   };
   const [formData, setFormData] = useState(initialForm);
 
-  // --- CARREGAMENTO ---
   const loadDependencies = async () => {
     setIsLoading(true);
     try {
@@ -68,7 +46,7 @@ const BusinessSales = ({ user, onLogout }) => {
         apiService.get('/api/business/companies'),
         apiService.get('/api/business/stakeholders'), 
         apiService.get('/api/business/inventory'),
-        apiService.get('/api/business/sales') // Histórico de vendas
+        apiService.get('/api/business/sales') 
       ]);
       setCompanies(compData);
       setClients(clientData.filter(c => c.type === 'pf' || c.type === 'pj'));
@@ -80,27 +58,19 @@ const BusinessSales = ({ user, onLogout }) => {
 
   useEffect(() => { loadDependencies(); }, []);
 
-  // --- HANDLERS ---
   const handleInputChange = (field, value) => {
       let updates = { [field]: value };
-      
-      // Autopreencher dados do produto se selecionado do estoque
       if (field === 'product_id') {
           const prod = products.find(p => p.id.toString() === value);
-          if (prod) {
-              updates.total_value = prod.sale_price; 
-              updates.product_sku = prod.sku;
-          }
+          if (prod) { updates.total_value = prod.sale_price; updates.product_sku = prod.sku; }
       }
       setFormData(prev => ({ ...prev, ...updates }));
   };
 
   const handleSave = async () => {
       if (!formData.company_id || !formData.client_id || !formData.total_value || !formData.first_due_date) {
-          alert("Preencha os campos obrigatórios.");
-          return;
+          alert("Preencha os campos obrigatórios."); return;
       }
-
       setIsSaving(true);
       try {
           const payload = {
@@ -110,33 +80,56 @@ const BusinessSales = ({ user, onLogout }) => {
               product_id: formData.use_inventory && formData.product_id ? parseInt(formData.product_id) : null,
               total_value: parseFloat(formData.total_value),
               quantity: parseFloat(formData.quantity),
-              
-              // Se for a vista, força 1 parcela
               installment_count: formData.payment_terms === 'vista' ? 1 : parseInt(formData.installment_count),
-              
               fine_percent: formData.apply_penalty ? parseFloat(formData.fine_percent) : 0,
               interest_percent: formData.apply_penalty ? parseFloat(formData.interest_percent) : 0
           };
-
           await apiService.post('/api/business/sales', payload);
           await loadDependencies();
           setIsModalOpen(false);
           setFormData(initialForm);
           alert("Venda registrada! As parcelas foram geradas em 'Contas a Receber'.");
-      } catch (error) {
-          alert("Erro ao salvar venda.");
-      } finally {
-          setIsSaving(false);
+      } catch (error) { alert("Erro ao salvar venda."); } 
+      finally { setIsSaving(false); }
+  };
+
+  const handleDelete = async (sale) => {
+      if (!sale.can_modify) {
+          alert("Esta venda possui parcelas já recebidas e não pode ser excluída.");
+          return;
+      }
+      if (confirm(`Tem certeza que deseja excluir a venda #${sale.id}? Isso apagará as parcelas em aberto e estornará o estoque.`)) {
+          try {
+              await apiService.delete(`/api/business/sales/${sale.id}`);
+              setSalesHistory(prev => prev.filter(s => s.id !== sale.id));
+          } catch (error) {
+              alert(error.response?.data?.error || "Erro ao excluir venda.");
+          }
       }
   };
 
-  const filteredHistory = salesHistory.filter(s => s.client_name?.toLowerCase().includes(searchTerm.toLowerCase()));
+  // --- LÓGICA DE FILTRO ---
+  const filteredHistory = salesHistory.filter(s => {
+      const matchesSearch = s.client_name?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      let matchesDate = true;
+      if (dateFilter.start) matchesDate = matchesDate && s.date >= dateFilter.start;
+      if (dateFilter.end) matchesDate = matchesDate && s.date <= dateFilter.end;
+
+      return matchesSearch && matchesDate;
+  });
+
+  // KPI
+  const totalSalesCount = filteredHistory.length;
+  const totalSalesValue = filteredHistory.reduce((acc, curr) => acc + curr.total_value, 0);
 
   return (
     <div className="bg-gray-50 dark:bg-slate-900 min-h-screen pb-20">
       <PageHeaderBusiness user={user} onLogout={onLogout} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
+        
+        {/* HEADER E BOTÃO */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Vendas</h1>
@@ -147,18 +140,73 @@ const BusinessSales = ({ user, onLogout }) => {
           </Button>
         </div>
 
-        {/* LISTAGEM SIMPLES DE HISTÓRICO (APENAS CABEÇALHO) */}
-        <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <Input placeholder="Buscar vendas por cliente..." className="pl-10 bg-white" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/>
+        {/* KPI DE VENDAS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-cyan-500 shadow-sm">
+                <CardContent className="p-4 flex justify-between items-center">
+                    <div>
+                        <p className="text-xs text-slate-400 font-bold uppercase">Vendas no Período</p>
+                        <p className="text-3xl font-bold text-slate-700 dark:text-white">{totalSalesCount}</p>
+                    </div>
+                    <ShoppingBag className="text-cyan-500 opacity-20" size={40} />
+                </CardContent>
+            </Card>
+            <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-green-500 shadow-sm">
+                <CardContent className="p-4 flex justify-between items-center">
+                    <div>
+                        <p className="text-xs text-slate-400 font-bold uppercase">Volume Total</p>
+                        <p className="text-2xl font-bold text-slate-700 dark:text-white">R$ {totalSalesValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                    </div>
+                    <div className="bg-green-100 p-2 rounded-full text-green-600 font-bold text-xs">R$</div>
+                </CardContent>
+            </Card>
         </div>
 
+        {/* FILTROS DE DATA E BUSCA */}
+        <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
+            <CardContent className="p-3">
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Input 
+                            placeholder="Buscar vendas por cliente..." 
+                            className="pl-10" 
+                            value={searchTerm} 
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-1 rounded-md border">
+                            <span className="text-xs text-slate-500 pl-2">De:</span>
+                            <Input 
+                                type="date" className="h-8 border-0 bg-transparent w-32"
+                                value={dateFilter.start} onChange={e => setDateFilter({...dateFilter, start: e.target.value})}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-1 rounded-md border">
+                            <span className="text-xs text-slate-500 pl-2">Até:</span>
+                            <Input 
+                                type="date" className="h-8 border-0 bg-transparent w-32"
+                                value={dateFilter.end} onChange={e => setDateFilter({...dateFilter, end: e.target.value})}
+                            />
+                        </div>
+                        {(dateFilter.start || dateFilter.end) && (
+                            <Button variant="ghost" size="icon" onClick={() => setDateFilter({start:'', end:''})} title="Limpar datas">
+                                <X size={16} className="text-slate-500"/>
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        {/* LISTAGEM */}
         {isLoading ? (
             <div className="flex justify-center py-10"><Loader2 className="animate-spin text-cyan-600"/></div>
         ) : (
             <div className="grid gap-4">
                 {filteredHistory.map(sale => (
-                    <Card key={sale.id} className="hover:shadow-md transition-all">
+                    <Card key={sale.id} className="hover:shadow-md transition-all group relative">
                         <CardContent className="p-4 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="flex items-center gap-4">
                                 <div className="bg-cyan-50 p-3 rounded-full text-cyan-600 font-bold text-xs">#{sale.id}</div>
@@ -167,159 +215,79 @@ const BusinessSales = ({ user, onLogout }) => {
                                     <p className="text-sm text-slate-500">{sale.product_name ? `${sale.product_name} (x${sale.quantity})` : 'Venda Avulsa'} - {sale.payment_terms}</p>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <p className="text-lg font-bold text-slate-700">R$ {sale.total_value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                                <p className="text-xs text-slate-400">Data: {new Date(sale.date).toLocaleDateString('pt-BR')}</p>
+                            
+                            <div className="flex items-center gap-6">
+                                <div className="text-right">
+                                    <p className="text-lg font-bold text-slate-700">R$ {sale.total_value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                                    <p className="text-xs text-slate-400 flex items-center justify-end gap-1">
+                                        <Calendar size={12}/> {new Date(sale.date).toLocaleDateString('pt-BR')}
+                                    </p>
+                                </div>
+                                
+                                {/* BOTÃO EXCLUIR */}
+                                {sale.can_modify ? (
+                                    <Button 
+                                        variant="ghost" size="icon" 
+                                        className="text-slate-400 hover:text-red-600 hover:bg-red-50"
+                                        onClick={() => handleDelete(sale)}
+                                        title="Excluir Venda (Estornar)"
+                                    >
+                                        <Trash2 size={18} />
+                                    </Button>
+                                ) : (
+                                    <Button 
+                                        variant="ghost" size="icon" 
+                                        className="text-slate-300 cursor-not-allowed"
+                                        title="Venda possui recebimentos (bloqueado)"
+                                    >
+                                        <Ban size={18} />
+                                    </Button>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
                 ))}
+                
+                {filteredHistory.length === 0 && (
+                    <div className="text-center py-10 text-slate-400">Nenhuma venda encontrada neste período.</div>
+                )}
             </div>
         )}
       </div>
 
-      {/* --- MODAL NOVA VENDA (FORMULÁRIO VERTICAL) --- */}
+      {/* MODAL NOVA VENDA (MANTIDO) */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Nova Venda</DialogTitle><DialogDescription>Preencha os dados da venda abaixo.</DialogDescription></DialogHeader>
-          
           <div className="space-y-5 py-4">
-            
-            {/* EMPRESA/CLIENTE */}
             <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label>Empresa Vendedora</Label>
-                    <Select value={formData.company_id} onValueChange={v => handleInputChange('company_id', v)}>
-                        <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                        <SelectContent>{companies.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.razao_social}</SelectItem>)}</SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label>Nome do Cliente</Label>
-                    <Select value={formData.client_id} onValueChange={v => handleInputChange('client_id', v)}>
-                        <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                        <SelectContent>{clients.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent>
-                    </Select>
-                </div>
+                <div className="space-y-2"><Label>Empresa Vendedora</Label><Select value={formData.company_id} onValueChange={v => handleInputChange('company_id', v)}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{companies.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.razao_social}</SelectItem>)}</SelectContent></Select></div>
+                <div className="space-y-2"><Label>Nome do Cliente</Label><Select value={formData.client_id} onValueChange={v => handleInputChange('client_id', v)}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{clients.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent></Select></div>
             </div>
-
-            {/* ESTOQUE */}
             <div className="space-y-4 bg-slate-50 p-4 rounded-lg border">
-                <div className="flex items-center justify-between">
-                    <Label className="flex items-center gap-2 font-bold text-slate-700"><Box size={16} /> Baixar Estoque?</Label>
-                    <Switch checked={formData.use_inventory} onCheckedChange={c => handleInputChange('use_inventory', c)} />
-                </div>
+                <div className="flex items-center justify-between"><Label className="flex items-center gap-2 font-bold text-slate-700"><Box size={16} /> Baixar Estoque?</Label><Switch checked={formData.use_inventory} onCheckedChange={c => handleInputChange('use_inventory', c)} /></div>
                 {formData.use_inventory && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="space-y-2">
-                            <Label>Produto</Label>
-                            <Select value={formData.product_id} onValueChange={v => handleInputChange('product_id', v)}>
-                                <SelectTrigger><SelectValue placeholder="Selecione do estoque..." /></SelectTrigger>
-                                <SelectContent>{products.map(p => <SelectItem key={p.id} value={p.id.toString()}>{p.name} (Saldo: {p.current_stock})</SelectItem>)}</SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Código (SKU)</Label>
-                                <Input value={formData.product_sku} onChange={e => handleInputChange('product_sku', e.target.value)} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Quantidade</Label>
-                                <Input type="number" value={formData.quantity} onChange={e => handleInputChange('quantity', e.target.value)} />
-                            </div>
-                        </div>
+                        <div className="space-y-2"><Label>Produto</Label><Select value={formData.product_id} onValueChange={v => handleInputChange('product_id', v)}><SelectTrigger><SelectValue placeholder="Selecione do estoque..." /></SelectTrigger><SelectContent>{products.map(p => <SelectItem key={p.id} value={p.id.toString()}>{p.name} (Saldo: {p.current_stock})</SelectItem>)}</SelectContent></Select></div>
+                        <div className="grid grid-cols-2 gap-4"><div className="space-y-2"><Label>Código (SKU)</Label><Input value={formData.product_sku} onChange={e => handleInputChange('product_sku', e.target.value)} /></div><div className="space-y-2"><Label>Quantidade</Label><Input type="number" value={formData.quantity} onChange={e => handleInputChange('quantity', e.target.value)} /></div></div>
                     </div>
                 )}
             </div>
-
-            {/* FINANCEIRO */}
             <div className="space-y-4">
-                <div className="space-y-2">
-                    <Label>Valor Total (R$)</Label>
-                    <Input type="number" className="font-bold text-lg" value={formData.total_value} onChange={e => handleInputChange('total_value', e.target.value)} placeholder="0.00" />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Forma de Recebimento</Label>
-                    <Select value={formData.payment_terms} onValueChange={v => handleInputChange('payment_terms', v)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent><SelectItem value="vista">À Vista</SelectItem><SelectItem value="parcelado">Parcelado</SelectItem></SelectContent>
-                    </Select>
-                </div>
-
-                {formData.payment_terms === 'parcelado' && (
-                    <div className="grid grid-cols-2 gap-4 bg-cyan-50 p-3 rounded border border-cyan-100">
-                        <div className="space-y-2">
-                            <Label>Qtd. Parcelas</Label>
-                            <Input type="number" min="2" value={formData.installment_count} onChange={e => handleInputChange('installment_count', e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Periodicidade</Label>
-                            <Select value={formData.periodicity} onValueChange={v => handleInputChange('periodicity', v)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="mensal">Mensal</SelectItem>
-                                    <SelectItem value="quinzenal">Quinzenal</SelectItem>
-                                    <SelectItem value="semestral">Semestral</SelectItem>
-                                    <SelectItem value="anual">Anual</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                )}
-
-                <div className="space-y-2">
-                    <Label>{formData.payment_terms === 'parcelado' ? '1ª Data de Vencimento' : 'Data de Recebimento'}</Label>
-                    <Input type="date" value={formData.first_due_date} onChange={e => handleInputChange('first_due_date', e.target.value)} />
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Meio de Pagamento</Label>
-                    <Select value={formData.payment_method} onValueChange={v => handleInputChange('payment_method', v)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="pix">PIX</SelectItem><SelectItem value="boleto">Boleto</SelectItem><SelectItem value="cartao_credito">Cartão Crédito</SelectItem><SelectItem value="cartao_debito">Cartão Débito</SelectItem><SelectItem value="dinheiro">Dinheiro</SelectItem><SelectItem value="ted">TED/DOC</SelectItem><SelectItem value="cheque">Cheque</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="space-y-2">
-                    <Label>NF de Saída (Opcional)</Label>
-                    <Input value={formData.doc_nf} onChange={e => handleInputChange('doc_nf', e.target.value)} placeholder="Número da Nota" />
-                </div>
+                <div className="space-y-2"><Label>Valor Total (R$)</Label><Input type="number" className="font-bold text-lg" value={formData.total_value} onChange={e => handleInputChange('total_value', e.target.value)} placeholder="0.00" /></div>
+                <div className="space-y-2"><Label>Forma de Recebimento</Label><Select value={formData.payment_terms} onValueChange={v => handleInputChange('payment_terms', v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="vista">À Vista</SelectItem><SelectItem value="parcelado">Parcelado</SelectItem></SelectContent></Select></div>
+                {formData.payment_terms === 'parcelado' && (<div className="grid grid-cols-2 gap-4 bg-cyan-50 p-3 rounded border border-cyan-100"><div className="space-y-2"><Label>Qtd. Parcelas</Label><Input type="number" min="2" value={formData.installment_count} onChange={e => handleInputChange('installment_count', e.target.value)} /></div><div className="space-y-2"><Label>Periodicidade</Label><Select value={formData.periodicity} onValueChange={v => handleInputChange('periodicity', v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="mensal">Mensal</SelectItem><SelectItem value="quinzenal">Quinzenal</SelectItem><SelectItem value="semestral">Semestral</SelectItem><SelectItem value="anual">Anual</SelectItem></SelectContent></Select></div></div>)}
+                <div className="space-y-2"><Label>{formData.payment_terms === 'parcelado' ? '1ª Data de Vencimento' : 'Data de Recebimento'}</Label><Input type="date" value={formData.first_due_date} onChange={e => handleInputChange('first_due_date', e.target.value)} /></div>
+                <div className="space-y-2"><Label>Meio de Pagamento</Label><Select value={formData.payment_method} onValueChange={v => handleInputChange('payment_method', v)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pix">PIX</SelectItem><SelectItem value="boleto">Boleto</SelectItem><SelectItem value="cartao_credito">Cartão Crédito</SelectItem><SelectItem value="cartao_debito">Cartão Débito</SelectItem><SelectItem value="dinheiro">Dinheiro</SelectItem><SelectItem value="ted">TED/DOC</SelectItem><SelectItem value="cheque">Cheque</SelectItem></SelectContent></Select></div>
+                <div className="space-y-2"><Label>NF de Saída (Opcional)</Label><Input value={formData.doc_nf} onChange={e => handleInputChange('doc_nf', e.target.value)} placeholder="Número da Nota" /></div>
             </div>
-
-            {/* JUROS E MULTA */}
             <div className="space-y-4 bg-red-50 p-4 rounded-lg border border-red-100">
-                <div className="flex items-center justify-between">
-                    <Label className="font-bold text-red-800">Cobrar Juros e Multa em atraso?</Label>
-                    <Switch checked={formData.apply_penalty} onCheckedChange={c => handleInputChange('apply_penalty', c)} />
-                </div>
-                {formData.apply_penalty && (
-                    <div className="grid grid-cols-2 gap-4 animate-in fade-in">
-                        <div className="space-y-2">
-                            <Label>Juros (% ao Mês)</Label>
-                            <Input type="number" step="0.01" value={formData.interest_percent} onChange={e => handleInputChange('interest_percent', e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Multa (% Fixa)</Label>
-                            <Input type="number" step="0.01" value={formData.fine_percent} onChange={e => handleInputChange('fine_percent', e.target.value)} />
-                        </div>
-                        <p className="text-[10px] text-red-600 col-span-2">* O cálculo será feito por dia de atraso automaticamente.</p>
-                    </div>
-                )}
+                <div className="flex items-center justify-between"><Label className="font-bold text-red-800">Cobrar Juros e Multa em atraso?</Label><Switch checked={formData.apply_penalty} onCheckedChange={c => handleInputChange('apply_penalty', c)} /></div>
+                {formData.apply_penalty && (<div className="grid grid-cols-2 gap-4 animate-in fade-in"><div className="space-y-2"><Label>Juros (% ao Mês)</Label><Input type="number" step="0.01" value={formData.interest_percent} onChange={e => handleInputChange('interest_percent', e.target.value)} /></div><div className="space-y-2"><Label>Multa (% Fixa)</Label><Input type="number" step="0.01" value={formData.fine_percent} onChange={e => handleInputChange('fine_percent', e.target.value)} /></div><p className="text-[10px] text-red-600 col-span-2">* O cálculo será feito por dia de atraso automaticamente.</p></div>)}
             </div>
-
-            <div className="space-y-2">
-                <Label>Observações</Label>
-                <Textarea value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} />
-            </div>
-
+            <div className="space-y-2"><Label>Observações</Label><Textarea value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} /></div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-700 text-white">{isSaving ? 'Salvando...' : 'Salvar Venda'}</Button>
-          </DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button><Button onClick={handleSave} disabled={isSaving} className="bg-cyan-600 hover:bg-cyan-700 text-white">{isSaving ? 'Salvando...' : 'Salvar Venda'}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
