@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount
+from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount, BusinessPayable
 from datetime import date, timedelta
 import calendar
 from src.routes.user import active_user_required
@@ -441,5 +441,99 @@ def delete_bank_account(id):
         return jsonify({'error': 'Conta não encontrada'}), 404
 
     db.session.delete(account)
+    db.session.commit()
+    return '', 204
+
+# ==========================================
+# ROTAS DE CONTAS A PAGAR (PAYABLES)
+# ==========================================
+
+@business_bp.route('/business/payables', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_payables():
+    user_id = get_jwt_identity()
+    # Ordena por vencimento
+    payables = BusinessPayable.query.filter_by(user_id=user_id).order_by(BusinessPayable.due_date).all()
+    return jsonify([p.to_dict() for p in payables]), 200
+
+@business_bp.route('/business/payables', methods=['POST'])
+@jwt_required()
+@active_user_required
+def create_payable():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    # Validação mínima
+    required = ['company_id', 'stakeholder_id', 'category_id', 'value', 'due_date']
+    if not all(k in data for k in required):
+        return jsonify({'error': 'Campos obrigatórios faltando'}), 400
+
+    new_payable = BusinessPayable(
+        user_id=user_id,
+        company_id=data['company_id'],
+        stakeholder_id=data['stakeholder_id'],
+        category_id=data['category_id'],
+        subcategory_id=data.get('subcategory_id'),
+        
+        value=float(data['value']),
+        due_date=data['due_date'],
+        extension_date=data.get('extension_date', data['due_date']), # Se não vier, usa vencimento
+        
+        status=data.get('status', 'a_pagar'),
+        doc_type=data.get('doc_type', 'outros'),
+        nf_type=data.get('nf_type'),
+        doc_number=data.get('doc_number'),
+        notes=data.get('notes'),
+        
+        # Opcionais no cadastro inicial
+        bank_account_id=data.get('bank_account_id'),
+        bank_name=data.get('bank_name')
+    )
+
+    db.session.add(new_payable)
+    db.session.commit()
+    return jsonify(new_payable.to_dict()), 201
+
+@business_bp.route('/business/payables/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_payable(id):
+    user_id = get_jwt_identity()
+    payable = BusinessPayable.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not payable:
+        return jsonify({'error': 'Conta não encontrada'}), 404
+
+    data = request.json
+    
+    # Atualização dinâmica (serve tanto para edição completa quanto para a rápida do card)
+    if 'status' in data: payable.status = data['status']
+    if 'extension_date' in data: payable.extension_date = data['extension_date']
+    if 'bank_name' in data: payable.bank_name = data['bank_name']
+    if 'bank_account_id' in data: payable.bank_account_id = data['bank_account_id']
+    
+    # Campos do formulário completo
+    if 'value' in data: payable.value = float(data['value'])
+    if 'due_date' in data: payable.due_date = data['due_date']
+    if 'doc_number' in data: payable.doc_number = data['doc_number']
+    if 'notes' in data: payable.notes = data['notes']
+    if 'category_id' in data: payable.category_id = data['category_id']
+    if 'subcategory_id' in data: payable.subcategory_id = data['subcategory_id']
+
+    db.session.commit()
+    return jsonify(payable.to_dict()), 200
+
+@business_bp.route('/business/payables/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_payable(id):
+    user_id = get_jwt_identity()
+    payable = BusinessPayable.query.filter_by(id=id, user_id=user_id).first()
+    
+    if not payable:
+        return jsonify({'error': 'Conta não encontrada'}), 404
+
+    db.session.delete(payable)
     db.session.commit()
     return '', 204

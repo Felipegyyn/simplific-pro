@@ -225,3 +225,72 @@ class BusinessBankAccount(db.Model):
             'open_date': self.open_date,
             'notes': self.notes
         }
+
+# ... (Mantenha as classes anteriores) ...
+
+class BusinessPayable(db.Model):
+    __tablename__ = 'business_payables'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Relacionamentos Principais
+    company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
+    stakeholder_id = db.Column(db.Integer, db.ForeignKey('business_stakeholders.id'), nullable=False)
+    
+    # Classificação
+    category_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=False)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
+    
+    # Dados Financeiros
+    value = db.Column(db.Float, nullable=False)
+    due_date = db.Column(db.String(10), nullable=False) # Vencimento Original
+    extension_date = db.Column(db.String(10)) # Data Prorrogação / Pagamento Real
+    
+    # Status e Pagamento
+    status = db.Column(db.String(20), default='a_pagar') # a_pagar, pago
+    bank_account_id = db.Column(db.Integer, db.ForeignKey('business_bank_accounts.id'), nullable=True)
+    bank_name = db.Column(db.String(100)) # Guardamos o nome do banco para facilitar filtros visuais antes de escolher a conta
+    
+    # Documento
+    doc_type = db.Column(db.String(50)) # nota_fiscal, recibo, outros
+    nf_type = db.Column(db.String(50)) # municipal, estadual
+    doc_number = db.Column(db.String(100)) # Numero NF ou Chave Danfe
+    
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamentos para facilitar o to_dict
+    company = db.relationship('Company', foreign_keys=[company_id])
+    stakeholder = db.relationship('Stakeholder', foreign_keys=[stakeholder_id])
+    category = db.relationship('BusinessCategory', foreign_keys=[category_id])
+    subcategory = db.relationship('BusinessCategory', foreign_keys=[subcategory_id])
+    bank_account = db.relationship('BusinessBankAccount', foreign_keys=[bank_account_id])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'company_id': self.company_id,
+            'company_name': self.company.razao_social if self.company else 'N/A',
+            
+            'stakeholder_id': self.stakeholder_id,
+            'stakeholder_name': self.stakeholder.name if self.stakeholder else 'N/A',
+            
+            'category_id': self.category_id,
+            'category_name': self.category.name if self.category else 'N/A',
+            'subcategory_id': self.subcategory_id,
+            'subcategory_name': self.subcategory.name if self.subcategory else None,
+            
+            'value': self.value,
+            'due_date': self.due_date,
+            'extension_date': self.extension_date or self.due_date,
+            
+            'status': self.status,
+            'bank_account_id': self.bank_account_id,
+            'bank_name': self.bank_name, # Pode vir do banco salvo ou da conta vinculada
+            
+            'doc_type': self.doc_type,
+            'nf_type': self.nf_type,
+            'doc_number': self.doc_number,
+            'notes': self.notes
+        }
