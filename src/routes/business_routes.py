@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetItem
+from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem
 from datetime import date, timedelta
 import calendar
 from src.routes.user import active_user_required
