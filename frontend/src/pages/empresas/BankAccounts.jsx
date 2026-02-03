@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Landmark, Building2, Calendar, FileText, Edit, Trash2, Loader2, Wallet } from 'lucide-react';
 import apiService from '../../services/api';
 
-// Lista básica de Bancos para facilitar (pode ser expandida)
+// Lista básica de Bancos
 const BANK_OPTIONS = [
     { code: '001', name: 'Banco do Brasil' },
     { code: '033', name: 'Santander' },
@@ -25,7 +25,8 @@ const BANK_OPTIONS = [
     { code: '260', name: 'Nubank' },
     { code: '290', name: 'PagSeguro' },
     { code: '336', name: 'C6 Bank' },
-    { code: '999', name: 'Outros' } // Fallback
+    { code: '079', name: 'PicPay' }, // Adicionado exemplo
+    { code: '212', name: 'Banco Original' }
 ];
 
 const BankAccounts = ({ user, onLogout }) => {
@@ -33,6 +34,9 @@ const BankAccounts = ({ user, onLogout }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
+  // Estado para controlar se é um banco fora da lista
+  const [isCustomBank, setIsCustomBank] = useState(false);
+
   // Dados
   const [accounts, setAccounts] = useState([]);
   const [companies, setCompanies] = useState([]);
@@ -41,9 +45,9 @@ const BankAccounts = ({ user, onLogout }) => {
   const initialForm = {
       company_id: '',
       bank_name: '',
-      account_type: 'corrente', // corrente, controle, aplicacao
-      agency: '', // Opcional, mas bom ter visualmente
-      account_number: '', // Opcional, mas bom ter visualmente
+      account_type: 'corrente', 
+      agency: '', 
+      account_number: '', 
       open_date: '',
       notes: ''
   };
@@ -54,7 +58,6 @@ const BankAccounts = ({ user, onLogout }) => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Carrega Empresas (para o select) e Contas (para a lista)
       const [companiesData, accountsData] = await Promise.all([
         apiService.get('/api/business/companies'),
         apiService.get('/api/business/bank-accounts')
@@ -63,26 +66,29 @@ const BankAccounts = ({ user, onLogout }) => {
       setAccounts(accountsData);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
-      // Mock de dados caso a API ainda não exista (para teste visual)
-      if (accounts.length === 0) setAccounts([]); 
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   // --- HANDLERS ---
   const handleOpenNew = () => {
       setEditingId(null);
       setFormData(initialForm);
+      setIsCustomBank(false); // Reseta o modo custom
       setIsModalOpen(true);
   };
 
   const handleEdit = (acc) => {
       setEditingId(acc.id);
+      
+      // Verifica se o banco salvo está na lista padrão
+      const isStandardBank = BANK_OPTIONS.some(b => b.name === acc.bank_name);
+      
+      setIsCustomBank(!isStandardBank); // Se não estiver na lista, ativa o modo custom
+
       setFormData({
           company_id: acc.company_id.toString(),
           bank_name: acc.bank_name,
@@ -95,9 +101,19 @@ const BankAccounts = ({ user, onLogout }) => {
       setIsModalOpen(true);
   };
 
+  const handleBankSelectChange = (value) => {
+      if (value === 'OUTROS') {
+          setIsCustomBank(true);
+          setFormData(prev => ({ ...prev, bank_name: '' })); // Limpa para digitar
+      } else {
+          setIsCustomBank(false);
+          setFormData(prev => ({ ...prev, bank_name: value }));
+      }
+  };
+
   const handleSave = async () => {
       if (!formData.company_id || !formData.bank_name) {
-          alert("Empresa e Banco são obrigatórios.");
+          alert("Empresa e Nome do Banco são obrigatórios.");
           return;
       }
 
@@ -135,19 +151,13 @@ const BankAccounts = ({ user, onLogout }) => {
       }
   };
 
-  // Helper para nome da empresa
   const getCompanyName = (id) => {
       const comp = companies.find(c => c.id === id);
       return comp ? comp.razao_social : 'Empresa Desconhecida';
   };
 
-  // Helper para formatar tipo
   const formatType = (type) => {
-      const map = {
-          'corrente': 'Conta Corrente',
-          'controle': 'Conta Controle',
-          'aplicacao': 'Conta Aplicação'
-      };
+      const map = { 'corrente': 'Conta Corrente', 'controle': 'Conta Controle', 'aplicacao': 'Conta Aplicação' };
       return map[type] || type;
   };
 
@@ -172,10 +182,9 @@ const BankAccounts = ({ user, onLogout }) => {
             <div className="flex justify-center py-12"><Loader2 className="animate-spin text-cyan-600" /></div>
         ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* LISTAGEM DE CONTAS */}
+                {/* LISTAGEM */}
                 {accounts.map((acc) => (
                     <Card key={acc.id} className="border-slate-200 dark:border-slate-800 hover:border-cyan-200 transition-all group relative overflow-hidden">
-                        {/* Faixa decorativa baseada no tipo */}
                         <div className={`absolute top-0 left-0 w-1.5 h-full ${
                             acc.account_type === 'aplicacao' ? 'bg-purple-500' : 
                             acc.account_type === 'controle' ? 'bg-amber-500' : 'bg-cyan-500'
@@ -195,7 +204,7 @@ const BankAccounts = ({ user, onLogout }) => {
                                     </Button>
                                 </div>
                             </div>
-                            <CardTitle className="text-lg mt-3">{acc.bank_name}</CardTitle>
+                            <CardTitle className="text-lg mt-3 truncate">{acc.bank_name}</CardTitle>
                             <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
                                 {formatType(acc.account_type)}
                             </p>
@@ -231,7 +240,6 @@ const BankAccounts = ({ user, onLogout }) => {
                     </Card>
                 ))}
 
-                {/* EMPTY STATE */}
                 {accounts.length === 0 && (
                     <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300">
                         <Landmark size={48} className="mx-auto mb-4 opacity-20" />
@@ -265,14 +273,38 @@ const BankAccounts = ({ user, onLogout }) => {
             <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label>Banco</Label>
-                    <Select value={formData.bank_name} onValueChange={v => setFormData({...formData, bank_name: v})}>
-                        <SelectTrigger><SelectValue placeholder="Selecione o banco..." /></SelectTrigger>
-                        <SelectContent>
-                            {BANK_OPTIONS.map(b => <SelectItem key={b.code} value={b.name}>{b.code} - {b.name}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                    {/* Fallback se for banco não listado (poderíamos implementar input livre, mas select é mais limpo) */}
+                    
+                    {/* Se estiver no modo custom, mostra Input, senão Select */}
+                    {isCustomBank ? (
+                        <div className="flex gap-2">
+                            <Input 
+                                autoFocus
+                                placeholder="Digite o nome do banco..." 
+                                value={formData.bank_name} 
+                                onChange={e => setFormData({...formData, bank_name: e.target.value})}
+                            />
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setIsCustomBank(false)}
+                                title="Voltar para a lista"
+                            >
+                                x
+                            </Button>
+                        </div>
+                    ) : (
+                        <Select 
+                            value={isCustomBank ? 'OUTROS' : formData.bank_name} 
+                            onValueChange={handleBankSelectChange}
+                        >
+                            <SelectTrigger><SelectValue placeholder="Selecione o banco..." /></SelectTrigger>
+                            <SelectContent>
+                                {BANK_OPTIONS.map(b => <SelectItem key={b.code} value={b.name}>{b.code} - {b.name}</SelectItem>)}
+                                <SelectItem value="OUTROS" className="font-bold text-cyan-600">+ Outro Banco</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
                 </div>
+                
                 <div className="space-y-2">
                     <Label>Tipo de Conta</Label>
                     <Select value={formData.account_type} onValueChange={v => setFormData({...formData, account_type: v})}>
@@ -286,7 +318,6 @@ const BankAccounts = ({ user, onLogout }) => {
                 </div>
             </div>
 
-            {/* DADOS OPCIONAIS DE AGENCIA E CONTA (Para diferenciar se tiver duas do mesmo banco) */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label>Agência (Opcional)</Label>
