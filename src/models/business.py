@@ -111,6 +111,7 @@ class BusinessCategory(db.Model):
             'parent_name': self.parent.name if self.parent else None
         }
 
+
 class BusinessBudget(db.Model):
     __tablename__ = 'business_budgets'
 
@@ -118,31 +119,59 @@ class BusinessBudget(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
     
-    name = db.Column(db.String(200), nullable=False) # Ex: Planejamento Marketing 2026
-    
-    category_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=False)
-    subcategory_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
-    
-    start_date = db.Column(db.String(10), nullable=False) # 'YYYY-MM'
+    name = db.Column(db.String(200), nullable=False) # Ex: Planejamento 2026
+    start_date = db.Column(db.String(10), nullable=False) # '2026-01'
     period_months = db.Column(db.Integer, default=12)
-    
-    base_value = db.Column(db.Float)
-    is_replicated = db.Column(db.Boolean, default=True)
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relacionamento com os itens mensais (cascade delete garante que se apagar o plano, apaga os meses)
-    items = db.relationship('BusinessBudgetItem', backref='budget', cascade="all, delete-orphan")
+    # Relacionamento com as linhas do orçamento (Categorias)
+    lines = db.relationship('BusinessBudgetLine', backref='budget', cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'company_id': self.company_id,
+            'start_date': self.start_date,
+            'period_months': self.period_months,
+            'total_value': sum(line.total_value for line in self.lines),
+            'lines': [l.to_dict() for l in self.lines]
+        }
+
+class BusinessBudgetLine(db.Model):
+    __tablename__ = 'business_budget_lines'
+
+    id = db.Column(db.Integer, primary_key=True)
+    budget_id = db.Column(db.Integer, db.ForeignKey('business_budgets.id'), nullable=False)
+    
+    category_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=False)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
+    
+    # Dados de criação (para referência)
+    base_value = db.Column(db.Float)
+    is_replicated = db.Column(db.Boolean, default=True)
+
+    # Relacionamento com os valores mensais
+    items = db.relationship('BusinessBudgetItem', backref='line', cascade="all, delete-orphan")
+    
+    # Relacionamentos para trazer os nomes das categorias
+    category = db.relationship('BusinessCategory', foreign_keys=[category_id])
+    subcategory = db.relationship('BusinessCategory', foreign_keys=[subcategory_id])
+
+    @property
+    def total_value(self):
+        return sum(item.value for item in self.items)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'category_name': self.category.name,
+            'subcategory_name': self.subcategory.name if self.subcategory else None,
             'category_id': self.category_id,
             'subcategory_id': self.subcategory_id,
-            'start_date': self.start_date,
-            'total_value': sum(item.value for item in self.items), # Calcula total na hora
+            'base_value': self.base_value,
+            'total_value': self.total_value,
             'items': [i.to_dict() for i in self.items]
         }
 
@@ -150,9 +179,9 @@ class BusinessBudgetItem(db.Model):
     __tablename__ = 'business_budget_items'
 
     id = db.Column(db.Integer, primary_key=True)
-    budget_id = db.Column(db.Integer, db.ForeignKey('business_budgets.id'), nullable=False)
+    line_id = db.Column(db.Integer, db.ForeignKey('business_budget_lines.id'), nullable=False)
     
-    month_date = db.Column(db.Date, nullable=False) # A data específica do mês (01/MM/YYYY)
+    month_date = db.Column(db.Date, nullable=False)
     value = db.Column(db.Float, nullable=False)
 
     def to_dict(self):
