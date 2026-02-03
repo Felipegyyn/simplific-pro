@@ -13,7 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Search, Tags, Edit, Trash2, FolderTree, Loader2 } from 'lucide-react';
+import { Plus, Search, Tags, Edit, Trash2, FolderTree, Loader2, CornerDownRight } from 'lucide-react';
 import apiService from '../../services/api';
 
 const BusinessCategories = ({ user, onLogout }) => {
@@ -24,7 +24,7 @@ const BusinessCategories = ({ user, onLogout }) => {
   
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({ name: '', type: 'saida', parent_id: 'root' });
-  const [editingId, setEditingId] = useState(null); // ID sendo editado
+  const [editingId, setEditingId] = useState(null);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -42,14 +42,46 @@ const BusinessCategories = ({ user, onLogout }) => {
 
   const rootCategories = categories.filter(c => c.parent_id === null);
 
-  // --- ABRIR NOVO ---
+  // --- LÓGICA DE ORGANIZAÇÃO VISUAL (PAI > FILHO) ---
+  const getOrganizedList = () => {
+    // 1. Separa Pais e Filhos
+    const parents = categories.filter(c => !c.parent_id).sort((a, b) => a.name.localeCompare(b.name));
+    const children = categories.filter(c => c.parent_id).sort((a, b) => a.name.localeCompare(b.name));
+
+    let organized = [];
+
+    // 2. Itera sobre os pais e insere os filhos logo abaixo
+    parents.forEach(parent => {
+        organized.push(parent); // Adiciona o Pai
+        
+        // Encontra os filhos deste pai específico
+        const myChildren = children.filter(c => c.parent_id === parent.id);
+        
+        // Adiciona os filhos na sequência
+        organized.push(...myChildren);
+    });
+
+    // (Opcional) Adiciona órfãos ou categorias sem pai encontrado no final, se houver erro de integridade
+    const parentsIds = parents.map(p => p.id);
+    const orphans = children.filter(c => !parentsIds.includes(c.parent_id));
+    if (orphans.length > 0) organized.push(...orphans);
+
+    return organized;
+  };
+
+  // Se tiver busca, filtra a lista bruta. Se não, usa a lista organizada hierarquicamente.
+  const displayList = searchTerm 
+    ? categories.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    : getOrganizedList();
+
+
+  // --- HANDLERS ---
   const handleOpenNew = () => {
       setEditingId(null);
       setFormData({ name: '', type: 'saida', parent_id: 'root' });
       setIsModalOpen(true);
   }
 
-  // --- ABRIR EDIÇÃO ---
   const handleEdit = (cat) => {
       setEditingId(cat.id);
       setFormData({
@@ -60,7 +92,6 @@ const BusinessCategories = ({ user, onLogout }) => {
       setIsModalOpen(true);
   }
 
-  // --- SALVAR (CREATE OR UPDATE) ---
   const handleSave = async () => {
     if (!formData.name) return alert('Nome é obrigatório');
     
@@ -73,10 +104,8 @@ const BusinessCategories = ({ user, onLogout }) => {
       };
       
       if (editingId) {
-          // PUT
           await apiService.put(`/api/business/categories/${editingId}`, payload);
       } else {
-          // POST
           await apiService.post('/api/business/categories', payload);
       }
       
@@ -90,19 +119,17 @@ const BusinessCategories = ({ user, onLogout }) => {
     }
   };
 
-  // --- DELETAR ---
   const handleDelete = async (id) => {
     if(confirm("Tem certeza que deseja excluir esta categoria?")) {
         try {
             await apiService.delete(`/api/business/categories/${id}`);
+            // Atualiza localmente removendo o item
             setCategories(prev => prev.filter(c => c.id !== id));
         } catch (error) {
             alert("Erro ao excluir. Verifique se não há orçamentos vinculados.");
         }
     }
   }
-
-  const filteredList = categories.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="bg-gray-50 dark:bg-slate-900 min-h-screen pb-20">
@@ -141,12 +168,22 @@ const BusinessCategories = ({ user, onLogout }) => {
             <TableBody>
               {isLoading ? (
                  <TableRow><TableCell colSpan={4} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2"/> Carregando...</TableCell></TableRow>
-              ) : filteredList.map((cat) => (
-                <TableRow key={cat.id}>
+              ) : displayList.map((cat) => (
+                <TableRow key={cat.id} className={cat.parent_id ? "bg-slate-50/50 dark:bg-slate-900/30" : ""}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                        {cat.parent_id ? <FolderTree size={16} className="text-slate-400 ml-4" /> : <Tags size={16} className="text-cyan-600" />}
-                        {cat.name}
+                        {/* Identação visual para subcategorias */}
+                        {cat.parent_id ? (
+                            <>
+                                <div className="w-6"></div> {/* Espaço vazio para indentar */}
+                                <CornerDownRight size={16} className="text-slate-400" />
+                            </>
+                        ) : (
+                            <Tags size={16} className="text-cyan-600" />
+                        )}
+                        <span className={cat.parent_id ? "text-slate-600 dark:text-slate-300" : "font-bold text-slate-800 dark:text-slate-100"}>
+                            {cat.name}
+                        </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -174,6 +211,7 @@ const BusinessCategories = ({ user, onLogout }) => {
         </div>
       </div>
 
+      {/* MODAL MANTIDO IGUAL AO ANTERIOR */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -201,6 +239,7 @@ const BusinessCategories = ({ user, onLogout }) => {
                         <SelectTrigger><SelectValue placeholder="Nenhuma (Raiz)" /></SelectTrigger>
                         <SelectContent>
                             <SelectItem value="root">Nenhuma (É Principal)</SelectItem>
+                            {/* Filtra para não deixar selecionar a própria categoria como pai na edição */}
                             {rootCategories.filter(c => c.type === formData.type && c.id !== editingId).map(c => (
                                 <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                             ))}
