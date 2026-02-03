@@ -13,8 +13,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { 
     Plus, Calendar, FileText, AlertCircle, 
-    Loader2, Search, Edit, Trash2, Filter, X,
-    ArrowUpCircle, ArrowDownCircle
+    Loader2, Search, Edit, Trash2, X,
+    ArrowDownCircle
 } from 'lucide-react';
 import apiService from '../../services/api';
 
@@ -43,7 +43,7 @@ const BusinessPayables = ({ user, onLogout }) => {
       status: 'a_pagar', notes: ''
   };
   const [formData, setFormData] = useState(initialForm);
-  const [editingId, setEditingId] = useState(null); // ID para edição completa
+  const [editingId, setEditingId] = useState(null); 
   const [budgetError, setBudgetError] = useState(null);
 
   // --- CARREGAMENTO ---
@@ -77,7 +77,8 @@ const BusinessPayables = ({ user, onLogout }) => {
   // --- FILTROS E TOTAIS ---
   const filteredPayables = payables.filter(p => {
       const matchesSearch = p.stakeholder_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            p.category_name?.toLowerCase().includes(searchTerm.toLowerCase());
+                            p.category_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            p.id.toString().includes(searchTerm); // Busca também pelo ID
       
       let matchesDate = true;
       if (dateFilter.start) matchesDate = matchesDate && p.due_date >= dateFilter.start;
@@ -144,7 +145,7 @@ const BusinessPayables = ({ user, onLogout }) => {
           status: pay.status,
           notes: pay.notes || ''
       });
-      setBudgetError(null); // Ao editar, reseta erro visualmente por enquanto
+      setBudgetError(null); 
       setIsModalOpen(true);
   };
 
@@ -192,7 +193,6 @@ const BusinessPayables = ({ user, onLogout }) => {
       catch (e) { alert("Erro ao atualizar."); }
   };
 
-  // Helpers
   const getUniqueBanks = () => [...new Set(bankAccounts.map(b => b.bank_name))];
   const getAccountsForBank = (bankName, companyId) => bankAccounts.filter(b => b.bank_name === bankName && b.company_id === companyId);
 
@@ -202,7 +202,7 @@ const BusinessPayables = ({ user, onLogout }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
         
-        {/* HEADER E BOTÃO NOVO */}
+        {/* HEADER */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Contas a Pagar</h1>
@@ -213,7 +213,7 @@ const BusinessPayables = ({ user, onLogout }) => {
           </Button>
         </div>
 
-        {/* CARDS DE RESUMO (TOTAIS) */}
+        {/* CARDS DE RESUMO */}
         <div className="grid grid-cols-2 gap-4">
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-green-500 shadow-sm">
                 <CardContent className="p-4 flex items-center justify-between">
@@ -243,14 +243,14 @@ const BusinessPayables = ({ user, onLogout }) => {
             </Card>
         </div>
 
-        {/* BARRA DE FILTROS */}
+        {/* FILTROS */}
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
             <CardContent className="p-3">
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                         <Input 
-                            placeholder="Buscar fornecedor ou categoria..." 
+                            placeholder="Buscar por ID, fornecedor ou categoria..." 
                             className="pl-10" 
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -290,12 +290,16 @@ const BusinessPayables = ({ user, onLogout }) => {
                     <Card key={pay.id} className={`border-l-4 ${pay.status === 'pago' ? 'border-l-green-500' : 'border-l-amber-500'} hover:shadow-md transition-all group`}>
                         <CardContent className="p-4 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                             
-                            {/* COLUNA 1: INFO */}
+                            {/* COLUNA 1: INFO E ID */}
                             <div className="md:col-span-4 space-y-1 relative">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-bold text-slate-400 uppercase">{pay.company_name}</span>
+                                <div className="flex items-center gap-2 mb-1">
+                                    {/* IDENTIFICAÇÃO ÚNICA (ID) */}
+                                    <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                        #{pay.id}
+                                    </span>
+                                    <span className="text-xs font-bold text-slate-400 uppercase truncate max-w-[150px]">{pay.company_name}</span>
                                     
-                                    {/* STATUS EDITÁVEL (SELECT) */}
+                                    {/* STATUS */}
                                     <Select 
                                         value={pay.status} 
                                         onValueChange={(val) => handleQuickUpdate(pay.id, 'status', val)}
@@ -309,7 +313,8 @@ const BusinessPayables = ({ user, onLogout }) => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{pay.stakeholder_name}</h3>
+                                
+                                <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 leading-tight">{pay.stakeholder_name}</h3>
                                 <p className="text-sm text-slate-500">{pay.category_name} {pay.subcategory_name && `/ ${pay.subcategory_name}`}</p>
                                 <div className="flex gap-2 text-xs text-slate-400 mt-1">
                                     {pay.doc_type !== 'outros' && <span className="flex items-center gap-1"><FileText size={10}/> {pay.doc_number || 'S/N'}</span>}
@@ -362,7 +367,7 @@ const BusinessPayables = ({ user, onLogout }) => {
                                     </div>
                                 </div>
                                 
-                                {/* BOTÕES DE AÇÃO (EDITAR / EXCLUIR) */}
+                                {/* BOTÕES DE AÇÃO */}
                                 <div className="flex flex-col gap-1 justify-center">
                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-600 hover:bg-slate-100" onClick={() => handleEditFull(pay)}>
                                         <Edit size={16}/>
@@ -380,34 +385,75 @@ const BusinessPayables = ({ user, onLogout }) => {
         )}
       </div>
 
-      {/* --- MODAL DO ASSISTENTE (MANTIDO) --- */}
+      {/* --- MODAL DO ASSISTENTE (AGORA MAIS LARGO: max-w-6xl) --- */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Editar Conta a Pagar' : 'Assistente de Pagamento'}</DialogTitle>
             <DialogDescription>Lance suas contas com validação orçamentária.</DialogDescription>
           </DialogHeader>
+          
           <div className="grid gap-6 py-4">
-            <div className="grid sm:grid-cols-3 gap-4">
-                <div className="space-y-2"><Label>Empresa</Label><Select value={formData.company_id} onValueChange={v => handleInputChange('company_id', v)}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{companies.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.razao_social}</SelectItem>)}</SelectContent></Select></div>
-                <div className="space-y-2"><Label>Fornecedor</Label><Select value={formData.stakeholder_id} onValueChange={v => handleInputChange('stakeholder_id', v)}><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger><SelectContent>{stakeholders.map(s => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent></Select></div>
-                <div className="space-y-2"><Label>Vencimento</Label><Input type="date" value={formData.due_date} onChange={e => handleInputChange('due_date', e.target.value)} /></div>
+            
+            {/* LINHA 1 (4 Colunas agora) */}
+            <div className="grid sm:grid-cols-4 gap-4">
+                <div className="space-y-2 col-span-1 sm:col-span-1">
+                    <Label>Empresa</Label>
+                    <Select value={formData.company_id} onValueChange={v => handleInputChange('company_id', v)}>
+                        <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                        <SelectContent>{companies.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.razao_social}</SelectItem>)}</SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2 col-span-1 sm:col-span-2">
+                    <Label>Fornecedor</Label>
+                    <Select value={formData.stakeholder_id} onValueChange={v => handleInputChange('stakeholder_id', v)}>
+                        <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                        <SelectContent>{stakeholders.map(s => <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>)}</SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Vencimento</Label>
+                    <Input type="date" value={formData.due_date} onChange={e => handleInputChange('due_date', e.target.value)} />
+                </div>
             </div>
-            <div className="grid sm:grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
-                <div className="space-y-2"><Label>Tipo Doc</Label><Select value={formData.doc_type} onValueChange={v => handleInputChange('doc_type', v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="nota_fiscal">Nota Fiscal</SelectItem><SelectItem value="recibo">Recibo</SelectItem><SelectItem value="outros">Outros</SelectItem></SelectContent></Select></div>
+
+            {/* LINHA 2: DOCUMENTO (4 Colunas) */}
+            <div className="grid sm:grid-cols-4 gap-4 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg">
+                <div className="space-y-2">
+                    <Label>Tipo Doc</Label>
+                    <Select value={formData.doc_type} onValueChange={v => handleInputChange('doc_type', v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="nota_fiscal">Nota Fiscal</SelectItem><SelectItem value="recibo">Recibo</SelectItem><SelectItem value="outros">Outros</SelectItem></SelectContent></Select>
+                </div>
                 {formData.doc_type === 'nota_fiscal' && <div className="space-y-2"><Label>Esfera</Label><Select value={formData.nf_type} onValueChange={v => handleInputChange('nf_type', v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="municipal">Municipal</SelectItem><SelectItem value="estadual">Estadual</SelectItem></SelectContent></Select></div>}
-                {formData.doc_type === 'nota_fiscal' && <div className="space-y-2"><Label>{formData.nf_type === 'municipal' ? 'Número NF' : 'Chave Danfe'}</Label><Input value={formData.doc_number} onChange={e => handleInputChange('doc_number', e.target.value)} /></div>}
+                {formData.doc_type === 'nota_fiscal' && <div className="space-y-2 col-span-2"><Label>{formData.nf_type === 'municipal' ? 'Número NF' : 'Chave Danfe'}</Label><Input value={formData.doc_number} onChange={e => handleInputChange('doc_number', e.target.value)} /></div>}
             </div>
-            <div className="grid sm:grid-cols-3 gap-4">
-                <div className="space-y-2"><Label>Categoria</Label><Select value={formData.category_id} onValueChange={v => handleInputChange('category_id', v)}><SelectTrigger><SelectValue placeholder="Principal..." /></SelectTrigger><SelectContent>{rootCategories.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent></Select></div>
-                <div className="space-y-2"><Label>Subcategoria</Label><Select value={formData.subcategory_id} disabled={!formData.category_id} onValueChange={v => handleInputChange('subcategory_id', v)}><SelectTrigger><SelectValue placeholder="Específica..." /></SelectTrigger><SelectContent>{subCategories.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent></Select></div>
-                <div className="space-y-2 relative"><Label>Valor</Label><div className="relative"><span className="absolute left-3 top-2.5 text-slate-500 text-sm">R$</span><Input type="number" className={`pl-8 ${budgetError ? 'border-red-500 ring-red-500' : ''}`} placeholder="0,00" value={formData.value} onChange={e => handleInputChange('value', e.target.value)} /></div></div>
+
+            {/* LINHA 3: CATEGORIA E VALOR (4 Colunas) */}
+            <div className="grid sm:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                    <Label>Categoria</Label>
+                    <Select value={formData.category_id} onValueChange={v => handleInputChange('category_id', v)}><SelectTrigger><SelectValue placeholder="Principal..." /></SelectTrigger><SelectContent>{rootCategories.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent></Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Subcategoria</Label>
+                    <Select value={formData.subcategory_id} disabled={!formData.category_id} onValueChange={v => handleInputChange('subcategory_id', v)}><SelectTrigger><SelectValue placeholder="Específica..." /></SelectTrigger><SelectContent>{subCategories.map(c => <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>)}</SelectContent></Select>
+                </div>
+                <div className="space-y-2 relative">
+                    <Label>Valor</Label>
+                    <div className="relative"><span className="absolute left-3 top-2.5 text-slate-500 text-sm">R$</span><Input type="number" className={`pl-8 ${budgetError ? 'border-red-500 ring-red-500' : ''}`} placeholder="0,00" value={formData.value} onChange={e => handleInputChange('value', e.target.value)} /></div>
+                </div>
+                <div className="space-y-2">
+                    <Label>Status Inicial</Label>
+                    <Select value={formData.status} onValueChange={v => handleInputChange('status', v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="a_pagar">A Pagar</SelectItem><SelectItem value="pago">Pago</SelectItem></SelectContent></Select>
+                </div>
             </div>
+
             {budgetError && <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 animate-pulse"><AlertCircle size={20} /><span className="text-sm font-bold">{budgetError}</span></div>}
-            <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Status Inicial</Label><Select value={formData.status} onValueChange={v => handleInputChange('status', v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="a_pagar">A Pagar</SelectItem><SelectItem value="pago">Pago</SelectItem></SelectContent></Select></div>
-                <div className="space-y-2"><Label>Observações</Label><Textarea className="h-10 min-h-[40px]" placeholder="Detalhes..." value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} /></div>
+            
+            <div className="space-y-2">
+                <Label>Observações</Label>
+                <Textarea className="h-10 min-h-[40px]" placeholder="Detalhes..." value={formData.notes} onChange={e => handleInputChange('notes', e.target.value)} />
             </div>
+
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
