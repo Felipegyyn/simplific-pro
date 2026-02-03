@@ -364,3 +364,97 @@ class InventoryMovement(db.Model):
             'reason': self.reason,
             'date': self.created_at.strftime('%Y-%m-%d %H:%M')
         }
+
+
+class BusinessSale(db.Model):
+    __tablename__ = 'business_sales'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Dados Gerais
+    company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('business_stakeholders.id'), nullable=False)
+    
+    # Produto (Opcional, pois pode ser venda avulsa)
+    product_id = db.Column(db.Integer, db.ForeignKey('inventory_products.id'), nullable=True)
+    quantity = db.Column(db.Float, default=1.0)
+    
+    # Financeiro
+    total_value = db.Column(db.Float, nullable=False)
+    payment_terms = db.Column(db.String(20)) # vista, parcelado
+    payment_method = db.Column(db.String(50)) # pix, boleto, etc
+    doc_nf = db.Column(db.String(50))
+    
+    # Configuração de Juros/Multa (Salva na venda para aplicar nas parcelas)
+    apply_penalty = db.Column(db.Boolean, default=False)
+    fine_percent = db.Column(db.Float, default=0.0)
+    interest_percent = db.Column(db.Float, default=0.0)
+    
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamentos
+    company = db.relationship('Company', foreign_keys=[company_id])
+    client = db.relationship('Stakeholder', foreign_keys=[client_id])
+    product = db.relationship('InventoryProduct', foreign_keys=[product_id])
+    
+    # Uma venda tem várias parcelas (recebíveis)
+    receivables = db.relationship('BusinessReceivable', backref='sale', cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'client_name': self.client.name if self.client else 'Cliente Removido',
+            'product_name': self.product.name if self.product else None,
+            'quantity': self.quantity,
+            'total_value': self.total_value,
+            'payment_terms': self.payment_terms,
+            'date': self.created_at.strftime('%Y-%m-%d')
+        }
+
+class BusinessReceivable(db.Model):
+    __tablename__ = 'business_receivables'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    sale_id = db.Column(db.Integer, db.ForeignKey('business_sales.id'), nullable=False)
+    
+    # Redundância útil para filtros rápidos sem join
+    company_id = db.Column(db.Integer, db.ForeignKey('business_companies.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('business_stakeholders.id'), nullable=False)
+    
+    installment_number = db.Column(db.Integer, nullable=False) # 1 de 12, 2 de 12...
+    total_installments = db.Column(db.Integer, nullable=False)
+    
+    value = db.Column(db.Float, nullable=False)
+    due_date = db.Column(db.String(10), nullable=False) # YYYY-MM-DD
+    
+    status = db.Column(db.String(20), default='a_receber') # a_receber, recebido
+    
+    # Relacionamentos para facilitar listagem
+    company = db.relationship('Company', foreign_keys=[company_id])
+    client = db.relationship('Stakeholder', foreign_keys=[client_id])
+
+    def to_dict(self):
+        sale = self.sale
+        return {
+            'id': self.id,
+            'sale_id': self.sale_id,
+            'company_name': self.company.razao_social if self.company else '-',
+            'client_name': self.client.name if self.client else '-',
+            'product_name': sale.product.name if sale and sale.product else None,
+            'quantity': sale.quantity if sale else 0,
+            
+            'installment_number': self.installment_number,
+            'total_installments': self.total_installments,
+            'value': self.value,
+            'due_date': self.due_date,
+            'status': self.status,
+            'doc_nf': sale.doc_nf if sale else '',
+            
+            # Repassa config de juros da venda pai
+            'apply_penalty': sale.apply_penalty if sale else False,
+            'fine_percent': sale.fine_percent if sale else 0,
+            'interest_percent': sale.interest_percent if sale else 0
+        }

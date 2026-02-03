@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount, BusinessPayable, InventoryProduct, InventoryMovement
+from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount, BusinessPayable, InventoryProduct, InventoryMovement, BusinessSale, BusinessReceivable
 from datetime import date, timedelta
 import calendar
 from src.routes.user import active_user_required
@@ -647,3 +647,125 @@ def stock_movement():
 
     db.session.commit()
     return jsonify({'new_stock': prod.current_stock}), 200
+
+# ==========================================
+# ROTAS DE VENDAS E RECEBÍVEIS
+# ==========================================
+
+# 1. Listar Histórico de Vendas (Resumo)
+@business_bp.route('/business/sales', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_sales():
+    user_id = get_jwt_identity()
+    sales = BusinessSale.query.filter_by(user_id=user_id).order_by(BusinessSale.created_at.desc()).limit(50).all()
+    return jsonify([s.to_dict() for s in sales]), 200
+
+# 2. Listar Contas a Receber (Parcelas)
+@business_bp.route('/business/receivables', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_receivables():
+    user_id = get_jwt_identity()
+    # Ordena por vencimento
+    receivables = BusinessReceivable.query.filter_by(user_id=user_id).order_by(BusinessReceivable.due_date).all()
+    return jsonify([r.to_dict() for r in receivables]), 200
+
+# 3. CRIAR NOVA VENDA (O GRANDE POS)
+@business_bp.route('/business/sales', methods=['POST'])
+@jwt_required()
+@active_user_required
+def create_sale():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    # Validações Básicas
+    if not data.get('company_id') or not data.get('client_id') or not data.get('total_value'):
+        return jsonify({'error': 'Dados incompletos'}), 400
+
+    # A. Cria a Venda (Cabeçalho)
+    new_sale = BusinessSale(
+        user_id=user_id,
+        company_id=data['company_id'],
+        client_id=data['client_id'],
+        product_id=data.get('product_id'),
+        quantity=float(data.get('quantity', 1)),
+        total_value=float(data['total_value']),
+        payment_terms=data.get('payment_terms', 'vista'),
+        payment_method=data.get('payment_method', 'pix'),
+        doc_nf=data.get('doc_nf'),
+        apply_penalty=data.get('apply_penalty', False),
+        fine_percent=float(data.get('fine_percent', 0)),
+        interest_percent=float(data.get('interest_percent', 0)),
+        notes=data.get('notes')
+    )
+    db.session.add(new_sale)
+    db.session.flush() # Gera o ID da venda para usar nas parcelas
+
+    # B. Baixa de Estoque (Opcional)
+    if data.get('product_id') and new_sale.product_id:
+        prod = InventoryProduct.query.get(new_sale.product_id)
+        if prod:
+            # Registra movimento de saída
+            move = InventoryMovement(
+                user_id=user_id,
+                product_id=prod.id,
+                type='saida',
+                quantity=new_sale.quantity,
+                reason='venda'
+            )
+            prod.current_stock -= new_sale.quantity
+            db.session.add(move)
+
+    # C. Gerar Parcelas (Recebíveis)
+    installments = int(data.get('installment_count', 1))
+    periodicity = data.get('periodicity', 'mensal')
+    first_date = datetime.strptime(data.get('first_due_date'), '%Y-%m-%d')
+    installment_value = new_sale.total_value / installments
+
+    for i in range(installments):
+        # Calcula data
+        due_date = first_date
+        if i > 0:
+            if periodicity == 'mensal':
+                due_date = first_date + relativedelta(months=i)
+            elif periodicity == 'quinzenal':
+                due_date = first_date + timedelta(days=15*i)
+            elif periodicity == 'semanal':
+                due_date = first_date + timedelta(days=7*i)
+            elif periodicity == 'anual':
+                due_date = first_date + relativedelta(years=i)
+            elif periodicity == 'semestral':
+                due_date = first_date + relativedelta(months=6*i)
+
+        receivable = BusinessReceivable(
+            user_id=user_id,
+            sale_id=new_sale.id,
+            company_id=new_sale.company_id,
+            client_id=new_sale.client_id,
+            installment_number=i+1,
+            total_installments=installments,
+            value=installment_value,
+            due_date=due_date.strftime('%Y-%m-%d'),
+            status=data.get('status', 'a_receber') # Se for a vista e recebido, já nasce pago
+        )
+        db.session.add(receivable)
+
+    db.session.commit()
+    return jsonify({'message': 'Venda registrada com sucesso'}), 201
+
+# 4. Atualizar Recebível (Baixa ou Data)
+@business_bp.route('/business/receivables/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_receivable(id):
+    user_id = get_jwt_identity()
+    rec = BusinessReceivable.query.filter_by(id=id, user_id=user_id).first()
+    if not rec: return jsonify({'error': 'Conta não encontrada'}), 404
+
+    data = request.json
+    if 'status' in data: rec.status = data['status']
+    if 'due_date' in data: rec.due_date = data['due_date']
+
+    db.session.commit()
+    return jsonify(rec.to_dict()), 200
