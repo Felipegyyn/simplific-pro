@@ -39,7 +39,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       color: 'text-emerald-400',
       items: [
         { name: 'Venda de Serviço', path: '/business/sales/service', icon: Briefcase },
-        { name: 'Venda de Produto', path: '/business/sales/product', icon: Package },
+        { name: 'Venda de Produto', path: '/business/sales', icon: Package },
         { name: 'Estoque', path: '/business/inventory', icon: Box },
       ]
     },
