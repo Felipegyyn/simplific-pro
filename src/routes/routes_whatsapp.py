@@ -1509,7 +1509,6 @@ def handle_cadastrar_contato(user_id, dados):
 
     return f"Contato '{nome}' cadastrado com sucesso! Agora posso agendar a reunião."
 
-:
 # ==============================================================================
 # CORREÇÃO 2: Função de Agendamento com Prefixo 'whatsapp:'
 # ==============================================================================
