@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.db import db
-from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount, BusinessPayable
+from src.models.business import Stakeholder, Company, BusinessCategory, BusinessBudget, BusinessBudgetLine, BusinessBudgetItem, BusinessBankAccount, BusinessPayable, InventoryProduct, InventoryMovement
 from datetime import date, timedelta
 import calendar
 from src.routes.user import active_user_required
@@ -537,3 +537,113 @@ def delete_payable(id):
     db.session.delete(payable)
     db.session.commit()
     return '', 204
+
+# ==========================================
+# ROTAS DE ESTOQUE (INVENTORY)
+# ==========================================
+
+@business_bp.route('/business/inventory', methods=['GET'])
+@jwt_required()
+@active_user_required
+def get_inventory():
+    user_id = get_jwt_identity()
+    products = InventoryProduct.query.filter_by(user_id=user_id).order_by(InventoryProduct.name).all()
+    return jsonify([p.to_dict() for p in products]), 200
+
+@business_bp.route('/business/inventory', methods=['POST'])
+@jwt_required()
+@active_user_required
+def create_product():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    if not data.get('name') or not data.get('sku'):
+        return jsonify({'error': 'Nome e SKU são obrigatórios'}), 400
+
+    new_prod = InventoryProduct(
+        user_id=user_id,
+        name=data['name'],
+        sku=data['sku'],
+        category_id=data.get('category_id'),
+        unit=data.get('unit', 'UN'),
+        min_stock=float(data.get('min_stock', 5)),
+        cost_price=float(data.get('cost_price', 0)),
+        sale_price=float(data.get('sale_price', 0)),
+        description=data.get('description'),
+        current_stock=0 # Produto nasce com 0, precisa de entrada via movimento
+    )
+
+    db.session.add(new_prod)
+    db.session.commit()
+    return jsonify(new_prod.to_dict()), 201
+
+@business_bp.route('/business/inventory/<int:id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_product(id):
+    user_id = get_jwt_identity()
+    prod = InventoryProduct.query.filter_by(id=id, user_id=user_id).first()
+    if not prod: return jsonify({'error': 'Produto não encontrado'}), 404
+
+    data = request.json
+    if 'name' in data: prod.name = data['name']
+    if 'sku' in data: prod.sku = data['sku']
+    if 'category_id' in data: prod.category_id = data['category_id']
+    if 'unit' in data: prod.unit = data['unit']
+    if 'min_stock' in data: prod.min_stock = float(data['min_stock'])
+    if 'cost_price' in data: prod.cost_price = float(data['cost_price'])
+    if 'sale_price' in data: prod.sale_price = float(data['sale_price'])
+    if 'description' in data: prod.description = data['description']
+
+    db.session.commit()
+    return jsonify(prod.to_dict()), 200
+
+@business_bp.route('/business/inventory/<int:id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_product(id):
+    user_id = get_jwt_identity()
+    prod = InventoryProduct.query.filter_by(id=id, user_id=user_id).first()
+    if not prod: return jsonify({'error': 'Produto não encontrado'}), 404
+
+    db.session.delete(prod)
+    db.session.commit()
+    return '', 204
+
+# --- ROTA ESPECIAL DE MOVIMENTAÇÃO (ENTRADA/SAÍDA) ---
+@business_bp.route('/business/inventory/movement', methods=['POST'])
+@jwt_required()
+@active_user_required
+def stock_movement():
+    user_id = get_jwt_identity()
+    data = request.json
+    
+    prod_id = data.get('product_id')
+    move_type = data.get('type') # 'entrada' ou 'saida'
+    qty = float(data.get('quantity', 0))
+    
+    if qty <= 0: return jsonify({'error': 'Quantidade deve ser maior que zero'}), 400
+
+    prod = InventoryProduct.query.filter_by(id=prod_id, user_id=user_id).first()
+    if not prod: return jsonify({'error': 'Produto não encontrado'}), 404
+
+    # 1. Registra o Movimento (Histórico)
+    movement = InventoryMovement(
+        user_id=user_id,
+        product_id=prod.id,
+        type=move_type,
+        quantity=qty,
+        reason=data.get('reason', 'ajuste')
+    )
+    db.session.add(movement)
+
+    # 2. Atualiza o Saldo do Produto
+    if move_type == 'entrada':
+        prod.current_stock += qty
+    elif move_type == 'saida':
+        # (Opcional) Bloquear saldo negativo:
+        # if prod.current_stock < qty: return jsonify({'error': 'Saldo insuficiente'}), 400
+        prod.current_stock -= qty
+
+    db.session.commit()
+    return jsonify({'new_stock': prod.current_stock}), 200

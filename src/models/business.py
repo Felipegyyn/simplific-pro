@@ -294,3 +294,73 @@ class BusinessPayable(db.Model):
             'doc_number': self.doc_number,
             'notes': self.notes
         }
+
+# ... (Mantenha as classes anteriores) ...
+
+class InventoryProduct(db.Model):
+    __tablename__ = 'inventory_products'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    # Vinculamos à categoria que já criamos antes
+    category_id = db.Column(db.Integer, db.ForeignKey('business_categories.id'), nullable=True)
+    
+    name = db.Column(db.String(150), nullable=False)
+    sku = db.Column(db.String(50)) # Código de Barras / Referência
+    unit = db.Column(db.String(10), default='UN') # UN, KG, L
+    
+    # Saldo Atual (Atualizado automaticamente pelas movimentações)
+    current_stock = db.Column(db.Float, default=0.0)
+    min_stock = db.Column(db.Float, default=5.0) # Ponto de reposição
+    
+    # Financeiro
+    cost_price = db.Column(db.Float, default=0.0)
+    sale_price = db.Column(db.Float, default=0.0)
+    
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento com categoria para exibir o nome
+    category = db.relationship('BusinessCategory', foreign_keys=[category_id])
+    
+    # Histórico de movimentos (se deletar produto, apaga histórico)
+    movements = db.relationship('InventoryMovement', backref='product', cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'sku': self.sku,
+            'category_id': self.category_id,
+            'category_name': self.category.name if self.category else 'Geral',
+            'unit': self.unit,
+            'current_stock': self.current_stock,
+            'min_stock': self.min_stock,
+            'cost_price': self.cost_price,
+            'sale_price': self.sale_price,
+            'description': self.description
+        }
+
+class InventoryMovement(db.Model):
+    __tablename__ = 'inventory_movements'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('inventory_products.id'), nullable=False)
+    
+    type = db.Column(db.String(20), nullable=False) # 'entrada' ou 'saida'
+    quantity = db.Column(db.Float, nullable=False)
+    reason = db.Column(db.String(50)) # compra, venda, perda, ajuste
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'type': self.type,
+            'quantity': self.quantity,
+            'reason': self.reason,
+            'date': self.created_at.strftime('%Y-%m-%d %H:%M')
+        }
