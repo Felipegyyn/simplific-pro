@@ -11,7 +11,15 @@ payment_bp = Blueprint('payment', __name__)
 
 @payment_bp.route('/process_subscription', methods=['POST'])
 def process_subscription_route():
-    data = request.get_json()
+    # --- PROTEÇÃO CONTRA JSON VAZIO ---
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Corpo da requisição vazio ou JSON inválido"}), 400
+    except Exception as e:
+        return jsonify({"error": "Erro ao ler JSON", "detail": str(e)}), 400
+
+
     card_token = data.get('card_token')
     payer_data = data.get('payer_data', {})
     

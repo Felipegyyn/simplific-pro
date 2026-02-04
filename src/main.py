@@ -57,28 +57,28 @@ from src.scheduler import check_and_send_reminders, enviar_resumos_semanais, ver
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
-# --- CORREÇÃO DE SEGURANÇA MANUAL ---
-# 1. Ativamos o CORS básico para lidar com o preflight (OPTIONS)
-CORS(app) 
+# --- CONFIGURAÇÃO DE SEGURANÇA CORS (CORRIGIDA) ---
+# 1. Lista de domínios permitidos (Whitelist)
+ALLOWED_ORIGINS = [
+    "https://simplificpro.com",
+    "https://www.simplificpro.com",
+    "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173", # Adicionado vite local comum
+    "https://diagnostico.simplificpro.com.br",
+    "https://www.diagnostico.simplificpro.com.br"
+]
 
-# 2. Forçamos o header CORRETO na saída.
-# O navegador exige que 'Access-Control-Allow-Origin' seja EXATO (não pode ser '*')
-# quando estamos enviando cookies ou tokens de pagamento.
+# 2. Inicializa o CORS permitindo credenciais para os domínios da lista
+CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
+
+# 3. Handler Manual para garantir headers (Blindagem)
 @app.after_request
 def finalize_cors_headers(response):
     origin = request.headers.get('Origin')
     
-    # Lista de sites permitidos
-    whitelist = [
-        "https://simplificpro.com",
-        "https://www.simplificpro.com",
-        "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
-        "http://localhost:3000",
-        "https://diagnostico.simplificpro.com.br",
-        "https://www.diagnostico.simplificpro.com.br"
-    ]
-    
-    if origin in whitelist:
+    # Se a origem estiver na nossa lista, carimbamos a resposta
+    if origin in ALLOWED_ORIGINS:
         response.headers['Access-Control-Allow-Origin'] = origin
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, Accept, X-Idempotency-Key'
@@ -214,18 +214,18 @@ def create_default_categories():
 # --- ADICIONE ISTO NO SEU MAIN.PY ---
 # Solução Nuclear para CORS: Injeta headers manualmente em TODAS as respostas
 
-@app.after_request
-def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, x-idempotency-key"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
-    return response
+#@app.after_request
+#def add_cors_headers(response):
+    #response.headers["Access-Control-Allow-Origin"] = "*"
+    #response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, x-idempotency-key"
+    #response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+    #return response
 
 # Se uma requisição OPTIONS bater e não for tratada, o Flask retorna 404 ou 405.
 # Isso garante que o navegador receba um 200 OK com os headers acima.
-@app.route('/api/payment/process_subscription', methods=['OPTIONS'])
-def options_handler():
-    return jsonify({'status': 'ok'}), 200
+#@app.route('/api/payment/process_subscription', methods=['OPTIONS'])
+#def options_handler():
+    #return jsonify({'status': 'ok'}), 200
 # ------------------------------------
 
 # Rotas simples
