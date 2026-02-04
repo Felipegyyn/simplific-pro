@@ -98,7 +98,7 @@ const Checkout = () => {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await fetch('https://simplific-pro-backend.onrender.com/api/payment/process_subscription', {
+        const response = await fetch('https://simplificpro-backend.onrender.com/api/payment/process_subscription', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
