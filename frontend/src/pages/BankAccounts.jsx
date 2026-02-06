@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from '@/components/Navbar';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Landmark, Plus, Trash2, Wallet } from 'lucide-react';
-import apiService from '../services/api'; // <--- USANDO API REAL AGORA
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Landmark, Plus, Trash2, Wallet, Filter, Check } from 'lucide-react';
+import apiService from '../services/api';
 
 const BANCOS_BRASIL = [
   { code: '260', name: 'Nubank' },
@@ -29,6 +30,9 @@ const BankAccounts = ({ user, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // --- LÓGICA DO FILTRO MÚLTIPLO ---
+  const [selectedBanks, setSelectedBanks] = useState([]); // Array de bancos selecionados
+
   const [formData, setFormData] = useState({
     banco: '',
     agencia: '',
@@ -36,7 +40,6 @@ const BankAccounts = ({ user, onLogout }) => {
     saldo_inicial: ''
   });
 
-  // 1. Carregar contas do Backend
   const loadAccounts = async () => {
     try {
         const data = await apiService.get('/api/bank-accounts');
@@ -54,13 +57,11 @@ const BankAccounts = ({ user, onLogout }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // 2. Salvar no Backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Monta o payload para a API
       const payload = {
         bank_name: formData.banco,
         agency: formData.agencia,
@@ -69,8 +70,8 @@ const BankAccounts = ({ user, onLogout }) => {
       };
 
       await apiService.post('/api/bank-accounts', payload);
-
-      await loadAccounts(); // Recarrega a lista
+      await loadAccounts();
+      
       setFormData({ banco: '', agencia: '', conta: '', saldo_inicial: '' });
       setIsModalOpen(false);
       alert('Conta adicionada com sucesso!');
@@ -83,10 +84,8 @@ const BankAccounts = ({ user, onLogout }) => {
     }
   };
 
-  // 3. Excluir no Backend
   const handleDelete = async (id) => {
       if (!confirm("Tem certeza que deseja excluir esta conta?")) return;
-      
       try {
           await apiService.delete(`/api/bank-accounts/${id}`);
           await loadAccounts();
@@ -96,12 +95,35 @@ const BankAccounts = ({ user, onLogout }) => {
       }
   };
 
-  const saldoTotal = contas.reduce((acc, conta) => acc + (Number(conta.balance) || 0), 0);
+  // --- FILTRAGEM ---
+  // 1. Extrai bancos únicos presentes nas contas cadastradas para montar as opções do filtro
+  const availableBanks = useMemo(() => {
+      const banks = contas.map(c => c.bank_name);
+      return [...new Set(banks)];
+  }, [contas]);
+
+  // 2. Filtra as contas baseado na seleção (se vazio, mostra todas)
+  const filteredAccounts = useMemo(() => {
+      if (selectedBanks.length === 0) return contas;
+      return contas.filter(conta => selectedBanks.includes(conta.bank_name));
+  }, [contas, selectedBanks]);
+
+  // 3. Toggle do checkbox do filtro
+  const toggleBankFilter = (bankName) => {
+      setSelectedBanks(prev => 
+          prev.includes(bankName) 
+              ? prev.filter(b => b !== bankName) 
+              : [...prev, bankName]
+      );
+  };
+
+  const saldoTotal = filteredAccounts.reduce((acc, conta) => acc + (Number(conta.balance) || 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 p-4 sm:p-8">
       
       <div className="max-w-6xl mx-auto">
+        {/* Cabeçalho */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -111,55 +133,110 @@ const BankAccounts = ({ user, onLogout }) => {
             <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie seus saldos e contas correntes.</p>
           </div>
 
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="h-4 w-4 mr-2" /> Adicionar Nova Conta
-              </Button>
-            </DialogTrigger>
-            
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Nova Conta Bancária</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="banco">Instituição Financeira</Label>
-                  <Select 
-                    value={formData.banco} 
-                    onValueChange={(val) => handleInputChange('banco', val)}
-                    required
-                  >
-                    <SelectTrigger><SelectValue placeholder="Selecione o banco" /></SelectTrigger>
-                    <SelectContent className="max-h-[200px]">
-                      {BANCOS_BRASIL.map((banco) => (
-                        <SelectItem key={banco.code} value={banco.name}>{banco.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="agencia">Agência</Label>
-                    <Input id="agencia" placeholder="0000" value={formData.agencia} onChange={(e) => handleInputChange('agencia', e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="conta">Conta Corrente</Label>
-                    <Input id="conta" placeholder="12345-6" value={formData.conta} onChange={(e) => handleInputChange('conta', e.target.value)} required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="saldo">Saldo Inicial (R$)</Label>
-                  <Input id="saldo" type="number" step="0.01" placeholder="0,00" value={formData.saldo_inicial} onChange={(e) => handleInputChange('saldo_inicial', e.target.value)} />
-                  <p className="text-xs text-gray-500">Se não houver saldo, deixe em branco ou 0.</p>
-                </div>
-                <div className="pt-4 flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-                  <Button type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Conta'}</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-3">
+            {/* --- COMPONENTE DE FILTRO MÚLTIPLO --- */}
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button variant="outline" className="border-dashed">
+                        <Filter className="h-4 w-4 mr-2" />
+                        Filtrar Bancos
+                        {selectedBanks.length > 0 && (
+                            <span className="ml-2 rounded bg-blue-100 text-blue-700 px-1.5 py-0.5 text-xs font-bold">
+                                {selectedBanks.length}
+                            </span>
+                        )}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-3" align="end">
+                    <div className="space-y-2">
+                        <h4 className="font-medium text-sm text-gray-500 mb-2">Selecione os bancos:</h4>
+                        {availableBanks.length === 0 ? (
+                            <p className="text-xs text-gray-400">Nenhum banco cadastrado.</p>
+                        ) : (
+                            availableBanks.map(bank => (
+                                <div key={bank} className="flex items-center space-x-2">
+                                    <Checkbox 
+                                        id={`filter-${bank}`} 
+                                        checked={selectedBanks.includes(bank)}
+                                        onCheckedChange={() => toggleBankFilter(bank)}
+                                    />
+                                    <label 
+                                        htmlFor={`filter-${bank}`} 
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                    >
+                                        {bank}
+                                    </label>
+                                </div>
+                            ))
+                        )}
+                        {selectedBanks.length > 0 && (
+                            <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="w-full mt-2 text-xs h-8"
+                                onClick={() => setSelectedBanks([])}
+                            >
+                                Limpar Filtros
+                            </Button>
+                        )}
+                    </div>
+                </PopoverContent>
+            </Popover>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Plus className="h-4 w-4 mr-2" /> Nova Conta
+                </Button>
+                </DialogTrigger>
+                
+                <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Nova Conta Bancária</DialogTitle>
+                    {/* ADICIONADO PARA CORRIGIR O WARNING */}
+                    <DialogDescription>
+                        Preencha os dados da sua conta para controle de saldo.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                    <div className="space-y-2">
+                    <Label htmlFor="banco">Instituição Financeira</Label>
+                    <Select 
+                        value={formData.banco} 
+                        onValueChange={(val) => handleInputChange('banco', val)}
+                        required
+                    >
+                        <SelectTrigger><SelectValue placeholder="Selecione o banco" /></SelectTrigger>
+                        <SelectContent className="max-h-[200px]">
+                        {BANCOS_BRASIL.map((banco) => (
+                            <SelectItem key={banco.code} value={banco.name}>{banco.name}</SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="agencia">Agência</Label>
+                        <Input id="agencia" placeholder="0000" value={formData.agencia} onChange={(e) => handleInputChange('agencia', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="conta">Conta Corrente</Label>
+                        <Input id="conta" placeholder="12345-6" value={formData.conta} onChange={(e) => handleInputChange('conta', e.target.value)} required />
+                    </div>
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="saldo">Saldo Inicial (R$)</Label>
+                    <Input id="saldo" type="number" step="0.01" placeholder="0,00" value={formData.saldo_inicial} onChange={(e) => handleInputChange('saldo_inicial', e.target.value)} />
+                    <p className="text-xs text-gray-500">Se não houver saldo, deixe em branco ou 0.</p>
+                    </div>
+                    <div className="pt-4 flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                    <Button type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Conta'}</Button>
+                    </div>
+                </form>
+                </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Card de Resumo Total */}
@@ -167,9 +244,9 @@ const BankAccounts = ({ user, onLogout }) => {
           <Card className="bg-gradient-to-r from-blue-900 to-slate-900 border-none text-white shadow-xl">
             <CardContent className="p-6 flex items-center justify-between">
               <div>
-                <p className="text-blue-200 font-medium mb-1">Saldo Geral Acumulado</p>
+                <p className="text-blue-200 font-medium mb-1">Saldo Geral {selectedBanks.length > 0 ? '(Filtrado)' : ''}</p>
                 <h2 className="text-4xl font-bold">
-                  R$ {saldoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {saldoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </h2>
               </div>
               <div className="h-12 w-12 bg-white/10 rounded-full flex items-center justify-center">
@@ -180,14 +257,20 @@ const BankAccounts = ({ user, onLogout }) => {
         </div>
 
         {/* Grid de Contas */}
-        {contas.length === 0 ? (
+        {loading && !isModalOpen && contas.length === 0 ? (
+            <div className="text-center py-12"><p>Carregando contas...</p></div>
+        ) : filteredAccounts.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
-            <p className="text-gray-500">Nenhuma conta bancária cadastrada.</p>
-            <Button variant="link" onClick={() => setIsModalOpen(true)}>Cadastrar a primeira</Button>
+            <p className="text-gray-500">
+                {contas.length === 0 ? "Nenhuma conta bancária cadastrada." : "Nenhuma conta encontrada com o filtro atual."}
+            </p>
+            {contas.length === 0 && (
+                <Button variant="link" onClick={() => setIsModalOpen(true)}>Cadastrar a primeira</Button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contas.map((conta) => (
+            {filteredAccounts.map((conta) => (
               <Card key={conta.id} className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500 relative group">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
@@ -204,7 +287,7 @@ const BankAccounts = ({ user, onLogout }) => {
                     <div>
                       <p className="text-xs text-gray-400 uppercase font-bold">Saldo Atual</p>
                       <p className={`text-2xl font-bold ${conta.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        R$ {(Number(conta.balance) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {Number(conta.balance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                       </p>
                     </div>
                     <Button 
