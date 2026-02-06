@@ -144,15 +144,6 @@ const App = () => {
     );
   }
 
-  // ▼▼▼ ADICIONE ESTE BLOCO AQUI- Página de manutenção▼▼▼
-  // Se estiver em manutenção E o usuário NÃO for admin, exibe a tela de bloqueio.
-  if (IS_MAINTENANCE_MODE) {
-      const isAdmin = user && user.profile === 'admin';
-      
-      if (!isAdmin) {
-          return <Maintenance />;
-      }
-  }
 
 
   return (
@@ -182,10 +173,23 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* Rota de Layout Protegido */}
+              {/* Rota de Layout Protegido COM TRAVA DE MANUTENÇÃO */}
             <Route 
-                element={user ? <MainLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
+                element={
+                    user ? (
+                        // Se o usuário está logado, verificamos a manutenção
+                        IS_MAINTENANCE_MODE && user.profile !== 'admin' ? (
+                            <Maintenance />
+                        ) : (
+                            <MainLayout user={user} onLogout={handleLogout} />
+                        )
+                    ) : (
+                        // Se não está logado, manda pro login
+                        <Navigate to="/login" replace />
+                    )
+                }
             >
+
                 <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} />} />
                 <Route path="/planning" element={<Planning user={user} onLogout={handleLogout} />} />
                 <Route path="/transactions" element={<Transactions user={user} onLogout={handleLogout} />} />
