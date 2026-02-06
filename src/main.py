@@ -498,3 +498,71 @@ if os.environ.get('WERKZEUG_RUN_MAIN') != 'true': # Evita rodar duplicado em mod
     
     scheduler.start()
     print("--- [SISTEMA] Agendador de tarefas iniciado com sucesso! ---")
+
+# ▼▼▼ COLE NO FINAL DO ARQUIVO src/main.py ▼▼▼
+
+@app.cli.command("diagnostico-assinaturas")
+def diagnostico_assinaturas():
+    """
+    Lista o status real das assinaturas diretamente do Mercado Pago.
+    Útil para verificar renovações e datas de cobrança.
+    """
+    from src.models.user import User
+    from src.services.payment_service import get_subscription_details
+    from datetime import datetime
+
+    print(f"\n--- [DIAGNÓSTICO] Iniciando verificação em {datetime.now()} ---")
+    
+    # Busca usuários que têm algum ID de assinatura gravado
+    users = User.query.filter(User.subscription_id != None).all()
+    
+    if not users:
+        print("Nenhum usuário com assinatura encontrada no banco.")
+        return
+
+    print(f"Encontrados {len(users)} usuários com registro de assinatura.\n")
+    print(f"{'E-MAIL':<35} | {'ID ASSINATURA':<25} | {'STATUS MP':<15} | {'PRÓX. PAGAMENTO'}")
+    print("-" * 100)
+
+    for user in users:
+        sub_id = user.subscription_id
+        
+        # Pula planos anuais (pois não são recorrentes no MP da mesma forma)
+        if sub_id.startswith('annual_'):
+            print(f"{user.email:<35} | {sub_id:<25} | {'ANUAL (OK)':<15} | {user.subscription_valid_until}")
+            continue
+            
+        if sub_id == 'pending_sub':
+            print(f"{user.email:<35} | {'PENDENTE':<25} | {'ERRO':<15} | -")
+            continue
+
+        # Consulta o Mercado Pago
+        try:
+            mp_data = get_subscription_details(sub_id)
+            
+            if mp_data:
+                status_mp = mp_data.get('status', 'N/A')
+                # Tenta pegar a data de diversas formas que o MP pode retornar
+                next_payment = mp_data.get('next_payment_date')
+                if not next_payment:
+                    # Se não tiver next_payment, tenta ver a data de início da recorrência
+                    next_payment = mp_data.get('auto_recurring', {}).get('start_date', 'Sem data')
+                
+                # Limpa a formatação da data para ficar legível
+                if isinstance(next_payment, str) and 'T' in next_payment:
+                    next_payment = next_payment.split('T')[0]
+
+                print(f"{user.email:<35} | {sub_id:<25} | {status_mp:<15} | {next_payment}")
+            else:
+                print(f"{user.email:<35} | {sub_id:<25} | {'NÃO ENCONTRADO':<15} | -")
+                
+        except Exception as e:
+            print(f"{user.email:<35} | {sub_id:<25} | {'ERRO API':<15} | {str(e)}")
+
+    print("-" * 100)
+    print("LEGENDA STATUS MP:")
+    print(" - authorized: Tudo certo! A cobrança está agendada.")
+    print(" - paused: Assinatura pausada (não cobrará).")
+    print(" - cancelled: Cancelada.")
+    print(" - pending: Problema no cartão ou aguardando.")
+    print("\n")
