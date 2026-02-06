@@ -72,7 +72,7 @@ const HomePage = () => {
     if (window.fbq) {
       window.fbq('track', 'InitiateCheckout', {
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
-        value: billingCycle === 'monthly' ? 13.45 : 199.00,
+        value: billingCycle === 'monthly' ? 29.90 : 199.00, // <--- AJUSTADO AQUI
         currency: 'BRL'
       });
     }
@@ -84,7 +84,7 @@ const HomePage = () => {
     }
   };
 
-  // 2. ALTERAÇÃO: Objeto de Preços Atualizado com a nova lógica visual
+// 2. ALTERAÇÃO: Objeto de Preços Atualizado
   const pricing = {
     annual: {
         oldPrice: "R$ 358,80", // (29,90 * 12)
@@ -95,12 +95,12 @@ const HomePage = () => {
         badge: "💎 MELHOR ESCOLHA: 45% OFF"
       },
     monthly: {
-      oldPrice: "R$ 29,90",
-      priceDisplay: "13,45",        
-      priceSuffix: " no 1º mês",  
-      subDetail: "A partir do 2º mês R$ 29,90",
-      buttonText: "COMEÇAR MENSAL",
-      badge: "TESTE SEM COMPROMISSO"
+      oldPrice: null, // Sem preço antigo ("de/por") no mensal padrão
+      priceDisplay: "29,90",        
+      priceSuffix: "/mês",  
+      subDetail: "Sem fidelidade. Cancele quando quiser.",
+      buttonText: "ASSINAR MENSAL",
+      badge: "FLEXIBILIDADE TOTAL"
     }
   };
 
@@ -358,7 +358,10 @@ const HomePage = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-3xl font-bold text-center mb-12 text-white">Dúvidas Frequentes</h2>
           <div className="space-y-4">
-            <FaqItem question="O valor de R$ 13,45 é recorrente?" answer="Não. Este é um valor especial para o seu primeiro mês de uso (quase 60% de desconto), para que você possa testar a plataforma sem barreiras. Após 30 dias, a assinatura renova pelo valor padrão de R$ 29,90 mensais." />
+            <FaqItem 
+    question="O plano mensal tem fidelidade?" 
+    answer="Não. O valor é de R$ 29,90 mensais e você tem total liberdade. Pode usar por um mês e cancelar no próximo se desejar, sem multas ou taxas surpresas." 
+/>
             <FaqItem question="Posso parcelar o plano anual?" answer="Sim! O plano anual de R$ 199,00 oferece o maior desconto (apenas R$ 16,58/mês) e você pode parcelá-lo em até 12x no cartão de crédito." />
             <FaqItem question="Meus dados bancários ficam salvos?" answer="Nós não temos acesso às suas senhas bancárias e não realizamos movimentações. O Simplific apenas lê e organiza as informações para você. Usamos criptografia de ponta a ponta com segurança nível bancário." />
             <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a mágica. Você pode registrar gastos, consultar saldo e pedir relatórios apenas mandando áudios ou textos para nossa IA no WhatsApp. O Dashboard serve para quando você quiser uma visão mais profunda." />

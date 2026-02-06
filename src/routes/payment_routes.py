@@ -57,41 +57,30 @@ def process_subscription_route():
     result_mp = None
     days_access = 32 # Padrão mensal
     
-    # === PLANO MENSAL ===
+    # === PLANO MENSAL (ATUALIZADO: R$ 29,90 DIRETO) ===
     if plan_type == 'monthly':
-        print(f"Iniciando plano MENSAL para {email}...")
+        print(f"Iniciando assinatura MENSAL DIRETA para {email}...")
         
-        # A) Cobrança do 1º Mês: R$ 13,45
-        entry_amount = 13.45
+        # Como é direto, não cobramos entrada (one_time_payment).
+        # Criamos apenas a assinatura. O MP cobra a primeira parcela na hora.
         
-        payment_result = create_one_time_payment(
+        recurring_amount = 29.90
+        
+        subscription_result = create_subscription(
             user.email, 
             card_token, 
-            amount=entry_amount, 
-            description="Simplific Pro - 1º Mês",
-            installments=1 # Mensal é sempre à vista a entrada
+            amount=recurring_amount, 
+            frequency=1
+            # start_date removido: assim o MP cobra a 1ª agora e a próxima em 30 dias
         )
-
-        if payment_result['status'] == 'success':
-            # B) Agendamento da Recorrência: R$ 29,90 daqui a 30 dias
-            start_date_future = datetime.utcnow() + timedelta(days=30)
-            print(f"Pagamento de entrada aprovado! Agendando assinatura de R$ 29,90 para {start_date_future}...")
-            
-            recurring_amount = 29.90
-            
-            subscription_result = create_subscription(
-                user.email, 
-                card_token, 
-                amount=recurring_amount, 
-                frequency=1,
-                start_date=start_date_future
-            )
-            
-            # Se a assinatura falhar, mas o pagamento passou, liberamos o acesso e marcamos ID pendente
-            result_mp = {'status': 'success', 'id': subscription_result.get('id', 'pending_sub')}
-            days_access = 32
+        
+        if subscription_result['status'] == 'success':
+            result_mp = {'status': 'success', 'id': subscription_result['id']}
+            days_access = 32 # Garante 32 dias de acesso inicial
         else:
-            result_mp = payment_result # Retorna o erro do pagamento
+            # Se falhar, retornamos o erro do MP e não liberamos acesso
+            print(f"Erro na assinatura mensal: {subscription_result}")
+            result_mp = subscription_result
 
     # === PLANO ANUAL ===
     elif plan_type == 'yearly':

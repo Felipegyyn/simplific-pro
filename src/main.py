@@ -566,3 +566,77 @@ def diagnostico_assinaturas():
     print(" - cancelled: Cancelada.")
     print(" - pending: Problema no cartão ou aguardando.")
     print("\n")
+
+
+# ▼▼▼ COLE NO FINAL DO ARQUIVO src/main.py ▼▼▼
+
+@app.cli.command("disparar-recuperacao-lista")
+def disparar_recuperacao_lista():
+    """
+    Dispara e-mail de recuperação APENAS para a lista VIP de e-mails fornecida.
+    Ignora status de assinatura e foca nos e-mails específicos.
+    """
+    from src.models.user import User
+    from src.extensions import mail
+    from flask_mail import Message
+
+    # --- LISTA DE ALVOS ---
+    target_emails = [
+        "cvn.camila@gmail.com",
+        "contato.rennedyeidi@gmail.com",
+        "jean.hd3@gmail.com",
+        "felipegyyyn@gmail.com"
+    ]
+    # ----------------------
+
+    print(f"--- Iniciando Disparo VIP para {len(target_emails)} usuários ---")
+
+    for email in target_emails:
+        # Busca o usuário pelo e-mail, independente de ter assinatura ou não
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            print(f"[ALERTA] Usuário {email} NÃO encontrado no banco de dados.")
+            continue
+
+        print(f"Enviando e-mail de renovação para: {user.name} ({user.email})...")
+
+        try:
+            msg = Message(
+                subject="Ação Necessária: Renovação da sua assinatura Simplific Pro",
+                recipients=[user.email]
+            )
+
+            # Link direto para o checkout
+            link_pagamento = "https://www.simplificpro.com/#/checkout"
+
+            msg.html = f"""
+            <div style="font-family: Arial, sans-serif; color: #333;">
+                <h2>Olá, {user.name.split()[0] if user.name else 'Parceiro'}!</h2>
+                <p>Esperamos que você tenha aproveitado seu primeiro mês no Simplific Pro.</p>
+                <p>Identificamos uma pendência na renovação automática da sua assinatura.</p>
+                <p>Para garantir que você continue acessando seus painéis, metas e inteligência artificial sem interrupções, 
+                por favor, clique no botão abaixo para reativar seu plano:</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{link_pagamento}" 
+                       style="background-color: #0891b2; color: white; padding: 15px 25px; 
+                              text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                       RENOVAR ASSINATURA AGORA
+                    </a>
+                </div>
+                
+                <p>O valor da renovação mensal é de <strong>R$ 29,90</strong>.</p>
+                <p>Se tiver qualquer dúvida, é só responder a este e-mail.</p>
+                <br>
+                <p>Atenciosamente,<br>Equipe Simplific Pro</p>
+            </div>
+            """
+            
+            mail.send(msg)
+            print(f" -> [SUCESSO] E-mail enviado para {email}")
+            
+        except Exception as e:
+            print(f" -> [ERRO] Falha ao enviar para {email}: {e}")
+
+    print("--- FIM DO DISPARO ---")

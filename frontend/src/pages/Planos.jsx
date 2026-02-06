@@ -11,10 +11,10 @@ const Planos = () => {
   const [billingCycle, setBillingCycle] = useState('annual');
 
   const handleSubscribe = () => {
-    if (window.fbq) {
+   if (window.fbq) {
       window.fbq('track', 'InitiateCheckout', {
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
-        value: billingCycle === 'monthly' ? 13.45 : 199.00,
+        value: billingCycle === 'monthly' ? 29.90 : 199.00, // <--- VALOR AJUSTADO
         currency: 'BRL'
       });
     }
@@ -31,23 +31,22 @@ const Planos = () => {
   // --- CONFIGURAÇÃO DE PREÇOS ATUALIZADA ---
   const pricing = {
     annual: {
-        oldPrice: "R$ 29,90", // Comparativo mensal padrão
-        priceDisplay: "16,58", // Foco no valor mensal equivalente
+        oldPrice: "R$ 358,80", // Valor cheio anual (29,90 * 12)
+        priceDisplay: "16,58", 
         priceSuffix: "/mês",
         headerText: "MELHOR CUSTO-BENEFÍCIO",
         headerColor: "bg-yellow-400 text-black",
-        // Texto secundário explicando o total
         subDetail: "No plano anual de R$ 199,00 (parcele em até 12x)", 
         buttonText: "QUERO O PLANO ANUAL"
       },
     monthly: {
-      oldPrice: "R$ 29,90",
-      priceDisplay: "13,45",        
-      priceSuffix: " no 1º mês",  
-      headerText: "OFERTA BLACK: 1º MÊS PROMOCIONAL",
-      headerColor: "bg-green-600 text-black",
-      subDetail: "A partir do 2º mês R$ 29,90 mensais.",
-      buttonText: "TESTAR POR R$ 13,45"
+      oldPrice: null, // Sem preço antigo (de/por)
+      priceDisplay: "29,90",        
+      priceSuffix: "/mês",  
+      headerText: "FLEXIBILIDADE TOTAL",
+      headerColor: "bg-gray-700 text-white", // Cor mais neutra
+      subDetail: "Sem fidelidade. Cancele quando quiser.",
+      buttonText: "ASSINAR MENSAL"
     }
   };
 

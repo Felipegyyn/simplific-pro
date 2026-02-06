@@ -57,11 +57,11 @@ const Checkout = () => {
   const isAnnual = searchParams.get('plan') === 'annual';
   
   // --- ALTERAÇÃO 2: NOVOS VALORES ---
-  const [amount] = useState(isAnnual ? 199.00 : 13.45);
+  const [amount] = useState(isAnnual ? 199.00 : 29.90);
   
   const planName = isAnnual 
     ? "Plano Anual (Parcele em até 12x)" 
-    : "Plano Mensal - 1º mês por R$ 13,45 (depois R$ 29,90)";
+    : "Plano Mensal - Assinatura (R$ 29,90)";
 
   const [formData, setFormData] = useState({
     name: '',
@@ -180,10 +180,10 @@ const Checkout = () => {
                 <Lock size={18} /> Pagamento Seguro
             </div>
             
-            {/* Componente Blindado */}
+           {/* Componente Blindado */}
             <PaymentBrick 
                 amount={amount}
-                maxInstallments={isAnnual ? 12 : 1} // <--- ALTERAÇÃO 4: Lógica das parcelas
+                maxInstallments={isAnnual ? 12 : 1} // Anual até 12x, Mensal apenas 1x
                 onSubmit={onSubmit} 
                 onError={onError} 
                 onReady={onReady} 
