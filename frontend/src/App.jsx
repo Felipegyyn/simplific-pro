@@ -22,7 +22,7 @@ import SimplificIA from './pages/SimplificIA';
 import AdvisorFeatures from './pages/AdvisorFeatures';
 import MainLayout from './components/MainLayout'; 
 import { Outlet } from 'react-router-dom';
-import BankAccounts from './pages/BankAccounts';
+import PersonalBankAccounts from './pages/BankAccounts'; // Mudamos o nome aqui
 import { ThemeProvider } from './contexts/ThemeContext'; 
 import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
@@ -190,7 +190,7 @@ const App = () => {
                     )
                 }
             >
-                <Route path="/bank-accounts" element={<BankAccounts user={user} onLogout={handleLogout} />} />
+                <Route path="/bank-accounts" element={<PersonalBankAccounts user={user} onLogout={handleLogout} />} />
                 <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} />} />
                 <Route path="/planning" element={<Planning user={user} onLogout={handleLogout} />} />
                 <Route path="/transactions" element={<Transactions user={user} onLogout={handleLogout} />} />
