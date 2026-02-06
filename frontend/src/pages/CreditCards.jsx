@@ -191,6 +191,28 @@ return false;
     setIsFaturaModalOpen(true);
   };
 
+
+  const excluirTransacao = async (transacaoId) => {
+    if (!confirm('Tem certeza? Isso restaurará o limite do cartão e reduzirá o valor da fatura.')) return;
+
+    try {
+      await apiService.delete(`/api/credit-cards/transactions/${transacaoId}`);
+      alert('✅ Transação excluída com sucesso!');
+      
+      // Fecha o modal da fatura para evitar dados desatualizados
+      setIsFaturaModalOpen(false);
+      
+      // Recarrega tudo para atualizar os valores na tela principal
+      await loadCartoes();
+      
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+      alert('Erro ao excluir. Tente novamente.');
+    }
+  };
+
+// ...
+
   // Função para excluir cartão
 const excluirCartao = async (cardId) => {
   if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
@@ -1061,19 +1083,46 @@ if (sucesso) {
                     <h4 className="font-semibold mb-4">Todas as Transações</h4>
                     <div className="space-y-2 max-h-60 overflow-y-auto">
                       {selectedFatura.transacoes.map((transacao, index) => (
-                        <div key={index} className="flex justify-between items-center py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-lg">
-                          <div>
-                            <p className="font-medium">{transacao.description}</p>
-                            <p className="text-sm text-gray-600 dark:text-slate-400">{formatDateForDisplay(transacao.date)}</p>
-                          </div>
-                          <p className="font-bold text-red-600 dark:text-red-400">
-                      R$ {(Number(transacao.value) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-                        </div>
-                      ))}
+  <div key={index} className="flex justify-between items-center py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-lg group">
+    
+    {/* Detalhes da Compra */}
+    <div className="flex-1">
+      <p className="font-medium text-slate-700 dark:text-slate-200">{transacao.description}</p>
+      <p className="text-sm text-gray-600 dark:text-slate-400">
+        {formatDateForDisplay(transacao.date)}
+        {/* Mostra qual é a parcela se for parcelado */}
+        {transacao.installments > 1 && (
+            <span className="ml-2 text-xs bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-500">
+                Parcela {transacao.current_installment}/{transacao.installments}
+            </span>
+        )}
+      </p>
+    </div>
+    
+    {/* Valor e Botão de Excluir */}
+    <div className="flex items-center gap-4">
+      <p className="font-bold text-red-600 dark:text-red-400">
+        R$ {(Number(transacao.value) || 0).toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        })}
+      </p>
+      
+      {/* Botão de Lixeira (Só aparece se a fatura estiver 'aberta') */}
+      {selectedFatura.status === 'aberta' && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => excluirTransacao(transacao.id)}
+            title="Excluir despesa"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+      )}
+    </div>
+  </div>
+))}
                     </div>
                   </div>
 

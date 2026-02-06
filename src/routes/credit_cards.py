@@ -386,6 +386,51 @@ def get_fatura_transactions(fatura_id):
     return jsonify([t.to_dict() for t in transactions])
 
 
+# ▼▼▼ COLE NO FINAL DO ARQUIVO src/routes/credit_cards.py ▼▼▼
+
+@credit_cards_bp.route('/credit-cards/transactions/<int:transaction_id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_credit_card_transaction(transaction_id):
+    user_id = get_jwt_identity()
+    
+    # 1. Busca a transação
+    transaction = CreditCardTransaction.query.filter_by(id=transaction_id, user_id=user_id).first()
+    if not transaction:
+        return jsonify({'error': 'Transação não encontrada'}), 404
+
+    # 2. Busca o cartão e a fatura vinculados
+    card = CreditCard.query.filter_by(id=transaction.credit_card_id).first()
+    fatura = Fatura.query.filter_by(id=transaction.fatura_id).first()
+
+    try:
+        # 3. Restaura o limite do cartão
+        if card:
+            # Converte para Decimal para evitar erros de ponto flutuante, se necessário, ou usa float se seu modelo for float
+            card.available_limit = float(card.available_limit) + float(transaction.value)
+            
+            # Trava de segurança: limite disponível não pode ser maior que o limite total
+            if card.available_limit > card.limit:
+                card.available_limit = card.limit
+
+        # 4. Abate o valor da fatura
+        if fatura:
+            fatura.valor_total = float(fatura.valor_total) - float(transaction.value)
+            # Se ficar negativo por algum erro de arredondamento, zera
+            if fatura.valor_total < 0:
+                fatura.valor_total = 0
+
+        # 5. Deleta a transação
+        db.session.delete(transaction)
+        db.session.commit()
+
+        return jsonify({'message': 'Transação excluída, limite restaurado e fatura atualizada.'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao excluir transação: {str(e)}'}), 500
+
+
 
 
 

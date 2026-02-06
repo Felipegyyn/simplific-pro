@@ -27,6 +27,7 @@ import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CategoriesSettings from './pages/CategoriesSettings';
+import Maintenance from './pages/Maintenance';
 
 //--- IMPORTS EMPRESARIAIS
 import BusinessAccess from './pages/empresas/BusinessAccess';
@@ -53,6 +54,8 @@ import SecurityPage from './pages/SecurityPage'; // <--- 1. IMPORT NOVO AQUI
 
 // Serviços
 import notificationService from './services/notifications';
+
+const IS_MAINTENANCE_MODE = true; // Mude para 'false' para desativar
 
 // Componente Guardião para Rotas de Admin
 const AdminRoute = ({ user, children }) => {
@@ -140,6 +143,17 @@ const App = () => {
       </div>
     );
   }
+
+  // ▼▼▼ ADICIONE ESTE BLOCO AQUI- Página de manutenção▼▼▼
+  // Se estiver em manutenção E o usuário NÃO for admin, exibe a tela de bloqueio.
+  if (IS_MAINTENANCE_MODE) {
+      const isAdmin = user && user.profile === 'admin';
+      
+      if (!isAdmin) {
+          return <Maintenance />;
+      }
+  }
+
 
   return (
     <Router>
