@@ -252,3 +252,35 @@ def to_dict(self):
         'created_at': self.created_at.isoformat() if self.created_at else None
     }
 
+# ▼▼▼ COLE NO FINAL DO ARQUIVO src/models/extended_modules.py ▼▼▼
+
+class BankAccount(db.Model):
+    __tablename__ = 'bank_accounts'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    
+    bank_name = db.Column(db.String(100), nullable=False) # Nome do Banco
+    agency = db.Column(db.String(20), nullable=True)      # Agência
+    account_number = db.Column(db.String(30), nullable=False) # Conta
+    
+    # Saldo Inicial (o ponto de partida)
+    initial_balance = db.Column(db.Float, default=0.0)
+    
+    # Saldo Atual (será atualizado conforme movimentações futuras)
+    current_balance = db.Column(db.Float, default=0.0)
+    
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'bank_name': self.bank_name,
+            'agency': self.agency,
+            'account_number': self.account_number,
+            'balance': self.current_balance, # O front recebe o saldo ATUAL
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+

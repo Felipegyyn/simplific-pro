@@ -47,6 +47,7 @@ from src.routes.investments import investments_bp
 from src.routes.extended_simple import extended_bp
 from src.routes.reports import reports_bp # <-- ADICIONE ESTA LINHA para reports
 from src.routes.routes_whatsapp import whatsapp_bp
+from src.routes.bank_accounts import bank_accounts_bp # <--- IMPORT NOVO
 from src.routes.analysis import analysis_bp # <-- ADICIONE ESTA LINHA
 from src.routes.business_routes import business_bp # <--- 1. Rota Empresarial
 from src.models.business import Stakeholder, Company  # <--- 2. Modelo Empresarial
@@ -133,6 +134,7 @@ app.register_blueprint(extended_bp, url_prefix='/api')
 app.register_blueprint(reports_bp, url_prefix='/api') 
 app.register_blueprint(whatsapp_bp)
 app.register_blueprint(webhooks_bp, url_prefix='/webhooks')
+app.register_blueprint(bank_accounts_bp, url_prefix='/api') # <--- REGISTRO NOVO
 app.register_blueprint(payment_bp, url_prefix='/api/payment')
 app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 app.register_blueprint(analysis_bp, url_prefix='/api') 
