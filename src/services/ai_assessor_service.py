@@ -88,23 +88,32 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         return "Tive um problema para me conectar com minha inteligência. Tente novamente em alguns instantes.", None
         
 
-    # --- PASSO 3: Processar a Resposta do Gemini ---
+   # --- PASSO 3: Processar a Resposta do Gemini (VERSÃO BLINDADA) ---
     texto_para_usuario = resposta_gemini
     acao_a_executar = None
 
-    # Procura pelo bloco [ACTION] na resposta
-    match = re.search(r'\[ACTION\]\s*({.*})', resposta_gemini)
-    if match:
-        json_action_str = match.group(1)
-        # Remove o bloco [ACTION] do texto que será enviado ao usuário
-        texto_para_usuario = re.sub(r'\[ACTION\]\s*({.*})', '', texto_para_usuario).strip()
+    # Verifica se existe a tag de ação
+    if '[ACTION]' in resposta_gemini:
+        # Separa o texto da ação usando o split, que é mais seguro que regex
+        partes = resposta_gemini.split('[ACTION]')
         
+        # A parte 0 é o que a IA falou para o usuário
+        texto_para_usuario = partes[0].strip()
+        
+        # A parte 1 é o código JSON (pode ter lixo, quebra de linha, markdown)
+        json_sujo = partes[1].strip()
+        
+        # Limpeza profunda para garantir que o JSON funcione
+        # Remove ```json, ```, e a palavra json solta
+        json_limpo = json_sujo.replace('```json', '').replace('```', '').strip()
+        if json_limpo.lower().startswith('json'):
+            json_limpo = json_limpo[4:].strip()
+            
         try:
-            # Tenta decodificar o JSON da ação
-            acao_a_executar = json.loads(json_action_str)
-        except json.JSONDecodeError:
-            print(f"ERRO: Falha ao decodificar o JSON de ação: {json_action_str}")
-            # Se o JSON for inválido, ignoramos a ação mas ainda retornamos o texto
+            acao_a_executar = json.loads(json_limpo)
+        except json.JSONDecodeError as e:
+            print(f"ERRO: IA enviou JSON inválido: {json_limpo} | Erro: {e}")
+            # Se der erro no JSON, pelo menos o usuário vê apenas o texto limpo
             acao_a_executar = None
 
     # --- PASSO 4: Executar a Ação (se houver) ---

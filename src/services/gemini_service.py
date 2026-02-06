@@ -72,19 +72,16 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - Mantenha a lógica de ações rigorosamente igual (create_transaction, pay_credit_card_bill, etc).
     - **IMPORTANTE:** Para lançamentos, sua resposta de texto deve ser MÁXIMO uma frase de confirmação.
     
-    # FORMATO DAS AÇÕES (JSON)
-    - Mantenha exatamente o mesmo padrão JSON que você já conhece para:
-      - "create_transaction" (gastos/receitas)
-      - "lancar_gasto_cartao" (se citar 'cartão' ou 'crédito')
-      - "consultar_planejamento" (orçamento)
-      - "consultar_transacoes" (extrato)
-      - "pay_credit_card_bill" (pagar fatura)
-      - "add_value_to_goal" (metas)
-      - "cadastrar_investimento"
-      - "consultar_preco_ativo"
-      - "simular_cenario_financeiro"
-      - "cadastrar_evento_agenda" e "consultar_agenda"
-      - "consultar_contato" e "cadastrar_contato"
+    # FORMATO DAS AÇÕES (JSON) - RIGOROSO
+    - O bloco [ACTION] deve vir SEMPRE no final da resposta.
+    - NÃO USE formatacao markdown (como ```json). Envie apenas o texto cru.
+    - NÃO invente chaves novas. Siga ESTRITAMENTE a estrutura: {{"type": "NOME_DA_ACAO", "data": {{...}}}}
+    - ERRO COMUM: Não use "action": "create...". O correto é "type": "create_transaction".
+    - ERRO COMUM: Para despesas, use "type": "saida". NÃO use "Despesa".
+    
+    # EXEMPLOS DE ESTRUTURA CORRETA (Copie estes padrões):
+    - Lançar Gasto: [ACTION]{{"type": "create_transaction", "data": {{"description": "Mercado", "value": 50.00, "type": "saida", "category_name": "Alimentação"}}}}
+    - Pagar Fatura: [ACTION]{{"type": "pay_credit_card_bill", "data": {{"card_name": "Nubank"}}}}
 
     # EXEMPLOS DE INTERAÇÃO (NOVA PERSONALIDADE)
     - User: "quanto gastei com iFood?"

@@ -616,7 +616,7 @@ def disparar_recuperacao_lista():
                 <p>Esperamos que você tenha aproveitado seu primeiro mês no Simplific Pro.</p>
                 <p>Identificamos uma pendência na renovação automática da sua assinatura.</p>
                 <p>Para garantir que você continue acessando seus painéis, metas e inteligência artificial sem interrupções, 
-                por favor, clique no botão abaixo para reativar seu plano:</p>
+                por favor, clique no botão abaixo para renovar seu plano:</p>
                 
                 <div style="text-align: center; margin: 30px 0;">
                     <a href="{link_pagamento}" 
