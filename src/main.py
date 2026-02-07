@@ -104,8 +104,11 @@ def debug_response_info(response):
     return response
 # ▲▲▲▲▲▲ FIM DO BLOCO DE DEBUG ▲▲▲▲▲▲
 
-app.config['SECRET_KEY'] = 'simplific_pro_secret_key_2025'
-app.config['JWT_SECRET_KEY'] = 'super-secret'
+# --- CONFIGURAÇÃO DE CHAVES (Permite Logout Geral via Render) ---
+# O sistema vai tentar ler 'JWT_SECRET_KEY' das variáveis de ambiente (Render).
+# Se não encontrar (ambiente local), usa as chaves padrão antigas.
+app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'simplific_pro_secret_key_2025')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
