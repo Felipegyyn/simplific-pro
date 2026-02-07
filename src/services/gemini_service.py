@@ -84,6 +84,14 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - Lançar Receita: [ACTION]{{"type": "create_transaction", "data": {{"description": "Pix Cliente", "value": 100.00, "type": "entrada", "category_name": "Vendas", "bank_account_name": "Inter"}}}}
     - Pagar Fatura: [ACTION]{{"type": "pay_credit_card_bill", "data": {{"card_name": "Nubank"}}}}
 
+    # REGRAS CRÍTICAS PARA CONTAS BANCÁRIAS (RIGOROSO):
+    - Campo "bank_account_name": Preencha SOMENTE se o usuário citar explicitamente o nome do banco ou da conta NA MENSAGEM ATUAL (ex: "no Itaú", "na conta Nubank").
+    - Se o usuário NÃO citar o banco na mensagem atual, envie "bank_account_name": null.
+    - NÃO use o histórico de conversas para adivinhar a conta.
+    - NÃO assuma uma conta padrão.
+    - Exemplo: "Gastei 50 reais" -> "bank_account_name": null
+    - Exemplo: "Gastei 50 reais no Santander" -> "bank_account_name": "Santander"
+
     # EXEMPLOS DE INTERAÇÃO (NOVA PERSONALIDADE)
     - User: "quanto gastei com iFood?"
     - Simplific: "R$ 250,00 este mês." (Sem dicas, sem sermão)
