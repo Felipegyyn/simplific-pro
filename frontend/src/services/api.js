@@ -108,7 +108,7 @@ class ApiService {
     return headers;
   }
 
-  async request(endpoint, options = {}) {
+async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
       headers: this.getHeaders(),
@@ -118,6 +118,14 @@ class ApiService {
     try {
       const response = await fetch(url, config);
 
+      // --- MUDANÇA 1: Tratamento explícito para 422 (Logout Imediato) ---
+      if (response.status === 422) {
+          console.warn('Sessão invalidada pelo servidor (422). Realizando logout.');
+          this.logout();
+          throw new Error('Sessão expirada. Faça login novamente.');
+      }
+
+      // Tratamento para 401 (Tenta renovar)
       if (response.status === 401 && !options._retry) {
         try {
           await this.silentRefreshToken();
@@ -187,15 +195,26 @@ class ApiService {
     return data;
   }
 
-  async logout() {
+  logout() { // Removi o 'async' pois não precisa ser assíncrono
+    // 1. Para qualquer renovação em andamento
+    this.isRefreshing = false;
+    this.failedQueue = [];
+    
+    // 2. Limpa variáveis de memória
     this.token = null;
     this.refreshToken = null;
+
+    // 3. Limpa o armazenamento
     localStorage.removeItem('simplific_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('simplific_user');
 
-    if (window.location.hash !== '#/login' && window.location.hash !== '#/') {
-      window.location.hash = '#/login';
+    // 4. Redireciona apenas se não estiver na tela de login
+    // Usamos window.location.href para forçar um recarregamento limpo
+    if (!window.location.hash.includes('/login')) {
+      console.log('Redirecionando para login...');
+      window.location.href = '/#/login'; 
+      // Se você não usar hash router (#), use: window.location.href = '/login';
     }
   }
 
