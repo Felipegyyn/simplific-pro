@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, case
 from sqlalchemy import cast
 from src.database.database import execute_query # <-- ADICIONE ESTA LINHA
+from src.models.extended_modules import BankAccount # <--- ADICIONE ESTE IMPORT
 from src.models.db import db
 from src.models.financial import Category, Planning, Transaction
 from src.services.transacoes_service import processar_extrato_pdf 
@@ -375,23 +376,26 @@ def planning_to_transaction(planning_id):
     
     return jsonify(transaction.to_dict()), 201
 
-# Transactions routes
 @transactions_bp.route('/', methods=['GET'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def get_transactions():
     user_id = get_jwt_identity()
-    ano = request.args.get('ano')
     
-    # Get filter parameters
+    # Filtros
+    ano = request.args.get('ano')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     type_filter = request.args.get('type')
     payment_form_filter = request.args.get('payment_form')
     category_filter = request.args.get('category_id')
-    category_name = request.args.get('category_name')  # ← ADICIONE AQUI
+    category_name = request.args.get('category_name')
     status_filter = request.args.get('status')
     
+    # ▼▼▼ NOVO FILTRO ▼▼▼
+    bank_account_id = request.args.get('bank_account_id')
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     query = Transaction.query.filter_by(user_id=user_id)
 
     if ano:
@@ -426,42 +430,54 @@ def get_transactions():
         query = query.filter_by(category_id=category_filter)
 
     if category_name:
-        # filtra por nome da categoria via join
         query = query.join(Category).filter(Category.name == category_name)
     
     if status_filter:
         query = query.filter_by(status=status_filter)
-    
+
+    # ▼▼▼ APLICAÇÃO DO NOVO FILTRO ▼▼▼
+    if bank_account_id:
+        query = query.filter_by(bank_account_id=bank_account_id)
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     transactions = query.order_by(Transaction.date.desc()).all()
+    
     valid_transactions = []
     for transaction in transactions:
         try:
             valid_transactions.append(transaction.to_frontend_dict())
         except Exception as e:
-            print(f"[WARNING] Transação inválida ignorada (ID: {getattr(transaction, 'id', 'desconhecido')}): {str(e)}")
+            print(f"[WARNING] Transação inválida ignorada: {str(e)}")
+            
     return jsonify({'transactions': valid_transactions}), 200
 
 
-    
 
 @transactions_bp.route('/', methods=['POST', 'OPTIONS'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def create_transaction():
+    if request.method == 'OPTIONS':
+        return '', 200
+
     user_id = get_jwt_identity()
     data = request.json
 
-    print("DEBUG - DADOS RECEBIDOS EM /transactions:")
-    print(data)
-
+    print("DEBUG - DADOS RECEBIDOS EM /transactions:", data)
     
     date_str = data.get('date')
     type = data.get('type')
     if type not in ['entrada', 'saida']:
         return jsonify({'error': 'Tipo inválido. Deve ser "entrada" ou "saida".'}), 400
+    
     category_id = data.get('category_id')
     if not category_id:
         return jsonify({'error': 'ID da categoria obrigatório'}), 400
+        
+    # ▼▼▼ NOVO CAMPO ▼▼▼
+    bank_account_id = data.get('bank_account_id')
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+    
     format = data.get('format', 'variavel')
     payment_form = data.get('payment_form', 'a_vista')
     installments = data.get('installments', 1)
@@ -479,15 +495,30 @@ def create_transaction():
     except ValueError:
         return jsonify({'error': 'Data, valor ou parcelas inválidos'}), 400
     
-    # Verify category belongs to user
+    # Valida categoria
     category = Category.query.filter_by(id=category_id, user_id=user_id).first()
     if not category:
         return jsonify({'error': 'Categoria não encontrada'}), 404
     
+    # ▼▼▼ LÓGICA DE SALDO BANCÁRIO ▼▼▼
+    account = None
+    if bank_account_id:
+        account = BankAccount.query.filter_by(id=bank_account_id, user_id=user_id).first()
+        if not account:
+            return jsonify({'error': 'Conta bancária não encontrada'}), 404
+            
+        # Se a transação já nasce confirmada, atualizamos o saldo
+        if status == 'confirmada':
+            if type == 'entrada':
+                account.current_balance += value
+            elif type == 'saida':
+                account.current_balance -= value
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     transactions_created = []
     
     if payment_form == 'parcelado' and installments > 1:
-        # Create multiple transactions for installments
+        # Lógica de parcelamento (mantida igual)
         for i in range(installments):
             installment_date = date + relativedelta(months=i)
             installment_description = f"{description} - Parcela {i+1}/{installments}"
@@ -502,23 +533,22 @@ def create_transaction():
                 installments=installments,
                 current_installment=i+1,
                 description=installment_description,
-                value=value / installments,  # Divide value by installments
-                status=status
+                value=value / installments,
+                status=status,
+                bank_account_id=bank_account_id # <--- VINCULA A CONTA
             )
             
             if i == 0:
-                # First transaction is the parent
                 db.session.add(transaction)
-                db.session.flush()  # Get the ID
+                db.session.flush()
                 parent_id = transaction.id
             else:
-                # Subsequent transactions reference the parent
                 transaction.parent_transaction_id = parent_id
                 db.session.add(transaction)
             
             transactions_created.append(transaction)
     else:
-        # Single transaction
+        # Transação única
         transaction = Transaction(
             user_id=user_id,
             date=date,
@@ -530,7 +560,8 @@ def create_transaction():
             current_installment=1,
             description=description,
             value=value,
-            status=status
+            status=status,
+            bank_account_id=bank_account_id # <--- VINCULA A CONTA
         )
         
         db.session.add(transaction)
@@ -539,6 +570,7 @@ def create_transaction():
     db.session.commit()
     
     return jsonify(transactions_created[0].to_frontend_dict()), 201
+
 
 @transactions_bp.route('/<int:transaction_id>', methods=['PUT', 'OPTIONS'])
 def update_transaction(transaction_id):
@@ -588,11 +620,10 @@ def pay_transaction(transaction_id):
 
 @transactions_bp.route('/<int:transaction_id>/confirm', methods=['POST', 'OPTIONS'])
 def confirm_transaction(transaction_id):
-
     if request.method == 'OPTIONS':
-        return '', 200  # Resposta para o preflight, sem autenticação
+        return '', 200
 
-    verify_jwt_in_request()  # Agora só valida para POST
+    verify_jwt_in_request()
     user_id = get_jwt_identity()
     transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
     
@@ -602,6 +633,16 @@ def confirm_transaction(transaction_id):
     if transaction.status == 'confirmada':
         return jsonify({'error': 'Lançamento já confirmado'}), 400
     
+    # ▼▼▼ ATUALIZAÇÃO DE SALDO NA CONFIRMAÇÃO ▼▼▼
+    if transaction.bank_account_id:
+        account = BankAccount.query.filter_by(id=transaction.bank_account_id, user_id=user_id).first()
+        if account:
+            if transaction.type == 'entrada':
+                account.current_balance += transaction.value
+            elif transaction.type == 'saida':
+                account.current_balance -= transaction.value
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
     transaction.status = 'confirmada'
     transaction.confirmed_at = datetime.utcnow()
     
@@ -612,7 +653,7 @@ def confirm_transaction(transaction_id):
 @transactions_bp.route('/<int:transaction_id>', methods=['DELETE', 'OPTIONS'])
 def delete_transaction(transaction_id):
     if request.method == 'OPTIONS':
-        return '', 200  
+        return '', 200
 
     verify_jwt_in_request() 
     user_id = get_jwt_identity()
@@ -621,15 +662,20 @@ def delete_transaction(transaction_id):
     if not transaction:
         return jsonify({'error': 'Lançamento não encontrado'}), 404
     
-    # REMOVIDO A TRAVA DE CONFIRMADO CONFORME SOLICITADO ANTERIORMENTE
-    # if transaction.status == 'confirmada':
-    #      return jsonify({'error': 'Não é possível excluir lançamento confirmado'}), 400
+    # ▼▼▼ ESTORNO DE SALDO AO EXCLUIR ▼▼▼
+    # Só estorna se a transação estava confirmada e vinculada a uma conta
+    if transaction.status == 'confirmada' and transaction.bank_account_id:
+        account = BankAccount.query.filter_by(id=transaction.bank_account_id, user_id=user_id).first()
+        if account:
+            # Lógica INVERSA para desfazer
+            if transaction.type == 'entrada':
+                account.current_balance -= transaction.value # Tira a receita
+            elif transaction.type == 'saida':
+                account.current_balance += transaction.value # Devolve a despesa
+    # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-    # --- CORREÇÃO DO ERRO AQUI ---
-    # Garantimos que installments seja tratado como 1 se vier None (nulo) do banco
     num_installments = transaction.installments or 1
 
-    # Se for uma transação pai e tiver mais de 1 parcela, deleta as filhas
     if transaction.parent_transaction_id is None and num_installments > 1:
         child_transactions = Transaction.query.filter_by(parent_transaction_id=transaction.id).all()
         for child in child_transactions:

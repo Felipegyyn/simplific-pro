@@ -8,11 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox'; // <--- IMPORT NOVO
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'; // <--- IMPORT NOVO
 import { 
   DollarSign, TrendingUp, TrendingDown, Plus, Edit, Trash2, 
   Search, Filter, Calendar, CheckCircle, Clock, LogOut, ArrowLeft,
-  FileText, RefreshCw
+  FileText, RefreshCw, Wallet // <--- Wallet ADICIONADO
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
@@ -21,39 +22,37 @@ import logo from '../assets/LOGO.png';
 const Transactions = ({ user, onLogout }) => {
   const navigate = useNavigate();
 
-  // ▼▼▼ ADICIONE ESTA FUNÇÃO AQUI ▼▼▼
   const getLocalDate = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Meses são de 0 a 11
+    const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  // ▲▲▲ FIM DA FUNÇÃO ▲▲▲
 
-  // ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO AQUI ▼▼▼
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return 'Data inválida';
-    // Pega a parte da data antes do 'T' (ex: "2025-08-29")
     const datePart = dateString.split('T')[0];
-    // Adiciona um horário para evitar que o JS interprete como UTC
     const localDate = new Date(`${datePart}T12:00:00`);
-    // Formata para o padrão local (ex: "29/08/2025")
     return localDate.toLocaleDateString();
   };
-  // ▲▲▲ FIM DA NOVA FUNÇÃO ▲▲▲
 
-  // Estados para transações e modal
   const [transacoes, setTransacoes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTransacao, setSelectedTransacao] = useState(null);
+  
+  // Estados de Contas
+  const [contas, setContas] = useState([]);
+  const [selectedContas, setSelectedContas] = useState([]); // <--- NOVO ESTADO DE FILTRO
+
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
     type: 'expense',
     category: '',
+    bank_account_id: 'none',
     transaction_date: getLocalDate(),
     status: 'pendente'
   });
@@ -62,39 +61,30 @@ const Transactions = ({ user, onLogout }) => {
   const [categoriasLoading, setCategoriasLoading] = useState(true);
   const [novaCategoria, setNovaCategoria] = useState('');
 
-const adicionarCategoria = async (novaCategoria) => {
-  try {
+  const adicionarCategoria = async (novaCategoria) => {
+    try {
+      const existe = Array.isArray(categorias) && categorias.some(
+        (cat) => cat.name.toLowerCase() === novaCategoria.toLowerCase() && cat.type === (formData.type === 'income' ? 'entrada' : 'saida')
+      );
+      if (existe) {
+        alert('Essa categoria já existe.');
+        return;
+      }
 
-    const existe = Array.isArray(categorias) && categorias.some(
-    (cat) => cat.name.toLowerCase() === novaCategoria.toLowerCase() && cat.type === (formData.type === 'income' ? 'entrada' : 'saida')
-);
-    if (existe) {
-      alert('Essa categoria já existe.');
-      return;
+      const categoriaData = {
+        name: novaCategoria,
+        type: formData.type === 'income' ? 'entrada' : 'saida'
+      };
+
+      await apiService.post('/api/categories', categoriaData);
+      await loadCategorias();
+      setFormData((prev) => ({ ...prev, category: novaCategoria }));
+      alert('Categoria cadastrada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao criar categoria:', error);
+      alert('Erro ao criar categoria. Tente novamente.');
     }
-
-    // 👉 Chamada correta, APENAS UMA
-    const categoriaData = {
-  name: novaCategoria,
-  type: formData.type === 'income' ? 'entrada' : 'saida'
-};
-
-console.log('✅ Dados enviados para API:', categoriaData);
-
-await apiService.post('/api/categories', categoriaData);
-
-
-    await loadCategorias(); // 🔄 Atualiza lista a partir do backend
-    // Forçar renderização correta
-    setFormData((prev) => ({ ...prev, category: novaCategoria }));
-
-    alert('Categoria cadastrada com sucesso!');
-  } catch (error) {
-    console.error('Erro ao criar categoria:', error.response ? error.response.data : error.message);
-    alert('Erro ao criar categoria. Tente novamente.');
-  }
-};
-
+  };
 
   const [editFormData, setEditFormData] = useState({
     description: '',
@@ -105,172 +95,151 @@ await apiService.post('/api/categories', categoriaData);
     status: 'pendente'
   });
 
-  const fileInputRef = useRef(null); // <-- Adicione esta linha para o input de arquivo
+  const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState(null); // para a mensagem de sucesso/erro
+  const [uploadResult, setUploadResult] = useState(null);
 
-  // Carregar transações da API
   useEffect(() => {
     loadTransacoes();
     loadCategorias();
+    loadContas();
   }, []);
 
-const loadTransacoes = async () => {
-  try {
-    setLoading(true);
-    const response = await apiService.get('/api/transactions');
-    console.log('Retorno da API:', response);
-
-    let lista = [];
-
-    if (response && response.data && Array.isArray(response.data.transactions)) {
-      lista = response.data.transactions;
-    } else if (response && Array.isArray(response.data)) {
-      lista = response.data;
-    } else if (response && Array.isArray(response.transactions)) { // Fallback se o backend mudar estrutura
-      lista = response.transactions;
-    } else {
-      console.error('Formato inesperado da resposta:', response);
+  const loadContas = async () => {
+    try {
+        const data = await apiService.get('/api/bank-accounts');
+        setContas(data || []);
+    } catch (error) {
+        console.error("Erro ao carregar contas:", error);
     }
+  };
 
-    // 🔑 Garantir que o estado é sempre um array
-    setTransacoes(Array.isArray(lista) ? lista : []);
-  } catch (error) {
-    console.error('Erro ao carregar transações:', error.response ? error.response.data : error.message);
-    setTransacoes([]); // Limpa corretamente em caso de erro
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const loadTransacoes = async () => {
+    try {
+      setLoading(true);
+      const response = await apiService.get('/api/transactions');
+      let lista = [];
+      if (response && response.data && Array.isArray(response.data.transactions)) {
+        lista = response.data.transactions;
+      } else if (response && Array.isArray(response.data)) {
+        lista = response.data;
+      } else if (response && Array.isArray(response.transactions)) {
+        lista = response.transactions;
+      }
+      setTransacoes(Array.isArray(lista) ? lista : []);
+    } catch (error) {
+      console.error('Erro ao carregar transações:', error);
+      setTransacoes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadCategorias = async () => {
-  try {
-    setCategoriasLoading(true); // Início do carregamento
-    const response = await apiService.get('/api/categories');
-    console.log('🔍 Resposta completa da API:', response);
-    setCategorias(response || []);
-    console.log('Categorias carregadas:', response);
-  } catch (error) {
-    console.error('Erro ao carregar categorias:', error);
-    setCategorias([]);
-  } finally {
-    setCategoriasLoading(false); // Final do carregamento
-  }
-};
+    try {
+      setCategoriasLoading(true);
+      const response = await apiService.get('/api/categories');
+      setCategorias(response || []);
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error);
+      setCategorias([]);
+    } finally {
+      setCategoriasLoading(false);
+    }
+  };
 
-// Em src/pages/Transactions.jsx
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-// ▼▼▼ SUBSTITUA A SUA FUNÇÃO 'handleFileUpload' INTEIRA POR ESTA ▼▼▼
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  if (file.type !== 'application/pdf') {
-    alert('Por favor, selecione um arquivo PDF.');
-    return;
-  }
-
-  setIsUploading(true);
-  setUploadResult(null);
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    // --- MUDANÇA PRINCIPAL: USANDO 'FETCH' EM VEZ DE 'APISERVICE' ---
-    // Pegamos o token de autenticação diretamente do localStorage
-    const token = localStorage.getItem('simplific_token');
-    if (!token) {
-        throw new Error('Token de autenticação não encontrado.');
+    if (file.type !== 'application/pdf') {
+      alert('Por favor, selecione um arquivo PDF.');
+      return;
     }
 
-    // Usamos a API 'fetch' nativa para ter controle total sobre o upload
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions/import-statement`, {
-      method: 'POST',
-      headers: {
-        // NÃO definimos 'Content-Type' aqui. O navegador faz isso
-        // automaticamente para FormData, incluindo o 'boundary' correto.
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData,
-    });
-    
-    // Convertemos a resposta 
-    const result = await response.json();
+    setIsUploading(true);
+    setUploadResult(null);
 
-    // Verificamos se a resposta da API foi um sucesso (status 2xx)
-    if (!response.ok) {
-        // Se não foi sucesso, lançamos um erro com a mensagem da API
-        throw new Error(result.error || 'Erro no servidor.');
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const token = localStorage.getItem('simplific_token');
+      if (!token) throw new Error('Token de autenticação não encontrado.');
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions/import-statement`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataUpload,
+      });
+      
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error || 'Erro no servidor.');
+
+      setUploadResult({ success: true, message: result.mensagem });
+      await loadTransacoes();
+
+    } catch (error) {
+      setUploadResult({ success: false, message: error.message });
+    } finally {
+      setIsUploading(false);
     }
+  };
 
-    // Se tudo deu certo, atualizamos a tela
-    setUploadResult({ success: true, message: result.mensagem });
-    await loadTransacoes();
+  const carregarCategoriasAntesDeAbrir = async () => {
+    setCategoriasLoading(true);
+    await loadCategorias();
+    await loadContas();
+    setCategoriasLoading(false);
+    setIsModalOpen(true);
+  };
 
-  } catch (error) {
-    // A mensagem de erro agora virá do 'throw new Error' acima
-    setUploadResult({ success: false, message: error.message });
-  } finally {
-    setIsUploading(false);
-  }
-};
-
-const carregarCategoriasAntesDeAbrir = async () => {
-  setCategoriasLoading(true);
-  await loadCategorias();  // Garante carregamento completo
-  setCategoriasLoading(false);
-  setIsModalOpen(true);
-};
-
-
-  // Função para criar nova transação
   const criarTransacao = async (dadosTransacao) => {
-  try {
-    // Correção: criar a transação no backend
-    await apiService.post('/api/transactions', dadosTransacao);
-    await loadTransacoes(); // Depois de criar, recarregar
-    eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
-    setIsModalOpen(false); // Fechar modal
-    setFormData({
-      description: '',
-      amount: '',
-      type: 'expense',
-      category: '',
-      transaction_date: getLocalDate(),
-      status: 'pendente'
-    });
-  } catch (error) {
-    console.error('Erro ao criar transação:', error);
-    alert('Erro ao criar transação. Tente novamente.');
-  }
-};
+    try {
+      await apiService.post('/api/transactions', dadosTransacao);
+      await loadTransacoes();
+      await loadContas(); 
+      eventService.emit('transactionsChanged');
+      setIsModalOpen(false);
+      
+      if (dadosTransacao.type === 'entrada') {
+          alert("Valor adicionado com sucesso!");
+      } else {
+          alert("Transação criada com sucesso!");
+      }
 
+      setFormData({
+        description: '',
+        amount: '',
+        type: 'expense',
+        category: '',
+        bank_account_id: 'none',
+        transaction_date: getLocalDate(),
+        status: 'pendente'
+      });
+    } catch (error) {
+      console.error('Erro ao criar transação:', error);
+      alert('Erro ao criar transação. Tente novamente.');
+    }
+  };
 
-  // Função para confirmar transação
   const confirmarTransacao = async (id) => {
-  try {
-    await apiService.post(`/api/transactions/${id}/confirm`);
-    await loadTransacoes();
-    eventService.emit('transactionsChanged'); // <-- ADICIONE ESTA LINHA
-    alert('Transação confirmada com sucesso!');
-  } catch (error) {
-    console.error('Erro ao confirmar transação:', error);
-    alert('Erro ao confirmar transação. Tente novamente.');
-  }
-};
+    try {
+      await apiService.post(`/api/transactions/${id}/confirm`);
+      await loadTransacoes();
+      await loadContas();
+      eventService.emit('transactionsChanged');
+      alert('Transação confirmada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao confirmar transação:', error);
+      alert('Erro ao confirmar transação. Tente novamente.');
+    }
+  };
 
-
-// ▼▼▼ SUBSTITUA TODA A FUNÇÃO 'editarTransacao' POR ESTA ▼▼▼
   const editarTransacao = async (id, dados) => {
     try {
-      // A chamada para a API permanece a mesma
       const response = await apiService.put(`/api/transactions/${id}`, dados);
-
-      // A MUDANÇA ESTÁ AQUI. Como a API retorna um status 200 OK (sucesso),
-      // podemos confiar que, se não houve um erro pego pelo 'catch',
-      // a operação foi bem-sucedida. Este 'if' é mais robusto.
       if (response) {
         await loadTransacoes();
         eventService.emit('transactionsChanged');
@@ -278,7 +247,6 @@ const carregarCategoriasAntesDeAbrir = async () => {
         setSelectedTransacao(null);
         alert('Transação atualizada com sucesso!');
       } else {
-        // Este bloco de 'else' agora serve como uma segurança extra.
         alert('A API não retornou uma confirmação. Tente novamente.');
       }
     } catch (error) {
@@ -286,38 +254,31 @@ const carregarCategoriasAntesDeAbrir = async () => {
       alert('Erro ao editar transação. Tente novamente.');
     }
   };
-// ▲▲▲ FIM DO BLOCO DE SUBSTITUIÇÃO ▲▲▲
 
-  // Função para abrir modal de edição
   const abrirModalEdicao = (transacao) => {
     setSelectedTransacao(transacao);
     setEditFormData({
-  description: transacao.description,
-  amount: (transacao.amount || 0).toString(), // VOLTAR PARA amount
-  type: transacao.type, // Simplificado para usar o tipo diretamente
-  category: transacao.category,
-  transaction_date: transacao.transaction_date,
-  status: transacao.status
-});
-
+      description: transacao.description,
+      amount: (transacao.amount || 0).toString(),
+      type: transacao.type === 'entrada' ? 'income' : 'expense',
+      category: transacao.category,
+      transaction_date: transacao.transaction_date,
+      status: transacao.status
+    });
     setIsEditModalOpen(true);
   };
 
-  // Função para excluir transação
   const excluirTransacao = async (transacao) => {
-    // Define a mensagem base
     let mensagem = 'Tem certeza que deseja excluir esta transação?';
-
-    // Se estiver confirmada, muda a mensagem para a de segurança
     if (transacao.status === 'confirmada') {
-      mensagem = 'Este lançamento está confirmado. Tem certeza que deseja excluir?';
+      mensagem = 'Este lançamento está confirmado e afetará o saldo da conta. Tem certeza que deseja excluir?';
     }
 
-    // O confirm do navegador exibe "OK" (Sim) e "Cancelar" (Não) nativamente
     if (window.confirm(mensagem)) {
       try {
         await apiService.delete(`/api/transactions/${transacao.id}`);
-        await loadTransacoes(); // Recarregar lista
+        await loadTransacoes();
+        await loadContas();
         eventService.emit('transactionsChanged');
       } catch (error) {
         console.error('Erro ao excluir transação:', error);
@@ -327,137 +288,150 @@ const carregarCategoriasAntesDeAbrir = async () => {
   };
 
   const buscarCategoryId = (categoriaSelecionada) => {
-  const categoriaEncontrada = categorias.find(cat => cat.name === categoriaSelecionada && cat.type === (formData.type === 'income' ? 'entrada' : 'saida'));
-  return categoriaEncontrada ? categoriaEncontrada.id : null;
+    const categoriaEncontrada = categorias.find(cat => cat.name === categoriaSelecionada && cat.type === (formData.type === 'income' ? 'entrada' : 'saida'));
+    return categoriaEncontrada ? categoriaEncontrada.id : null;
+  };
 
-};
-  // Função para lidar com submit do formulário
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validação básica
     if (!formData.amount || !formData.category) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
-    // Converter amount para número positivo
-    const amount = parseFloat(formData.amount);
-    const finalAmount = Math.abs(amount); // Garante que o valor é sempre positivo
+    if (!formData.bank_account_id || formData.bank_account_id === 'none') {
+        if (!window.confirm("Nenhuma conta adicionada, deseja continuar?")) {
+            return;
+        }
+    }
 
+    const amount = parseFloat(formData.amount);
+    const finalAmount = Math.abs(amount);
+
+    if (formData.type === 'expense' && formData.bank_account_id && formData.bank_account_id !== 'none') {
+        const contaSelecionada = contas.find(c => c.id.toString() === formData.bank_account_id.toString());
+        if (contaSelecionada) {
+            if (contaSelecionada.balance < finalAmount) {
+                if (!window.confirm("Essa conta não tem saldo suficiente, deseja continuar?")) {
+                    return;
+                }
+            }
+        }
+    }
 
     const categoriaSelecionada = categorias.find(cat => cat.name === formData.category && cat.type === (formData.type === 'income' ? 'entrada' : 'saida'));
 
-if (!categoriaSelecionada) {
-  alert('Categoria inválida.');
-  return;
-}
+    if (!categoriaSelecionada) {
+      alert('Categoria inválida.');
+      return;
+    }
 
-criarTransacao({
-  description: formData.description,
-  value: finalAmount,
-  type: formData.type === 'income' ? 'entrada' : 'saida',
-  category_id: buscarCategoryId(formData.category),
-  date: formData.transaction_date,
-  status: formData.status,
-  format: 'variavel',
-  payment_form: 'a_vista'
-});
-
-
+    criarTransacao({
+      description: formData.description,
+      value: finalAmount,
+      type: formData.type === 'income' ? 'entrada' : 'saida',
+      category_id: buscarCategoryId(formData.category),
+      bank_account_id: formData.bank_account_id === 'none' ? null : parseInt(formData.bank_account_id),
+      date: formData.transaction_date,
+      status: formData.status,
+      format: 'variavel',
+      payment_form: 'a_vista'
+    });
   };
 
-  // Função para lidar com mudanças no formulário
   const handleInputChange = (field, value) => {
-  if (field === 'type') {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-      category: '' // Se mudar o tipo, zera a categoria
-    }));
-  } else {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  }
-};
+    if (field === 'type') {
+      setFormData(prev => ({
+        ...prev,
+        [field]: value,
+        category: '' 
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    }
+  };
 
+  // --- FUNÇÃO PARA ALTERNAR O FILTRO DE CONTAS ---
+  const toggleContaFilter = (contaId) => {
+    setSelectedContas(prev => 
+        prev.includes(contaId) 
+            ? prev.filter(id => id !== contaId) 
+            : [...prev, contaId]
+    );
+  };
 
-const [filtroAtivo, setFiltroAtivo] = useState('todas');
-const [busca, setBusca] = useState('');
-const [dataInicial, setDataInicial] = useState('');
-const [dataFinal, setDataFinal] = useState('');
+  const [filtroAtivo, setFiltroAtivo] = useState('todas');
+  const [busca, setBusca] = useState('');
+  const [dataInicial, setDataInicial] = useState('');
+  const [dataFinal, setDataFinal] = useState('');
 
+  // --- LÓGICA DE FILTRAGEM ATUALIZADA ---
+  const transacoesFiltradas = Array.isArray(transacoes)
+    ? transacoes.filter(transacao => {
+        if (!transacao) return false;
 
-const transacoesFiltradas = Array.isArray(transacoes)
-  ? transacoes.filter(transacao => {
-      if (!transacao) return false;
+        const matchBusca = transacao.description?.toLowerCase().includes(busca.toLowerCase()) ||
+                           transacao.category?.toLowerCase().includes(busca.toLowerCase());
 
-      const matchBusca = transacao.description?.toLowerCase().includes(busca.toLowerCase()) ||
-                         transacao.category?.toLowerCase().includes(busca.toLowerCase());
+        const dataTransacao = new Date(transacao.transaction_date);
+        const dataInicio = dataInicial ? new Date(dataInicial) : null;
+        const dataFim = dataFinal ? new Date(dataFinal) : null;
 
-      const dataTransacao = new Date(transacao.transaction_date);
-      const dataInicio = dataInicial ? new Date(dataInicial) : null;
-      const dataFim = dataFinal ? new Date(dataFinal) : null;
+        const dentroDoPeriodo = (!dataInicio || dataTransacao >= dataInicio) &&
+                                (!dataFim || dataTransacao <= dataFim);
 
-      const dentroDoPeriodo = (!dataInicio || dataTransacao >= dataInicio) &&
-                              (!dataFim || dataTransacao <= dataFim);
+        // Lógica do Filtro de Conta Múltiplo
+        const matchConta = selectedContas.length === 0 || 
+                           (transacao.bank_account_id && selectedContas.includes(transacao.bank_account_id.toString()));
 
-      switch (filtroAtivo) {
-        case 'receita':
-          return transacao.type === 'income' && matchBusca && dentroDoPeriodo;
-        case 'despesa':
-          return transacao.type === 'expense' && matchBusca && dentroDoPeriodo;
-        case 'pendentes':
-          return transacao.status === 'pendente' && matchBusca && dentroDoPeriodo;
-        case 'todas':
-        default:
-          return matchBusca && dentroDoPeriodo;
+        const baseMatch = matchBusca && dentroDoPeriodo && matchConta; // <--- INCLUIU matchConta
+
+        switch (filtroAtivo) {
+          case 'receita':
+            return transacao.type === 'income' && baseMatch;
+          case 'despesa':
+            return transacao.type === 'expense' && baseMatch;
+          case 'pendentes':
+            return transacao.status === 'pendente' && baseMatch;
+          case 'todas':
+          default:
+            return baseMatch;
+        }
+      })
+    : [];
+
+  const { totalReceitas, totalDespesas, totalPendentes } = useMemo(() => {
+    let receitas = 0;
+    let despesas = 0;
+    let pendentes = 0;
+
+    for (const t of transacoesFiltradas) {
+      if (t.status === 'confirmada') {
+        if (t.type === 'income') {
+          receitas += (t.amount || 0);
+        } else if (t.type === 'expense') {
+          despesas += (t.amount || 0);
+        }
       }
-    })
-  : [];
-
-// NOVA VERSÃO (CALCULA A PARTIR DA LISTA FILTRADA E É MAIS EFICIENTE)
-const { totalReceitas, totalDespesas, totalPendentes } = useMemo(() => {
-  let receitas = 0;
-  let despesas = 0;
-  let pendentes = 0;
-
-  // AGORA USAMOS A LISTA JÁ FILTRADA PELA DATA E PELA BUSCA!
-  for (const t of transacoesFiltradas) {
-    if (t.status === 'confirmada') {
-      if (t.type === 'income') {
-        receitas += (t.amount || 0);
-      } else if (t.type === 'expense') {
-        despesas += (t.amount || 0);
+      if (t.status === 'pendente') {
+        pendentes++;
       }
     }
-    // A contagem de pendentes não deve ser afetada pelo filtro de 'confirmada'
-    if (t.status === 'pendente') {
-      pendentes++;
-    }
-  }
-  return { totalReceitas: receitas, totalDespesas: despesas, totalPendentes: pendentes };
-}, [transacoesFiltradas]); // A mágica está aqui: recalcula sempre que a lista filtrada mudar
+    return { totalReceitas: receitas, totalDespesas: despesas, totalPendentes: pendentes };
+  }, [transacoesFiltradas]);
 
-const saldoLiquido = totalReceitas - totalDespesas;
+  const saldoLiquido = totalReceitas - totalDespesas;
 
-  // ▼▼▼ COLE O NOVO BLOCO DE CÓDIGO AQUI ▼▼▼
-const { receitasPendentes, despesasPendentes } = useMemo(() => {
-  const pending = transacoes.filter(t => t.status === 'pendente');
-
-  const receitas = pending
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + (t.amount || 0), 0);
-
-  const despesas = pending
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + (t.amount || 0), 0);
-
-  return { receitasPendentes: receitas, despesasPendentes: despesas };
-}, [transacoes]); // Recalcula apenas quando a lista de transações muda
-// ▲▲▲ FIM DO NOVO BLOCO ▲▲▲
+  const { receitasPendentes, despesasPendentes } = useMemo(() => {
+    const pending = transacoes.filter(t => t.status === 'pendente');
+    const receitas = pending.filter(t => t.type === 'income').reduce((sum, t) => sum + (t.amount || 0), 0);
+    const despesas = pending.filter(t => t.type === 'expense').reduce((sum, t) => sum + (t.amount || 0), 0);
+    return { receitasPendentes: receitas, despesasPendentes: despesas };
+  }, [transacoes]);
 
   const getStatusBadge = (status) => {
     return status === 'confirmada' ? 
@@ -467,56 +441,40 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
 
   const getTipoBadge = (tipo) => {
     return tipo === 'income' ? 
-  <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Receita</Badge> :
-  <Badge className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Despesa</Badge>;
+      <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Receita</Badge> :
+      <Badge className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Despesa</Badge>;
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
-      {/* Header */}
       <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
+              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mr-4">
+                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
               </Button>
               <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                Bem-vindo, {user.name}
-              </span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Bem-vindo, {user.name}</span>
               <Button variant="outline" size="sm" onClick={onLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
+                <LogOut className="h-4 w-4 mr-2" /> Sair
               </Button>
             </div>
           </div>
-        
       </header>
 
-      {/* Main Content */}
-      
-        <div className="py-6">
+      <div className="py-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Lançamentos Financeiros</h2>
             <p className="text-gray-600 dark:text-gray-400">Gerencie suas receitas e despesas</p>
           </div>
 
-          {/* Cards de Resumo */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <TrendingUp className="h-8 w-8 text-green-600 ark:text-green-400" />
-                  </div>
+                  <div className="flex-shrink-0"><TrendingUp className="h-8 w-8 text-green-600 ark:text-green-400" /></div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Receitas</p>
                     <p className="text-2xl font-bold text-green-600 ark:text-green-400">R$ {totalReceitas.toLocaleString()}</p>
@@ -524,13 +482,10 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400" />
-                  </div>
+                  <div className="flex-shrink-0"><TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400" /></div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Despesas</p>
                     <p className="text-2xl font-bold text-red-600 dark:text-red-400">R$ {totalDespesas.toLocaleString()}</p>
@@ -538,13 +493,10 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
+                  <div className="flex-shrink-0"><DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" /></div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Saldo Líquido</p>
                     <p className={`text-2xl font-bold ${saldoLiquido >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -554,13 +506,10 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
                 </div>
               </CardContent>
             </Card>
-
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
-                  </div>
+                  <div className="flex-shrink-0"><Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" /></div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pendentes</p>
                     <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{totalPendentes}</p>
@@ -570,65 +519,93 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
             </Card>
           </div>
 
-  <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
-   <TabsList className="grid w-full sm:w-auto grid-cols-4">
+          <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
+            <TabsList className="grid w-full sm:w-auto grid-cols-4">
                 <TabsTrigger value="todas">Todas</TabsTrigger>
                 <TabsTrigger value="receita">Receitas</TabsTrigger>
                 <TabsTrigger value="despesa">Despesas</TabsTrigger>
                 <TabsTrigger value="pendentes">Pendentes</TabsTrigger>
-              </TabsList>
+            </TabsList>
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            {/* Filtro de Período */}
-            <div className="flex gap-4 items-center">
-             <div>
-            <Label htmlFor="data_inicial"></Label>
-            <Input
-            id="data_inicial"
-            type="date"
-            value={dataInicial}
-            onChange={(e) => setDataInicial(e.target.value)}
-            className="w-36"
-            />
-            </div>
-            <div>
-            <Label htmlFor="data_final"></Label>
-            <Input
-            id="data_final"
-            type="date"
-            value={dataFinal}
-            onChange={(e) => setDataFinal(e.target.value)}
-            className="w-36"
-            />
-            </div>
-            </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div className="flex gap-4 items-center">
+                <div>
+                  <Label htmlFor="data_inicial"></Label>
+                  <Input id="data_inicial" type="date" value={dataInicial} onChange={(e) => setDataInicial(e.target.value)} className="w-36" />
+                </div>
+                <div>
+                  <Label htmlFor="data_final"></Label>
+                  <Input id="data_final" type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} className="w-36" />
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
+                
+                {/* ▼▼▼ NOVO BOTÃO DE FILTRAR CONTAS ▼▼▼ */}
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline" className="border-dashed h-10">
+                            <Wallet className="h-4 w-4 mr-2" />
+                            Contas
+                            {selectedContas.length > 0 && (
+                                <span className="ml-2 rounded bg-blue-100 text-blue-700 px-1.5 py-0.5 text-xs font-bold">
+                                    {selectedContas.length}
+                                </span>
+                            )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-56 p-3" align="end">
+                        <div className="space-y-2">
+                            <h4 className="font-medium text-sm text-gray-500 mb-2">Filtrar por Conta:</h4>
+                            {contas.length === 0 ? (
+                                <p className="text-xs text-gray-400">Nenhuma conta cadastrada.</p>
+                            ) : (
+                                contas.map(conta => (
+                                    <div key={conta.id} className="flex items-center space-x-2">
+                                        <Checkbox 
+                                            id={`filter-conta-${conta.id}`} 
+                                            checked={selectedContas.includes(conta.id.toString())}
+                                            onCheckedChange={() => toggleContaFilter(conta.id.toString())}
+                                        />
+                                        <label 
+                                            htmlFor={`filter-conta-${conta.id}`} 
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                        >
+                                            {conta.bank_name}
+                                        </label>
+                                    </div>
+                                ))
+                            )}
+                            {selectedContas.length > 0 && (
+                                <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-8" onClick={() => setSelectedContas([])}>
+                                    Limpar Filtro
+                                </Button>
+                            )}
+                        </div>
+                    </PopoverContent>
+                </Popover>
+                {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
-                  <Input
-                    placeholder="Buscar transações..."
-                    value={busca}
-                    onChange={(e) => setBusca(e.target.value)}
-                    className="pl-10 w-full sm:w-64"
-                  />
+                  <Input placeholder="Buscar transações..." value={busca} onChange={(e) => setBusca(e.target.value)} className="pl-10 w-full sm:w-64" />
                 </div>
+                
                 <Dialog open={isModalOpen} onOpenChange={(open) => {
-  if (open) {
-  carregarCategoriasAntesDeAbrir();
-  setFormData({
-  description: '',
-  amount: '',
-  type: 'expense', 
-  category: '',
-  transaction_date: getLocalDate(),
-  status: 'pendente'
-});
-
-  } else {
-    setIsModalOpen(false);
-  }
-}}>
-
+                  if (open) {
+                    carregarCategoriasAntesDeAbrir();
+                    setFormData({
+                      description: '',
+                      amount: '',
+                      type: 'expense', 
+                      category: '',
+                      bank_account_id: 'none',
+                      transaction_date: getLocalDate(),
+                      status: 'pendente'
+                    });
+                  } else {
+                    setIsModalOpen(false);
+                  }
+                }}>
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
@@ -636,204 +613,143 @@ const { receitasPendentes, despesasPendentes } = useMemo(() => {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px] px-6" aria-describedby="descricaoDialog">
-                  <p id="descricaoDialog" className="sr-only">Formulário para criar nova transação financeira.</p>
+                    <p id="descricaoDialog" className="sr-only">Formulário para criar nova transação financeira.</p>
                     <DialogHeader className="mb-4">
                       <DialogTitle className="text-lg font-semibold">Nova Transação</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-3">
+                      <div>
+                        <Label htmlFor="description">Descrição *</Label>
+                        <Input id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Supermercado, Salário..." required />
+                      </div>
 
-  
-  <div>
-  <Label htmlFor="description">Descrição *</Label>
-  <Input
-    id="description"
-    value={formData.description}
-    onChange={(e) => handleInputChange('description', e.target.value)}
-    placeholder="Ex: Supermercado, Salário..."
-    required
-  />
-</div>
+                      <div>
+                        <Label htmlFor="type">Tipo *</Label>
+                        <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="income">Receita</SelectItem>
+                            <SelectItem value="expense">Despesa</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-  <div>
-    <Label htmlFor="type">Tipo *</Label>
-    <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="income">Receita</SelectItem>
-        <SelectItem value="expense">Despesa</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+                      {/* Campo Conta Bancária */}
+                      <div>
+                        <Label htmlFor="bank_account">Conta Bancária (Opcional)</Label>
+                        <Select value={formData.bank_account_id} onValueChange={(val) => handleInputChange('bank_account_id', val)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Selecione uma conta" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="none">Nenhuma</SelectItem>
+                                {contas.map(conta => (
+                                    <SelectItem key={conta.id} value={conta.id.toString()}>
+                                        {conta.bank_name} - Ag: {conta.agency} CC: {conta.account_number}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                      </div>
 
-  <div>
-    <Label htmlFor="category">Categoria *</Label>
-<div className="flex items-center gap-2">
-  <Select key={formData.type + categorias.length}value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-    <SelectTrigger>
-      <SelectValue placeholder="Selecione..." />
-    </SelectTrigger>
-    <SelectContent className="max-h-[250px] overflow-y-auto">
-     {(Array.isArray(categorias) ? categorias : [])
-  .filter((cat) => {
-  console.log('Tipo selecionado:', formData.type === 'income' ? 'entrada' : 'saida');
-  return cat?.type === (formData.type === 'income' ? 'entrada' : 'saida');
-})
-  .map((cat, index) => (
-    <SelectItem key={index} value={cat.name}>
-      {cat.name}
-    </SelectItem>
-))}
-    </SelectContent>
-  </Select>
+                      <div>
+                        <Label htmlFor="category">Categoria *</Label>
+                        <div className="flex items-center gap-2">
+                          <Select key={formData.type + categorias.length} value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                            <SelectContent className="max-h-[250px] overflow-y-auto">
+                              {(Array.isArray(categorias) ? categorias : [])
+                                .filter((cat) => cat?.type === (formData.type === 'income' ? 'entrada' : 'saida'))
+                                .map((cat, index) => (
+                                  <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="text" placeholder="+" className="w-10 h-10 text-center p-0" maxLength={1}
+                            onClick={() => {
+                              if (categoriasLoading) { alert('As categorias ainda estão carregando. Tente novamente em instantes.'); return; }
+                              if (!formData.type) { alert('Por favor, selecione o tipo antes de adicionar uma categoria.'); return; }
+                              const nomeCategoria = prompt('Digite o nome da nova categoria:');
+                              if (nomeCategoria) { adicionarCategoria(nomeCategoria.trim()); }
+                            }}
+                            readOnly
+                          />
+                        </div>
+                      </div>
 
-  <Input
-  type="text"
-  placeholder="+"
-  className="w-10 h-10 text-center p-0"
-  maxLength={1}
-onClick={() => {
-  if (categoriasLoading) {
-  alert('As categorias ainda estão carregando. Tente novamente em instantes.');
-  return;
-}
+                      <div>
+                        <Label htmlFor="amount">Valor *</Label>
+                        <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required />
+                      </div>
 
-if (!formData.type) {
-  alert('Por favor, selecione o tipo antes de adicionar uma categoria.');
-  return;
-}
+                      <div>
+                        <Label htmlFor="transaction_date">Data</Label>
+                        <Input id="transaction_date" type="date" value={formData.transaction_date} onChange={(e) => handleInputChange('transaction_date', e.target.value)} />
+                      </div>
 
-console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 'income' ? 'entrada' : 'saida');
+                      <div>
+                        <Label htmlFor="status">Status</Label>
+                        <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="confirmada">Confirmada</SelectItem>
+                            <SelectItem value="pendente">Pendente</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-
-  const nomeCategoria = prompt('Digite o nome da nova categoria:');
-  if (nomeCategoria) {
-    adicionarCategoria(nomeCategoria.trim());
-  }
-}}
-
-  readOnly
-/>
-</div>
-
-  </div>
-
-  <div>
-    <Label htmlFor="amount">Valor *</Label>
-    <Input
-      id="amount"
-      type="number"
-      step="0.01"
-      value={formData.amount}
-      onChange={(e) => handleInputChange('amount', e.target.value)}
-      placeholder="0,00"
-      required
-    />
-  </div>
-
-  <div>
-    <Label htmlFor="transaction_date">Data</Label>
-    <Input
-      id="transaction_date"
-      type="date"
-      value={formData.transaction_date}
-      onChange={(e) => handleInputChange('transaction_date', e.target.value)}
-    />
-  </div>
-
-  <div>
-    <Label htmlFor="status">Status</Label>
-    <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="confirmada">Confirmada</SelectItem>
-        <SelectItem value="pendente">Pendente</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-
-  <div className="flex justify-between pt-4">
-    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-  Cancelar
-</Button>
-<Button type="submit" className="bg-green-700 hover:bg-green-800">
-  Criar Transação
-</Button>
-
-  </div>
-
-</form>
-
+                      <div className="flex justify-between pt-4">
+                        <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                        <Button type="submit" className="bg-green-700 hover:bg-green-800">Criar Transação</Button>
+                      </div>
+                    </form>
                   </DialogContent>
                 </Dialog>
-                {/* ▼▼▼ ADICIONE O CÓDIGO DO BOTÃO E DO INPUT OCULTO AQUI ▼▼▼ */}
-    <Button 
-      variant="outline" 
-      onClick={() => fileInputRef.current.click()} 
-      disabled={isUploading}
-    >
-      {isUploading ? (
-        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-      ) : (
-        <FileText className="h-4 w-4 mr-2" />
-      )}
-      {isUploading ? 'Importando...' : 'Importar Extrato'}
-    </Button>
-    <input
-      type="file"
-      ref={fileInputRef}
-      onChange={handleFileUpload}
-      accept=".pdf"
-      className="hidden" // O input fica invisível, o botão o aciona
-    />
-    
+                
+                <Button variant="outline" onClick={() => fileInputRef.current.click()} disabled={isUploading}>
+                  {isUploading ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
+                  {isUploading ? 'Importando...' : 'Importar Extrato'}
+                </Button>
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
               </div>
             </div>
-{/* ▼▼▼ ADICIONE ESTE BLOCO PARA EXIBIR O RESULTADO DO UPLOAD ▼▼▼ */}
-      {uploadResult && (
-        <div className={`p-3 rounded-md text-sm mb-4 ${
-          uploadResult.success 
-            ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' 
-            : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
-        }`}>
-          {uploadResult.message}
-        </div>
-      )}
+
+            {uploadResult && (
+              <div className={`p-3 rounded-md text-sm mb-4 ${uploadResult.success ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'}`}>
+                {uploadResult.message}
+              </div>
+            )}
+
             <TabsContent value={filtroAtivo} className="space-y-4">
               <Card>
                 <CardHeader>
-  {/* Lógica condicional: verifica qual aba está ativa */}
-  {filtroAtivo === 'pendentes' ? (
-    // SE for a aba 'pendentes', renderiza o novo layout com mini-cards
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <CardTitle>Transações Pendentes</CardTitle>
-      <div className="flex items-center gap-4">
-        <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
-          <p className="text-xs font-medium text-green-700 dark:text-green-300">Receitas</p>
-          <p className="text-lg font-bold text-green-600">
-            R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-        <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
-          <p className="text-xs font-medium text-red-700 dark:text-red-300">Despesas</p>
-          <p className="text-lg font-bold text-red-600">
-            R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-      </div>
-    </div>
-  ) : (
-    // SENÃO, renderiza o título simples como era antes
-    <CardTitle>
-      {filtroAtivo === 'todas' && 'Todas as Transações'}
-      {filtroAtivo === 'receita' && 'Receitas'}
-      {filtroAtivo === 'despesa' && 'Despesas'}
-    </CardTitle>
-  )}
-</CardHeader>
+                  {filtroAtivo === 'pendentes' ? (
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <CardTitle>Transações Pendentes</CardTitle>
+                      <div className="flex items-center gap-4">
+                        <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                          <p className="text-xs font-medium text-green-700 dark:text-green-300">Receitas</p>
+                          <p className="text-lg font-bold text-green-600">
+                            R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
+                          <p className="text-xs font-medium text-red-700 dark:text-red-300">Despesas</p>
+                          <p className="text-lg font-bold text-red-600">
+                            R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <CardTitle>
+                      {filtroAtivo === 'todas' && 'Todas as Transações'}
+                      {filtroAtivo === 'receita' && 'Receitas'}
+                      {filtroAtivo === 'despesa' && 'Despesas'}
+                    </CardTitle>
+                  )}
+                </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {(Array.isArray(transacoesFiltradas) ? transacoesFiltradas : []).map((transacao) => (transacao && (
@@ -845,57 +761,45 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                               {getTipoBadge(transacao.type)}
                               {getStatusBadge(transacao.status)}
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-4 gap-x-2 text-sm text-gray-600 dark:text-slate-400">
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-y-4 gap-x-2 text-sm text-gray-600 dark:text-slate-400">
                               <div>
                                 <p className="font-medium">Categoria</p>
                                 <p>{transacao.category || 'Sem categoria'}</p>
+                              </div>
+                              <div>
+                                <p className="font-medium">Conta</p>
+                                <p>{transacao.account_label || '---'}</p>
                               </div>
                               <div>
                                 <p className="font-medium">Data</p>
                                 <p>{formatDateForDisplay(transacao.transaction_date)}</p>
                               </div>
                               <div>
-  <p className="font-medium">Valor</p>
-  <p className={`text-lg font-bold ${transacao.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-    R$ {(transacao.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-  </p>
-</div>
+                                <p className="font-medium">Valor</p>
+                                <p className={`text-lg font-bold ${transacao.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                                  R$ {(transacao.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
                             </div>
                           </div>
                           <div className="flex flex-row sm:flex-col md:flex-row justify-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
                             {transacao.status === 'pendente' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => confirmarTransacao(transacao.id)}
-                              >
+                              <Button variant="outline" size="sm" onClick={() => confirmarTransacao(transacao.id)}>
                                 <CheckCircle className="h-4 w-4 mr-1" />
                                 Confirmar
                               </Button>
                             )}
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => abrirModalEdicao(transacao)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(transacao)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                              
+                            <Button variant="outline" size="sm" onClick={() => excluirTransacao(transacao)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                          // Passamos o objeto 'transacao' inteiro agora, não só o ID
-                            onClick={() => excluirTransacao(transacao)} 
-                          >
-                        <Trash2 className="h-4 w-4" />  
-                          </Button>               
                         </div>
                       </div>
-                    )
-                    ))}
+                    )))}
                   </div>
-
                   {transacoesFiltradas.length === 0 && (
                     <div className="text-center py-8">
                       <p className="text-gray-500 dark:text-slate-400">Nenhuma transação encontrada</p>
@@ -906,75 +810,44 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
             </TabsContent>
           </Tabs>
 
-          {/* Modal para Editar Transação */}
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogContent className="sm:max-w-[500px] px-6">
               <DialogHeader>
                 <DialogTitle>Editar Transação</DialogTitle>
               </DialogHeader>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                if (!editFormData.description || !editFormData.amount || !editFormData.category) {
+                  alert('Por favor, preencha todos os campos obrigatórios.');
+                  return;
+                }
+                const tipoSelecionado = editFormData.type === 'income' ? 'entrada' : 'saida';
+                const categoriaObj = categorias.find(cat => cat.name === editFormData.category && cat.type === tipoSelecionado);
+                if (!categoriaObj) { alert('Categoria inválida. Por favor, selecione uma da lista.'); return; }
                 
-<form onSubmit={(e) => {
-  e.preventDefault();
-  if (!editFormData.description || !editFormData.amount || !editFormData.category) {
-    alert('Por favor, preencha todos os campos obrigatórios.');
-    return;
-  }
-
-  // 1. Busca o ID da categoria a partir do nome selecionado no formulário
-  const tipoSelecionado = editFormData.type === 'income' ? 'entrada' : 'saida';
-  const categoriaObj = categorias.find(
-    cat => cat.name === editFormData.category && cat.type === tipoSelecionado
-  );
-
-  if (!categoriaObj) {
-    alert('Categoria inválida. Por favor, selecione uma da lista.');
-    return;
-  }
-
-  // 2. Monta o 'payload' com os nomes de campos EXATOS que a API espera
-  const payload = {
-    description: editFormData.description,
-    value: Math.abs(parseFloat(editFormData.amount)),
-    type: tipoSelecionado, // Garante que seja 'entrada' ou 'saida'
-    category_id: categoriaObj.id, // Envia o ID da categoria, não o nome
-    date: editFormData.transaction_date, // O backend espera 'date'
-    status: editFormData.status
-  };
-
-  // 3. Chama a função de edição com os dados corretos
-  editarTransacao(selectedTransacao.id, payload);
-
-}} className="space-y-4">
+                const payload = {
+                  description: editFormData.description,
+                  value: Math.abs(parseFloat(editFormData.amount)),
+                  type: tipoSelecionado,
+                  category_id: categoriaObj.id,
+                  date: editFormData.transaction_date,
+                  status: editFormData.status
+                };
+                editarTransacao(selectedTransacao.id, payload);
+              }} className="space-y-4">
                 <div>
                   <Label htmlFor="edit_description">Descrição *</Label>
-                  <Input
-                    id="edit_description"
-                    value={editFormData.description}
-                    onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))}
-                    placeholder="Ex: Supermercado, Salário..."
-                    required
-                  />
+                  <Input id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} required />
                 </div>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit_amount">Valor *</Label>
-                    <Input
-                      id="edit_amount"
-                      type="number"
-                      step="0.01"
-                      value={editFormData.amount}
-                      onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))}
-                      placeholder="0,00"
-                      required
-                    />
+                    <Input id="edit_amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))} required />
                   </div>
                   <div>
                     <Label htmlFor="edit_type">Tipo *</Label>
                     <Select value={editFormData.type} onValueChange={(value) => setEditFormData(prev => ({...prev, type: value}))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="income">Receita</SelectItem>
                         <SelectItem value="expense">Despesa</SelectItem>
@@ -982,41 +855,26 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                     </Select>
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="edit_category">Categoria *</Label>
                   <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                     <SelectContent className="max-h-[250px] overflow-y-auto">
-                    {(Array.isArray(categorias) ? categorias : [])
-  .filter((cat) => cat.type === editFormData.type === 'income' ? 'entrada' : 'saida')
-  .map((cat, index) => (
-    <SelectItem key={index} value={cat.name}>
-      {cat.name}
-    </SelectItem>
-))}
-                  </SelectContent>
+                      {(Array.isArray(categorias) ? categorias : [])
+                        .filter((cat) => cat.type === (editFormData.type === 'income' ? 'entrada' : 'saida'))
+                        .map((cat, index) => <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>)}
+                    </SelectContent>
                   </Select>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit_transaction_date">Data</Label>
-                    <Input
-                      id="edit_transaction_date"
-                      type="date"
-                      value={editFormData.transaction_date}
-                      onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))}
-                    />
+                    <Input id="edit_transaction_date" type="date" value={editFormData.transaction_date} onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))} />
                   </div>
                   <div>
                     <Label htmlFor="edit_status">Status</Label>
                     <Select value={editFormData.status} onValueChange={(value) => setEditFormData(prev => ({...prev, status: value}))}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="confirmada">Confirmada</SelectItem>
                         <SelectItem value="pendente">Pendente</SelectItem>
@@ -1024,23 +882,16 @@ console.log('👉 Categoria criada:', novaCategoria, 'Tipo:', formData.type === 
                     </Select>
                   </div>
                 </div>
-
                 <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit">
-                    Salvar Alterações
-                  </Button>
+                  <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+                  <Button type="submit">Salvar Alterações</Button>
                 </div>
               </form>
             </DialogContent>
           </Dialog>
-        </div>
-      
+      </div>
     </div>
   );
 };
 
 export default Transactions;
-
