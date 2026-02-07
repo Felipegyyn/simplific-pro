@@ -264,6 +264,8 @@ class BankAccount(db.Model):
     bank_name = db.Column(db.String(100), nullable=False) # Nome do Banco
     agency = db.Column(db.String(20), nullable=True)      # Agência
     account_number = db.Column(db.String(30), nullable=False) # Conta
+
+    observations = db.Column(db.String(255), nullable=True)
     
     # Saldo Inicial (o ponto de partida)
     initial_balance = db.Column(db.Float, default=0.0)
@@ -281,6 +283,7 @@ class BankAccount(db.Model):
             'agency': self.agency,
             'account_number': self.account_number,
             'balance': self.current_balance, # O front recebe o saldo ATUAL
+            'observations': self.observations,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea'; // <--- IMPORT NOVO
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Landmark, Plus, Trash2, Wallet, Filter, Check } from 'lucide-react';
+import { Landmark, Plus, Trash2, Wallet, Filter, Edit } from 'lucide-react'; // <--- IMPORT Edit
 import apiService from '../services/api';
 
 const BANCOS_BRASIL = [
@@ -29,15 +30,18 @@ const BankAccounts = ({ user, onLogout }) => {
   const [contas, setContas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // --- ESTADO PARA CONTROLE DE EDIÇÃO ---
+  const [editingId, setEditingId] = useState(null); 
 
-  // --- LÓGICA DO FILTRO MÚLTIPLO ---
-  const [selectedBanks, setSelectedBanks] = useState([]); // Array de bancos selecionados
+  const [selectedBanks, setSelectedBanks] = useState([]); 
 
   const [formData, setFormData] = useState({
     banco: '',
     agencia: '',
     conta: '',
-    saldo_inicial: ''
+    saldo_inicial: '',
+    observacoes: '' // <--- NOVO CAMPO
   });
 
   const loadAccounts = async () => {
@@ -57,6 +61,25 @@ const BankAccounts = ({ user, onLogout }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // --- FUNÇÃO PARA ABRIR O MODAL EM MODO DE EDIÇÃO ---
+  const handleEdit = (conta) => {
+      setEditingId(conta.id);
+      setFormData({
+          banco: conta.bank_name,
+          agencia: conta.agency || '',
+          conta: conta.account_number,
+          saldo_inicial: conta.balance, // Apenas para exibição, não editaremos o saldo no update para manter consistência
+          observacoes: conta.observations || ''
+      });
+      setIsModalOpen(true);
+  };
+
+  const handleOpenModal = () => {
+      setEditingId(null); // Reseta para modo criação
+      setFormData({ banco: '', agencia: '', conta: '', saldo_inicial: '', observacoes: '' });
+      setIsModalOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -66,15 +89,25 @@ const BankAccounts = ({ user, onLogout }) => {
         bank_name: formData.banco,
         agency: formData.agencia,
         account_number: formData.conta,
-        balance: parseFloat(formData.saldo_inicial || 0)
+        observations: formData.observacoes
       };
 
-      await apiService.post('/api/bank-accounts', payload);
+      if (editingId) {
+          // --- MODO EDIÇÃO (PUT) ---
+          await apiService.put(`/api/bank-accounts/${editingId}`, payload);
+          alert('Conta atualizada com sucesso!');
+      } else {
+          // --- MODO CRIAÇÃO (POST) ---
+          // Apenas na criação enviamos o saldo inicial
+          payload.balance = parseFloat(formData.saldo_inicial || 0);
+          await apiService.post('/api/bank-accounts', payload);
+          alert('Conta adicionada com sucesso!');
+      }
+
       await loadAccounts();
-      
-      setFormData({ banco: '', agencia: '', conta: '', saldo_inicial: '' });
       setIsModalOpen(false);
-      alert('Conta adicionada com sucesso!');
+      setFormData({ banco: '', agencia: '', conta: '', saldo_inicial: '', observacoes: '' });
+      setEditingId(null);
 
     } catch (error) {
       console.error(error);
@@ -95,20 +128,16 @@ const BankAccounts = ({ user, onLogout }) => {
       }
   };
 
-  // --- FILTRAGEM ---
-  // 1. Extrai bancos únicos presentes nas contas cadastradas para montar as opções do filtro
   const availableBanks = useMemo(() => {
       const banks = contas.map(c => c.bank_name);
       return [...new Set(banks)];
   }, [contas]);
 
-  // 2. Filtra as contas baseado na seleção (se vazio, mostra todas)
   const filteredAccounts = useMemo(() => {
       if (selectedBanks.length === 0) return contas;
       return contas.filter(conta => selectedBanks.includes(conta.bank_name));
   }, [contas, selectedBanks]);
 
-  // 3. Toggle do checkbox do filtro
   const toggleBankFilter = (bankName) => {
       setSelectedBanks(prev => 
           prev.includes(bankName) 
@@ -123,7 +152,6 @@ const BankAccounts = ({ user, onLogout }) => {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 p-4 sm:p-8">
       
       <div className="max-w-6xl mx-auto">
-        {/* Cabeçalho */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -134,7 +162,6 @@ const BankAccounts = ({ user, onLogout }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* --- COMPONENTE DE FILTRO MÚLTIPLO --- */}
             <Popover>
                 <PopoverTrigger asChild>
                     <Button variant="outline" className="border-dashed">
@@ -160,22 +187,14 @@ const BankAccounts = ({ user, onLogout }) => {
                                         checked={selectedBanks.includes(bank)}
                                         onCheckedChange={() => toggleBankFilter(bank)}
                                     />
-                                    <label 
-                                        htmlFor={`filter-${bank}`} 
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                    >
+                                    <label htmlFor={`filter-${bank}`} className="text-sm cursor-pointer">
                                         {bank}
                                     </label>
                                 </div>
                             ))
                         )}
                         {selectedBanks.length > 0 && (
-                            <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="w-full mt-2 text-xs h-8"
-                                onClick={() => setSelectedBanks([])}
-                            >
+                            <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-8" onClick={() => setSelectedBanks([])}>
                                 Limpar Filtros
                             </Button>
                         )}
@@ -185,17 +204,16 @@ const BankAccounts = ({ user, onLogout }) => {
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={handleOpenModal}>
                     <Plus className="h-4 w-4 mr-2" /> Nova Conta
                 </Button>
                 </DialogTrigger>
                 
                 <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Nova Conta Bancária</DialogTitle>
-                    {/* ADICIONADO PARA CORRIGIR O WARNING */}
+                    <DialogTitle>{editingId ? 'Editar Conta' : 'Nova Conta Bancária'}</DialogTitle>
                     <DialogDescription>
-                        Preencha os dados da sua conta para controle de saldo.
+                        {editingId ? 'Atualize os dados da sua conta.' : 'Preencha os dados da sua conta para controle de saldo.'}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -224,14 +242,39 @@ const BankAccounts = ({ user, onLogout }) => {
                         <Input id="conta" placeholder="12345-6" value={formData.conta} onChange={(e) => handleInputChange('conta', e.target.value)} required />
                     </div>
                     </div>
+                    
                     <div className="space-y-2">
                     <Label htmlFor="saldo">Saldo Inicial (R$)</Label>
-                    <Input id="saldo" type="number" step="0.01" placeholder="0,00" value={formData.saldo_inicial} onChange={(e) => handleInputChange('saldo_inicial', e.target.value)} />
-                    <p className="text-xs text-gray-500">Se não houver saldo, deixe em branco ou 0.</p>
+                    <Input 
+                        id="saldo" 
+                        type="number" 
+                        step="0.01" 
+                        placeholder="0,00" 
+                        value={formData.saldo_inicial} 
+                        onChange={(e) => handleInputChange('saldo_inicial', e.target.value)}
+                        disabled={!!editingId} // Desabilita edição de saldo no modo Editar
+                        title={editingId ? "O saldo deve ser ajustado via transações" : ""}
+                    />
+                    <p className="text-xs text-gray-500">
+                        {editingId ? "O saldo só pode ser alterado via lançamentos." : "Se não houver saldo, deixe em branco ou 0."}
+                    </p>
                     </div>
+
+                    {/* ▼▼▼ CAMPO OBSERVAÇÕES ▼▼▼ */}
+                    <div className="space-y-2">
+                        <Label htmlFor="observacoes">Observações (Opcional)</Label>
+                        <Textarea 
+                            id="observacoes" 
+                            placeholder="Ex: Conta usada apenas para investimentos..." 
+                            value={formData.observacoes} 
+                            onChange={(e) => handleInputChange('observacoes', e.target.value)}
+                        />
+                    </div>
+                    {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+
                     <div className="pt-4 flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-                    <Button type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar Conta'}</Button>
+                    <Button type="submit" disabled={loading}>{loading ? 'Salvando...' : (editingId ? 'Atualizar' : 'Salvar Conta')}</Button>
                     </div>
                 </form>
                 </DialogContent>
@@ -239,7 +282,6 @@ const BankAccounts = ({ user, onLogout }) => {
           </div>
         </div>
 
-        {/* Card de Resumo Total */}
         <div className="mb-8">
           <Card className="bg-gradient-to-r from-blue-900 to-slate-900 border-none text-white shadow-xl">
             <CardContent className="p-6 flex items-center justify-between">
@@ -256,7 +298,6 @@ const BankAccounts = ({ user, onLogout }) => {
           </Card>
         </div>
 
-        {/* Grid de Contas */}
         {loading && !isModalOpen && contas.length === 0 ? (
             <div className="text-center py-12"><p>Carregando contas...</p></div>
         ) : filteredAccounts.length === 0 ? (
@@ -265,24 +306,31 @@ const BankAccounts = ({ user, onLogout }) => {
                 {contas.length === 0 ? "Nenhuma conta bancária cadastrada." : "Nenhuma conta encontrada com o filtro atual."}
             </p>
             {contas.length === 0 && (
-                <Button variant="link" onClick={() => setIsModalOpen(true)}>Cadastrar a primeira</Button>
+                <Button variant="link" onClick={handleOpenModal}>Cadastrar a primeira</Button>
             )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAccounts.map((conta) => (
-              <Card key={conta.id} className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500 relative group">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                  <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
-                    {conta.bank_name}
-                  </CardTitle>
-                  <Landmark className="h-5 w-5 text-gray-400" />
-                </CardHeader>
+              <Card key={conta.id} className="hover:shadow-md transition-shadow border-l-4 border-l-blue-500 relative group flex flex-col justify-between">
+                <div>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                    <CardTitle className="text-lg font-bold text-gray-800 dark:text-white">
+                        {conta.bank_name}
+                    </CardTitle>
+                    <Landmark className="h-5 w-5 text-gray-400" />
+                    </CardHeader>
+                    <CardContent>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <p>Ag: {conta.agency || '---'}</p>
+                        <p>CC: {conta.account_number}</p>
+                        {conta.observations && (
+                            <p className="mt-2 text-xs italic text-gray-400 border-t pt-2">"{conta.observations}"</p>
+                        )}
+                    </div>
+                    </CardContent>
+                </div>
                 <CardContent>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    <p>Ag: {conta.agency || '---'}</p>
-                    <p>CC: {conta.account_number}</p>
-                  </div>
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-xs text-gray-400 uppercase font-bold">Saldo Atual</p>
@@ -290,14 +338,26 @@ const BankAccounts = ({ user, onLogout }) => {
                         {Number(conta.balance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                       </p>
                     </div>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handleDelete(conta.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* ▼▼▼ BOTÃO DE EDITAR ▼▼▼ */}
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-gray-400 hover:text-blue-500"
+                            onClick={() => handleEdit(conta)}
+                        >
+                        <Edit className="h-4 w-4" />
+                        </Button>
+                        {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-gray-400 hover:text-red-500"
+                            onClick={() => handleDelete(conta.id)}
+                        >
+                        <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
