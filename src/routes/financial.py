@@ -817,25 +817,35 @@ def import_statement():
     else:
         return jsonify({'error': 'Formato de arquivo inválido. Por favor, envie um PDF.'}), 400
 
-def criar_lancamento(user_id, tipo, categoria_id, valor, descricao, formato='Variável', status='confirmada'):
+def criar_lancamento(user_id, tipo, categoria_id, valor, descricao, formato='Variável', status='confirmada', bank_account_id=None):
     """
-    Grava o lançamento na tabela de transações
+    Grava o lançamento na tabela de transações e atualiza o saldo se tiver conta.
     """
-    # ... (O código desta função permanece o mesmo)
-    query = """
-        INSERT INTO transactions (user_id, date, type, category_id, value, description, format, payment_form, status)
-        VALUES (:user_id, :date, :type, :category_id, :value, :description, :format, :payment_form, :status)
-    """
-    params = {
-        'user_id': user_id,
-        'date': datetime.now().date(),
-        'type': tipo,
-        'category_id': categoria_id,
-        'value': valor,
-        'description': descricao,
-        'format': formato,
-        'payment_form': 'À vista',
-        'status': 'confirmada'
-    }
-    execute_query(query, params)
+    # 1. Cria a transação
+    nova_transacao = Transaction(
+        user_id=user_id,
+        date=datetime.now().date(),
+        type=tipo,
+        category_id=categoria_id,
+        value=abs(float(valor)),
+        description=descricao,
+        format=formato,
+        payment_form='À vista',
+        status=status,
+        bank_account_id=bank_account_id # <--- VINCULA A CONTA
+    )
+    
+    db.session.add(nova_transacao)
+    
+    # 2. Atualiza o saldo da conta (se houver conta e estiver confirmada)
+    if bank_account_id and status == 'confirmada':
+        conta = BankAccount.query.filter_by(id=bank_account_id, user_id=user_id).first()
+        if conta:
+            if tipo == 'entrada':
+                conta.current_balance += nova_transacao.value
+            elif tipo == 'saida':
+                conta.current_balance -= nova_transacao.value
+
+    db.session.commit()
+    return nova_transacao
 

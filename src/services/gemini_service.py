@@ -80,7 +80,8 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - ERRO COMUM: Para despesas, use "type": "saida". NÃO use "Despesa".
     
     # EXEMPLOS DE ESTRUTURA CORRETA (Copie estes padrões):
-    - Lançar Gasto: [ACTION]{{"type": "create_transaction", "data": {{"description": "Mercado", "value": 50.00, "type": "saida", "category_name": "Alimentação"}}}}
+    - Lançar Gasto: [ACTION]{{"type": "create_transaction", "data": {{"description": "Mercado", "value": 50.00, "type": "saida", "category_name": "Alimentação", "bank_account_name": "Nubank"}}}}
+    - Lançar Receita: [ACTION]{{"type": "create_transaction", "data": {{"description": "Pix Cliente", "value": 100.00, "type": "entrada", "category_name": "Vendas", "bank_account_name": "Inter"}}}}
     - Pagar Fatura: [ACTION]{{"type": "pay_credit_card_bill", "data": {{"card_name": "Nubank"}}}}
 
     # EXEMPLOS DE INTERAÇÃO (NOVA PERSONALIDADE)

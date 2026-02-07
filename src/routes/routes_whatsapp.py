@@ -18,6 +18,7 @@ from src.services.schedule_service import criar_evento_agenda, buscar_resumo_age
 from src.services.visual_report_service import generate_visual_report
 from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
 from src.services.tts_service import texto_para_audio # <-- ADICIONE
+from src.models.extended_modules import BankAccount
 from src.models.contact import Contact  # <--- NOVO: Modelo de Contatos
 from src.services.user_service import normalize_phone_number # <--- NOVO: Para salvar o zap do contato certo
 from src.services.google_calendar_service import add_event_to_google # <--- NOVO: Para criar o Meet
@@ -310,29 +311,67 @@ def executar_acao_simplific(user_id, acao, from_number):
         if tipo_acao == 'create_transaction':
             dados = dados_acao
             category_name = dados.get('category_name')
-
-            # 1. Busca as categorias do usuário para encontrar o ID correto
+            bank_account_name = dados.get('bank_account_name') # <--- IA tentou extrair
+            
+            # 1. Busca a categoria
             categorias_usuario = buscar_categorias(user_id)
             categoria_encontrada = next((cat for cat in categorias_usuario if cat['name'].lower() == category_name.lower()), None)
 
             if not categoria_encontrada:
-                # Se o Simplific não achou uma categoria, informa o usuário.
-                return f"Não encontrei a categoria '{category_name}'. Por favor, tente novamente com uma das suas categorias cadastradas."
+                return f"Não encontrei a categoria '{category_name}'. Tente novamente com uma categoria válida."
 
-            # 2. Chama o serviço para criar o lançamento no banco de dados
+            # 2. Lógica da Conta Bancária
+            conta_encontrada = None
+            
+            # Cenário A: IA identificou um nome de banco
+            if bank_account_name:
+                conta_encontrada = BankAccount.query.filter(
+                    BankAccount.user_id == user_id,
+                    BankAccount.bank_name.ilike(f'%{bank_account_name}%')
+                ).first()
+                
+                if not conta_encontrada:
+                    # Se falou nome mas não achou, avisa e pede pra selecionar manual depois
+                    # (Ou podemos seguir sem conta, mas melhor avisar)
+                    pass 
+
+            # Cenário B: Não temos conta definida. Vamos perguntar!
+            if not conta_encontrada:
+                # Salva os dados na sessão para concluir depois
+                user_sessions[from_number] = {
+                    'contexto': 'perguntar_vincular_conta',
+                    'dados_lancamento': {
+                        'user_id': user_id,
+                        'tipo': dados.get('type'),
+                        'categoria_id': categoria_encontrada['id'],
+                        'categoria_nome': categoria_encontrada['name'], # Para exibir na msg
+                        'valor': dados.get('value'),
+                        'descricao': dados.get('description')
+                    }
+                }
+                
+                # Retorna a pergunta interativa
+                return (
+                    f"Entendi! Vou lançar *{dados.get('description')}* (R$ {dados.get('value')}) em *{category_name}*.\n\n"
+                    f"Deseja vincular a uma conta bancária para atualizar o saldo?\n"
+                    f"1. Sim\n"
+                    f"2. Não (Lançar sem conta)"
+                )
+
+            # Cenário C: Temos a conta! Lança direto.
             criar_lancamento(
                 user_id=user_id,
                 tipo=dados.get('type'),
                 categoria_id=categoria_encontrada['id'],
                 valor=dados.get('value'),
-                descricao=dados.get('description')
+                descricao=dados.get('description'),
+                bank_account_id=conta_encontrada.id
             )
-
-            # 3. Retorna None. Isso é crucial!
-            # Ao retornar None, nós dizemos ao sistema para usar a resposta
-            # conversacional e amigável que o Simplific já preparou, em vez
-            # de uma mensagem robótica.
-            return None
+            
+            # Retorna None para usar a resposta padrão da IA (que geralmente confirma o feito)
+            # Mas como alteramos o fluxo, a IA pode ter dito "Vou lançar...", então aqui confirmamos.
+            emoji = "💰" if dados.get('type') == 'entrada' else "💸"
+            return f"Feito! {emoji} Lançamento registrado na conta *{conta_encontrada.bank_name}* e saldo atualizado."
 
         elif tipo_acao == 'consultar_agenda':
             resumo = get_agenda_summary(user_id)
@@ -1380,6 +1419,67 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
         except (ValueError, IndexError, KeyError):
             remover_sessao(from_number)
             return 'Resposta inválida. Ação cancelada.'
+
+    # --- NOVO FLUXO: PERGUNTAR SE QUER VINCULAR CONTA ---
+    elif contexto == 'perguntar_vincular_conta':
+        dados_lancamento = sessao['dados_lancamento']
+        
+        if mensagem == '1': # Sim, quer vincular
+            # Busca as contas do usuário para mostrar a lista
+            contas = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
+            
+            if not contas:
+                # Se disse sim mas não tem contas cadastradas
+                criar_lancamento(
+                    dados_lancamento['user_id'], dados_lancamento['tipo'], 
+                    dados_lancamento['categoria_id'], dados_lancamento['valor'], 
+                    dados_lancamento['descricao'], bank_account_id=None
+                )
+                remover_sessao(from_number)
+                return "Você não tem contas cadastradas ainda! O lançamento foi salvo sem vínculo. Crie uma conta no menu Configurações."
+
+            # Lista as contas
+            sessao['contexto'] = 'selecionar_conta_bancaria'
+            sessao['lista_contas'] = contas # Guarda a lista na sessão
+            
+            resposta = "Selecione a conta:\n"
+            for idx, conta in enumerate(contas, start=1):
+                resposta += f"{idx}. {conta.bank_name} (Saldo: R$ {conta.current_balance:.2f})\n"
+            
+            return resposta
+
+        else: # Não (ou qualquer outra coisa), lança sem conta
+            criar_lancamento(
+                dados_lancamento['user_id'], dados_lancamento['tipo'], 
+                dados_lancamento['categoria_id'], dados_lancamento['valor'], 
+                dados_lancamento['descricao'], bank_account_id=None
+            )
+            remover_sessao(from_number)
+            return f"Ok! Lançamento registrado em *{dados_lancamento['categoria_nome']}* sem vínculo bancário. 👍"
+
+    # --- NOVO FLUXO: SELECIONAR A CONTA DA LISTA ---
+    elif contexto == 'selecionar_conta_bancaria':
+        try:
+            idx = int(mensagem)
+            contas = sessao['lista_contas']
+            dados_lancamento = sessao['dados_lancamento']
+            
+            if 1 <= idx <= len(contas):
+                conta_escolhida = contas[idx - 1]
+                
+                # CRIA O LANÇAMENTO VINCULADO
+                criar_lancamento(
+                    dados_lancamento['user_id'], dados_lancamento['tipo'], 
+                    dados_lancamento['categoria_id'], dados_lancamento['valor'], 
+                    dados_lancamento['descricao'], bank_account_id=conta_escolhida.id
+                )
+                
+                remover_sessao(from_number)
+                return f"Pronto! Lançado na conta *{conta_escolhida.bank_name}*. Saldo atualizado! ✅"
+            else:
+                return "Opção inválida. Tente novamente."
+        except ValueError:
+            return "Por favor, digite o número da conta."
 
     # --- LÓGICA ANTIGA PARA ESCOLHER UMA CATEGORIA ---
     else: # Se não houver contexto, assume que é para escolher categoria
