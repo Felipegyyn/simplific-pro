@@ -1108,12 +1108,16 @@ if (sucesso) {
         })}
       </p>
       
-      {/* Botão de Lixeira (Só aparece se a fatura estiver 'aberta') */}
+     {/* Botão de Lixeira (Só aparece se a fatura estiver 'aberta') */}
       {selectedFatura.status === 'aberta' && (
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+            // CORREÇÃO AQUI: 
+            // opacity-100 (visível no mobile) 
+            // md:opacity-0 (invisível no desktop por padrão)
+            // md:group-hover:opacity-100 (visível no desktop ao passar o mouse)
+            className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
             onClick={() => excluirTransacao(transacao.id)}
             title="Excluir despesa"
           >
