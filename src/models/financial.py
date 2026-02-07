@@ -82,6 +82,9 @@ class Transaction(db.Model):
         confirmed_at = db.Column(db.DateTime)
         planning_id = db.Column(db.Integer, db.ForeignKey('planning.id'), nullable=True)
         receipt_image_url = db.Column(db.String(255), nullable=True) # URL do comprovante (Cloudinary)
+
+        bank_account_id = db.Column(db.Integer, db.ForeignKey('bank_accounts.id'), nullable=True)
+        bank_account = db.relationship('BankAccount', backref='transactions', lazy=True)
         
         # Relationships
         category = db.relationship('Category', backref='transactions', lazy='joined')
@@ -103,8 +106,10 @@ class Transaction(db.Model):
                 'value': self.value,
                 'status': self.status,
                 'parent_transaction_id': self.parent_transaction_id,
+                'bank_account_id': self.bank_account_id,
                 'created_at': self.created_at.isoformat() if self.created_at else None,
                 'confirmed_at': self.confirmed_at.isoformat() if self.confirmed_at else None
+
             }
 
         def to_frontend_dict(self):
@@ -115,7 +120,10 @@ class Transaction(db.Model):
                 'transaction_date': self.date.strftime('%Y-%m-%d') if self.date else None,
                 'category': self.category.name if self.category else 'Sem categoria',
                 'type': 'income' if self.type == 'entrada' else 'expense',
-                'status': 'confirmada' if self.status == 'confirmada' else 'pendente'
+                'status': 'confirmada' if self.status == 'confirmada' else 'pendente',
+                'bank_account_id': self.bank_account_id,
+                'bank_name': self.bank_account.bank_name if self.bank_account else None,
+                'account_label': f"{self.bank_account.bank_name} - {self.bank_account.account_number}" if self.bank_account else None
             }
 
 
