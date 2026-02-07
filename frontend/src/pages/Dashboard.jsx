@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import WhatsNewModal from '@/components/WhatsNewModal';
 import eventService from '../services/eventService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -448,6 +449,7 @@ const tutorials = [
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+      <WhatsNewModal />
       <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
