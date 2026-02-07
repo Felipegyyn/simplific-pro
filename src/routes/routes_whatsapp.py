@@ -308,10 +308,11 @@ def executar_acao_simplific(user_id, acao, from_number):
     print(f"Executando ação '{tipo_acao}' com dados: {dados_acao}")
 
     try:
+        
         if tipo_acao == 'create_transaction':
             dados = dados_acao
             category_name = dados.get('category_name')
-            bank_account_name = dados.get('bank_account_name') # <--- IA tentou extrair
+            bank_account_name = dados.get('bank_account_name')
             
             # 1. Busca a categoria
             categorias_usuario = buscar_categorias(user_id)
@@ -322,35 +323,34 @@ def executar_acao_simplific(user_id, acao, from_number):
 
             # 2. Lógica da Conta Bancária
             conta_encontrada = None
+            lancar_sem_conta = False # Nova flag
+
+            # Cenário Especial: IA detectou que o usuário RECUSOU vincular (resposta "2" ou "Não")
+            if bank_account_name == 'none':
+                lancar_sem_conta = True
             
-            # Cenário A: IA identificou um nome de banco
-            if bank_account_name:
+            # Cenário A: IA identificou um nome de banco real
+            elif bank_account_name:
                 conta_encontrada = BankAccount.query.filter(
                     BankAccount.user_id == user_id,
                     BankAccount.bank_name.ilike(f'%{bank_account_name}%')
                 ).first()
-                
-                if not conta_encontrada:
-                    # Se falou nome mas não achou, avisa e pede pra selecionar manual depois
-                    # (Ou podemos seguir sem conta, mas melhor avisar)
-                    pass 
 
-            # Cenário B: Não temos conta definida. Vamos perguntar!
-            if not conta_encontrada:
-                # Salva os dados na sessão para concluir depois
+            # Cenário B: Não temos conta e nem recusa explícita -> PERGUNTAR
+            if not conta_encontrada and not lancar_sem_conta:
+                # Salva os dados na sessão
                 user_sessions[from_number] = {
                     'contexto': 'perguntar_vincular_conta',
                     'dados_lancamento': {
                         'user_id': user_id,
                         'tipo': dados.get('type'),
                         'categoria_id': categoria_encontrada['id'],
-                        'categoria_nome': categoria_encontrada['name'], # Para exibir na msg
+                        'categoria_nome': categoria_encontrada['name'],
                         'valor': dados.get('value'),
                         'descricao': dados.get('description')
                     }
                 }
                 
-                # Retorna a pergunta interativa
                 return (
                     f"Entendi! Vou lançar *{dados.get('description')}* (R$ {dados.get('value')}) em *{category_name}*.\n\n"
                     f"Deseja vincular a uma conta bancária para atualizar o saldo?\n"
@@ -358,20 +358,24 @@ def executar_acao_simplific(user_id, acao, from_number):
                     f"2. Não (Lançar sem conta)"
                 )
 
-            # Cenário C: Temos a conta! Lança direto.
+            # Cenário C: Temos a conta OU o usuário disse "Não" (none)
+            # Se for 'none', bank_account_id será None
+            id_conta_final = conta_encontrada.id if conta_encontrada else None
+
             criar_lancamento(
                 user_id=user_id,
                 tipo=dados.get('type'),
                 categoria_id=categoria_encontrada['id'],
                 valor=dados.get('value'),
                 descricao=dados.get('description'),
-                bank_account_id=conta_encontrada.id
+                bank_account_id=id_conta_final
             )
             
-            # Retorna None para usar a resposta padrão da IA (que geralmente confirma o feito)
-            # Mas como alteramos o fluxo, a IA pode ter dito "Vou lançar...", então aqui confirmamos.
-            emoji = "💰" if dados.get('type') == 'entrada' else "💸"
-            return f"Feito! {emoji} Lançamento registrado na conta *{conta_encontrada.bank_name}* e saldo atualizado."
+            # Mensagem de sucesso personalizada
+            if id_conta_final:
+                return f"Feito! 🏦 Lançamento registrado na conta *{conta_encontrada.bank_name}* e saldo atualizado."
+            else:
+                return f"Feito! ✅ Lançamento registrado em *{category_name}* (sem vínculo bancário)."
 
         elif tipo_acao == 'consultar_agenda':
             resumo = get_agenda_summary(user_id)
