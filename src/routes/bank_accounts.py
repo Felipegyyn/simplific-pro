@@ -37,7 +37,7 @@ def create_account():
         agency=data.get('agency', ''),
         account_number=data['account_number'],
         initial_balance=saldo_inicial,
-        current_balance=saldo_inicial # Ao criar, o saldo atual é igual ao inicial
+        current_balance=saldo_inicial, # Ao criar, o saldo atual é igual ao inicial
         observations=data.get('observations', '')
     )
 
