@@ -381,17 +381,24 @@ def executar_acao_simplific(user_id, acao, from_number):
             resumo = get_agenda_summary(user_id)
             return formatar_resumo_agenda(resumo) # Precisaremos criar esta função de formatação
 
-        elif tipo_acao == 'cadastrar_evento_agenda':
+        # ▼▼▼ BLOCO DE AGENDA CORRIGIDO E BLINDADO ▼▼▼
+        elif tipo_acao == 'cadastrar_evento_agenda' or tipo_acao == 'create_agenda_item':
             # Verifica se é uma reunião com Meet (novo fluxo)
-            if dados_acao.get('create_meet'):
+            # A IA as vezes manda 'create_meet': True ou infere pelo título
+            tem_meet = dados_acao.get('create_meet')
+            eh_reuniao = 'reunião' in (dados_acao.get('title') or '').lower() or 'reuniao' in (dados_acao.get('title') or '').lower()
+            
+            if tem_meet or eh_reuniao:
+                # Se for reunião, chama o fluxo do Google Meet
                 return handle_agendar_reuniao_meet(dados_acao, user_id)
             else:
-                # Fluxo antigo (lembrete simples)
+                # Fluxo antigo (lembrete simples na agenda interna)
                 success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
                 if success:
                     return None
                 else:
                     return message
+        # ▲▲▲ FIM DO BLOCO CORRIGIDO ▲▲▲
 
         # ▼▼▼ NOVAS AÇÕES DE CONTATO ▼▼▼
         elif tipo_acao == 'consultar_contato':

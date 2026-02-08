@@ -83,6 +83,7 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     - Lançar Gasto: [ACTION]{{"type": "create_transaction", "data": {{"description": "Mercado", "value": 50.00, "type": "saida", "category_name": "Alimentação", "bank_account_name": "Nubank"}}}}
     - Lançar Receita: [ACTION]{{"type": "create_transaction", "data": {{"description": "Pix Cliente", "value": 100.00, "type": "entrada", "category_name": "Vendas", "bank_account_name": "Inter"}}}}
     - Pagar Fatura: [ACTION]{{"type": "pay_credit_card_bill", "data": {{"card_name": "Nubank"}}}}
+    - Agendar Reunião com Meet: [ACTION]{{"type": "cadastrar_evento_agenda", "data": {{"title": "Reunião com Michel", "event_date": "2025-10-25", "time": "15:00", "create_meet": true, "attendee_email": "michel@email.com"}}}}
 
     # REGRAS CRÍTICAS PARA CONTAS BANCÁRIAS (RIGOROSO):
     - Campo "bank_account_name": Preencha SOMENTE se o usuário citar explicitamente o nome do banco NA MENSAGEM ATUAL.
