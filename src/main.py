@@ -1,5 +1,6 @@
 import os
 import sys
+import click
 from dotenv import load_dotenv
 from src.routes.marketing_routes import marketing_bp # <--- Adicione isto
 from src.routes.pluggy_routes import pluggy_bp
