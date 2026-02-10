@@ -585,7 +585,7 @@ def disparar_recuperacao_lista():
     from src.extensions import mail
     from flask_mail import Message
 
-    # --- LISTA DE ALVOS ---
+    # --- RECUPERAÇÃO LISTA DE ALVOS MUDAR E-MAIL SEMPRE QUE PRECISAR ---
     target_emails = [
         "cvn.camila@gmail.com",
         "contato.rennedyeidi@gmail.com",
@@ -645,3 +645,70 @@ def disparar_recuperacao_lista():
             print(f" -> [ERRO] Falha ao enviar para {email}: {e}")
 
     print("--- FIM DO DISPARO ---")
+
+# ▼▼▼ COLE NO FINAL DO ARQUIVO src/main.py ▼▼▼
+
+@app.cli.command("enviar-recuperacao-pagamento")
+@click.argument("email")
+def enviar_recuperacao_pagamento(email):
+    """
+    Envia um e-mail para o usuário avisando que o pagamento falhou
+    e fornecendo o link para tentar novamente.
+    Uso: flask enviar-recuperacao-pagamento "email@exemplo.com"
+    """
+    from src.models.user import User
+    from src.extensions import mail
+    from flask_mail import Message
+    
+    print(f"\n--- 📧 Preparando envio para: {email} ---")
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        print("❌ Usuário não encontrado.")
+        return
+
+    # Link direto para a tela de planos/checkout
+    # Ajuste se sua rota for diferente, mas geralmente é essa
+    link_pagamento = "https://www.simplificpro.com/#/checkout"
+
+    print(f"Usuário encontrado: {user.name}. Status atual: {user.status}")
+
+    try:
+        msg = Message(
+            subject="Finalize sua assinatura no Simplific Pro",
+            recipients=[user.email]
+        )
+
+        # Template do E-mail (HTML)
+        msg.html = f"""
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #0891b2;">Olá, {user.name.split()[0]}!</h2>
+            
+            <p>Notamos que você criou sua conta no <strong>Simplific Pro</strong>, mas por algum motivo,  processo de pagamento da assinatura não foi concluído(você pode checar no extrato do seu cartão).</p>
+            
+            <p>Não se preocupe: <strong>seu cadastro e configurações iniciais estão salvos!</strong></p>
+            
+            <p>Para liberar seu acesso completo ao Simplific Pro, basta finalizar a assinatura clicando no botão abaixo:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{link_pagamento}" 
+                   style="background-color: #16a34a; color: white; padding: 15px 25px; 
+                          text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                   FINALIZAR ASSINATURA AGORA
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #666;">
+                Se você já realizou o pagamento e acredita que isso é um erro, por favor, responda a este e-mail.
+            </p>
+            
+            <br>
+            <p>Um abraço,<br>Equipe Simplific Pro</p>
+        </div>
+        """
+        
+        mail.send(msg)
+        print(f"✅ E-mail de recuperação enviado com sucesso para {email}!")
+        
+    except Exception as e:
+        print(f"❌ Erro ao enviar e-mail: {e}")

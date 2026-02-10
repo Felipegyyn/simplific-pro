@@ -186,7 +186,7 @@ const Settings = ({ user, onLogout }) => {
             </Card>
 
             {/* Seção Assinatura - DESCOMENTAR DEPOIS */}
-            {/*<Card className="border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <Card className="border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
               <CardHeader className="pb-4 border-b bg-gray-50/50 dark:bg-slate-900/50">
                 <div className="flex items-center gap-2">
                   <CreditCard size={20} className="text-gray-500" />
@@ -248,7 +248,7 @@ const Settings = ({ user, onLogout }) => {
                   </div>
                 )}
               </CardContent>
-            </Card>*/}
+            </Card>
 
           </div>
 
