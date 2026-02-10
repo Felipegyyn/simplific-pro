@@ -9,7 +9,7 @@
 
     payment_bp = Blueprint('payment', __name__)
 
-    @payment_bp.route('/process_subscription', methods=['POST'])
+@payment_bp.route('/process_subscription', methods=['POST'])
 def process_subscription_route():
     # --- 1. VALIDAÇÃO INICIAL E PROTEÇÃO ---
     try:
