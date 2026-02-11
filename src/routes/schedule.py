@@ -69,7 +69,16 @@ def create_schedule_event():
     user = User.query.get(user_id)
     if user.google_calendar_token:
         print("Sincronizando com Google Calendar...")
-        google_id = add_event_to_google(user, event)
+        
+        google_id = add_event_to_google(
+        user, 
+        event, 
+        attendee_email=attendee_email, 
+        create_meet=create_meet
+    )
+    # ------------------------
+
+        
         if google_id:
             event.google_event_id = google_id
             db.session.commit()
