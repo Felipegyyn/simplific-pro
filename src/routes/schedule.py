@@ -23,22 +23,26 @@ def get_schedule_events():
 
 @schedule_bp.route('/schedule', methods=['POST'])
 @jwt_required()
-@active_user_required # <-- TRAVA APLICADA
+@active_user_required
 def create_schedule_event():
     user_id = get_jwt_identity()
     data = request.json
 
-    # 1. Captura todos os campos do formulário (com os nomes corretos)
+    # 1. Captura dados básicos
     title = data.get('title')
     description = data.get('description')
-    date_str = data.get('event_date') # <-- Corrigido de 'date' para 'event_date'
+    date_str = data.get('event_date')
     time_str = data.get('event_time')
     event_type = data.get('type')
     priority = data.get('priority')
     amount = data.get('amount')
     category = data.get('category')
+    
+    # 2. CAPTURA NOVOS DADOS (MEET/EMAIL)
+    create_meet = data.get('create_meet', False)
+    attendee_email = data.get('attendee_email')
 
-    # 2. Validação mais completa
+    # 3. Validação
     if not title or not date_str or not event_type:
         return jsonify({'error': 'Título, data e tipo são obrigatórios'}), 400
 
@@ -47,8 +51,7 @@ def create_schedule_event():
     except ValueError:
         return jsonify({'error': 'Data inválida'}), 400
 
-    # 3. Cria o objeto ScheduleEvent com todos os campos
-    # (É crucial que o seu modelo `ScheduleEvent` no banco de dados tenha essas colunas)
+    # 4. Criação Local
     event = ScheduleEvent(
         user_id=user_id,
         title=title,
@@ -57,34 +60,50 @@ def create_schedule_event():
         time=time_str,
         type=event_type,
         priority=priority,
-        value=float(amount) if amount else None, # Salva o valor (amount) se ele existir
+        value=float(amount) if amount else None,
         category=category
     )
 
     db.session.add(event)
-    db.session.commit()
+    db.session.commit() # <--- O evento é salvo aqui com sucesso!
 
-    # ▼▼▼ INTEGRAÇÃO GOOGLE ▼▼▼
-    # Tenta sincronizar com o Google se o usuário tiver token
-    user = User.query.get(user_id)
-    if user.google_calendar_token:
-        print("Sincronizando com Google Calendar...")
-        
-        google_id = add_event_to_google(
-        user, 
-        event, 
-        attendee_email=attendee_email, 
-        create_meet=create_meet
-    )
-    # ------------------------
-
-        
-        if google_id:
-            event.google_event_id = google_id
-            db.session.commit()
+    # ▼▼▼ INTEGRAÇÃO GOOGLE CORRIGIDA ▼▼▼
+    # Envolvemos em um TRY para que, se o Google falhar, o usuário não veja erro 500
+    try:
+        user = User.query.get(user_id)
+        if user.google_calendar_token:
+            print("Sincronizando com Google Calendar...")
+            
+            # Chama passando os parâmetros extras
+            google_result = add_event_to_google(
+                user, 
+                event, 
+                attendee_email=attendee_email, 
+                create_meet=create_meet
+            )
+            
+            if google_result:
+                # --- CORREÇÃO DO ERRO 'dict' ---
+                if isinstance(google_result, dict):
+                    # Extrai só o ID string para o banco (Isso evita o erro 500)
+                    event.google_event_id = google_result.get('id')
+                    
+                    # Se tiver link, adiciona na descrição
+                    meet_link = google_result.get('meet_link')
+                    if meet_link:
+                        desc_atual = event.description or ""
+                        event.description = f"{desc_atual}\n\nLink da Reunião: {meet_link}".strip()
+                else:
+                    # Fallback para string simples (compatibilidade)
+                    event.google_event_id = google_result
+                
+                db.session.commit()
+                
+    except Exception as e:
+        # Se der erro aqui, apenas logamos. O usuário recebe "Sucesso" pois o evento local existe.
+        print(f"Erro na integração Google (Ignorado para não travar o app): {e}")
     # ▲▲▲ FIM INTEGRAÇÃO ▲▲▲
 
-    # Adicionei um 'success: True' para alinhar com a checagem no frontend
     return jsonify({'success': True, 'event': event.to_dict()}), 201
 
 # ▼▼▼ SUBSTITUA A FUNÇÃO update_schedule_event PELA VERSÃO ABAIXO ▼▼▼
