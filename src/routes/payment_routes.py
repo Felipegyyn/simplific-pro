@@ -19,13 +19,11 @@ def process_subscription_route():
     except Exception as e:
         return jsonify({"error": "JSON inválido"}), 400
 
-    # 1. Extração dos Dados do Frontend
-    # Nota: No próximo passo (Frontend), vamos garantir que esses dados cheguem assim.
+    # 1. Extração dos Dados
     payer_data = data.get('payer', {})
     card_data = data.get('card', {})
     plan_type = data.get('plan_type', 'monthly')
     
-    # Dados obrigatórios para o Asaas
     email = payer_data.get('email')
     name = payer_data.get('name')
     cpf = payer_data.get('cpfCnpj')
@@ -37,12 +35,11 @@ def process_subscription_route():
     if not email or not cpf or not card_data.get('number'):
         return jsonify({"error": "Dados incompletos. CPF, Email e Cartão são obrigatórios."}), 400
 
-    # Normaliza telefone para salvar no banco depois
     whatsapp_normalized = normalize_phone_number(phone)
     
     print(f"--- [ASAAS] Iniciando processamento para: {email} ---")
 
-    # 2. Verifica se usuário já existe (Lógica de preservação)
+    # 2. Usuário no Banco (Lógica de preservação)
     user = User.query.filter_by(email=email).first()
     if user:
         print(f"Usuário existente (ID: {user.id}). Atualizando dados...")
@@ -54,7 +51,7 @@ def process_subscription_route():
 
     # 3. Interação com o Asaas
     try:
-        # A. Identifica ou Cria o Cliente no Asaas
+        # A. Identifica/Cria Cliente
         customer_id = get_or_create_customer(
             name, email, cpf, phone, postal_code, address_number
         )
@@ -62,16 +59,26 @@ def process_subscription_route():
         if not customer_id:
             return jsonify({"error": "Erro ao cadastrar cliente no Asaas."}), 500
 
-        # B. Define o valor do plano
+        # B. Define Valor
         value = 199.90 if plan_type == 'yearly' else 29.90
         
-        # C. Pega o IP do cliente (importante para antifraude)
+        # C. Antifraude (IP)
         remote_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+
+        # --- CORREÇÃO AQUI: PREPARAÇÃO DOS DADOS DO TITULAR ---
+        # O Asaas exige email, cpf, fone e endereço DENTRO do objeto do cartão.
+        # Vamos injetar os dados do pagador no objeto do cartão.
+        card_data['email'] = email
+        card_data['cpfCnpj'] = cpf
+        card_data['phone'] = phone
+        card_data['postalCode'] = postal_code
+        card_data['addressNumber'] = address_number
+        # -------------------------------------------------------
 
         # D. Cria a Assinatura
         result_asaas = create_asaas_subscription(customer_id, card_data, value, remote_ip)
 
-        # 4. Avalia o Resultado
+        # 4. Resultado
         if result_asaas['status'] == 'success':
             subscription_data = result_asaas['data']
             sub_id = subscription_data.get('id')
@@ -79,10 +86,8 @@ def process_subscription_route():
             
             print(f"✅ [ASAAS] Assinatura criada! ID: {sub_id} | Status: {status}")
 
-            # --- SUCESSO: ATIVAR USUÁRIO ---
+            # ATIVAR USUÁRIO
             new_credentials = None
-            
-            # Se usuário não existe, cria agora
             if not user:
                 success_create, result_create = create_user_from_purchase(name, email, whatsapp_normalized)
                 if success_create:
@@ -91,11 +96,10 @@ def process_subscription_route():
                 else:
                     return jsonify({"error": "Pagamento aprovado, mas erro ao criar usuário."}), 500
 
-            # Ativa no Banco de Dados
             days = 366 if plan_type == 'yearly' else 32
             user.status = 'ativo'
             user.profile = 'usuario'
-            user.subscription_id = sub_id  # Salva o ID do Asaas (pay_xxxx)
+            user.subscription_id = sub_id
             user.subscription_valid_until = datetime.utcnow() + timedelta(days=days)
             
             db.session.commit()
@@ -108,9 +112,9 @@ def process_subscription_route():
             return jsonify({"message": msg, "subscription_id": sub_id}), 200
 
         else:
-            # ERRO NO PAGAMENTO
             error_msg = result_asaas.get('message')
             print(f"🚫 [ASAAS] Falha: {error_msg}")
+            # Retorna o detalhe técnico para facilitar o debug no frontend se necessário
             return jsonify({"error": "Pagamento não autorizado.", "detail": error_msg}), 400
 
     except Exception as e:
