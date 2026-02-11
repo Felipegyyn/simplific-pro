@@ -9,32 +9,54 @@ def get_mp_sdk():
         return None
     return mercadopago.SDK(access_token)
 
-# --- FUNÇÃO ATUALIZADA: AGORA ACEITA PARCELAS ---
-def create_one_time_payment(user_email, card_token, amount, description, installments=1):
+# --- FUNÇÃO ATUALIZADA: AGORA ACEITA DADOS COMPLETOS E DEVICE ID ---
+def create_one_time_payment(user_email, card_token, amount, description, installments=1, payer_info=None, device_id=None):
     """
-    Cria uma cobrança única.
-    Args:
-        installments (int): Número de parcelas (Padrão 1).
+    Cria uma cobrança única com dados completos de antifraude.
     """
     sdk = get_mp_sdk()
     if not sdk: return {"status": "error", "message": "Erro SDK"}
+
+    # Garante que payer_info existe para evitar erros
+    if not payer_info:
+        payer_info = {}
 
     payment_data = {
         "transaction_amount": float(amount),
         "token": card_token,
         "description": description,
-        "installments": int(installments), # <-- Agora usa o valor passado
+        "installments": int(installments),
         "payer": {
-            "email": user_email
+            "email": user_email,
+            "first_name": payer_info.get("first_name"),
+            "last_name": payer_info.get("last_name"),
+            "identification": {
+                "type": "CPF", 
+                "number": payer_info.get("cpf") # CPF é crucial
+            },
+            "address": {
+                "zip_code": payer_info.get("zip_code"),
+                "street_name": payer_info.get("street_name"),
+                "street_number": payer_info.get("street_number"),
+                "neighborhood": payer_info.get("neighborhood"),
+                "city": payer_info.get("city"),
+                "federal_unit": payer_info.get("state")
+            }
         },
-        "external_reference": user_email
+        "external_reference": user_email,
+        "additional_info": {
+            "ip_address": "127.0.0.1" # Idealmente, pegar o IP real do cliente na rota
+        }
     }
+
+    # Adiciona Device ID se disponível (CRÍTICO PARA ANTIFRAUDE)
+    if device_id:
+        payment_data["metadata"] = {"device_id": device_id}
 
     try:
         print(f"Criando pagamento avulso de R$ {amount} ({installments}x) para {user_email}...")
         payment_response = sdk.payment().create(payment_data)
         
-        # Verificação de segurança caso a resposta venha vazia
         if "response" not in payment_response:
              return {"status": "error", "message": "Sem resposta do MP", "detail": payment_response}
 
@@ -52,10 +74,12 @@ def create_one_time_payment(user_email, card_token, amount, description, install
         print(f"Erro pagamento avulso: {e}")
         return {"status": "error", "message": str(e)}
 
-# --- FUNÇÃO ASSINATURA (MANTIDA COM PEQUENO AJUSTE) ---
-def create_subscription(user_email, card_token, amount, frequency=1, start_date=None):
+# --- FUNÇÃO ASSINATURA ATUALIZADA ---
+def create_subscription(user_email, card_token, amount, frequency=1, start_date=None, device_id=None):
     """
     Cria uma assinatura recorrente.
+    OBS: Assinaturas (Preapproval) têm menos campos de 'payer' no payload direto, 
+    mas o device_id e o card_token_id rico ajudam.
     """
     sdk = get_mp_sdk()
     if not sdk: return {"status": "error", "message": "Erro SDK"}
@@ -75,15 +99,23 @@ def create_subscription(user_email, card_token, amount, frequency=1, start_date=
         "card_token_id": card_token
     }
 
-    # Lógica para agendar o início da cobrança recorrente (ex: daqui 30 dias)
     if start_date:
         subscription_data["auto_recurring"]["start_date"] = start_date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
     try:
         request_options = mercadopago.config.RequestOptions()
-        request_options.custom_headers = {
+        
+        # Envia Device ID no Header customizado se houver (para Preapproval é diferente)
+        # Em preapproval, o antifraude roda forte na criação do card_token.
+        # Garantir que o card_token foi criado no front com o device_id vinculado é o principal.
+        
+        headers = {
             'x-idempotency-key': f"sub_{card_token}_{datetime.now().timestamp()}" 
         }
+        if device_id:
+             headers['x-device-id'] = device_id # Tentativa de enviar device no header
+
+        request_options.custom_headers = headers
         
         result = sdk.preapproval().create(subscription_data, request_options)
         

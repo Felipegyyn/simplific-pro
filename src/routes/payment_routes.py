@@ -21,26 +21,36 @@ def process_subscription_route():
         print(f"[ERRO PAGAMENTO] JSON malformado: {str(e)}")
         return jsonify({"error": "Erro ao ler JSON", "detail": str(e)}), 400
 
-    # Extração de dados
+    # Extração de dados básicos
     card_token = data.get('card_token')
     payer_data = data.get('payer_data', {})
-    plan_type = data.get('plan_type', 'monthly') # 'monthly' ou 'yearly'
+    plan_type = data.get('plan_type', 'monthly')
     installments = data.get('installments', 1)
+    
+    # Extração de dados ANTIFRAUDE (Novos)
+    device_id = data.get('device_id') # Vem do front (MP script)
+    payer_cpf = payer_data.get('cpf') # Novo campo obrigatório
+    address_data = data.get('address', {}) # Novo objeto de endereço
 
     email = payer_data.get('email')
     name = payer_data.get('name')
     whatsapp_raw = payer_data.get('whatsapp')
     
-    # Validação de campos obrigatórios
+    # Validação rigorosa
     if not card_token or not email:
-        print(f"[ERRO PAGAMENTO] Dados incompletos. Email: {email}, Token presente: {bool(card_token)}")
-        return jsonify({"error": "Dados incompletos. Verifique e-mail e cartão."}), 400
+        return jsonify({"error": "Dados incompletos (Token ou Email)."}), 400
+        
+    # Para Antifraude, CPF é essencial no Brasil.
+    # Se não vier no payload, logamos o aviso, mas tentamos seguir (pode falhar no MP)
+    if not payer_cpf:
+        print("[AVISO] CPF não fornecido. Risco alto de recusa.")
 
     whatsapp_normalized = normalize_phone_number(whatsapp_raw)
     
     print(f"--- INICIANDO PROCESSAMENTO PARA: {email} ({plan_type}) ---")
+    print(f"--- Device ID: {device_id} | CPF Presente: {bool(payer_cpf)} ---")
 
-    # --- 2. GESTÃO DO USUÁRIO (Cria ou Atualiza) ---
+    # --- 2. GESTÃO DO USUÁRIO ---
     try:
         user = User.query.filter_by(email=email).first()
         new_user_credentials = None 
@@ -61,7 +71,7 @@ def process_subscription_route():
             if whatsapp_normalized: user.whatsapp = whatsapp_normalized
             db.session.commit()
     except Exception as e:
-        print(f"[ERRO CRÍTICO] Erro de banco de dados ao gerenciar usuário: {e}")
+        print(f"[ERRO CRÍTICO] Erro de banco de dados: {e}")
         db.session.rollback()
         return jsonify({"error": "Erro interno no cadastro."}), 500
 
@@ -69,28 +79,47 @@ def process_subscription_route():
     result_mp = None
     days_access = 32
     
+    # Prepara o objeto payer_info com tudo que temos
+    # Separa Nome e Sobrenome para o MP (simples split)
+    first_name = name.split()[0] if name else "Cliente"
+    last_name = " ".join(name.split()[1:]) if name and len(name.split()) > 1 else "Sobrenome"
+
+    payer_info_full = {
+        "email": email,
+        "first_name": first_name,
+        "last_name": last_name,
+        "cpf": payer_cpf,
+        # Dados de endereço (se vierem vazios, passamos None, mas o ideal é preencher)
+        "zip_code": address_data.get('zip_code'),
+        "street_name": address_data.get('street_name'),
+        "street_number": address_data.get('street_number'),
+        "neighborhood": address_data.get('neighborhood'),
+        "city": address_data.get('city'),
+        "state": address_data.get('state')
+    }
+
     try:
         # === PLANO MENSAL ===
         if plan_type == 'monthly':
             recurring_amount = 29.90
-            print(f"Enviando solicitação de assinatura (R$ {recurring_amount}) ao Mercado Pago...")
+            print(f"Enviando solicitação de assinatura (R$ {recurring_amount})...")
             
+            # Para assinatura, passamos o device_id. O CPF vai vinculado ao card_token na criação ou no preapproval
             subscription_result = create_subscription(
                 user.email, 
                 card_token, 
                 amount=recurring_amount, 
-                frequency=1
+                frequency=1,
+                device_id=device_id
             )
             
-            # LOG IMPORTANTE: Ver o que o MP respondeu
             print(f"[DEBUG MP RESPONSE - MENSAL]: {subscription_result}")
 
             if subscription_result and subscription_result.get('status') == 'success':
                 result_mp = {'status': 'success', 'id': subscription_result['id']}
                 days_access = 32
             else:
-                # Captura o erro real do MP
-                error_msg = subscription_result.get('message') or subscription_result.get('detail') or "Cartão recusado ou inválido"
+                error_msg = subscription_result.get('message') or subscription_result.get('detail') or "Cartão recusado"
                 result_mp = {'status': 'error', 'detail': error_msg}
 
         # === PLANO ANUAL ===
@@ -103,10 +132,11 @@ def process_subscription_route():
                 card_token, 
                 amount=total_amount, 
                 description="Simplific Pro - Plano Anual",
-                installments=installments
+                installments=installments,
+                payer_info=payer_info_full, # Enviamos o pacote completo aqui
+                device_id=device_id         # E o device ID
             )
 
-            # LOG IMPORTANTE: Ver o que o MP respondeu
             print(f"[DEBUG MP RESPONSE - ANUAL]: {payment_result}")
             
             if payment_result and payment_result.get('status') == 'success':
@@ -117,18 +147,17 @@ def process_subscription_route():
                 result_mp = {'status': 'error', 'detail': error_msg}
 
     except Exception as e:
-        print(f"[ERRO CRÍTICO] Exceção durante chamada ao Payment Service: {str(e)}")
-        return jsonify({"error": "Erro na comunicação com gateway de pagamento", "detail": str(e)}), 500
+        print(f"[ERRO CRÍTICO] Exceção Payment Service: {str(e)}")
+        return jsonify({"error": "Erro comunicação gateway", "detail": str(e)}), 500
 
-    # --- 4. FINALIZAÇÃO E RETORNO ---
+    # --- 4. FINALIZAÇÃO ---
     if result_mp and result_mp.get('status') == 'success':
         try:
-            print(f"Pagamento APROVADO. Ativando assinatura {result_mp.get('id')}...")
+            print(f"Pagamento APROVADO. ID: {result_mp.get('id')}")
             user.status = 'ativo' 
             user.profile = 'usuario'  
             user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
             user.subscription_id = result_mp.get('id')
-            
             db.session.commit()
             
             msg = "Pagamento aprovado e plano ativado!"
@@ -139,84 +168,60 @@ def process_subscription_route():
             return jsonify({"message": msg, "subscription_id": user.subscription_id}), 200
             
         except Exception as e:
-            print(f"[ERRO PÓS-PAGAMENTO] Falha ao salvar status ativo: {e}")
+            print(f"[ERRO PÓS-PAGAMENTO] Falha ao salvar: {e}")
             db.session.rollback()
-            # Neste caso, o dinheiro foi cobrado, mas o banco falhou. 
-            # Retornamos 200 com aviso ou 500? Melhor avisar erro mas logar forte.
-            return jsonify({"error": "Pagamento processado, mas houve erro na ativação. Contate o suporte."}), 500
+            return jsonify({"error": "Pagamento ok, erro na ativação. Contate suporte."}), 500
     else:
-        # Retorna o erro exato para o Frontend mostrar
-        detail = result_mp.get('detail') if result_mp else "Erro desconhecido no pagamento"
-        print(f"[FALHA PAGAMENTO] Retornando erro 400 para o cliente: {detail}")
-        return jsonify({"error": "Não foi possível processar o pagamento.", "detail": detail}), 400
+        detail = result_mp.get('detail') if result_mp else "Erro desconhecido"
+        print(f"[FALHA PAGAMENTO] Recusado: {detail}")
+        return jsonify({"error": "Pagamento não autorizado.", "detail": detail}), 400
 
-
-# --- ROTAS: ÁREA DO ASSINANTE ---
-
+# Mantenha as outras rotas (subscription_status, cancel) iguais ao que já estava...
 @payment_bp.route('/subscription_status', methods=['GET'])
 @jwt_required()
 def get_subscription_status_route():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-
-    if not user:
-        return jsonify({"error": "Usuário não encontrado"}), 404
-
-    # Verifica se é plano anual (ID começa com 'annual_')
+    if not user: return jsonify({"error": "Usuário não encontrado"}), 404
     is_annual = user.subscription_id and user.subscription_id.startswith('annual_')
-
     status_data = {
         "status": user.status,
         "user_valid_until": user.subscription_valid_until.isoformat() if user.subscription_valid_until else None,
         "mp_status": "active" if user.status == 'ativo' else "inactive",
         "plan_type": "yearly" if is_annual else "monthly",
-        "amount": 199.00 if is_annual else 29.90 # Valor de referência atual
+        "amount": 199.00 if is_annual else 29.90
     }
-
-    # Se for mensal e tiver ID válido do MP (não 'pending_sub'), busca detalhes
     if user.subscription_id and not is_annual and user.subscription_id != 'pending_sub':
         try:
             mp_data = get_subscription_details(user.subscription_id)
             if mp_data:
                 status_data["mp_status"] = mp_data.get("status")
-                # Tenta pegar a próxima data de pagamento
                 next_payment = mp_data.get("next_payment_date")
                 if not next_payment:
-                    # Fallback para a data de início
                     next_payment = mp_data.get("auto_recurring", {}).get("start_date")
-                
                 status_data["next_payment_date"] = next_payment
                 status_data["amount"] = mp_data.get("auto_recurring", {}).get("transaction_amount")
         except Exception as e:
-            print(f"Erro ao buscar detalhes da assinatura: {e}")
-
+            print(f"Erro detalhe assinatura: {e}")
     return jsonify(status_data), 200
 
 @payment_bp.route('/cancel_subscription', methods=['POST'])
 @jwt_required()
 def cancel_subscription_route():
-    """Cancela a renovação automática."""
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-
     if not user or not user.subscription_id:
         return jsonify({"error": "Assinatura não encontrada."}), 400
-
-    # Se for anual, não tem cancelamento no MP (já pagou tudo)
     if user.subscription_id.startswith('annual_'):
         return jsonify({
-            "message": "Seu plano é anual e não possui renovação automática mensal. Seu acesso continua garantido até o fim do período.",
+            "message": "Plano anual não possui recorrência para cancelar. Acesso mantido.",
             "valid_until": user.subscription_valid_until
         }), 200
-
-    # Se for mensal
     result = cancel_subscription_service(user.subscription_id)
-
     if result['status'] == 'success':
-        # Opcional: Você pode querer atualizar o status no banco imediatamente ou esperar o webhook
         return jsonify({
-            "message": "Renovação automática cancelada com sucesso. Você mantém o acesso até o fim do período pago.",
+            "message": "Renovação cancelada. Acesso mantido até o fim do período.",
             "valid_until": user.subscription_valid_until
         }), 200
     else:
-        return jsonify({"error": "Falha ao cancelar assinatura.", "detail": result.get('message')}), 500
+        return jsonify({"error": "Falha ao cancelar.", "detail": result.get('message')}), 500
