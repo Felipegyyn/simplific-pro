@@ -1,6 +1,7 @@
 import requests
 import os
 import json
+from datetime import datetime
 
 def get_headers():
     token = os.getenv('ASAAS_ACCESS_TOKEN')
@@ -13,7 +14,6 @@ def get_headers():
     }
 
 def get_base_url():
-    # Pega a URL do Render. Se não tiver, usa a de Sandbox por segurança.
     return os.getenv('ASAAS_API_URL', 'https://api-sandbox.asaas.com/v3')
 
 def get_or_create_customer(name, email, cpf, phone, postal_code, address_number):
@@ -67,19 +67,18 @@ def get_or_create_customer(name, email, cpf, phone, postal_code, address_number)
 
 def create_asaas_subscription(customer_id, card_data, value, remote_ip):
     """
-    Cria a assinatura no cartão de crédito.
+    Cria uma ASSINATURA MENSAL (Recorrente).
     """
     headers = get_headers()
     base_url = get_base_url()
 
-    # Monta o payload da assinatura
     payload = {
         "customer": customer_id,
         "billingType": "CREDIT_CARD",
         "value": float(value),
         "nextDueDate": None, # Cobra agora
         "cycle": "MONTHLY",
-        "description": "Assinatura Simplific Pro",
+        "description": "Assinatura Simplific Pro (Mensal)",
         "creditCard": {
             "holderName": card_data.get('holderName'),
             "number": card_data.get('number'),
@@ -99,26 +98,71 @@ def create_asaas_subscription(customer_id, card_data, value, remote_ip):
     }
 
     try:
-        print(f"💳 [ASAAS] Enviando assinatura para o cliente {customer_id}...")
+        print(f"💳 [ASAAS] Criando Assinatura Mensal para {customer_id}...")
         response = requests.post(
             f"{base_url}/subscriptions", 
             headers=headers, 
             json=payload
         )
         
-        # Sucesso (200 OK)
         if response.status_code == 200:
             return {"status": "success", "data": response.json()}
-        
-        # Erro de Validação (400 Bad Request)
         elif response.status_code == 400:
-            error_json = response.json()
-            errors = error_json.get('errors', [])
-            msg = errors[0]['description'] if errors else "Dados inválidos"
-            return {"status": "error", "message": msg, "detail": error_json}
-            
+            return {"status": "error", "message": "Dados inválidos", "detail": response.json()}
         else:
-            return {"status": "error", "message": "Erro na API Asaas", "detail": response.text}
+            return {"status": "error", "message": "Erro Asaas API", "detail": response.text}
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# --- NOVA FUNÇÃO PARA PARCELAMENTO ---
+def create_asaas_payment(customer_id, card_data, total_value, installment_count, remote_ip):
+    """
+    Cria uma COBRANÇA ÚNICA PARCELADA (Ex: Anual em 12x).
+    """
+    headers = get_headers()
+    base_url = get_base_url()
+
+    payload = {
+        "customer": customer_id,
+        "billingType": "CREDIT_CARD",
+        "value": float(total_value),
+        "dueDate": datetime.now().strftime('%Y-%m-%d'), # Vence hoje
+        "installmentCount": int(installment_count),     # Número de parcelas (ex: 12)
+        "installmentValue": float(total_value / int(installment_count)), # Valor da parcela
+        "description": f"Plano Anual Simplific Pro ({installment_count}x)",
+        "creditCard": {
+            "holderName": card_data.get('holderName'),
+            "number": card_data.get('number'),
+            "expiryMonth": card_data.get('expiryMonth'),
+            "expiryYear": card_data.get('expiryYear'),
+            "ccv": card_data.get('ccv')
+        },
+        "creditCardHolderInfo": {
+            "name": card_data.get('holderName'),
+            "email": card_data.get('email'),
+            "cpfCnpj": card_data.get('cpfCnpj'),
+            "postalCode": card_data.get('postalCode'),
+            "addressNumber": card_data.get('addressNumber'),
+            "phone": card_data.get('phone')
+        },
+        "remoteIp": remote_ip
+    }
+
+    try:
+        print(f"💳 [ASAAS] Criando Pagamento Parcelado ({installment_count}x) para {customer_id}...")
+        response = requests.post(
+            f"{base_url}/payments", 
+            headers=headers, 
+            json=payload
+        )
+        
+        if response.status_code == 200:
+            return {"status": "success", "data": response.json()}
+        elif response.status_code == 400:
+            return {"status": "error", "message": "Dados inválidos", "detail": response.json()}
+        else:
+            return {"status": "error", "message": "Erro Asaas API", "detail": response.text}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
