@@ -55,21 +55,27 @@ def process_subscription_route():
     
     remote_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
-    # 4. DECISÃO: MENSAL vs ANUAL (12x)
+    # ... (código anterior igual) ...
+
+    # 4. DECISÃO: MENSAL vs ANUAL
     result_asaas = None
     days_access = 32
+    
+    # PEGA O NÚMERO DE PARCELAS DO FRONTEND (Padrão 1 se não vier)
+    installments_choice = data.get('installments', 1)
 
     if plan_type == 'yearly':
-        # ANUAL: R$ 199.90 em 12x de ~R$ 16,65
-        print(f"🔄 Processando Plano ANUAL (12x) para {email}")
+        # ANUAL: R$ 199.90 (Parcelado conforme escolha do cliente)
+        print(f"🔄 Processando Plano ANUAL ({installments_choice}x) para {email}")
         result_asaas = create_asaas_payment(
             customer_id=customer_id,
             card_data=card_data,
             total_value=199.90,
-            installment_count=12,
+            installment_count=installments_choice, # <--- USA A ESCOLHA DO CLIENTE
             remote_ip=remote_ip
         )
         days_access = 366
+    
     else:
         # MENSAL: Assinatura recorrente de R$ 29.90
         print(f"🔄 Processando Plano MENSAL para {email}")

@@ -115,10 +115,12 @@ def create_asaas_subscription(customer_id, card_data, value, remote_ip):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# --- NOVA FUNÇÃO PARA PARCELAMENTO ---
+# Em src/services/asaas_service.py
+
 def create_asaas_payment(customer_id, card_data, total_value, installment_count, remote_ip):
     """
-    Cria uma COBRANÇA ÚNICA PARCELADA (Ex: Anual em 12x).
+    Cria uma cobrança no cartão.
+    Se installment_count > 1, cria parcelado. Se for 1, cria à vista.
     """
     headers = get_headers()
     base_url = get_base_url()
@@ -127,9 +129,7 @@ def create_asaas_payment(customer_id, card_data, total_value, installment_count,
         "customer": customer_id,
         "billingType": "CREDIT_CARD",
         "value": float(total_value),
-        "dueDate": datetime.now().strftime('%Y-%m-%d'), # Vence hoje
-        "installmentCount": int(installment_count),     # Número de parcelas (ex: 12)
-        "installmentValue": float(total_value / int(installment_count)), # Valor da parcela
+        "dueDate": datetime.now().strftime('%Y-%m-%d'),
         "description": f"Plano Anual Simplific Pro ({installment_count}x)",
         "creditCard": {
             "holderName": card_data.get('holderName'),
@@ -149,8 +149,16 @@ def create_asaas_payment(customer_id, card_data, total_value, installment_count,
         "remoteIp": remote_ip
     }
 
+    # Lógica para Parcelamento vs À Vista
+    if int(installment_count) > 1:
+        payload["installmentCount"] = int(installment_count)
+        payload["installmentValue"] = float(total_value / int(installment_count))
+    else:
+        # Se for 1x, removemos campos de parcelamento para garantir que seja processado como 'à vista'
+        payload["description"] = "Plano Anual Simplific Pro (À Vista)"
+
     try:
-        print(f"💳 [ASAAS] Criando Pagamento Parcelado ({installment_count}x) para {customer_id}...")
+        print(f"💳 [ASAAS] Criando Pagamento ({installment_count}x) para {customer_id}...")
         response = requests.post(
             f"{base_url}/payments", 
             headers=headers, 
