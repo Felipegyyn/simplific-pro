@@ -607,10 +607,9 @@ const Transactions = ({ user, onLogout }) => {
                   }
                 }}>
                   <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Nova Transação
-                    </Button>
+                  <Button size="icon" className="w-10 h-10 bg-green-700 hover:bg-green-800" title="Novo Lançamento">
+                  <Plus className="h-6 w-6" />
+                  </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[500px] px-6" aria-describedby="descricaoDialog">
                     <p id="descricaoDialog" className="sr-only">Formulário para criar nova transação financeira.</p>
@@ -707,10 +706,9 @@ const Transactions = ({ user, onLogout }) => {
                   </DialogContent>
                 </Dialog>
                 
-                <Button variant="outline" onClick={() => fileInputRef.current.click()} disabled={isUploading}>
-                  {isUploading ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
-                  {isUploading ? 'Importando...' : 'Importar Extrato'}
-                </Button>
+                <Button variant="outline" size="icon" className="w-10 h-10 ml-2" onClick={() => fileInputRef.current.click()} disabled={isUploading} title="Importar Extrato">
+                {isUploading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                  </Button>
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
               </div>
             </div>
