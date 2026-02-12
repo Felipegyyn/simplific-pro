@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+import requests
+import os
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import User
 from src.models.db import db
@@ -131,20 +133,76 @@ def process_subscription_route():
 
         return jsonify({"error": "Pagamento não autorizado.", "detail": friendly_error}), 400
 
-# Rotas auxiliares mantidas...
+
+
+
 @payment_bp.route('/subscription_status', methods=['GET'])
 @jwt_required()
 def get_subscription_status_route():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if not user: return jsonify({"error": "User not found"}), 404
+
+    sub_id = user.subscription_id or ""
+    
+    # Lógica de Identificação do Gateway
+    # Se começar com 'sub_' ou 'pay_', assumimos que é o novo padrão Asaas.
+    # Caso contrário, assumimos que é o legado (Mercado Pago).
+    gateway = 'asaas' if (sub_id.startswith('sub_') or sub_id.startswith('pay_')) else 'mercadopago'
+    
+    # Se for Asaas e começar com 'sub_', é assinatura mensal cancelável.
+    is_subscription = sub_id.startswith('sub_')
+    
     return jsonify({
         "status": user.status,
         "valid_until": user.subscription_valid_until.isoformat() if user.subscription_valid_until else None,
-        "subscription_id": user.subscription_id
+        "subscription_id": sub_id,
+        "is_subscription": is_subscription, 
+        "gateway": gateway, # <--- Enviamos essa informação nova
+        "plan_type": "Anual (12x)" if (gateway == 'asaas' and not is_subscription) else "Mensal"
     }), 200
 
 @payment_bp.route('/cancel_subscription', methods=['POST'])
 @jwt_required()
 def cancel_subscription_route():
-    return jsonify({"message": "Gerencie sua assinatura pelo painel ou suporte."}), 200
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    
+    if not user or not user.subscription_id:
+        return jsonify({"error": "Nenhuma assinatura ativa encontrada."}), 400
+
+    # SE FOR ANUAL (Começa com 'pay_'), não dá pra cancelar assinatura, pois foi cobrança única parcelada.
+    if not user.subscription_id.startswith('sub_'):
+        return jsonify({"error": "Seu plano é Anual (Parcelado). O acesso continua ativo até o fim do período já pago."}), 400
+
+    # SE FOR MENSAL (Começa com 'sub_'), chamamos o Asaas para cancelar.
+    asaas_url = os.getenv('ASAAS_API_URL')
+    asaas_token = os.getenv('ASAAS_ACCESS_TOKEN')
+    
+    headers = {
+        'access_token': asaas_token,
+        'Content-Type': 'application/json'
+    }
+
+    try:
+        # Chama a API do Asaas para remover a assinatura
+        response = requests.delete(
+            f"{asaas_url}/subscriptions/{user.subscription_id}",
+            headers=headers
+        )
+        
+        if response.status_code == 200 or response.status_code == 204:
+            # Sucesso no Asaas
+            user.subscription_valid_until = datetime.utcnow().date() # Define validade para hoje (ou mantem até o fim do ciclo se preferir logica complexa)
+            # Geralmente deixamos o valid_until como está (fim do mês) e apenas marcamos que não renova.
+            # Mas para simplificar:
+            user.status = 'cancelado' 
+            db.session.commit()
+            
+            return jsonify({"message": "Assinatura cancelada com sucesso. Você não será cobrado novamente."}), 200
+        else:
+            return jsonify({"error": "Erro ao cancelar no Asaas. Tente novamente ou contate o suporte."}), 500
+
+    except Exception as e:
+        print(f"Erro cancelamento: {e}")
+        return jsonify({"error": "Erro interno ao processar cancelamento."}), 500
