@@ -113,6 +113,13 @@ app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
+# ▼▼▼ ADICIONE ESTAS LINHAS AQUI ▼▼▼
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,  # Testa a conexão antes de usar (Resolve o erro SSL)
+    "pool_recycle": 300,    # Recicla conexões a cada 5 minutos
+}
+# ▲▲▲ FIM DO BLOCO ▲▲▲
+
 
 db.init_app(app)
 mail.init_app(app)
