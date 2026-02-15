@@ -118,11 +118,14 @@ async request(endpoint, options = {}) {
     try {
       const response = await fetch(url, config);
 
-      // ▼▼▼ ADICIONE ESTE BLOCO AQUI (LOGO APÓS O FETCH) ▼▼▼
+      // ▼▼▼ BLOCO CORRIGIDO (Alerta ANTES do Logout) ▼▼▼
       if (response.status === 403) {
-         console.warn('Conta inativa (403). Realizando logout.');
-         this.logout();
+         // 1. Trava a tela com o aviso
          alert("Seu usuário está inativo, contate o suporte através do e-mail: contato@simplificpro.com");
+         
+         // 2. Só executa o logout/redirecionamento quando o usuário clicar em "OK"
+         this.logout();
+         
          throw new Error('Conta inativa.');
       }
       // ▲▲▲ FIM DO BLOCO ▲▲▲
