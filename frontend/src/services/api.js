@@ -118,6 +118,15 @@ async request(endpoint, options = {}) {
     try {
       const response = await fetch(url, config);
 
+      // ▼▼▼ ADICIONE ESTE BLOCO AQUI (LOGO APÓS O FETCH) ▼▼▼
+      if (response.status === 403) {
+         console.warn('Conta inativa (403). Realizando logout.');
+         this.logout();
+         alert("Seu usuário está inativo, contate o suporte através do e-mail: contato@simplificpro.com");
+         throw new Error('Conta inativa.');
+      }
+      // ▲▲▲ FIM DO BLOCO ▲▲▲
+
       // --- MUDANÇA 1: Tratamento explícito para 422 (Logout Imediato) ---
       if (response.status === 422) {
           console.warn('Sessão invalidada pelo servidor (422). Realizando logout.');

@@ -50,7 +50,7 @@ const Login = ({ onLogin }) => {
       if (error.response && error.response.status === 403) {
         setError(error.response.data.error);
       } else {
-        setError('E-mail ou senha inválidos. Verifique suas credenciais.');
+        setError('E-mail ou senha inválidos. Verifique suas credenciai ou contate o suporte: contato@simplificpro.com');
       }
     } finally {
       setLoading(false);
