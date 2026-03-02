@@ -50,7 +50,7 @@ const Login = ({ onLogin }) => {
       if (error.response && error.response.status === 403) {
         setError(error.response.data.error);
       } else {
-        setError('Dados inválidos. Verifique suas credenciais ou contate o suporte: contato@simplificpro.com');
+        setError('Acesso negado. Verifique suas credenciais ou contate o suporte: contato@simplificpro.com');
       }
     } finally {
       setLoading(false);
