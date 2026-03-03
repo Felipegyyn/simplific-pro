@@ -269,20 +269,31 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
 
     # 4. Chama a IA passando o nome correto (nome_usuario_personalizado)
-    texto_para_usuario, acao_a_executar = get_ai_response(
+    texto_para_usuario, acoes_a_executar = get_ai_response(
         usuario.id, 
         historico_chat, 
-        nome_usuario_personalizado=nome_exibicao # <--- AQUI A MÁGICA ACONTECE
+        nome_usuario_personalizado=nome_exibicao
     )
 
     resposta_final = texto_para_usuario
-    if acao_a_executar:
-        resultado_acao = executar_acao_simplific(usuario.id, acao_a_executar, from_number)
-        # Se a ação retornou um texto (como uma cotação), anexa à resposta
-        if resultado_acao:
-            # Se a ação retornou uma nova pergunta (como no caso da Renda Fixa),
-            # essa pergunta se torna a resposta principal.
-            resposta_final = resultado_acao
+    
+    # Agora iteramos sobre TODAS as ações que a IA decidiu executar
+    if acoes_a_executar:
+        resultados_acoes = []
+        for acao in acoes_a_executar:
+            resultado_acao = executar_acao_simplific(usuario.id, acao, from_number)
+            if resultado_acao:
+                resultados_acoes.append(resultado_acao)
+        
+        # Se as ações geraram respostas de sistema (ex: "Lançado com sucesso"),
+        # nós anexamos à resposta final (a não ser que o resultado seja uma nova pergunta).
+        if resultados_acoes:
+            # Se for só uma ação, mantém o comportamento antigo
+            if len(resultados_acoes) == 1:
+                 resposta_final = resultados_acoes[0]
+            else:
+                 # Se forem múltiplas, junta os textos com quebra de linha
+                 resposta_final += "\n\n" + "\n".join(resultados_acoes)
 
     historico_chat.append({"role": "model", "content": resposta_final})
     sessao['chat_history'] = historico_chat

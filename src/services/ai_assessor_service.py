@@ -5,7 +5,6 @@ import json
 from src.models.user import User
 from datetime import datetime
 
-
 # --- Importando TODOS os nossos serviços de resumo ---
 from src.services.gemini_service import construir_prompt_assessor, model
 from src.services.reports_service import get_financial_summary_for_ai
@@ -23,25 +22,19 @@ from src.services.investments_service import processar_investimento_whatsapp
 from src.services.schedule_service import criar_evento_agenda
 from src.models.financial import Category
 
-
-
-
 def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     """
     Função principal que orquestra a conversa com o assessor Simplific.
-    Agora aceita um nome personalizado para contas compartilhadas.
+    AGORA USANDO FUNCTION CALLING NATIVO (Roteador Multitarefas).
     """
     usuario = User.query.get(user_id)
     if not usuario:
-        return "Usuário não encontrado.", None
+        return "Usuário não encontrado.", []
 
     # --- DECISÃO DO NOME ---
-    # Se veio um nome personalizado (do WhatsApp secundário), usa ele.
-    # Senão, usa o nome do cadastro principal.
     nome_final = nome_usuario_personalizado if nome_usuario_personalizado else usuario.name
 
     # --- PASSO 1: Montar o "Dossiê Financeiro" ---
-    # Chamamos cada função de resumo que criamos na Fase 2
     resumo_planejamento = get_planning_summary_for_ai(user_id)
     resumo_transacoes = get_financial_summary_for_ai(user_id)
     resumo_cartoes = get_credit_card_summary_for_ai(user_id)
@@ -50,7 +43,6 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     resumo_agenda = get_schedule_summary_for_ai(user_id)
     resumo_categorias = get_categories_for_ai(user_id)
 
-    # Concatena todos os resumos em um único bloco de texto
     contexto_financeiro_completo = (
         f"{resumo_planejamento}\n"
         f"{resumo_transacoes}\n"
@@ -62,93 +54,80 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     )
 
     # --- PASSO 2: Construir o Prompt e Chamar o Gemini ---
-    # Usamos o 'nome_final' para o bot saber com quem está falando
     prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
-        # Envia o prompt para o modelo Gemini
+        # Envia o prompt para o modelo Gemini (Agora com as tools embutidas)
         response = model.generate_content(prompt)
 
-        # Adiciona uma verificação de segurança ANTES de tentar ler o texto
+        # Verificação de segurança
         if not response.parts:
             try:
-                # Tenta obter o motivo do bloqueio para um log mais claro
                 finish_reason = response.candidates[0].finish_reason
                 print(f"AVISO: A resposta do Gemini foi bloqueada. Motivo: {finish_reason.name}")
             except (IndexError, AttributeError):
                 print("AVISO: A resposta do Gemini foi bloqueada (resposta vazia).")
+            return "Não consegui processar sua solicitação devido às políticas de segurança. Por favor, tente reformular.", []
 
-            # Retorna uma mensagem amigável para o usuário
-            return "Não consegui processar sua solicitação devido às políticas de segurança. Por favor, tente reformular sua pergunta.", None
-
-        resposta_gemini = response.text
-    
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
-        return "Tive um problema para me conectar com minha inteligência. Tente novamente em alguns instantes.", None
+        return "Tive um problema para me conectar com minha inteligência. Tente novamente em alguns instantes.", []
         
 
-   # --- PASSO 3: Processar a Resposta do Gemini (VERSÃO BLINDADA) ---
-    texto_para_usuario = resposta_gemini
-    acao_a_executar = None
+    # --- PASSO 3: Processar a Resposta do Gemini (O ROTEADOR) ---
+    texto_para_usuario = ""
+    acoes_a_executar = [] # Agora é uma lista, pois a IA pode chamar múltiplas ferramentas
 
-    # Verifica se existe a tag de ação
-    if '[ACTION]' in resposta_gemini:
-        # Separa o texto da ação usando o split, que é mais seguro que regex
-        partes = resposta_gemini.split('[ACTION]')
+    # Itera sobre as partes da resposta
+    for part in response.candidates[0].content.parts:
+        # Se a parte for um texto normal para o usuário ler
+        if part.text:
+            texto_para_usuario += part.text + " "
         
-        # A parte 0 é o que a IA falou para o usuário
-        texto_para_usuario = partes[0].strip()
-        
-        # A parte 1 é o código JSON (pode ter lixo, quebra de linha, markdown)
-        json_sujo = partes[1].strip()
-        
-        # Limpeza profunda para garantir que o JSON funcione
-        # Remove ```json, ```, e a palavra json solta
-        json_limpo = json_sujo.replace('```json', '').replace('```', '').strip()
-        if json_limpo.lower().startswith('json'):
-            json_limpo = json_limpo[4:].strip()
+        # Se a parte for uma chamada de função (Function Call)
+        elif part.function_call:
+            # Extrai o nome da função que o Gemini quer usar
+            nome_funcao = part.function_call.name
             
-        try:
-            acao_a_executar = json.loads(json_limpo)
-        except json.JSONDecodeError as e:
-            print(f"ERRO: IA enviou JSON inválido: {json_limpo} | Erro: {e}")
-            # Se der erro no JSON, pelo menos o usuário vê apenas o texto limpo
-            acao_a_executar = None
+            # Extrai os argumentos e converte para um dicionário Python normal
+            argumentos = {}
+            for key, value in part.function_call.args.items():
+                argumentos[key] = value
+                
+            print(f"🔧 AGENTE ACIONOU FERRAMENTA: {nome_funcao} com args: {argumentos}")
+            
+            # Monta o dicionário no formato que o seu routes_whatsapp.py já espera
+            acao = {
+                "type": nome_funcao,
+                "data": argumentos
+            }
+            acoes_a_executar.append(acao)
 
-    # --- PASSO 4: Executar a Ação (se houver) ---
-    if acao_a_executar:
-        # A ação será retornada para o controller (route) executar
-        pass
+    texto_para_usuario = texto_para_usuario.strip()
 
-    if not texto_para_usuario and not acao_a_executar:
+    if not texto_para_usuario and not acoes_a_executar:
         print("AVISO: get_ai_response está retornando uma resposta vazia. Forçando mensagem de erro.")
         texto_para_usuario = "Opa! Não consegui entender sua solicitação no momento. Pode tentar reformular?"
 
-    return texto_para_usuario, acao_a_executar
+    # Retorna o texto que a IA gerou e a LISTA de ações que ela decidiu tomar
+    return texto_para_usuario, acoes_a_executar
 
-# ▼▼▼ ADICIONE ESTA NOVA FUNÇÃO NO FINAL DO ARQUIVO ▼▼▼
+# --- FUNÇÕES ORIGINAIS MANTIDAS NO FINAL ---
 
 def categorizar_descricao_transacao(user_id, descricao):
     """
     Usa o Gemini para analisar uma descrição de transação e sugerir a categoria mais apropriada.
     """
-    # 1. Busca todas as categorias de 'saida' do usuário
     categorias = Category.query.filter_by(user_id=user_id, type='saida').all()
     if not categorias:
-        # Se o usuário não tiver categorias, retorna 'Outros' por padrão.
         return 'Outros'
 
-    # 2. Formata a lista de categorias para incluir no prompt
-    # Usamos uma lista simples de nomes para a IA.
     nomes_categorias = [cat.name for cat in categorias]
-    # Garante que 'Outros' seja sempre uma opção válida.
     if 'Outros' not in nomes_categorias:
         nomes_categorias.append('Outros')
     
     lista_formatada = ", ".join(f"'{nome}'" for nome in nomes_categorias)
 
-    # 3. Cria o prompt para a IA
     prompt = (
         f"Analise a seguinte descrição de uma transação de extrato bancário: '{descricao}'.\n"
         f"Com base na lista de categorias disponíveis: [{lista_formatada}], qual é a mais adequada?\n"
@@ -157,27 +136,19 @@ def categorizar_descricao_transacao(user_id, descricao):
     )
 
     try:
-        # 4. Chama a IA e obtém a resposta
         response = model.generate_content(prompt)
-
         if not response.parts:
-            print(f"AVISO: Resposta do Gemini para categorizar '{descricao}' foi bloqueada.")
-            return 'Outros' # Retorna um valor seguro
+            return 'Outros'
         
-        # 5. Limpa e valida a resposta da IA
         categoria_sugerida = response.text.strip().replace("'", "").replace('"', '')
 
-        # Garante que a IA não "inventou" uma categoria que não existe
         if categoria_sugerida in nomes_categorias:
             return categoria_sugerida
         else:
-            # Se a IA sugerir algo que não está na lista, usamos 'Outros' por segurança
-            print(f"AVISO: IA sugeriu categoria não existente ('{categoria_sugerida}'). Usando 'Outros'.")
             return 'Outros'
             
     except Exception as e:
         print(f"ERRO na categorização com IA: {e}")
-        # Em caso de erro na API da IA, retorna 'Outros' como fallback
         return 'Outros'
 
 def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
@@ -186,8 +157,6 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     uma lista estruturada de transações em formato JSON.
     """
     ano_atual = datetime.now().year
-
-    # Dentro de src/services/ai_assessor_service.py, na função extrair_transacoes_de_texto_com_ia
 
     prompt = f"""
     Você é um assistente especialista em extração de dados financeiros de extratos bancários brasileiros.
@@ -214,17 +183,11 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     """
 
     try:
-        # Chama o modelo de IA diretamente para esta tarefa específica
         response = model.generate_content(prompt)
-
         if not response.parts:
-            print(f"AVISO: Resposta do Gemini para extrair transações foi bloqueada.")
-            return [] # Retorna uma lista vazia segura
-        resposta_ia_texto = response.text
-
-        # Limpa a resposta para garantir que seja um JSON válido
-        json_str = resposta_ia_texto.strip().replace('```json', '').replace('```', '')
-
+            return []
+        
+        json_str = response.text.strip().replace('```json', '').replace('```', '')
         transacoes_extraidas = json.loads(json_str)
 
         if isinstance(transacoes_extraidas, list):
