@@ -10,6 +10,7 @@ from src.services.gemini_service import construir_prompt_assessor, model
 from src.services.reports_service import get_financial_summary_for_ai
 from src.services.credit_card_service import get_credit_card_summary_for_ai
 from src.services.goals_service import get_goals_summary_for_ai
+from src.services.memory_service import buscar_memorias_relevantes
 from src.services.investments_service import get_investments_summary_for_ai
 from src.services.schedule_service import get_schedule_summary_for_ai
 from src.services.categorias_service import get_categories_for_ai
@@ -43,6 +44,11 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     resumo_agenda = get_schedule_summary_for_ai(user_id)
     resumo_categorias = get_categories_for_ai(user_id)
 
+    # ▼▼▼ BUSCA AS MEMÓRIAS NO PINECONE ▼▼▼
+    ultima_mensagem = historico_chat[-1]['content'] if historico_chat else ""
+    memorias_recuperadas = buscar_memorias_relevantes(user_id, ultima_mensagem)
+
+
     contexto_financeiro_completo = (
         f"{resumo_planejamento}\n"
         f"{resumo_transacoes}\n"
@@ -51,6 +57,7 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         f"{resumo_investimentos}\n"
         f"{resumo_agenda}\n"
         f"{resumo_categorias}"
+        f"{memorias_recuperadas}" # <--- A MEMÓRIA ENTRA AQUI
     )
 
     # --- PASSO 2: Construir o Prompt e Chamar o Gemini ---

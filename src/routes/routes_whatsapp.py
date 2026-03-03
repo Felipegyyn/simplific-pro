@@ -19,6 +19,7 @@ from src.services.visual_report_service import generate_visual_report
 from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
 from src.services.tts_service import texto_para_audio # <-- ADICIONE
 from src.models.extended_modules import BankAccount
+from src.services.memory_service import analisar_e_salvar_memoria
 from src.models.contact import Contact  # <--- NOVO: Modelo de Contatos
 from src.services.user_service import normalize_phone_number # <--- NOVO: Para salvar o zap do contato certo
 from src.services.google_calendar_service import add_event_to_google # <--- NOVO: Para criar o Meet
@@ -255,6 +256,9 @@ def tratar_nova_interacao(mensagem_usuario, media_url, from_number, usuario):
     sessao = user_sessions.get(from_number, {})
     historico_chat = sessao.get('chat_history', [])
     historico_chat.append({"role": "user", "content": mensagem_usuario})
+
+    # ▼▼▼ O UVINDO FATOS (Roda em paralelo para não travar a resposta) ▼▼▼
+    threading.Thread(target=analisar_e_salvar_memoria, args=(usuario.id, mensagem_usuario)).start()
 
     # ▼▼▼ NOVA LÓGICA DE NOME (Rayany vs Felipe) ▼▼▼
     # 1. Normaliza o número de quem enviou a mensagem agora
