@@ -28,7 +28,7 @@ def gerar_vetor(texto):
     """
     try:
         result = genai.embed_content(
-            model="models/text-embedding-004",
+            model="models/embedding-001",
             content=texto,
             task_type="retrieval_document"
         )
@@ -46,7 +46,7 @@ def analisar_e_salvar_memoria(user_id, mensagem_usuario):
     if not index: return
 
     # Usamos o modelo rápido e barato para essa tarefa de extração
-    extrator = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.1})
+    extrator = genai.GenerativeModel('gemini-flash-latest', generation_config={"temperature": 0.1})
     
     prompt = f"""
     Você é um extrator de memórias de longo prazo.
