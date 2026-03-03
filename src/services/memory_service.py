@@ -24,13 +24,15 @@ if PINECONE_API_KEY:
 # --- 2. FUNÇÃO DE VETORIZAÇÃO (EMBEDDING) ---
 def gerar_vetor(texto):
     """
-    Transforma um texto em um vetor numérico (768 dimensões) usando o motor do Google.
+    Transforma um texto em um vetor numérico.
+    ATUALIZADO: Forçando a saída para 768 dimensões para bater com o Pinecone.
     """
     try:
         result = genai.embed_content(
-            model="models/gemini-embedding-001",
+            model="models/gemini-embedding-001", 
             content=texto,
-            task_type="retrieval_document"
+            task_type="retrieval_document",
+            output_dimensionality=768  # <--- A SOLUÇÃO ESTÁ AQUI
         )
         return result['embedding']
     except Exception as e:
