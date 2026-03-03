@@ -56,7 +56,7 @@ import SecurityPage from './pages/SecurityPage'; // <--- 1. IMPORT NOVO AQUI
 // Serviços
 import notificationService from './services/notifications';
 
-const IS_MAINTENANCE_MODE = false; // Mude para 'false' para desativar
+const IS_MAINTENANCE_MODE = true; // Mude para 'false' para desativar
 
 // Componente Guardião para Rotas de Admin
 const AdminRoute = ({ user, children }) => {
