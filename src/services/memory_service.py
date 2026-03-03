@@ -28,7 +28,7 @@ def gerar_vetor(texto):
     """
     try:
         result = genai.embed_content(
-            model="models/embedding-001",
+            model="models/gemini-embedding-001",
             content=texto,
             task_type="retrieval_document"
         )
