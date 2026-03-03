@@ -36,7 +36,7 @@ safety_settings = [
 # 4. Inicializa o modelo CORRETO (apenas uma vez)
 # ATENÇÃO: Mudamos para gemini-1.5-flash pois é a versão mais estável para Function Calling
 model = genai.GenerativeModel(
-    'gemini-1.5-flash',
+    'gemini-flash-latest',
     generation_config=generation_config,
     safety_settings=safety_settings,
     tools=simplific_tools # <--- PLUGANDO AS FERRAMENTAS AQUI
