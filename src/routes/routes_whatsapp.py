@@ -330,44 +330,41 @@ def executar_acao_simplific(user_id, acao, from_number):
             categoria_encontrada = next((cat for cat in categorias_usuario if cat['name'].lower() == category_name.lower()), None)
 
             if not categoria_encontrada:
-                return f"Não encontrei a categoria '{category_name}'. Tente novamente com uma categoria válida."
+                # Fallback de segurança: Se não achar a categoria, joga em "Outros" em vez de dar erro
+                categoria_encontrada = next((cat for cat in categorias_usuario if cat['name'].lower() == 'outros'), None)
+                if not categoria_encontrada:
+                     return f"⚠️ Lançamento de R$ {dados.get('value')} pausado: Não encontrei a categoria '{category_name}'."
 
-            # 2. Lógica da Conta Bancária
-            conta_encontrada = None
-            lancar_sem_conta = False # Nova flag
+            # 2. Lógica da Conta Bancária (Simplificada e Direta)
+            id_conta_final = None
+            nome_conta_usada = ""
 
-            # Cenário Especial: IA detectou que o usuário RECUSOU vincular (resposta "2" ou "Não")
-            if bank_account_name == 'none':
-                lancar_sem_conta = True
-            
-            # Cenário A: IA identificou um nome de banco real
-            elif bank_account_name:
+            # Se o usuário citou o banco, tenta achar no banco de dados
+            if bank_account_name and str(bank_account_name).lower() != 'none':
                 conta_encontrada = BankAccount.query.filter(
                     BankAccount.user_id == user_id,
                     BankAccount.bank_name.ilike(f'%{bank_account_name}%')
                 ).first()
-
-            # Cenário B: Não temos conta e nem recusa explícita -> PERGUNTAR
-            if not conta_encontrada and not lancar_sem_conta:
-                # Salva os dados na sessão
-                user_sessions[from_number] = {
-                    'contexto': 'perguntar_vincular_conta',
-                    'dados_lancamento': {
-                        'user_id': user_id,
-                        'tipo': dados.get('type'),
-                        'categoria_id': categoria_encontrada['id'],
-                        'categoria_nome': categoria_encontrada['name'],
-                        'valor': dados.get('value'),
-                        'descricao': dados.get('description')
-                    }
-                }
                 
-                return (
-                    f"Entendi! Vou lançar *{dados.get('description')}* (R$ {dados.get('value')}) em *{category_name}*.\n\n"
-                    f"Deseja vincular a uma conta bancária para atualizar o saldo?\n"
-                    f"1. Sim\n"
-                    f"2. Não (Lançar sem conta)"
-                )
+                if conta_encontrada:
+                    id_conta_final = conta_encontrada.id
+                    nome_conta_usada = f" no banco *{conta_encontrada.bank_name}*"
+
+            # 3. Lança a transação IMEDIATAMENTE (com ou sem banco)
+            criar_lancamento(
+                user_id=user_id,
+                tipo=dados.get('type'),
+                categoria_id=categoria_encontrada['id'],
+                valor=dados.get('value'),
+                descricao=dados.get('description'),
+                bank_account_id=id_conta_final
+            )
+            
+            # Mensagem de sucesso enxuta para ficar bonita quando vierem em lote
+            if id_conta_final:
+                return f"✅ Lançado: *{dados.get('description')}* (R$ {dados.get('value')}) em {categoria_encontrada['name']}{nome_conta_usada}."
+            else:
+                return f"✅ Lançado: *{dados.get('description')}* (R$ {dados.get('value')}) em {categoria_encontrada['name']}."
 
             # Cenário C: Temos a conta OU o usuário disse "Não" (none)
             # Se for 'none', bank_account_id será None
