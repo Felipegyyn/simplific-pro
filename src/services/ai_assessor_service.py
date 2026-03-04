@@ -65,67 +65,73 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
-        # 1. Envia o prompt inicial para o modelo Gemini
-        response = model.generate_content(prompt)
+        # 1. Iniciamos a conversa do Bumerangue
+        mensagens_bumerangue = [{"role": "user", "parts": [prompt]}]
+        response = model.generate_content(mensagens_bumerangue)
 
-        # 2. Verificação de segurança primária
         if not response.parts:
             return "Não consegui processar sua solicitação devido às políticas de segurança.", []
 
-        # 3. O EFEITO BUMERANGUE (Multi-turn Function Calling)
-        # Verifica se o Gemini decidiu usar a ferramenta de pesquisa na internet
-        for part in response.candidates[0].content.parts:
-            if part.function_call and part.function_call.name == "pesquisar_na_internet":
-                query_busca = part.function_call.args.get("query")
-                
-                # Executa a pesquisa no mundo real (vai pra Tavily)
+        # 2. O LOOP DO BUMERANGUE (Agente Pensando)
+        # Deixamos ele pesquisar até 2 vezes seguidas se ele achar necessário
+        max_pesquisas = 2
+        for _ in range(max_pesquisas):
+            precisa_pesquisar = False
+            query_busca = ""
+
+            for part in response.candidates[0].content.parts:
+                if part.function_call and part.function_call.name == "pesquisar_na_internet":
+                    precisa_pesquisar = True
+                    query_busca = part.function_call.args.get("query")
+                    break
+
+            if precisa_pesquisar:
+                print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa: '{query_busca}'")
                 resultado_web = realizar_pesquisa_web(query_busca)
-                
-                # Preparamos o pacote de devolução para o Gemini
-                # É como se disséssemos: "Aqui está o que você pediu. Agora me dê a resposta final."
-                mensagens_bumerangue = [
-                    {"role": "user", "parts": [prompt]}, # O que o usuário perguntou
-                    response.candidates[0].content,      # O que o Gemini pediu (a function_call)
-                    {"role": "user", "parts": [{         # A nossa resposta com os dados da internet
+
+                # Salva o pedido do Gemini e a nossa resposta com os dados da web
+                mensagens_bumerangue.append(response.candidates[0].content)
+                mensagens_bumerangue.append({
+                    "role": "user",
+                    "parts": [{
                         "function_response": {
                             "name": "pesquisar_na_internet",
                             "response": {"resultado": resultado_web}
                         }
-                    }]}
-                ]
-                
-                # Chama o Gemini uma SEGUNDA VEZ, agora com os dados da internet em mãos!
+                    }]
+                })
+
+                # Chama o Gemini DE NOVO com o contexto atualizado da internet
                 response = model.generate_content(mensagens_bumerangue)
-                break # Limitamos a 1 pesquisa por vez para o WhatsApp não dar timeout
+            else:
+                # Se ele não pediu pra pesquisar, significa que já tem a resposta final!
+                break
 
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
         return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
-        
 
-    # --- PASSO 3: Processar a Resposta do Gemini (O ROTEADOR) ---
+    # --- PASSO 3: Processar a Resposta Final do Gemini ---
     texto_para_usuario = ""
-    acoes_a_executar = [] # Agora é uma lista, pois a IA pode chamar múltiplas ferramentas
+    acoes_a_executar = []
 
-    # Itera sobre as partes da resposta
     for part in response.candidates[0].content.parts:
-        # Se a parte for um texto normal para o usuário ler
         if part.text:
             texto_para_usuario += part.text + " "
         
-        # Se a parte for uma chamada de função (Function Call)
         elif part.function_call:
-            # Extrai o nome da função que o Gemini quer usar
             nome_funcao = part.function_call.name
             
-            # Extrai os argumentos e converte para um dicionário Python normal
+            # BARRICADA: Impede que a ferramenta de pesquisa vaze para o routes_whatsapp
+            if nome_funcao == "pesquisar_na_internet":
+                continue
+
             argumentos = {}
             for key, value in part.function_call.args.items():
                 argumentos[key] = value
                 
             print(f"🔧 AGENTE ACIONOU FERRAMENTA: {nome_funcao} com args: {argumentos}")
             
-            # Monta o dicionário no formato que o seu routes_whatsapp.py já espera
             acao = {
                 "type": nome_funcao,
                 "data": argumentos
