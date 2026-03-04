@@ -393,23 +393,29 @@ def executar_acao_simplific(user_id, acao, from_number):
             resumo = get_agenda_summary(user_id)
             return formatar_resumo_agenda(resumo) # Precisaremos criar esta função de formatação
 
-        # ▼▼▼ BLOCO DE AGENDA CORRIGIDO E BLINDADO ▼▼▼
+        # ▼▼▼ BLOCO DE AGENDA CORRIGIDO (SEM FORÇAR MEET) ▼▼▼
         elif tipo_acao == 'cadastrar_evento_agenda' or tipo_acao == 'create_agenda_item':
-            # Verifica se é uma reunião com Meet (novo fluxo)
-            # A IA as vezes manda 'create_meet': True ou infere pelo título
-            tem_meet = dados_acao.get('create_meet')
-            eh_reuniao = 'reunião' in (dados_acao.get('title') or '').lower() or 'reuniao' in (dados_acao.get('title') or '').lower()
             
-            if tem_meet or eh_reuniao:
-                # Se for reunião, chama o fluxo do Google Meet
+            # AGORA A DECISÃO É 100% DA IA. 
+            # Tiramos a regra que forçava o Meet só por ter a palavra "reunião" no título.
+            tem_meet = dados_acao.get('create_meet') is True
+            tem_email = bool(dados_acao.get('attendee_email'))
+            
+            if tem_meet or tem_email:
+                # Fluxo de Reunião: Só entra aqui se a IA mandou o booleano True ou se tem um e-mail de convidado
                 return handle_agendar_reuniao_meet(dados_acao, user_id)
             else:
-                # Fluxo antigo (lembrete simples na agenda interna)
+                # Fluxo de Lembrete Simples (Sem link de Meet)
                 success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
                 if success:
-                    return None
+                    try:
+                        data_br = datetime.strptime(dados_acao.get('event_date'), '%Y-%m-%d').strftime('%d/%m/%Y')
+                    except:
+                        data_br = dados_acao.get('event_date')
+                        
+                    return f"✅ Lembrete '{dados_acao.get('title')}' anotado na sua agenda para {data_br} às {dados_acao.get('time')}!"
                 else:
-                    return message
+                    return f"❌ Ops! {message}"
         # ▲▲▲ FIM DO BLOCO CORRIGIDO ▲▲▲
 
         # ▼▼▼ NOVAS AÇÕES DE CONTATO ▼▼▼
@@ -607,7 +613,59 @@ def executar_acao_simplific(user_id, acao, from_number):
     except Exception as e:
         print(f"ERRO ao executar ação '{tipo_acao}': {e}")
         return "Ocorreu um erro ao processar sua solicitação."
+        
 
+        # ▼▼▼ NOVA AÇÃO: CRIAR META (TURBINADA) ▼▼▼
+        elif tipo_acao == 'criar_meta':
+            from src.models.db import db
+            from src.models.extended import Goal
+            from datetime import datetime
+            
+            nome_meta = dados_acao.get('name')
+            try:
+                valor_alvo = float(dados_acao.get('target_amount', 0))
+            except:
+                valor_alvo = 0.0
+                
+            # 1. Tratamento da Data: Se a IA mandou, tenta usar. Senão, 31/12 do ano atual.
+            data_str = dados_acao.get('target_date')
+            if data_str:
+                try:
+                    data_final = datetime.strptime(data_str, '%Y-%m-%d').date()
+                except:
+                    data_final = datetime(datetime.now().year, 12, 31).date()
+            else:
+                data_final = datetime(datetime.now().year, 12, 31).date()
+                
+            # 2. Tratamento da Categoria: Se a IA mandou, usa. Senão, "Outros".
+            categoria = dados_acao.get('category')
+            if not categoria: # Se vier vazio ou None
+                categoria = "Outros"
+                
+            try:
+                nova_meta = Goal(
+                    user_id=user_id,
+                    name=nome_meta,
+                    description="Criada pelo Assistente IA via WhatsApp",
+                    target_value=valor_alvo,
+                    current_value=0.0,
+                    target_date=data_final,
+                    category=categoria,
+                    priority="Média",
+                    image_url=""
+                )
+                
+                db.session.add(nova_meta)
+                db.session.commit()
+                
+                data_br = data_final.strftime('%d/%m/%Y')
+                return f"✅ Meta '{nome_meta}' com alvo de R$ {valor_alvo:.2f} criada!\nPrazo: {data_br}\nCategoria: {categoria}"
+            
+            except Exception as e:
+                db.session.rollback()
+                print(f"Erro ao criar meta via WhatsApp: {e}")
+                return "❌ Não consegui criar a meta no banco de dados."
+        # ▲▲▲ FIM DA NOVA AÇÃO ▲▲▲
 
 
 # --------------------------------------------------------------------------

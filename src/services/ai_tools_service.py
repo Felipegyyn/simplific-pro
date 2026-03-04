@@ -198,6 +198,36 @@ simplific_tools = [
                 }
             },
 
+            # 15.0  criar Metas
+
+            # Ferramenta para Criar Novas Metas
+            {
+                "name": "criar_meta",
+                "description": "Cria uma nova meta financeira do zero para o usuário.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "name": {
+                            "type": "STRING", 
+                            "description": "O nome da meta. Ex: 'Parque no FDS', 'Aniversário Clarice', 'Viagem'."
+                        },
+                        "target_amount": {
+                            "type": "NUMBER", 
+                            "description": "O valor total (alvo) que o usuário deseja alcançar."
+                        },
+                        "target_date": {
+                            "type": "STRING",
+                            "description": "A data limite para a meta no formato 'YYYY-MM-DD'. Calcule a data exata se o usuário disser 'daqui a 6 meses' ou passar uma data específica. Se o usuário não falar sobre prazos, NÃO envie este campo."
+                        },
+                        "category": {
+                            "type": "STRING",
+                            "description": "A categoria da meta. Escolha uma das categorias que o usuário já possui. Se não souber ou não houver categoria clara, NÃO envie este campo."
+                        }
+                    },
+                    "required": ["name", "target_amount"] # Data e categoria são opcionais!
+                }
+            },
+
             # 15. Metas
             {
                 "name": "add_value_to_goal",
