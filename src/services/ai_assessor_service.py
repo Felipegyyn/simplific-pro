@@ -13,6 +13,7 @@ from src.services.goals_service import get_goals_summary_for_ai
 from src.services.memory_service import buscar_memorias_relevantes
 from src.services.investments_service import get_investments_summary_for_ai
 from src.services.schedule_service import get_schedule_summary_for_ai
+from src.services.search_service import realizar_pesquisa_web
 from src.services.categorias_service import get_categories_for_ai
 from src.services.reports_service import get_planning_summary_for_ai
 
@@ -64,21 +65,42 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
-        # Envia o prompt para o modelo Gemini (Agora com as tools embutidas)
+        # 1. Envia o prompt inicial para o modelo Gemini
         response = model.generate_content(prompt)
 
-        # Verificação de segurança
+        # 2. Verificação de segurança primária
         if not response.parts:
-            try:
-                finish_reason = response.candidates[0].finish_reason
-                print(f"AVISO: A resposta do Gemini foi bloqueada. Motivo: {finish_reason.name}")
-            except (IndexError, AttributeError):
-                print("AVISO: A resposta do Gemini foi bloqueada (resposta vazia).")
-            return "Não consegui processar sua solicitação devido às políticas de segurança. Por favor, tente reformular.", []
+            return "Não consegui processar sua solicitação devido às políticas de segurança.", []
+
+        # 3. O EFEITO BUMERANGUE (Multi-turn Function Calling)
+        # Verifica se o Gemini decidiu usar a ferramenta de pesquisa na internet
+        for part in response.candidates[0].content.parts:
+            if part.function_call and part.function_call.name == "pesquisar_na_internet":
+                query_busca = part.function_call.args.get("query")
+                
+                # Executa a pesquisa no mundo real (vai pra Tavily)
+                resultado_web = realizar_pesquisa_web(query_busca)
+                
+                # Preparamos o pacote de devolução para o Gemini
+                # É como se disséssemos: "Aqui está o que você pediu. Agora me dê a resposta final."
+                mensagens_bumerangue = [
+                    {"role": "user", "parts": [prompt]}, # O que o usuário perguntou
+                    response.candidates[0].content,      # O que o Gemini pediu (a function_call)
+                    {"role": "user", "parts": [{         # A nossa resposta com os dados da internet
+                        "function_response": {
+                            "name": "pesquisar_na_internet",
+                            "response": {"resultado": resultado_web}
+                        }
+                    }]}
+                ]
+                
+                # Chama o Gemini uma SEGUNDA VEZ, agora com os dados da internet em mãos!
+                response = model.generate_content(mensagens_bumerangue)
+                break # Limitamos a 1 pesquisa por vez para o WhatsApp não dar timeout
 
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
-        return "Tive um problema para me conectar com minha inteligência. Tente novamente em alguns instantes.", []
+        return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
         
 
     # --- PASSO 3: Processar a Resposta do Gemini (O ROTEADOR) ---

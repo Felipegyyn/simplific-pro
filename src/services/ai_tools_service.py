@@ -181,7 +181,24 @@ simplific_tools = [
                     "required": ["name", "email", "whatsapp"]
                 }
             },
-            # 14. Metas
+
+            # 14. Pesquisa na Internet (Janela para o Mundo)
+            {
+                "name": "pesquisar_na_internet",
+                "description": "Faz uma pesquisa em tempo real na internet para descobrir preços atualizados de passagens, produtos, notícias financeiras ou qualquer informação do mundo real necessária para ajudar o usuário.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "query": {
+                            "type": "STRING", 
+                            "description": "A pergunta exata ou termo de busca que será pesquisado no Google. Seja específico (ex: 'preço médio passagem aérea são paulo para paris 2024')."
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+
+            # 15. Metas
             {
                 "name": "add_value_to_goal",
                 "description": "Adiciona dinheiro guardado a uma Meta Financeira existente.",
