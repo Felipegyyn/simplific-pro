@@ -418,6 +418,56 @@ def executar_acao_simplific(user_id, acao, from_number):
                     return f"❌ Ops! {message}"
         # ▲▲▲ FIM DO BLOCO CORRIGIDO ▲▲▲
 
+        # ▼▼▼ NOVA AÇÃO: CRIAR META (TURBINADA) ▼▼▼
+        elif tipo_acao == 'criar_meta': # <--- Verifique se este elif está alinhado com o elif de cima
+            from src.models.db import db
+            from src.models.extended import Goal
+            from datetime import datetime
+            
+            nome_meta = dados_acao.get('name')
+            try:
+                valor_alvo = float(dados_acao.get('target_amount', 0))
+            except:
+                valor_alvo = 0.0
+                
+            data_str = dados_acao.get('target_date')
+            if data_str:
+                try:
+                    data_final = datetime.strptime(data_str, '%Y-%m-%d').date()
+                except:
+                    data_final = datetime(datetime.now().year, 12, 31).date()
+            else:
+                data_final = datetime(datetime.now().year, 12, 31).date()
+                
+            categoria = dados_acao.get('category')
+            if not categoria:
+                categoria = "Outros"
+                
+            try:
+                nova_meta = Goal(
+                    user_id=user_id,
+                    name=nome_meta,
+                    description="Criada pelo Assistente IA via WhatsApp",
+                    target_value=valor_alvo,
+                    current_value=0.0,
+                    target_date=data_final,
+                    category=categoria,
+                    priority="Média",
+                    image_url=""
+                )
+                
+                db.session.add(nova_meta)
+                db.session.commit()
+                
+                data_br = data_final.strftime('%d/%m/%Y')
+                return f"✅ Meta '{nome_meta}' com alvo de R$ {valor_alvo:.2f} criada!\nPrazo: {data_br}\nCategoria: {categoria}"
+            
+            except Exception as e:
+                db.session.rollback()
+                print(f"Erro ao criar meta via WhatsApp: {e}")
+                return "❌ Não consegui criar a meta no banco de dados."
+        # ▲▲▲ FIM DA NOVA AÇÃO ▲▲▲
+
         # ▼▼▼ NOVAS AÇÕES DE CONTATO ▼▼▼
         elif tipo_acao == 'consultar_contato':
             nome_busca = dados_acao.get('nome')
@@ -614,58 +664,6 @@ def executar_acao_simplific(user_id, acao, from_number):
         print(f"ERRO ao executar ação '{tipo_acao}': {e}")
         return "Ocorreu um erro ao processar sua solicitação."
         
-
-        # ▼▼▼ NOVA AÇÃO: CRIAR META (TURBINADA) ▼▼▼
-        elif tipo_acao == 'criar_meta':
-            from src.models.db import db
-            from src.models.extended import Goal
-            from datetime import datetime
-            
-            nome_meta = dados_acao.get('name')
-            try:
-                valor_alvo = float(dados_acao.get('target_amount', 0))
-            except:
-                valor_alvo = 0.0
-                
-            # 1. Tratamento da Data: Se a IA mandou, tenta usar. Senão, 31/12 do ano atual.
-            data_str = dados_acao.get('target_date')
-            if data_str:
-                try:
-                    data_final = datetime.strptime(data_str, '%Y-%m-%d').date()
-                except:
-                    data_final = datetime(datetime.now().year, 12, 31).date()
-            else:
-                data_final = datetime(datetime.now().year, 12, 31).date()
-                
-            # 2. Tratamento da Categoria: Se a IA mandou, usa. Senão, "Outros".
-            categoria = dados_acao.get('category')
-            if not categoria: # Se vier vazio ou None
-                categoria = "Outros"
-                
-            try:
-                nova_meta = Goal(
-                    user_id=user_id,
-                    name=nome_meta,
-                    description="Criada pelo Assistente IA via WhatsApp",
-                    target_value=valor_alvo,
-                    current_value=0.0,
-                    target_date=data_final,
-                    category=categoria,
-                    priority="Média",
-                    image_url=""
-                )
-                
-                db.session.add(nova_meta)
-                db.session.commit()
-                
-                data_br = data_final.strftime('%d/%m/%Y')
-                return f"✅ Meta '{nome_meta}' com alvo de R$ {valor_alvo:.2f} criada!\nPrazo: {data_br}\nCategoria: {categoria}"
-            
-            except Exception as e:
-                db.session.rollback()
-                print(f"Erro ao criar meta via WhatsApp: {e}")
-                return "❌ Não consegui criar a meta no banco de dados."
-        # ▲▲▲ FIM DA NOVA AÇÃO ▲▲▲
 
 
 # --------------------------------------------------------------------------
