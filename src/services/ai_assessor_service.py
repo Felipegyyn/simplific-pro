@@ -100,14 +100,24 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                         break
 
             if tem_pesquisa and respostas_das_ferramentas:
-                # Devolve TODAS as respostas da internet de uma só vez para a IA
                 mensagens_bumerangue.append(response.candidates[0].content)
+                
+                # ▼▼▼ O PUXÃO DE ORELHA (NOVO) ▼▼▼
+                # Injetamos uma ordem expressa junto com os resultados da pesquisa
+                partes_retorno = respostas_das_ferramentas.copy()
+                partes_retorno.append({
+                    "text": "AVISO DE SISTEMA: Você recebeu os resultados da pesquisa acima. Você DEVE OBRIGATORIAMENTE gerar um relatório completo em texto para o usuário, contendo os preços encontrados, os links para compra e as dicas. Escreva todo esse texto ANTES de chamar as ferramentas de meta ou agenda."
+                })
+
                 mensagens_bumerangue.append({
                     "role": "user",
-                    "parts": respostas_das_ferramentas
+                    "parts": partes_retorno
                 })
-                # IA analisa tudo e decide o próximo passo
+                # ▲▲▲ FIM DO PUXÃO DE ORELHA ▲▲▲
+                
+                # IA analisa tudo (agora com a ordem de falar) e decide o próximo passo
                 response = model.generate_content(mensagens_bumerangue)
+                
             else:
                 break 
 
