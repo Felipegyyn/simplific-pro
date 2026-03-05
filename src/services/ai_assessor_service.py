@@ -71,11 +71,11 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         if not response.parts:
             return "Não consegui processar sua solicitação devido às políticas de segurança.", []
 
-        # 2. O LOOP DO BUMERANGUE (Agora suporta Múltiplas Pesquisas Simultâneas)
+        # 2. O LOOP DO BUMERANGUE (100% à prova de falhas)
         max_pesquisas = 4
         for _ in range(max_pesquisas):
             tem_pesquisa = False
-            respostas_das_ferramentas = [] # Lista para guardar TODAS as respostas paralelas
+            respostas_das_ferramentas = []
 
             for part in response.candidates[0].content.parts:
                 if part.function_call:
@@ -87,37 +87,42 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                         print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa em lote: '{query_busca}'")
                         resultado_web = realizar_pesquisa_web(query_busca)
                         
-                        # Empacota a resposta desta pesquisa específica
+                        # ▼▼▼ O PUXÃO DE ORELHA BLINDADO ▼▼▼
+                        # Injetamos a ordem DIRETO no texto da resposta, sem quebrar a estrutura da API
+                        resultado_turbinado = (
+                            f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
+                            "--- ALERTA DE SISTEMA (MUITO IMPORTANTE) ---\n"
+                            "Você acabou de receber os dados da internet. Você É OBRIGADO a escrever um "
+                            "relatório completo em texto para o usuário, mostrando os preços, os detalhes e "
+                            "repassando os LINKS de compra/fontes que você encontrou.\n"
+                            "Gere esse texto OBRIGATORIAMENTE nesta resposta, mesmo que você vá acionar a agenda ou metas logo a seguir."
+                        )
+                        # ▲▲▲ FIM DO ALERTA ▲▲▲
+                        
                         respostas_das_ferramentas.append({
                             "function_response": {
                                 "name": "pesquisar_na_internet",
-                                "response": {"resultado": resultado_web}
+                                "response": {"resultado": resultado_turbinado}
                             }
                         })
                     else:
-                        # Se ele chamou uma ação final (criar_meta, agenda), paramos a pesquisa
                         tem_pesquisa = False
                         break
 
             if tem_pesquisa and respostas_das_ferramentas:
                 mensagens_bumerangue.append(response.candidates[0].content)
-                
-                # ▼▼▼ O PUXÃO DE ORELHA (NOVO) ▼▼▼
-                # Injetamos uma ordem expressa junto com os resultados da pesquisa
-                partes_retorno = respostas_das_ferramentas.copy()
-                partes_retorno.append({
-                    "text": "AVISO DE SISTEMA: Você recebeu os resultados da pesquisa acima. Você DEVE OBRIGATORIAMENTE gerar um relatório completo em texto para o usuário, contendo os preços encontrados, os links para compra e as dicas. Escreva todo esse texto ANTES de chamar as ferramentas de meta ou agenda."
-                })
-
                 mensagens_bumerangue.append({
                     "role": "user",
-                    "parts": partes_retorno
+                    "parts": respostas_das_ferramentas
                 })
-                # ▲▲▲ FIM DO PUXÃO DE ORELHA ▲▲▲
-                
-                # IA analisa tudo (agora com a ordem de falar) e decide o próximo passo
                 response = model.generate_content(mensagens_bumerangue)
-                
+            else:
+                break 
+
+    except Exception as e:
+        print(f"ERRO: Falha na chamada ao Gemini: {e}")
+        return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
+
             else:
                 break 
 

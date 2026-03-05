@@ -409,7 +409,7 @@ def executar_acao_simplific(user_id, acao, from_number):
                 success, message = create_agenda_event_from_whatsapp(user_id, dados_acao)
                 if success:
                     try:
-                        data_br = datetime.strptime(dados_acao.get('event_date'), '%Y-%m-%d').strftime('%d/%m/%Y')
+                        data_br = datetime.strptime(dados_acao.get('event_date'), '%d/%m/%Y').strftime('%d/%m/%Y')
                     except:
                         data_br = dados_acao.get('event_date')
                         
