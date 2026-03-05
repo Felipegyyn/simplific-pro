@@ -86,8 +86,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         { name: 'Categorias', path: '/categories', icon: Tags },
         { name: 'Conquistas', path: '/achievements', icon: Award },
         { name: 'Configurações', path: '/settings', icon: Settings },
-        { name: 'Admin', path: '/admin', icon: Users, adminOnly: true },
-        { name: 'Marketing', path: '/admin/marketing', icon: Megaphone, adminOnly: true },
+        //{ name: 'Admin', path: '/admin', icon: Users, adminOnly: true },
+        //{ name: 'Marketing', path: '/admin/marketing', icon: Megaphone, adminOnly: true },
       ]
     },
 
