@@ -109,14 +109,13 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                         if acao_atual not in acoes_a_executar: # Evita duplicar ações
                             acoes_a_executar.append(acao_atual)
                         
-                        # A MÁGICA: Devolvemos um "Falso Sucesso" para a IA
-                        # Isso acalma o cérebro dela e a obriga a gerar o texto final!
+                        # A MÁGICA: Devolvemos um "Falso Sucesso" com a LEI DO SILÊNCIO
                         respostas_das_ferramentas.append({
                             "function_response": {
                                 "name": nome_funcao,
                                 "response": {
                                     "status": "sucesso", 
-                                    "mensagem": "Ação salva no banco de dados com sucesso. Gere OBRIGATORIAMENTE o relatório de texto para o usuário agora."
+                                    "mensagem": "Ação salva no banco de dados. REGRA DE RESPOSTA: Foque o seu texto final APENAS nos resultados da pesquisa (links, dicas, preços). NÃO escreva que você criou metas ou agendou lembretes, pois o próprio sistema adicionará as confirmações verdes (✅) automaticamente no final da sua mensagem. Apenas entregue a pesquisa."
                                 }
                             }
                         })
