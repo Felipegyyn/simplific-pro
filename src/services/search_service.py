@@ -24,20 +24,27 @@ def realizar_pesquisa_web(query):
     
     try:
         print(f"🌍 [WEB SEARCH] Buscando na internet: '{query}'")
-        response = requests.post(url, json=payload, timeout=10) # Timeout para não travar o bot
+        response = requests.post(url, json=payload, timeout=10)
         response.raise_for_status()
         data = response.json()
         
-        # A Tavily é inteligente e geralmente nos dá um 'answer' direto e mastigado
-        if data.get('answer'):
-            print("✅ [WEB SEARCH] Resposta direta encontrada.")
-            return data['answer']
-        
-        # Se não vier a resposta mastigada, nós juntamos os resumos dos top 3 sites
+        # Juntamos os resumos dos top sites E resgatamos as URLs!
         resultados = data.get('results', [])
-        resumo = "\n".join([f"- {r.get('title')}: {r.get('content')}" for r in resultados])
         
-        print("✅ [WEB SEARCH] Resumos de sites capturados.")
+        # Agora o texto que vai para a IA inclui o link de onde a informação foi tirada
+        resumo = "\n\n".join([
+            f"Título: {r.get('title')}\nConteúdo: {r.get('content')}\nLink da Fonte: {r.get('url')}" 
+            for r in resultados
+        ])
+        
+        # Se a Tavily der uma resposta mastigada, colocamos ela no topo, junto com os links
+        resposta_direta = data.get('answer', '')
+        if resposta_direta:
+            resumo_final = f"Resposta da IA de Busca:\n{resposta_direta}\n\nFontes e Links Encontrados:\n{resumo}"
+            print("✅ [WEB SEARCH] Resposta mastigada e links capturados.")
+            return resumo_final
+            
+        print("✅ [WEB SEARCH] Apenas links e resumos capturados.")
         return resumo if resumo else "Não encontrei resultados relevantes sobre isso na internet."
         
     except Exception as e:

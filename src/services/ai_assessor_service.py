@@ -73,8 +73,8 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
             return "Não consegui processar sua solicitação devido às políticas de segurança.", []
 
         # 2. O LOOP DO BUMERANGUE (Agente Pensando)
-        # Deixamos ele pesquisar até 2 vezes seguidas se ele achar necessário
-        max_pesquisas = 2
+        # Aumentamos para 4 pesquisas seguidas para aguentar solicitações complexas (Passagem + Hotel + Turismo)
+        max_pesquisas = 4
         for _ in range(max_pesquisas):
             precisa_pesquisar = False
             query_busca = ""
