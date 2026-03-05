@@ -123,13 +123,6 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
         return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
 
-            else:
-                break 
-
-    except Exception as e:
-        print(f"ERRO: Falha na chamada ao Gemini: {e}")
-        return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
-
     # --- PASSO 3: Processar a Resposta Final do Gemini ---
     texto_para_usuario = ""
     acoes_a_executar = []
