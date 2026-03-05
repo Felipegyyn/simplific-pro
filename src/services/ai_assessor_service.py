@@ -65,47 +65,51 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
-        # 1. Iniciamos a conversa do Bumerangue
         mensagens_bumerangue = [{"role": "user", "parts": [prompt]}]
         response = model.generate_content(mensagens_bumerangue)
 
         if not response.parts:
             return "Não consegui processar sua solicitação devido às políticas de segurança.", []
 
-        # 2. O LOOP DO BUMERANGUE (Agente Pensando)
-        # Aumentamos para 4 pesquisas seguidas para aguentar solicitações complexas (Passagem + Hotel + Turismo)
+        # 2. O LOOP DO BUMERANGUE (Agora suporta Múltiplas Pesquisas Simultâneas)
         max_pesquisas = 4
         for _ in range(max_pesquisas):
-            precisa_pesquisar = False
-            query_busca = ""
+            tem_pesquisa = False
+            respostas_das_ferramentas = [] # Lista para guardar TODAS as respostas paralelas
 
             for part in response.candidates[0].content.parts:
-                if part.function_call and part.function_call.name == "pesquisar_na_internet":
-                    precisa_pesquisar = True
-                    query_busca = part.function_call.args.get("query")
-                    break
+                if part.function_call:
+                    nome_funcao = part.function_call.name
+                    
+                    if nome_funcao == "pesquisar_na_internet":
+                        tem_pesquisa = True
+                        query_busca = part.function_call.args.get("query", "")
+                        print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa em lote: '{query_busca}'")
+                        resultado_web = realizar_pesquisa_web(query_busca)
+                        
+                        # Empacota a resposta desta pesquisa específica
+                        respostas_das_ferramentas.append({
+                            "function_response": {
+                                "name": "pesquisar_na_internet",
+                                "response": {"resultado": resultado_web}
+                            }
+                        })
+                    else:
+                        # Se ele chamou uma ação final (criar_meta, agenda), paramos a pesquisa
+                        tem_pesquisa = False
+                        break
 
-            if precisa_pesquisar:
-                print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa: '{query_busca}'")
-                resultado_web = realizar_pesquisa_web(query_busca)
-
-                # Salva o pedido do Gemini e a nossa resposta com os dados da web
+            if tem_pesquisa and respostas_das_ferramentas:
+                # Devolve TODAS as respostas da internet de uma só vez para a IA
                 mensagens_bumerangue.append(response.candidates[0].content)
                 mensagens_bumerangue.append({
                     "role": "user",
-                    "parts": [{
-                        "function_response": {
-                            "name": "pesquisar_na_internet",
-                            "response": {"resultado": resultado_web}
-                        }
-                    }]
+                    "parts": respostas_das_ferramentas
                 })
-
-                # Chama o Gemini DE NOVO com o contexto atualizado da internet
+                # IA analisa tudo e decide o próximo passo
                 response = model.generate_content(mensagens_bumerangue)
             else:
-                # Se ele não pediu pra pesquisar, significa que já tem a resposta final!
-                break
+                break 
 
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
@@ -121,31 +125,18 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         
         elif part.function_call:
             nome_funcao = part.function_call.name
-            
-            # BARRICADA: Impede que a ferramenta de pesquisa vaze para o routes_whatsapp
             if nome_funcao == "pesquisar_na_internet":
                 continue
 
-            argumentos = {}
-            for key, value in part.function_call.args.items():
-                argumentos[key] = value
-                
-            print(f"🔧 AGENTE ACIONOU FERRAMENTA: {nome_funcao} com args: {argumentos}")
-            
-            acao = {
-                "type": nome_funcao,
-                "data": argumentos
-            }
-            acoes_a_executar.append(acao)
+            argumentos = {key: value for key, value in part.function_call.args.items()}
+            print(f"🔧 AGENTE ACIONOU FERRAMENTA FINAL: {nome_funcao} com args: {argumentos}")
+            acoes_a_executar.append({"type": nome_funcao, "data": argumentos})
 
-    texto_para_usuario = texto_para_usuario.strip()
+    # Trava de Segurança: Se a IA executar ações no banco mas esquecer de falar
+    if not texto_para_usuario.strip() and acoes_a_executar:
+        texto_para_usuario = "Pronto! Fui à internet, cruzei os dados e já executei todas as ações que você pediu."
 
-    if not texto_para_usuario and not acoes_a_executar:
-        print("AVISO: get_ai_response está retornando uma resposta vazia. Forçando mensagem de erro.")
-        texto_para_usuario = "Opa! Não consegui entender sua solicitação no momento. Pode tentar reformular?"
-
-    # Retorna o texto que a IA gerou e a LISTA de ações que ela decidiu tomar
-    return texto_para_usuario, acoes_a_executar
+    return texto_para_usuario.strip(), acoes_a_executar
 
 # --- FUNÇÕES ORIGINAIS MANTIDAS NO FINAL ---
 
