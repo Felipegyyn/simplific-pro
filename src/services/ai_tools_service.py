@@ -185,13 +185,13 @@ simplific_tools = [
             # 14. Pesquisa na Internet (Janela para o Mundo)
             {
                 "name": "pesquisar_na_internet",
-                "description": "Faz uma pesquisa em tempo real na internet para descobrir preços atualizados de passagens, produtos, notícias financeiras ou qualquer informação do mundo real necessária para ajudar o usuário.",
+                "description": "Faz uma pesquisa em tempo real na internet para descobrir preços atualizados de passagens, hotéis, produtos ou notícias. REGRA OBRIGATÓRIA: Se a pesquisa for para cotar preços, comprar produtos, ver passagens ou hotéis, você DEVE incluir o 'Link da Fonte' na sua resposta final ao utilizador para facilitar a compra. Se for uma pesquisa genérica (ex: previsão do tempo, notícias comuns), não inclua os links.",
                 "parameters": {
                     "type": "OBJECT",
                     "properties": {
                         "query": {
                             "type": "STRING", 
-                            "description": "Faz uma pesquisa em tempo real na internet para descobrir preços atualizados de passagens, hotéis, produtos ou notícias. REGRA OBRIGATÓRIA: Se a pesquisa for para cotar preços, comprar produtos, ver passagens ou hotéis, você DEVE incluir o 'Link da Fonte' na sua resposta final ao utilizador para facilitar a compra. Se for uma pesquisa genérica (ex: previsão do tempo, notícias comuns), não inclua os links.",
+                            "description": "A pergunta exata ou termo de busca que será pesquisado no Google. Seja específico (ex: 'preço médio passagem aérea são paulo para paris 2024')."
                         }
                     },
                     "required": ["query"]

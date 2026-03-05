@@ -71,33 +71,29 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         if not response.parts:
             return "Não consegui processar sua solicitação devido às políticas de segurança.", []
 
-        # 2. O LOOP DO BUMERANGUE (100% à prova de falhas)
-        max_pesquisas = 4
-        for _ in range(max_pesquisas):
-            tem_pesquisa = False
+        # 2. O LOOP DO BUMERANGUE (Nível 3 - Execução Simulada)
+        max_turnos = 5
+        acoes_a_executar = [] # Guardaremos TODAS as ferramentas finais aqui
+        
+        for _ in range(max_turnos):
+            precisa_continuar = False
             respostas_das_ferramentas = []
 
             for part in response.candidates[0].content.parts:
                 if part.function_call:
+                    precisa_continuar = True
                     nome_funcao = part.function_call.name
+                    argumentos = {key: value for key, value in part.function_call.args.items()}
                     
                     if nome_funcao == "pesquisar_na_internet":
-                        tem_pesquisa = True
-                        query_busca = part.function_call.args.get("query", "")
-                        print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa em lote: '{query_busca}'")
+                        query_busca = argumentos.get("query", "")
+                        print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa: '{query_busca}'")
                         resultado_web = realizar_pesquisa_web(query_busca)
                         
-                        # ▼▼▼ O PUXÃO DE ORELHA BLINDADO ▼▼▼
-                        # Injetamos a ordem DIRETO no texto da resposta, sem quebrar a estrutura da API
                         resultado_turbinado = (
                             f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
-                            "--- ALERTA DE SISTEMA (MUITO IMPORTANTE) ---\n"
-                            "Você acabou de receber os dados da internet. Você É OBRIGADO a escrever um "
-                            "relatório completo em texto para o usuário, mostrando os preços, os detalhes e "
-                            "repassando os LINKS de compra/fontes que você encontrou.\n"
-                            "Gere esse texto OBRIGATORIAMENTE nesta resposta, mesmo que você vá acionar a agenda ou metas logo a seguir."
+                            "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."
                         )
-                        # ▲▲▲ FIM DO ALERTA ▲▲▲
                         
                         respostas_das_ferramentas.append({
                             "function_response": {
@@ -106,10 +102,27 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                             }
                         })
                     else:
-                        tem_pesquisa = False
-                        break
+                        # É uma ferramenta de banco de dados (agenda, meta, lançamentos)
+                        print(f"🔧 [LOOP AGENTE] Interceptando ação final: {nome_funcao}")
+                        
+                        acao_atual = {"type": nome_funcao, "data": argumentos}
+                        if acao_atual not in acoes_a_executar: # Evita duplicar ações
+                            acoes_a_executar.append(acao_atual)
+                        
+                        # A MÁGICA: Devolvemos um "Falso Sucesso" para a IA
+                        # Isso acalma o cérebro dela e a obriga a gerar o texto final!
+                        respostas_das_ferramentas.append({
+                            "function_response": {
+                                "name": nome_funcao,
+                                "response": {
+                                    "status": "sucesso", 
+                                    "mensagem": "Ação salva no banco de dados com sucesso. Gere OBRIGATORIAMENTE o relatório de texto para o usuário agora."
+                                }
+                            }
+                        })
 
-            if tem_pesquisa and respostas_das_ferramentas:
+            if precisa_continuar and respostas_das_ferramentas:
+                # O Gemini chamou ferramentas, então entregamos as respostas e o fazemos pensar novamente
                 mensagens_bumerangue.append(response.candidates[0].content)
                 mensagens_bumerangue.append({
                     "role": "user",
@@ -117,30 +130,20 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                 })
                 response = model.generate_content(mensagens_bumerangue)
             else:
+                # Se ele NÃO chamou mais ferramentas, significa que ele finalmente gerou o texto!
                 break 
 
     except Exception as e:
         print(f"ERRO: Falha na chamada ao Gemini: {e}")
         return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
 
-    # --- PASSO 3: Processar a Resposta Final do Gemini ---
+    # --- PASSO 3: Extrair o texto final gerado pelo Gemini ---
     texto_para_usuario = ""
-    acoes_a_executar = []
-
     for part in response.candidates[0].content.parts:
         if part.text:
             texto_para_usuario += part.text + " "
-        
-        elif part.function_call:
-            nome_funcao = part.function_call.name
-            if nome_funcao == "pesquisar_na_internet":
-                continue
 
-            argumentos = {key: value for key, value in part.function_call.args.items()}
-            print(f"🔧 AGENTE ACIONOU FERRAMENTA FINAL: {nome_funcao} com args: {argumentos}")
-            acoes_a_executar.append({"type": nome_funcao, "data": argumentos})
-
-    # Trava de Segurança: Se a IA executar ações no banco mas esquecer de falar
+    # Trava de Segurança
     if not texto_para_usuario.strip() and acoes_a_executar:
         texto_para_usuario = "Pronto! Fui à internet, cruzei os dados e já executei todas as ações que você pediu."
 
