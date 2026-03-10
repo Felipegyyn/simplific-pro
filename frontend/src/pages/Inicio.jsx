@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark  } from 'lucide-react';
+import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark, CreditCard, Edit, Trash2  } from 'lucide-react';
 import apiService from '../services/api';
 import eventService from '../services/eventService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -46,15 +46,19 @@ const Inicio = ({ user }) => {
     return () => eventService.off('transactionsChanged', handleTransactionsChange);
   }, []);
 
+  
+
   const carregarDados = async () => {
     setLoading(true);
     try {
-      const [transRes, catRes, contasRes] = await Promise.all([
+      const [transRes, catRes, contasRes, cartoesRes] = await Promise.all([
         apiService.get('/api/transactions'),
         apiService.get('/api/categories'),
-        apiService.get('/api/bank-accounts')
+        apiService.get('/api/bank-accounts'),
+        apiService.get('/api/credit-cards') // <-- Nova requisição
       ]);
 
+      // ... (código de transações mantido igual)
       let listaTransacoes = [];
       if (transRes && transRes.data && Array.isArray(transRes.data.transactions)) {
         listaTransacoes = transRes.data.transactions;
@@ -67,6 +71,15 @@ const Inicio = ({ user }) => {
       setTransacoes(listaTransacoes);
       setCategorias(catRes || []);
       setContas(contasRes || []);
+      
+      // Formata os cartões igual ao CreditCards.jsx
+      if (Array.isArray(cartoesRes)) {
+        setCartoes(cartoesRes.map(c => ({
+          ...c,
+          usado: c.limit - c.available_limit,
+          disponivel: Number(c.available_limit) || 0
+        })));
+      }
     } catch (error) {
       console.error("Erro ao carregar dados do Início:", error);
     } finally {
@@ -158,6 +171,30 @@ const Inicio = ({ user }) => {
       );
     }
     return null;
+  };
+
+  // --- NOVOS ESTADOS PARA CARTÕES ---
+  const [cartoes, setCartoes] = useState([]);
+  
+  // --- IDENTIFICADOR DE LOGOS REAIS DOS BANCOS ---
+  const getBankLogo = (cardName = '') => {
+    const nameLower = cardName.toLowerCase();
+    if (nameLower.includes('nubank') || nameLower.includes('nu')) return 'nubank.com.br';
+    if (nameLower.includes('itaú') || nameLower.includes('itau')) return 'itau.com.br';
+    if (nameLower.includes('inter')) return 'bancointer.com.br';
+    if (nameLower.includes('c6')) return 'c6bank.com.br';
+    if (nameLower.includes('bradesco')) return 'bradesco.com.br';
+    if (nameLower.includes('santander')) return 'santander.com.br';
+    if (nameLower.includes('brasil') || nameLower.includes('bb')) return 'bb.com.br';
+    if (nameLower.includes('caixa')) return 'caixa.gov.br';
+    if (nameLower.includes('xp')) return 'xpi.com.br';
+    if (nameLower.includes('neon')) return 'neon.com.br';
+    if (nameLower.includes('will')) return 'willbank.com.br';
+    if (nameLower.includes('pan')) return 'bancopan.com.br';
+    if (nameLower.includes('pag') || nameLower.includes('pagseguro')) return 'pagbank.com.br';
+    if (nameLower.includes('mercado') || nameLower.includes('pago')) return 'mercadopago.com.br';
+    
+    return null; // Se não achar o nome do banco, retorna null
   };
 
   // --- AÇÃO: CONFIRMAR TRANSAÇÃO PENDENTE ---
@@ -521,12 +558,90 @@ const Inicio = ({ user }) => {
             </CardContent>
           </Card>
 
-          {/* ESPAÇO RESTANTE PARA A CONSTÂNCIA */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 flex items-center justify-center">
-            <p className="text-muted-foreground text-center">
-              Espaço reservado para o widget de Constância (Semanas).
-            </p>
-          </div>
+          {/* CARROSSEL DE CARTÕES DE CRÉDITO */}
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden bg-transparent border-none">
+            <CardHeader className="px-0 pt-0 pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                <CreditCard className="h-4 w-4" />
+                Meus Cartões
+              </CardTitle>
+              {/* Ao clicar aqui, o usuário deve ser redirecionado para a página completa de cartões */}
+              <Button variant="ghost" size="sm" className="text-xs text-emerald-600 hover:text-emerald-700 h-6 px-2" onClick={() => window.location.href = '#/credit-cards'}>
+                Gerenciar Todos
+              </Button>
+            </CardHeader>
+            
+            {/* Area rolável horizontal */}
+            <CardContent className="p-0 overflow-x-auto flex gap-4 pb-2 scrollbar-thin scrollbar-thumb-emerald-200">
+              {loading ? (
+                <div className="flex justify-center items-center w-full h-full min-h-[160px]">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
+                </div>
+              ) : cartoes.length === 0 ? (
+                <div className="flex flex-col justify-center items-center w-full h-full min-h-[160px] bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300">
+                   <p className="text-muted-foreground text-sm mb-2">Nenhum cartão cadastrado.</p>
+                   <Button variant="outline" size="sm" onClick={() => window.location.href = '#/credit-cards'}>Adicionar Cartão</Button>
+                </div>
+              ) : (
+                cartoes.map(cartao => {
+                  const bankDomain = getBankLogo(cartao.name); // Busca o domínio do banco
+                  const percUsado = (cartao.usado / cartao.limit) * 100;
+                  
+                  return (
+                    <div key={cartao.id} className="min-w-[280px] sm:min-w-[300px] bg-white dark:bg-slate-800 border border-border rounded-xl p-4 shadow-sm flex flex-col justify-between shrink-0 hover:shadow-md transition-shadow relative overflow-hidden">
+                      {/* Faixa decorativa neutra */}
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500/20"></div>
+                      
+                      <div className="flex justify-between items-start mb-4 mt-1">
+                        <div className="flex items-center gap-3">
+                          {/* ▼▼▼ O ÍCONE REAL DO BANCO AQUI ▼▼▼ */}
+                          <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-slate-700 shadow-sm flex items-center justify-center p-1.5 border border-slate-100 dark:border-slate-600">
+                            {bankDomain ? (
+                              <img 
+                                src={`https://www.google.com/s2/favicons?domain=${bankDomain}&sz=128`} 
+                                alt="Logo Banco" 
+                                className="w-full h-full object-contain rounded"
+                              />
+                            ) : (
+                              <CreditCard className="text-slate-400 w-5 h-5" />
+                            )}
+                          </div>
+                          {/* ▲▲▲ FIM DO ÍCONE ▲▲▲ */}
+
+                          <div>
+                            <h4 className="font-semibold text-sm text-foreground leading-none">{cartao.name}</h4>
+                            <p className="text-xs text-muted-foreground mt-1">Final {cartao.last_digits || '0000'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 mt-auto">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Disponível</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                            R$ {cartao.disponivel.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                          </span>
+                        </div>
+
+                        {/* Barra de Progresso */}
+                        <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full ${percUsado > 80 ? 'bg-red-500' : 'bg-blue-500'}`} 
+                            style={{ width: `${Math.min(percUsado, 100)}%` }}
+                          ></div>
+                        </div>
+
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Usado: R$ {cartao.usado.toLocaleString('pt-BR')}</span>
+                          <span>Limite: R$ {cartao.limit.toLocaleString('pt-BR')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </CardContent>
+          </Card>
 
         </div>
 

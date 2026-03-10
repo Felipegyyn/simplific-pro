@@ -45,6 +45,7 @@ const CreditCards = ({ user, onLogout }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
   const [formData, setFormData] = useState({
+    banco: '', // <--- ADICIONE ESTA LINHA
     name: '',
     card_number: '',
     limit_amount: '',
@@ -242,10 +243,10 @@ const handleSubmit = async (e) => {
   try {
 
     await criarCartao({
-      name: formData.name,
+      // Se o usuário selecionou o banco, salva como "Nubank - Meu Roxinho". Se não, salva só o nome.
+      name: formData.banco ? `${formData.banco} - ${formData.name}` : formData.name, 
       brand: formData.brand,
       limit: parseFloat(formData.limit_amount),
-      // Não enviamos mais o closing_day
       due_day: parseInt(formData.due_date),
       card_number: formData.card_number
     });
@@ -503,6 +504,28 @@ const respostaFaturas = await apiService.get(url);
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
+
+                          {/* ▼▼▼ NOVO SELETOR DE BANCO ▼▼▼ */}
+                      <div>
+                        <Label htmlFor="banco">Banco Emissor do Cartão</Label>
+                        <Select value={formData.banco} onValueChange={(value) => handleInputChange('banco', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o banco (opcional)" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            <SelectItem value="Nubank">Nubank</SelectItem>
+                            <SelectItem value="Itaú">Itaú</SelectItem>
+                            <SelectItem value="Bradesco">Bradesco</SelectItem>
+                            <SelectItem value="Santander">Santander</SelectItem>
+                            <SelectItem value="Banco do Brasil">Banco do Brasil</SelectItem>
+                            <SelectItem value="Caixa">Caixa Econômica</SelectItem>
+                            <SelectItem value="Inter">Banco Inter</SelectItem>
+                            <SelectItem value="C6 Bank">C6 Bank</SelectItem>
+                            <SelectItem value="XP">XP Investimentos</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {/* ▲▲▲ FIM DO SELETOR DE BANCO ▲▲▲ */}
                           <Label htmlFor="name">Nome do Cartão *</Label>
                           <Input
                             id="name"
