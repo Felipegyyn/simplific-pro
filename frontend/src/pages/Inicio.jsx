@@ -555,7 +555,7 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-screen overflow-hidden">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[400px] overflow-hidden">
             {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
             <CardHeader className="py-3 px-4 border-b bg-emerald-800 text-white">
               <div className="flex items-center justify-between">
@@ -841,7 +841,7 @@ const Inicio = ({ user }) => {
           </Dialog>
 
 {/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[250px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[400px]">
             
             {/* WIDGET AGENDA */}
             <Card className="border-border shadow-sm flex flex-col overflow-hidden">
