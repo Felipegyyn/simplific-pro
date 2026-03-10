@@ -218,7 +218,7 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 flex flex-col gap-6 h-full">
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[400px]">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0">
             <CardHeader className="pb-4 border-b">
               <div className="flex justify-between items-center mb-4">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -313,7 +313,7 @@ const Inicio = ({ user }) => {
               </div>
             </CardHeader>
 
-            <CardContent className="p-0 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-border">
+            <CardContent className="p-0 overflow-y-auto flex-1 min-h-0 scrollbar-thin scrollbar-thumb-border">
               {loading ? (
                 <div className="flex justify-center items-center h-full">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
@@ -359,7 +359,7 @@ const Inicio = ({ user }) => {
               </div>
             </CardHeader>
 
-            <CardContent className="p-0 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-border">
+            <CardContent className="p-0 overflow-y-auto flex-1 min-h-0 scrollbar-thin scrollbar-thumb-border">
               {loading ? (
                 <div className="flex justify-center items-center h-full">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
