@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark, CreditCard, Edit, Trash2  } from 'lucide-react';
+import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark, CreditCard, Edit, Trash2, Calendar, Target, DollarSign  } from 'lucide-react';
 import apiService from '../services/api';
 import eventService from '../services/eventService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -62,11 +62,13 @@ const Inicio = ({ user }) => {
   const carregarDados = async () => {
     setLoading(true);
     try {
-      const [transRes, catRes, contasRes, cartoesRes] = await Promise.all([
+      const [transRes, catRes, contasRes, cartoesRes, agendaRes, metasRes] = await Promise.all([
         apiService.get('/api/transactions'),
         apiService.get('/api/categories'),
         apiService.get('/api/bank-accounts'),
-        apiService.get('/api/credit-cards') // <-- Nova requisição
+        apiService.get('/api/credit-cards'),
+        apiService.get('/api/schedule'), // <-- Busca Agenda
+        apiService.get('/api/goals')     // <-- Busca Metas
       ]);
 
       // ... (código de transações mantido igual)
@@ -82,6 +84,8 @@ const Inicio = ({ user }) => {
       setTransacoes(listaTransacoes);
       setCategorias(catRes || []);
       setContas(contasRes || []);
+      setEventos(Array.isArray(agendaRes) ? agendaRes : []);
+      setMetas(Array.isArray(metasRes) ? metasRes : []);
       
       // Formata os cartões igual ao CreditCards.jsx
       if (Array.isArray(cartoesRes)) {
@@ -183,6 +187,24 @@ const Inicio = ({ user }) => {
     }
     return null;
   };
+
+  // --- ESTADOS PARA AGENDA E METAS ---
+  const [eventos, setEventos] = useState([]);
+  const [metas, setMetas] = useState([]);
+  
+  // Modais
+  const [isEventoModalOpen, setIsEventoModalOpen] = useState(false);
+  const [isAddValorMetaModalOpen, setIsAddValorMetaModalOpen] = useState(false);
+  const [selectedMetaAdd, setSelectedMetaAdd] = useState('');
+  const [valorAdicionarMeta, setValorAdicionarMeta] = useState('');
+
+  const [eventoFormData, setEventoFormData] = useState({
+    title: '',
+    description: '',
+    event_date: new Date().toISOString().split('T')[0],
+    type: 'pagamento',
+    category: ''
+  });
 
   // --- NOVOS ESTADOS PARA CARTÕES ---
   const [cartoes, setCartoes] = useState([]);
@@ -311,6 +333,57 @@ const Inicio = ({ user }) => {
     const datePart = dateString.split('T')[0];
     const localDate = new Date(`${datePart}T12:00:00`);
     return localDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  };
+
+  // --- LÓGICA DA AGENDA (Próximos 7 dias) ---
+  const eventosProximos = useMemo(() => {
+    const hojeDate = new Date();
+    hojeDate.setHours(0,0,0,0);
+    const daqui7Dias = new Date(hojeDate);
+    daqui7Dias.setDate(hojeDate.getDate() + 7);
+
+    return eventos.filter(e => {
+      if (e.is_completed) return false;
+      const dataE = new Date(e.date);
+      // Ajuste de fuso horário
+      const dataLocal = new Date(dataE.getTime() + dataE.getTimezoneOffset() * 60000);
+      dataLocal.setHours(0,0,0,0);
+      return dataLocal >= hojeDate && dataLocal <= daqui7Dias;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 4); // Pega só os 4 primeiros
+  }, [eventos]);
+
+  const handleEventoSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await apiService.post('/api/schedule', eventoFormData);
+      await carregarDados();
+      setIsEventoModalOpen(false);
+      setEventoFormData({ title: '', description: '', event_date: new Date().toISOString().split('T')[0], type: 'pagamento', category: '' });
+      alert("Evento criado!");
+    } catch (error) {
+      alert("Erro ao criar evento.");
+    }
+  };
+
+  // --- LÓGICA DAS METAS ---
+  const metasAtivas = useMemo(() => metas.filter(m => m.is_active && !m.is_completed), [metas]);
+  const valorTotalMetas = useMemo(() => metasAtivas.reduce((sum, m) => sum + m.target_value, 0), [metasAtivas]);
+  const valorAcumuladoMetas = useMemo(() => metasAtivas.reduce((sum, m) => sum + m.current_value, 0), [metasAtivas]);
+  const valorRestanteMetas = valorTotalMetas - valorAcumuladoMetas;
+
+  const handleAddValorMetaSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedMetaAdd || !valorAdicionarMeta) return alert("Preencha todos os campos.");
+    try {
+      await apiService.post(`/api/goals/${selectedMetaAdd}/contribute`, { amount: parseFloat(valorAdicionarMeta) });
+      await carregarDados();
+      setIsAddValorMetaModalOpen(false);
+      setSelectedMetaAdd('');
+      setValorAdicionarMeta('');
+      alert("Valor adicionado à meta!");
+    } catch (error) {
+      alert("Erro ao adicionar valor.");
+    }
   };
 
   return (
@@ -767,8 +840,145 @@ const Inicio = ({ user }) => {
             </DialogContent>
           </Dialog>
 
-        </div>
+{/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[250px]">
+            
+            {/* WIDGET AGENDA */}
+            <Card className="border-border shadow-sm flex flex-col overflow-hidden">
+              <CardHeader className="py-3 px-4 border-b bg-indigo-800 text-white flex flex-row items-center justify-between">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-indigo-100">
+                  <Calendar className="h-4 w-4" /> Próximos Eventos
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-indigo-200 hover:text-white h-6 px-2" onClick={() => window.location.href = '#/schedule'}>
+                  Gerenciar
+                </Button>
+              </CardHeader>
+              <CardContent className="p-0 overflow-y-auto flex-1 flex flex-col">
+                {eventosProximos.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+                    <Calendar className="h-8 w-8 text-gray-300 mb-2" />
+                    <p className="text-sm text-muted-foreground">Sua agenda está livre!</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border/50">
+                    {eventosProximos.map(e => (
+                      <div key={e.id} className="p-3 flex justify-between items-center hover:bg-muted/30">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-foreground">{e.title}</span>
+                          <span className="text-xs text-muted-foreground">{formatDateForDisplay(e.date)}</span>
+                        </div>
+                        {e.value && <span className="text-sm font-semibold text-red-500">R$ {e.value.toLocaleString('pt-BR')}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Botão Novo Evento Rápido */}
+                <div className="mt-auto p-3 border-t bg-muted/10">
+                  <Dialog open={isEventoModalOpen} onOpenChange={setIsEventoModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full border-dashed border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400">
+                        <Plus className="h-3 w-3 mr-1" /> Adicionar Evento
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[400px]">
+                      <DialogHeader><DialogTitle>Novo Evento Rápido</DialogTitle></DialogHeader>
+                      <form onSubmit={handleEventoSubmit} className="space-y-4">
+                        <div><Label>Título</Label><Input required value={eventoFormData.title} onChange={e => setEventoFormData({...eventoFormData, title: e.target.value})} /></div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div><Label>Data</Label><Input type="date" required value={eventoFormData.event_date} onChange={e => setEventoFormData({...eventoFormData, event_date: e.target.value})} /></div>
+                          <div>
+                            <Label>Tipo</Label>
+                            <Select value={eventoFormData.type} onValueChange={val => setEventoFormData({...eventoFormData, type: val})}>
+                              <SelectTrigger><SelectValue/></SelectTrigger>
+                              <SelectContent><SelectItem value="pagamento">Pagamento</SelectItem><SelectItem value="recebimento">Recebimento</SelectItem><SelectItem value="lembrete">Lembrete</SelectItem></SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">Salvar Evento</Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+            </Card>
 
+            {/* WIDGET METAS */}
+            <Card className="border-border shadow-sm flex flex-col overflow-hidden">
+              <CardHeader className="py-3 px-4 border-b bg-violet-800 text-white flex flex-row items-center justify-between">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-violet-100">
+                  <Target className="h-4 w-4" /> Visão de Metas
+                </CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs text-violet-200 hover:text-white h-6 px-2" onClick={() => window.location.href = '#/goals'}>
+                  Gerenciar
+                </Button>
+              </CardHeader>
+              <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                <div className="grid grid-cols-2 gap-4 mb-4 text-center md:text-left">
+                  <div className="bg-muted/30 p-3 rounded-lg border">
+                    <p className="text-xs text-muted-foreground font-medium mb-1">Total Almejado</p>
+                    <p className="text-lg font-bold text-blue-600 dark:text-blue-400">R$ {valorTotalMetas.toLocaleString('pt-BR')}</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg border">
+                    <p className="text-xs text-muted-foreground font-medium mb-1">Acumulado</p>
+                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">R$ {valorAcumuladoMetas.toLocaleString('pt-BR')}</p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Progresso Geral</span>
+                    <span className="font-bold text-violet-600">
+                      {valorTotalMetas > 0 ? ((valorAcumuladoMetas / valorTotalMetas) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                    <div className="h-2 rounded-full bg-violet-500" style={{ width: `${valorTotalMetas > 0 ? Math.min((valorAcumuladoMetas / valorTotalMetas) * 100, 100) : 0}%` }}></div>
+                  </div>
+                  <p className="text-xs text-right text-muted-foreground mt-1">Faltam R$ {Math.max(valorRestanteMetas, 0).toLocaleString('pt-BR')}</p>
+                </div>
+
+                {/* Botão Adicionar Valor em Meta */}
+                <div className="mt-auto">
+                  <Dialog open={isAddValorMetaModalOpen} onOpenChange={setIsAddValorMetaModalOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full bg-violet-600 hover:bg-violet-700 shadow-sm">
+                        <DollarSign className="h-4 w-4 mr-2" /> Injetar Valor
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[400px]">
+                      <DialogHeader><DialogTitle>Adicionar Valor à Meta</DialogTitle></DialogHeader>
+                      <form onSubmit={handleAddValorMetaSubmit} className="space-y-4">
+                        <div>
+                          <Label>Qual meta deseja abastecer?</Label>
+                          <Select value={selectedMetaAdd} onValueChange={setSelectedMetaAdd}>
+                            <SelectTrigger><SelectValue placeholder="Selecione a meta" /></SelectTrigger>
+                            <SelectContent>
+                              {metasAtivas.length === 0 ? (
+                                <SelectItem value="none" disabled>Nenhuma meta ativa</SelectItem>
+                              ) : (
+                                metasAtivas.map(m => (
+                                  <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Valor a injetar (R$)</Label>
+                          <Input type="number" step="0.01" value={valorAdicionarMeta} onChange={e => setValorAdicionarMeta(e.target.value)} required placeholder="Ex: 150.00" />
+                        </div>
+                        <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={!selectedMetaAdd}>Confirmar Injeção</Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardContent>
+            </Card>
+
+          </div>
+          {/* ▲▲▲ FIM DA NOVA FILEIRA ▲▲▲ */}
+        </div>
       </div>
     </div>
   );
