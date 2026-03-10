@@ -626,7 +626,7 @@ const Inicio = ({ user }) => {
         </div>
 
        {/* COLUNAS DIREITAS (GRÁFICOS E INDICADORES) */}
-        <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-auto lg:h-[724px]">
+        <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-[724px]">
           
           {/* GRÁFICO DE SALDO POR CONTA */}
           <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden">
