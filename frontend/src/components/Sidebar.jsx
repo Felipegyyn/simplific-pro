@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
   Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, 
-  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark // <--- 1. ÍCONES ADICIONADOS
+  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark, Home // <--- 1. ÍCONES ADICIONADOS
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils"; 
@@ -21,6 +21,21 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const fileInputRef = useRef(null);
 
   // --- ESTRUTURA DOS DADOS ---
+
+  // --- ESTRUTURA DOS DADOS ---
+  const menuStructure = [
+    // ▼▼▼ 1. NOVO MENU INÍCIO ▼▼▼
+    {
+      title: 'Início',
+      icon: Home,
+      color: 'text-amber-500', // Escolhi uma cor diferente (âmbar/amarelo) para destacar
+      items: [
+        { name: 'Início', path: '/inicio', icon: Home },
+      ]
+    },
+    // ▲▲▲ FIM DO NOVO MENU ▲▲▲
+
+
   const menuStructure = [
     {
       title: 'Resumo',
