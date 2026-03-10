@@ -5,10 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark  } from 'lucide-react'; // <--- NOVOS ÍCONES ADICIONADOS
+import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark  } from 'lucide-react';
 import apiService from '../services/api';
 import eventService from '../services/eventService';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'; // <--- NOVO: IMPORT DO GRÁFICO
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const Inicio = ({ user }) => {
   // --- ESTADOS GERAIS ---
@@ -77,7 +77,6 @@ const Inicio = ({ user }) => {
   // --- FILTRAGEM DOS DADOS (Confirmadas) ---
   const transacoesFiltradas = useMemo(() => {
     return transacoes.filter(t => {
-      // Na tela principal mostramos apenas o que já foi confirmado ou tudo do mês selecionado
       if (!t || t.type !== abaAtiva || t.status === 'pendente') return false; 
       const dataTransacao = new Date(t.transaction_date);
       const dataLocal = new Date(dataTransacao.getTime() + dataTransacao.getTimezoneOffset() * 60000);
@@ -88,12 +87,11 @@ const Inicio = ({ user }) => {
   // --- FILTRAGEM DOS DADOS (Pendentes) ---
   const transacoesPendentes = useMemo(() => {
     return transacoes.filter(t => {
-      // Traz as pendências do mês selecionado
       if (!t || t.status !== 'pendente') return false;
       const dataTransacao = new Date(t.transaction_date);
       const dataLocal = new Date(dataTransacao.getTime() + dataTransacao.getTimezoneOffset() * 60000);
       return dataLocal.getMonth() === mesFiltro && dataLocal.getFullYear() === anoFiltro;
-    }).sort((a, b) => new Date(a.transaction_date) - new Date(b.transaction_date)); // Mais antigas primeiro
+    }).sort((a, b) => new Date(a.transaction_date) - new Date(b.transaction_date)); 
   }, [transacoes, mesFiltro, anoFiltro]);
 
   const totaisDoMes = useMemo(() => {
@@ -115,16 +113,12 @@ const Inicio = ({ user }) => {
 
   // --- LÓGICA DO GRÁFICO DE SALDO POR CONTA ---
   const dadosGraficoSaldos = useMemo(() => {
-    // 1. Pega os saldos das contas cadastradas
     const saldosContas = contas.map(c => ({
       name: c.bank_name,
       value: parseFloat(c.balance) || 0,
-      fill: '#0ea5e9' // Azul padrão para contas
+      fill: '#0ea5e9' 
     }));
 
-    // 2. Calcula o saldo "Solto/Dinheiro" (lançamentos que não têm conta vinculada)
-    // Para simplificar a visão geral, vamos calcular o saldo solto geral (histórico todo), 
-    // pois saldo em conta é uma fotografia atual, não apenas do mês.
     let receitasSoltas = 0;
     let despesasSoltas = 0;
     
@@ -137,24 +131,21 @@ const Inicio = ({ user }) => {
     
     const saldoSolto = receitasSoltas - despesasSoltas;
 
-    // Só mostra a coluna de "Sem Conta" se houver algum valor
     if (saldoSolto !== 0) {
       saldosContas.push({
         name: 'S/ Conta Específica',
         value: saldoSolto,
-        fill: '#94a3b8' // Cinza para saldo não alocado
+        fill: '#94a3b8' 
       });
     }
 
     return saldosContas;
   }, [contas, transacoes]);
 
-  // Calcula o saldo total global somando o gráfico
   const saldoTotalGlobal = useMemo(() => {
     return dadosGraficoSaldos.reduce((acc, curr) => acc + curr.value, 0);
   }, [dadosGraficoSaldos]);
 
-  // Formatação personalizada para a "Dica" (Tooltip) do gráfico
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -275,18 +266,19 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 flex flex-col gap-6">
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <Card className="border-border shadow-sm flex flex-col h-[480px]">
-            <CardHeader className="pb-4 border-b">
+          <Card className="border-border shadow-sm flex flex-col h-[480px] overflow-hidden">
+            {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
+            <CardHeader className="pb-4 border-b bg-emerald-800 text-white">
               <div className="flex justify-between items-center mb-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Wallet className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg flex items-center gap-2 text-white">
+                  <Wallet className="h-5 w-5 text-emerald-300" />
                   Lançamentos
                 </CardTitle>
                 
-                {/* MODAL DE NOVO LANÇAMENTO */}
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 h-8 text-xs">
+                    {/* Botão Novo atualizado para destacar no verde escuro */}
+                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500 h-8 text-xs shadow-sm">
                       <Plus className="h-3.5 w-3.5 mr-1" /> Novo
                     </Button>
                   </DialogTrigger>
@@ -294,7 +286,6 @@ const Inicio = ({ user }) => {
                     <DialogHeader>
                       <DialogTitle>Lançamento Rápido</DialogTitle>
                     </DialogHeader>
-                    {/* ... (Formulário do modal mantido igual) ... */}
                     <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -339,36 +330,39 @@ const Inicio = ({ user }) => {
                           </SelectContent>
                         </Select>
                       </div>
-                      <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">Confirmar Lançamento</Button>
+                      <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700">Confirmar Lançamento</Button>
                     </form>
                   </DialogContent>
                 </Dialog>
               </div>
 
+              {/* Cores dos totais ajustadas para fundo escuro */}
               <div className="flex justify-between items-center text-sm px-1 mb-2">
-                <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
+                <div className="flex items-center gap-1.5 text-emerald-200 font-medium">
                   <ArrowUpCircle className="h-4 w-4" /> R$ {totaisDoMes.receitas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                 </div>
-                <div className="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-medium">
+                <div className="flex items-center gap-1.5 text-rose-300 font-medium">
                   <ArrowDownCircle className="h-4 w-4" /> R$ {totaisDoMes.despesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                 </div>
               </div>
 
-              <div className="flex rounded-lg bg-muted p-1">
+              {/* Fundo da barra de abas ajustado para fundo escuro */}
+              <div className="flex rounded-lg bg-emerald-900/60 p-1">
                 <button
                   onClick={() => setAbaAtiva('expense')}
-                  className={`flex-1 text-sm py-1.5 rounded-md font-medium transition-colors ${abaAtiva === 'expense' ? 'bg-white dark:bg-slate-800 shadow-sm text-red-600 dark:text-red-400' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`flex-1 text-sm py-1.5 rounded-md font-medium transition-colors ${abaAtiva === 'expense' ? 'bg-white shadow-sm text-red-600' : 'text-emerald-100 hover:text-white hover:bg-emerald-700/50'}`}
                 >
                   Despesas
                 </button>
                 <button
                   onClick={() => setAbaAtiva('income')}
-                  className={`flex-1 text-sm py-1.5 rounded-md font-medium transition-colors ${abaAtiva === 'income' ? 'bg-white dark:bg-slate-800 shadow-sm text-green-600 dark:text-green-400' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`flex-1 text-sm py-1.5 rounded-md font-medium transition-colors ${abaAtiva === 'income' ? 'bg-white shadow-sm text-emerald-700' : 'text-emerald-100 hover:text-white hover:bg-emerald-700/50'}`}
                 >
                   Receitas
                 </button>
               </div>
             </CardHeader>
+            {/* ▲▲▲ FIM DO CABEÇALHO VERDE ESCURO ▲▲▲ */}
 
             <CardContent className="p-0 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-border">
               {loading ? (
@@ -403,18 +397,20 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <Card className="border-border shadow-sm flex flex-col h-420px]">
-            <CardHeader className="py-3 px-4 border-b bg-muted/20">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+            {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
+            <CardHeader className="py-3 px-4 border-b bg-emerald-800 text-white">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-orange-500" />
+                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-white">
+                  <Clock className="h-4 w-4 text-orange-400" />
                   Lançamentos Pendentes
                 </CardTitle>
-                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                   {transacoesPendentes.length}
                 </span>
               </div>
             </CardHeader>
+            {/* ▲▲▲ FIM DO CABEÇALHO VERDE ESCURO ▲▲▲ */}
 
             <CardContent className="p-0 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-border">
               {loading ? (
@@ -468,19 +464,22 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-[724px]">
           
           {/* GRÁFICO DE SALDO POR CONTA */}
-          <Card className="border-border shadow-sm">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+          <Card className="border-border shadow-sm overflow-hidden">
+            {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
+            <CardHeader className="pb-3 pt-4 px-6 flex flex-row items-center justify-between bg-emerald-800 border-b text-white">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-emerald-100 uppercase tracking-wider">
                 <Landmark className="h-4 w-4" />
                 Saldo por Conta
               </CardTitle>
               <div className="text-right">
-                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Saldo Total</p>
-                <p className={`text-xl font-bold ${saldoTotalGlobal >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                <p className="text-[10px] text-emerald-200 font-semibold uppercase tracking-wider mb-0.5">Saldo Total</p>
+                <p className={`text-xl font-bold ${saldoTotalGlobal >= 0 ? 'text-white' : 'text-red-300'}`}>
                   R$ {saldoTotalGlobal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                 </p>
               </div>
             </CardHeader>
+            {/* ▲▲▲ FIM DO CABEÇALHO VERDE ESCURO ▲▲▲ */}
+            
             <CardContent className="pt-4 pb-2">
               {loading ? (
                 <div className="flex justify-center items-center h-[200px]">
