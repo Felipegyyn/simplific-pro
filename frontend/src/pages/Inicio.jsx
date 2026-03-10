@@ -215,11 +215,10 @@ const Inicio = ({ user }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* COLUNA ESQUERDA (LANÇAMENTOS + PENDÊNCIAS) */}
-        <div className="col-span-1 flex flex-col gap-6 h-[724px]"> 
-          {/* Defini a altura total da coluna para bater com a da direita */}
+        <div className="col-span-1 flex flex-col gap-6">
           
-          {/* 1. MINI TELA DE LANÇAMENTOS (Altura Fixa) */}
-          <Card className="border-border shadow-sm flex flex-col h-[420px] shrink-0">
+          {/* 1. MINI TELA DE LANÇAMENTOS */}
+          <Card className="border-border shadow-sm flex flex-col h-[420px]">
             <CardHeader className="pb-4 border-b">
               <div className="flex justify-between items-center mb-4">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -238,7 +237,7 @@ const Inicio = ({ user }) => {
                     <DialogHeader>
                       <DialogTitle>Lançamento Rápido</DialogTitle>
                     </DialogHeader>
-                    {/* O formulário continua igual */}
+                    {/* ... (Formulário do modal mantido igual) ... */}
                     <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -346,27 +345,64 @@ const Inicio = ({ user }) => {
             </CardContent>
           </Card>
 
-          {/* 2. MINI TELA DE PENDÊNCIAS (Estica para preencher o resto) */}
-          {/* Adicionei flex-1 min-h-0 para ele ocupar o espaço do 'X' azul e rolar internamente */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0">
+          {/* 2. MINI TELA DE PENDÊNCIAS */}
+          <Card className="border-border shadow-sm flex flex-col h-[280px]">
             <CardHeader className="py-3 px-4 border-b bg-muted/20">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                  {/* Se você não tiver o ícone Clock ou CheckCircle importados, lembre de adicionar no import do lucide-react */}
+                  <Clock className="h-4 w-4 text-orange-500" />
                   Lançamentos Pendentes
                 </CardTitle>
                 <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                  {/* Substitua por transacoesPendentes.length se quiser mostrar o total */}
-                  0
+                  {transacoesPendentes.length}
                 </span>
               </div>
             </CardHeader>
 
             <CardContent className="p-0 overflow-y-auto flex-1 scrollbar-thin scrollbar-thumb-border">
-               <div className="flex justify-center items-center h-full">
-                  {/* Aqui entrará o seu código para listar os pendentes futuramente */}
-                  <p className="text-muted-foreground text-sm text-center p-4">Espaço das Pendências preenchendo até o fim da tela!</p>
-               </div>
+              {loading ? (
+                <div className="flex justify-center items-center h-full">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                </div>
+              ) : transacoesPendentes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                  <CheckCircle className="h-8 w-8 text-green-500/50 mb-2" />
+                  <p className="text-muted-foreground text-sm font-medium">Tudo em dia!</p>
+                  <p className="text-xs text-muted-foreground/70">Nenhuma pendência para este mês.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-border/50">
+                  {transacoesPendentes.map((t) => (
+                    <div key={t.id} className="p-3 hover:bg-muted/30 transition-colors flex justify-between items-center group">
+                      <div className="flex flex-col overflow-hidden flex-1 mr-2">
+                        <span className="text-sm font-medium truncate text-foreground">{t.description}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={`text-[10px] font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
+                            {t.type === 'income' ? 'Receita' : 'Despesa'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">• {formatDateForDisplay(t.transaction_date)}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <span className={`font-bold text-sm whitespace-nowrap ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          R$ {(t.amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                        </span>
+                        
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 rounded-full text-green-600 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/30"
+                          onClick={() => confirmarTransacao(t.id)}
+                          title="Confirmar lançamento"
+                        >
+                          <CheckCircle className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
