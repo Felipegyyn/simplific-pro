@@ -622,7 +622,7 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-[724px]">
           
           {/* GRÁFICO DE SALDO POR CONTA */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[250px] overflow-hidden">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden">
             {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
             <CardHeader className="pb-3 pt-4 px-6 flex flex-row items-center justify-between bg-emerald-800 border-b text-white">
               <CardTitle className="text-sm font-semibold flex items-center gap-2 text-emerald-100 uppercase tracking-wider">
@@ -841,7 +841,7 @@ const Inicio = ({ user }) => {
           </Dialog>
 
 {/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[200px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[400px]">
             
             {/* WIDGET AGENDA */}
             <Card className="border-border shadow-sm flex flex-col overflow-hidden">
