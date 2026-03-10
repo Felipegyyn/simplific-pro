@@ -841,7 +841,7 @@ const Inicio = ({ user }) => {
           </Dialog>
 
 {/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[400px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[200px]">
             
             {/* WIDGET AGENDA */}
             <Card className="border-border shadow-sm flex flex-col overflow-hidden">
