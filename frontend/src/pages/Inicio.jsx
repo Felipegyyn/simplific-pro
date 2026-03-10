@@ -230,7 +230,7 @@ const Inicio = ({ user }) => {
     if (nameLower.includes('btg')) return 'btgpactual.com';
     if (nameLower.includes('DM')) return 'vocedm.com.br';
     if (nameLower.includes('Porto')) return 'portoseguro.com.br';
-    if (nameLower.includes('PicPay')) return 'picpay.com.br';
+    if (nameLower.includes('PicPay')) return 'picpay.com';
 
 
     
