@@ -387,7 +387,7 @@ const Inicio = ({ user }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h[724px]">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
       
       {/* CABEÇALHO */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
