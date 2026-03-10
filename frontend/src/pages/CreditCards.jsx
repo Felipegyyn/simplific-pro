@@ -510,7 +510,7 @@ const respostaFaturas = await apiService.get(url);
                         <Label htmlFor="banco">Banco Emissor do Cartão</Label>
                         <Select value={formData.banco} onValueChange={(value) => handleInputChange('banco', value)}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione o banco (opcional)" />
+                            <SelectValue placeholder="banco (opcional)" />
                           </SelectTrigger>
                           <SelectContent className="max-h-[200px]">
                             <SelectItem value="Nubank">Nubank</SelectItem>
@@ -522,6 +522,12 @@ const respostaFaturas = await apiService.get(url);
                             <SelectItem value="Inter">Banco Inter</SelectItem>
                             <SelectItem value="C6 Bank">C6 Bank</SelectItem>
                             <SelectItem value="XP">XP Investimentos</SelectItem>
+                            <SelectItem value="XP">Afinz</SelectItem>
+                            <SelectItem value="XP">Porto</SelectItem>
+                            <SelectItem value="XP">DM Card</SelectItem>
+                            <SelectItem value="XP">Dígio</SelectItem>
+                            <SelectItem value="XP">Sicoob</SelectItem>
+                            <SelectItem value="XP">Sicredi</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
