@@ -387,7 +387,7 @@ const Inicio = ({ user }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h[900px]">
+    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
       
       {/* CABEÇALHO */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -555,7 +555,7 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-screen overflow-hidden">
             {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
             <CardHeader className="py-3 px-4 border-b bg-emerald-800 text-white">
               <div className="flex items-center justify-between">
