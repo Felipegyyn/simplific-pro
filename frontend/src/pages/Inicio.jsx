@@ -35,6 +35,17 @@ const Inicio = ({ user }) => {
     status: 'confirmada'
   });
 
+  const [isGastoModalOpen, setIsGastoModalOpen] = useState(false);
+  const [selectedCartao, setSelectedCartao] = useState(null);
+  const [gastoFormData, setGastoFormData] = useState({
+    description: '',
+    amount: '',
+    category: '',
+    date: new Date().toISOString().split('T')[0],
+    payment_method: 'a_vista',
+    installments: 1
+  });
+
   const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
   const anos = [2024, 2025, 2026, 2027, 2028];
 
@@ -255,6 +266,43 @@ const Inicio = ({ user }) => {
     } catch (error) {
       console.error('Erro ao criar transação:', error);
       alert('Erro ao criar transação.');
+    }
+  };
+
+  const abrirModalGasto = (cartao) => {
+    setSelectedCartao(cartao);
+    setIsGastoModalOpen(true);
+  };
+
+  const handleGastoSubmit = async (e) => {
+    e.preventDefault();
+    if (!gastoFormData.description || !gastoFormData.amount) return alert('Preencha os campos obrigatórios.');
+
+    const categoriaObj = categorias.find(cat => cat.name === gastoFormData.category && cat.type === 'saida');
+    if (!categoriaObj) return alert("Selecione uma categoria válida para a despesa.");
+
+    try {
+      const response = await apiService.post(`/api/credit-cards/${selectedCartao.id}/transactions`, {
+        description: gastoFormData.description,
+        value: parseFloat(gastoFormData.amount),
+        date: gastoFormData.date,
+        category_id: categoriaObj.id,
+        payment_method: gastoFormData.payment_method,
+        installments: gastoFormData.installments
+      });
+      
+      if (response && response.category_id && response.value) {
+        alert('✅ Gasto lançado no cartão com sucesso!');
+        setIsGastoModalOpen(false);
+        setGastoFormData({ description: '', amount: '', category: '', date: new Date().toISOString().split('T')[0], payment_method: 'a_vista', installments: 1 });
+        await carregarDados();
+        eventService.emit('transactionsChanged');
+      } else {
+        alert('❌ Erro ao lançar o gasto. Verifique o Limite.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('❌ Erro ao lançar o gasto. Verifique o Limite.');
     }
   };
 
@@ -609,8 +657,19 @@ const Inicio = ({ user }) => {
                           {/* ▲▲▲ FIM DO ÍCONE ▲▲▲ */}
 
                           <div>
-                            <h4 className="font-semibold text-sm text-foreground leading-none">{cartao.name}</h4>
-                            <p className="text-xs text-muted-foreground mt-1">Final {cartao.last_digits || '0000'}</p>
+                            <h4 className="font-semibold text-sm text-foreground flex items-center gap-1.5">
+                              {cartao.name}
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-5 w-5 bg-emerald-50 hover:bg-emerald-200 text-emerald-600 dark:bg-emerald-900/30 dark:hover:bg-emerald-800/50 rounded-full shrink-0" 
+                                onClick={() => abrirModalGasto(cartao)} 
+                                title="Lançar Gasto neste Cartão"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-0.5">Final {cartao.last_digits || '0000'}</p>
                           </div>
                         </div>
                       </div>
@@ -642,6 +701,71 @@ const Inicio = ({ user }) => {
               )}
             </CardContent>
           </Card>
+
+          {/* MODAL DE LANÇAR GASTO NO CARTÃO */}
+          <Dialog open={isGastoModalOpen} onOpenChange={setIsGastoModalOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Lançar Gasto no Cartão</DialogTitle>
+                <p className="text-sm text-gray-600 dark:text-slate-400">
+                  {selectedCartao?.name}
+                </p>
+              </DialogHeader>
+              <form onSubmit={handleGastoSubmit} className="space-y-4 mt-2">
+                <div>
+                  <Label htmlFor="gasto_desc">Descrição *</Label>
+                  <Input id="gasto_desc" value={gastoFormData.description} onChange={(e) => setGastoFormData(prev => ({...prev, description: e.target.value}))} placeholder="Ex: Ifood, Uber..." required />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="gasto_amount">Valor *</Label>
+                    <Input id="gasto_amount" type="number" step="0.01" value={gastoFormData.amount} onChange={(e) => setGastoFormData(prev => ({...prev, amount: e.target.value}))} placeholder="0,00" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="gasto_date">Data</Label>
+                    <Input id="gasto_date" type="date" value={gastoFormData.date} onChange={(e) => setGastoFormData(prev => ({...prev, date: e.target.value}))} />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="gasto_category">Categoria da Despesa</Label>
+                  <Select value={gastoFormData.category} onValueChange={(value) => setGastoFormData(prev => ({...prev, category: value}))}>
+                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectContent className="max-h-[200px]">
+                      {categorias.filter(c => c.type === 'saida').map((cat, idx) => (
+                        <SelectItem key={idx} value={cat.name}>{cat.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="gasto_pay_method">Pagamento</Label>
+                    <Select value={gastoFormData.payment_method} onValueChange={(value) => setGastoFormData(prev => ({...prev, payment_method: value, installments: 1}))}>
+                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="a_vista">À Vista</SelectItem>
+                        <SelectItem value="parcelado">Parcelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {gastoFormData.payment_method === 'parcelado' && (
+                    <div>
+                      <Label htmlFor="gasto_install">Parcelas</Label>
+                      <Input id="gasto_install" type="number" min="2" max="24" value={gastoFormData.installments} onChange={(e) => setGastoFormData(prev => ({...prev, installments: parseInt(e.target.value) || 1}))} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end space-x-2 pt-2">
+                  <Button type="button" variant="outline" onClick={() => setIsGastoModalOpen(false)}>Cancelar</Button>
+                  <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">Lançar</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
 
         </div>
 
