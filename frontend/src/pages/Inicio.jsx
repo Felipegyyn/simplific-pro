@@ -218,7 +218,7 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 flex flex-col gap-6">
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <Card className="border-border shadow-sm flex flex-col h-[450px]">
+          <Card className="border-border shadow-sm flex flex-col h-[480px]">
             <CardHeader className="pb-4 border-b">
               <div className="flex justify-between items-center mb-4">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -346,7 +346,7 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <Card className="border-border shadow-sm flex flex-col h-380px]">
+          <Card className="border-border shadow-sm flex flex-col h-420px]">
             <CardHeader className="py-3 px-4 border-b bg-muted/20">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
