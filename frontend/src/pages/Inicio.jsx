@@ -215,10 +215,10 @@ const Inicio = ({ user }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* COLUNA ESQUERDA (LANÇAMENTOS + PENDÊNCIAS) */}
-        <div className="col-span-1 flex flex-col gap-6">
+        <div className="col-span-1 flex flex-col gap-6 h-full">
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <Card className="border-border shadow-sm flex flex-col h-[420px]">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[400px]">
             <CardHeader className="pb-4 border-b">
               <div className="flex justify-between items-center mb-4">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -346,7 +346,7 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <Card className="border-border shadow-sm flex flex-col h-[280px]">
+          <Card className="border-border shadow-sm flex flex-col h-[280px] shrink-0">
             <CardHeader className="py-3 px-4 border-b bg-muted/20">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
