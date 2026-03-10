@@ -680,7 +680,7 @@ const Inicio = ({ user }) => {
           </Card>
 
           {/* CARROSSEL DE CARTÕES DE CRÉDITO */}
-          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden bg-transparent border-none">
+          <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[250px] overflow-hidden">
             <CardHeader className="px-0 pt-0 pb-2 flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
                 <CreditCard className="h-4 w-4" />
