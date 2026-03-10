@@ -394,11 +394,15 @@ const Inicio = ({ user }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
-      
-      {/* CABEÇALHO */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-foreground">Página Inicial</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+      <WhatsNewModal />
+      <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
+            <h1 className="text-xl font-bold text-green-800 dark:text-green-400">Página Inicial</h1>
+          </div>
+          <div className="flex items-center space-x-2 sm:space-x-4">
         
         <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-lg border shadow-sm">
           <Select value={mesFiltro.toString()} onValueChange={(val) => setMesFiltro(parseInt(val))}>
