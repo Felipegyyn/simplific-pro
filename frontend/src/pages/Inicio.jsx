@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import PageHeader from '../components/PageHeader'; // <--- ADICIONE ESTA LINHA
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -387,11 +388,16 @@ const Inicio = ({ user }) => {
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+ <div className="bg-gray-50 dark:bg-slate-900 min-h-screen">
+      {/* CABEÇALHO GLOBAL IMPORTADO */}
+      <PageHeader user={user} onLogout={() => window.location.href = '#/login'} />
       
-      {/* CABEÇALHO */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-foreground">Visão Geral</h1>
+      {/* CONTEÚDO DA PÁGINA */}
+      <div className="p-4 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
+        
+        {/* TÍTULO E FILTROS */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h1 className="text-2xl font-bold text-foreground">página Inicial</h1>
         
         <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-lg border shadow-sm">
           <Select value={mesFiltro.toString()} onValueChange={(val) => setMesFiltro(parseInt(val))}>
