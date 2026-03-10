@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle } from 'lucide-react'; // <--- NOVOS ÍCONES ADICIONADOS
+import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark  } from 'lucide-react'; // <--- NOVOS ÍCONES ADICIONADOS
 import apiService from '../services/api';
 import eventService from '../services/eventService';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'; // <--- NOVO: IMPORT DO GRÁFICO
 
 const Inicio = ({ user }) => {
   // --- ESTADOS GERAIS ---
@@ -111,6 +112,62 @@ const Inicio = ({ user }) => {
     });
     return { receitas, despesas };
   }, [transacoes, mesFiltro, anoFiltro]);
+
+  // --- LÓGICA DO GRÁFICO DE SALDO POR CONTA ---
+  const dadosGraficoSaldos = useMemo(() => {
+    // 1. Pega os saldos das contas cadastradas
+    const saldosContas = contas.map(c => ({
+      name: c.bank_name,
+      value: parseFloat(c.balance) || 0,
+      fill: '#0ea5e9' // Azul padrão para contas
+    }));
+
+    // 2. Calcula o saldo "Solto/Dinheiro" (lançamentos que não têm conta vinculada)
+    // Para simplificar a visão geral, vamos calcular o saldo solto geral (histórico todo), 
+    // pois saldo em conta é uma fotografia atual, não apenas do mês.
+    let receitasSoltas = 0;
+    let despesasSoltas = 0;
+    
+    transacoes.forEach(t => {
+      if (t && t.status === 'confirmada' && !t.bank_account_id) {
+        if (t.type === 'income') receitasSoltas += (t.amount || 0);
+        if (t.type === 'expense') despesasSoltas += (t.amount || 0);
+      }
+    });
+    
+    const saldoSolto = receitasSoltas - despesasSoltas;
+
+    // Só mostra a coluna de "Sem Conta" se houver algum valor
+    if (saldoSolto !== 0) {
+      saldosContas.push({
+        name: 'S/ Conta Específica',
+        value: saldoSolto,
+        fill: '#94a3b8' // Cinza para saldo não alocado
+      });
+    }
+
+    return saldosContas;
+  }, [contas, transacoes]);
+
+  // Calcula o saldo total global somando o gráfico
+  const saldoTotalGlobal = useMemo(() => {
+    return dadosGraficoSaldos.reduce((acc, curr) => acc + curr.value, 0);
+  }, [dadosGraficoSaldos]);
+
+  // Formatação personalizada para a "Dica" (Tooltip) do gráfico
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white dark:bg-slate-800 p-3 border border-border shadow-md rounded-lg">
+          <p className="font-semibold text-sm mb-1">{payload[0].payload.name}</p>
+          <p className={`font-bold ${payload[0].value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+            R$ {payload[0].value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   // --- AÇÃO: CONFIRMAR TRANSAÇÃO PENDENTE ---
   const confirmarTransacao = async (id) => {
@@ -407,13 +464,71 @@ const Inicio = ({ user }) => {
           </Card>
         </div>
 
-        {/* ÁREA RESERVADA (COLUNAS DIREITAS) */}
-        <div className="col-span-1 lg:col-span-2 space-y-6">
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm h-full flex items-center justify-center min-h-[724px]">
+       {/* COLUNAS DIREITAS (GRÁFICOS E INDICADORES) */}
+        <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-[724px]">
+          
+          {/* GRÁFICO DE SALDO POR CONTA */}
+          <Card className="border-border shadow-sm">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                <Landmark className="h-4 w-4" />
+                Saldo por Conta
+              </CardTitle>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Saldo Total</p>
+                <p className={`text-xl font-bold ${saldoTotalGlobal >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                  R$ {saldoTotalGlobal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4 pb-2">
+              {loading ? (
+                <div className="flex justify-center items-center h-[200px]">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                </div>
+              ) : dadosGraficoSaldos.length === 0 ? (
+                <div className="flex justify-center items-center h-[200px] text-muted-foreground text-sm">
+                  Nenhuma conta ou saldo registrado.
+                </div>
+              ) : (
+                <div className="h-[220px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dadosGraficoSaldos} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:stroke-slate-700" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#6b7280', fontSize: 12 }} 
+                        dy={10} 
+                        tickFormatter={(value) => value.length > 10 ? value.substring(0, 10) + '...' : value}
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#6b7280', fontSize: 12 }} 
+                        tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(0) + 'k' : value}`}
+                      />
+                      <Tooltip content={<CustomTooltip />} cursor={{fill: 'transparent'}} />
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                        {dadosGraficoSaldos.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.value < 0 ? '#ef4444' : entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* ESPAÇO RESTANTE PARA A CONSTÂNCIA */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 flex items-center justify-center">
             <p className="text-muted-foreground text-center">
-              Espaço reservado para os próximos painéis (Gráficos, Constância, etc.)
+              Espaço reservado para o widget de Constância (Semanas).
             </p>
           </div>
+
         </div>
 
       </div>
