@@ -424,7 +424,7 @@ const Inicio = ({ user }) => {
         <div className="col-span-1 flex flex-col gap-6">
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <Card className="border-border shadow-sm flex flex-col h-[610px] overflow-hidden">
+          <Card className="border-border shadow-sm flex flex-col h-[630px] overflow-hidden">
             {/* ▼▼▼ CABEÇALHO VERDE ESCURO ▼▼▼ */}
             <CardHeader className="pb-4 border-b bg-emerald-800 text-white">
               <div className="flex justify-between items-center mb-4">
