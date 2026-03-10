@@ -20,9 +20,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // --- ESTRUTURA DOS DADOS ---
+  // --- ESTRUTURA DOS DADOS
 
-  // --- ESTRUTURA DOS DADOS ---
   const menuStructure = [
     // ▼▼▼ 1. NOVO MENU INÍCIO ▼▼▼
     {
@@ -35,8 +34,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     },
     // ▲▲▲ FIM DO NOVO MENU ▲▲▲
 
-
-  const menuStructure = [
+  
     {
       title: 'Resumo',
       icon: LayoutDashboard,
