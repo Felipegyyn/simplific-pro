@@ -227,6 +227,12 @@ const Inicio = ({ user }) => {
     if (nameLower.includes('pan')) return 'bancopan.com.br';
     if (nameLower.includes('pag') || nameLower.includes('pagseguro')) return 'pagbank.com.br';
     if (nameLower.includes('mercado') || nameLower.includes('pago')) return 'mercadopago.com.br';
+    if (nameLower.includes('btg')) return 'btgpactual.com';
+    if (nameLower.includes('DM')) return 'vocedm.com.br';
+    if (nameLower.includes('Porto')) return 'portoseguro.com.br';
+    if (nameLower.includes('PicPay')) return 'picpay.com.br';
+
+
     
     return null; // Se não achar o nome do banco, retorna null
   };
