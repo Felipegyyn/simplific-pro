@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import PageHeader from '@/components/PageHeader';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -183,8 +182,6 @@ const Inicio = ({ user }) => {
 
   return (
     <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
-
-        <PageHeader user={user} onLogout={onLogout} />
       
       {/* CABEÇALHO */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
