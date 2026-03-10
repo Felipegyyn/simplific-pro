@@ -18,9 +18,6 @@ const Inicio = ({ user }) => {
   const [contas, setContas] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const Inicio = ({ user, onLogout }) => {
-  const navigate = useNavigate();
-
   // --- ESTADOS DOS FILTROS DA MINI TELA ---
   const dataAtual = new Date();
   const [mesFiltro, setMesFiltro] = useState(dataAtual.getMonth());
@@ -391,8 +388,11 @@ const Inicio = ({ user }) => {
   };
 
   return (
-
-    <PageHeader user={user} onLogout={onLogout} />
+    <div className="p-4 sm:p-6 space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+      
+      {/* CABEÇALHO */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl font-bold text-foreground">Página Inicial</h1>
         
         <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-1.5 rounded-lg border shadow-sm">
           <Select value={mesFiltro.toString()} onValueChange={(val) => setMesFiltro(parseInt(val))}>
