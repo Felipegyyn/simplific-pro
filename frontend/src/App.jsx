@@ -57,13 +57,13 @@ import SecurityPage from './pages/SecurityPage'; // <--- 1. IMPORT NOVO AQUI
 // Serviços
 import notificationService from './services/notifications';
 
-const IS_MAINTENANCE_MODE = true; // Mude para 'false' para desativar
+const IS_MAINTENANCE_MODE = false; // Mude para 'false' para desativar
 
 // Componente Guardião para Rotas de Admin
 const AdminRoute = ({ user, children }) => {
   if (user?.profile !== 'admin') {
-    // Se não for admin, redireciona para o dashboard
-    return <Navigate to="/dashboard" replace />;
+    // Se não for admin, redireciona para o inicio
+    return <Navigate to="/inicio" replace />;
   }
   // Se for admin, permite o acesso
   return children;
@@ -169,7 +169,7 @@ const App = () => {
 
             <Route 
                 path="/login" 
-                element={user ? <Navigate to="/dashboard" replace /> : <Login onLogin={handleLogin} />} 
+                element={user ? <Navigate to="/inicio" replace /> : <Login onLogin={handleLogin} />} 
             />
 
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -302,7 +302,7 @@ const App = () => {
 
             <Route 
                 path="/" 
-                element={user ? <Navigate to="/dashboard" replace /> : <HomePage />}  
+                element={user ? <Navigate to="/inicio" replace /> : <HomePage />}  
             />
         </Routes>
         
