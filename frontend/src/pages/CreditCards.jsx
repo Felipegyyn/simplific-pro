@@ -505,7 +505,7 @@ const respostaFaturas = await apiService.get(url);
                       <div className="grid grid-cols-2 gap-4">
                         <div>
 
-                          {/* ▼▼▼ NOVO SELETOR DE BANCO ▼▼▼ */}
+                          {/* ▼▼▼ NOVO SELETOR DE BANCO ▼▼▼ 
                       <div>
                         <Label htmlFor="banco">Banco Emissor do Cartão</Label>
                         <Select value={formData.banco} onValueChange={(value) => handleInputChange('banco', value)}>
