@@ -63,9 +63,7 @@ const Reports = ({ user, onLogout }) => {
   const [investmentChartData, setInvestmentChartData] = useState([]); 
   const [investmentYear, setInvestmentYear] = useState(new Date().getFullYear()); 
   const [goalsReportData, setGoalsReportData] = useState({ summary: {}, goalsList: [] }); // <-- ADICIONE ESTA LINHA
-  useEffect(() => {
-    loadReportData();
-  }, [filters]);
+ 
 
   // ▼▼▼ ADICIONE O NOVO useEffect AQUI ▼▼▼
   useEffect(() => {
@@ -102,6 +100,8 @@ useEffect(() => {
     loadGoalsData();
   }, [activeTab]);
 
+
+
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
       ...prev,
@@ -109,28 +109,34 @@ useEffect(() => {
     }));
   };
 
-// ▼▼▼ SUBSTITUA A FUNÇÃO loadReportData POR ESTA VERSÃO FINAL ▼▼▼
+  // ▼▼▼ NOVA FUNÇÃO QUE FORÇA O ENVIO DOS FILTROS NA URL ▼▼▼
   const loadReportData = async () => {
     try {
       setReportData(prev => ({ ...prev, loading: true }));
 
-      const response = await apiService.get('/api/reports/overview', {
-        params: filters
+      // TRUQUE DE MESTRE: Converte o objeto de filtros em uma Query String real
+      // Fica assim: "?period=last_month&type=income"
+      const queryParams = new URLSearchParams();
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          queryParams.append(key, filters[key]);
+        }
       });
 
+      // Enviamos a string de busca colada na URL! Agora o backend é obrigado a ler.
+      const response = await apiService.get(`/api/reports/overview?${queryParams.toString()}`);
+
       if (response) {
-        // Usa a forma funcional do setState para mesclar os dados
         setReportData(prevState => ({
-          ...prevState, // Mantém a estrutura antiga
-          summary: response.summary, // Atualiza o resumo
+          ...prevState,
+          summary: response.summary || prevState.summary,
           charts: {
-            ...prevState.charts,  // Mantém TODAS as chaves de gráficos existentes (como goalProgress)
-            ...response.charts,    // Sobrescreve apenas as que vieram da API (cashFlow, etc.)
+            ...prevState.charts,
+            ...(response.charts || {})
           },
           loading: false,
         }));
       } else {
-        // Caso a resposta seja vazia, apenas para de carregar
         setReportData(prev => ({ ...prev, loading: false }));
       }
 
@@ -138,7 +144,13 @@ useEffect(() => {
       console.error('Erro ao carregar dados do relatório:', error);
       setReportData(prev => ({ ...prev, loading: false }));
     }
-  };  
+  };
+
+  // O useEffect FICA ABAIXO da função para o React rodar perfeitamente
+  useEffect(() => {
+    loadReportData();
+  }, [filters]);
+  // ▲▲▲ FIM DO PASSO 1 ▲▲▲
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -338,8 +350,13 @@ useEffect(() => {
             <YAxis />
             <Tooltip formatter={(value) => formatCurrency(value)} />
             <Legend />
-            <Bar dataKey="receitas" fill="#10b981" name="Receitas" />
-            <Bar dataKey="despesas" fill="#ef4444" name="Despesas" />
+            {/* RENDERIZAÇÃO CONDICIONAL BASEADA NO FILTRO */}
+            {(filters.type === 'all' || filters.type === 'income') && (
+              <Bar dataKey="receitas" fill="#10b981" name="Receitas" />
+            )}
+            {(filters.type === 'all' || filters.type === 'expense') && (
+              <Bar dataKey="despesas" fill="#ef4444" name="Despesas" />
+            )}
             <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={3} name="Saldo" />
           </ComposedChart>
         </ResponsiveContainer>
@@ -460,10 +477,15 @@ useEffect(() => {
                     <CartesianGrid stroke="hsl(var(--border))" />
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                   <Tooltip formatter={(value) => formatCurrency(value)} />
                     <Legend />
-                    <Area type="monotone" dataKey="receitas" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="Receitas" />
-                    <Area type="monotone" dataKey="despesas" stackId="2" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Despesas" />
+                    {/* RENDERIZAÇÃO CONDICIONAL BASEADA NO FILTRO */}
+                    {(filters.type === 'all' || filters.type === 'income') && (
+                      <Area type="monotone" dataKey="receitas" stackId="1" stroke="#10b981" fill="#10b981" fillOpacity={0.6} name="Receitas" />
+                    )}
+                    {(filters.type === 'all' || filters.type === 'expense') && (
+                      <Area type="monotone" dataKey="despesas" stackId="2" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} name="Despesas" />
+                    )}
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
