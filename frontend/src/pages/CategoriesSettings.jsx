@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Plus, Edit2, Trash2, X, Check, Tag, AlertCircle, ArrowUpCircle, ArrowDownCircle 
+  Plus, Edit2, Trash2, X, Check, Tag, AlertCircle, ArrowUpCircle, ArrowDownCircle, Smile
 } from 'lucide-react';
+import EmojiPicker from 'emoji-picker-react'; // <-- ADICIONADO
 
 const CategoriesSettings = () => {
   const [categories, setCategories] = useState([]);
@@ -19,6 +20,10 @@ const CategoriesSettings = () => {
     color: '#808080',
     type: 'saida'
   });
+
+  // --- NOVOS ESTADOS PARA O EMOJI PICKER ---
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedEmoji, setSelectedEmoji] = useState('💰'); // Emoji Padrão
 
   // Paleta de cores sugerida (Cores do Simplific)
   const presetColors = [
@@ -63,21 +68,37 @@ const CategoriesSettings = () => {
 
   const handleOpenModal = (category = null) => {
     setError('');
+    setShowEmojiPicker(false); // Sempre fecha o picker ao abrir o modal
+    
     if (category) {
-      // Modo Edição
+      // MODO EDIÇÃO: Tentar separar o emoji do nome (Ex: "🍔 Lanche" -> Emoji: "🍔", Nome: "Lanche")
+      // Usa uma Regex básica para detectar se o primeiro caractere é um emoji
+      const emojiRegex = /^(\p{Emoji_Presentation}|\p{Extended_Pictographic})/u;
+      const match = category.name.match(emojiRegex);
+      
+      let initialEmoji = '💰';
+      let initialName = category.name;
+
+      if (match) {
+        initialEmoji = match[0];
+        initialName = category.name.substring(match[0].length).trim(); // Tira o emoji do nome para editar
+      }
+
       setEditingCategory(category);
+      setSelectedEmoji(initialEmoji);
       setFormData({
-        name: category.name,
+        name: initialName,
         color: category.color || '#808080',
         type: category.type
       });
     } else {
-      // Modo Criação
+      // MODO CRIAÇÃO
       setEditingCategory(null);
+      setSelectedEmoji('💰');
       setFormData({
         name: '',
         color: presetColors[Math.floor(Math.random() * presetColors.length)],
-        type: activeTab // Já abre com o tipo da aba atual
+        type: activeTab
       });
     }
     setIsModalOpen(true);
@@ -95,6 +116,9 @@ const CategoriesSettings = () => {
         'Content-Type': 'application/json'
       };
 
+      // FUSÃO MÁGICA: Junta o Emoji selecionado com o nome digitado
+      const nomeComEmoji = `${selectedEmoji} ${formData.name.trim()}`;
+
       let response;
       if (editingCategory) {
         // EDITAR (PUT)
@@ -102,7 +126,7 @@ const CategoriesSettings = () => {
           method: 'PUT',
           headers,
           body: JSON.stringify({ 
-            name: formData.name, 
+            name: nomeComEmoji, 
             color: formData.color 
           })
         });
@@ -111,7 +135,10 @@ const CategoriesSettings = () => {
         response = await fetch(`${API_URL}/api/categories`, {
           method: 'POST',
           headers,
-          body: JSON.stringify(formData)
+          body: JSON.stringify({
+            ...formData,
+            name: nomeComEmoji // Sobrescreve o nome pelo formato com emoji
+          })
         });
       }
 
@@ -294,17 +321,47 @@ const CategoriesSettings = () => {
                 </div>
               )}
 
-              {/* Nome */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nome da Categoria</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ex: Alimentação, Salário..."
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-background"
-                />
+              {/* Nome com Emoji Picker */}
+              <div className="space-y-2 relative">
+                <label className="text-sm font-medium">Nome e Ícone da Categoria</label>
+                <div className="flex gap-2">
+                  {/* Botão de abrir os Emojis */}
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="flex items-center justify-center w-12 h-[42px] border rounded-lg bg-muted/30 hover:bg-muted transition-colors text-xl shrink-0"
+                    title="Escolher Ícone"
+                  >
+                    {selectedEmoji}
+                  </button>
+                  
+                  {/* Input do Nome */}
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Alimentação, Salário..."
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-background h-[42px]"
+                  />
+                </div>
+
+                {/* O Teclado de Emojis "Flutuante" */}
+                {showEmojiPicker && (
+                  <div className="absolute top-16 left-0 z-50 shadow-2xl rounded-lg overflow-hidden border border-border">
+                    <EmojiPicker 
+                      onEmojiClick={(emojiObject) => {
+                        setSelectedEmoji(emojiObject.emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                      autoFocusSearch={false}
+                      theme="auto" // Respeita o dark/light mode do sistema
+                      searchPlaceHolder="Buscar ícone..."
+                      width={300}
+                      height={400}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Cor Picker Customizado */}
