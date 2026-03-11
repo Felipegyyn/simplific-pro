@@ -1,28 +1,27 @@
 import React from 'react';
-import PageHeader from '@/components/PageHeader'; // <--- IMPORTAR
+import PageHeader from '@/components/PageHeader';
 import { 
   Wallet, TrendingUp, MessageCircle, 
-  CreditCard, Sparkles, Mic, BarChart3, Video, UserPlus 
+  CreditCard, Sparkles, Mic, BarChart3, Video, UserPlus, FileText, Target, Brain, Search, Receipt
 } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description, commands, color }) => (
-  // ... (código do card continua igual)
-   <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1">
+   <div className="bg-white p-6 rounded-2xl shadow-sm border border-border hover:shadow-md transition-all hover:-translate-y-1 flex flex-col h-full">
     <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${color}`}>
       <Icon size={24} className="text-white" />
     </div>
-    <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
-    <p className="text-gray-600 text-sm mb-6 min-h-[40px]">{description}</p>
+    <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
+    <p className="text-muted-foreground text-sm mb-6 flex-grow">{description}</p>
     
-    <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Exemplos de Comandos:</p>
+    <div className="bg-muted/50 rounded-xl p-4 border border-border/50 mt-auto">
+      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Exemplos de Comandos:</p>
       <div className="space-y-3">
         {commands.map((cmd, idx) => (
           <div key={idx} className="flex gap-3 items-start">
-            <div className="bg-green-100 p-1.5 rounded-full mt-0.5">
-              <MessageCircle size={12} className="text-green-700" />
+            <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1.5 rounded-full mt-0.5 shrink-0">
+              <MessageCircle size={12} className="text-emerald-700 dark:text-emerald-400" />
             </div>
-            <p className="text-sm text-gray-700 font-medium italic">"{cmd}"</p>
+            <p className="text-sm text-foreground font-medium italic">"{cmd}"</p>
           </div>
         ))}
       </div>
@@ -30,145 +29,175 @@ const FeatureCard = ({ icon: Icon, title, description, commands, color }) => (
   </div>
 );
 
-// ADICIONE AS PROPS user E onLogout
 const AdvisorFeatures = ({ user, onLogout }) => {
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col font-sans">
       
-      {/* ▼▼▼ NOVO CABEÇALHO ▼▼▼ */}
       <PageHeader user={user} onLogout={onLogout} />
-      {/* ▲▲▲ FIM DO CABEÇALHO ▲▲▲ */}
 
       <div className="flex-grow container mx-auto px-4 py-8 max-w-7xl">
-        {/* ... (O RESTO DO CONTEÚDO CONTINUA IGUAL) ... */}
+        
          <div className="text-center mb-12 mt-4">
-        <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-6">
-          <Sparkles size={16} /> Inteligência Artificial Simplific
+            <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 px-4 py-1.5 rounded-full text-sm font-bold mb-6">
+              <Sparkles size={16} /> Inteligência Artificial Simplific
+            </div>
+            <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4 tracking-tight">
+              O seu Super App de bolso <span className="text-emerald-600 dark:text-emerald-400">no WhatsApp</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Mais que um bot. O Simplific é seu parceiro financeiro, analista de mercado e secretária executiva. Explore todos os poderes da IA enviando mensagens ou áudios naturais.
+            </p>
         </div>
-        <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-4 tracking-tight">
-          Seu Assessor Pessoal <span className="text-green-600">no WhatsApp</span>
-        </h1>
-        <p className="text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed">
-          Muito mais que um bot. O Simplific é seu parceiro financeiro, secretária executiva e analista de investimentos. 
-          Tudo isso conversando naturalmente.
-        </p>
-      </div>
 
-      {/* Grid de Funcionalidades */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        
-        {/* 1. Gestão Financeira */}
-        <FeatureCard 
-          icon={Wallet}
-          color="bg-blue-500"
-          title="Controle Financeiro"
-          description="Registre gastos e receitas em tempo real sem abrir o app. A IA categoriza tudo automaticamente."
-          commands={[
-            "Gastei 50 reais no almoço",
-            "Recebi 1500 de um freela",
-            "Como está meu saldo esse mês?",
-            "Gastei 100 reais com Uber no Nubank"
-          ]}
-        />
+        {/* --- SESSÃO 1: DIA A DIA --- */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+             <div className="h-8 w-1.5 bg-blue-500 rounded-full"></div>
+             <h2 className="text-2xl font-bold text-foreground">Gestão do Dia a Dia</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard 
+              icon={Wallet} color="bg-blue-500"
+              title="Lançamentos & Contas"
+              description="Registre gastos e receitas na hora. A IA entende a categoria e pode vincular direto ao saldo da sua conta."
+              commands={[
+                "Gastei 50 reais de Ifood no Nubank",
+                "Recebi 1500 do freela de design",
+                "Como está meu extrato de receitas este mês?"
+              ]}
+            />
+            <FeatureCard 
+              icon={CreditCard} color="bg-orange-500"
+              title="Cartões e Faturas"
+              description="Gerencie limites, registre compras (à vista ou parceladas) e pague faturas abertas sem abrir o aplicativo."
+              commands={[
+                "Comprei uma TV de 2000 em 10x no Itaú",
+                "Qual o meu limite disponível no C6?",
+                "Pagar a fatura aberta do Nubank"
+              ]}
+            />
+             <FeatureCard 
+              icon={Receipt} color="bg-rose-500"
+              title="Leitura de Comprovantes"
+              description="Tirou foto da nota fiscal ou recebeu um comprovante de pix? Basta enviar a imagem para o WhatsApp!"
+              commands={[
+                "📸 [Enviar a foto do comprovante]",
+                "Acabei de pagar isso aqui, pode registrar?",
+                "📸 [Foto da nota do supermercado]"
+              ]}
+            />
+          </div>
+        </div>
 
-        {/* 2. Agenda e Reuniões */}
-        <FeatureCard 
-          icon={Video}
-          color="bg-purple-500"
-          title="Agenda & Reuniões"
-          description="Agende compromissos e reuniões. O robô cria o evento, gera link do Meet e envia o convite."
-          commands={[
-            "Agende uma reunião com o Carlos amanhã às 15h",
-            "Me lembre de pagar a luz hoje às 18h",
-            "O que tenho na agenda hoje?",
-            "Tenho algum compromisso atrasado?"
-          ]}
-        />
+        {/* --- SESSÃO 2: PATRIMÔNIO --- */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+             <div className="h-8 w-1.5 bg-purple-500 rounded-full"></div>
+             <h2 className="text-2xl font-bold text-foreground">Patrimônio e Futuro</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard 
+              icon={Target} color="bg-purple-500"
+              title="Criação de Metas"
+              description="Crie novas metas do zero e injete valores diretamente pelo chat para ver seu patrimônio crescer."
+              commands={[
+                "Quero criar uma meta chamada Viagem Europa de 15 mil",
+                "Guarda 300 reais na meta do Carro",
+                "Falta quanto pra eu bater a meta da Viagem?"
+              ]}
+            />
+            <FeatureCard 
+              icon={TrendingUp} color="bg-emerald-600"
+              title="Mercado & Investimentos"
+              description="Consulte cotações na bolsa (B3/EUA), veja notícias do ativo e registre suas compras de ações."
+              commands={[
+                "Qual o preço atual da PETR4?",
+                "Comprei 100 cotas de MXRF11 hoje",
+                "Como está a rentabilidade da minha carteira?"
+              ]}
+            />
+             <FeatureCard 
+              icon={BarChart3} color="bg-indigo-500"
+              title="Simulador & Planejamento"
+              description="A IA faz cálculos matemáticos complexos para você projetar rendimentos ou simular financiamentos."
+              commands={[
+                "Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?",
+                "Como está meu orçamento para Lazer este mês?",
+                "Me envie o resumo visual de março (Gera Gráfico)"
+              ]}
+            />
+          </div>
+        </div>
 
-        {/* 3. Investimentos */}
-        <FeatureCard 
-          icon={TrendingUp}
-          color="bg-green-500"
-          title="Investimentos & Mercado"
-          description="Acompanhe sua carteira e consulte cotações em tempo real."
-          commands={[
-            "Comprei 10 ações de PETR4",
-            "Qual o preço do Dólar agora?",
-            "Como está minha carteira?",
-            "Comprei 1000 reais em CDB do Inter"
-          ]}
-        />
+        {/* --- SESSÃO 3: PRODUTIVIDADE E IA --- */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+             <div className="h-8 w-1.5 bg-yellow-500 rounded-full"></div>
+             <h2 className="text-2xl font-bold text-foreground">Produtividade e Superpoderes</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FeatureCard 
+              icon={Video} color="bg-red-500"
+              title="Agenda e Google Meet"
+              description="Agende reuniões, crie lembretes e deixe a IA gerar o link do Meet e disparar o WhatsApp pro seu cliente."
+              commands={[
+                "Me lembre de cancelar a Netflix sexta-feira",
+                "Marque uma reunião com o Felipe amanhã às 14h",
+                "O que eu tenho na agenda para hoje?"
+              ]}
+            />
+            <FeatureCard 
+              icon={Search} color="bg-teal-500"
+              title="Pesquisas na Internet"
+              description="A IA sai do WhatsApp e pesquisa voos, hotéis, preços e notícias em tempo real, trazendo os links para você."
+              commands={[
+                "Busque passagens baratas de SP para RJ no dia 15",
+                "Pesquisa pra mim o preço do iPhone 15",
+                "Quais as principais notícias de economia hoje?"
+              ]}
+            />
+            <FeatureCard 
+              icon={Brain} color="bg-slate-700"
+              title="Memória e Transcrição"
+              description="Mande áudios gigantes ou conte fatos da sua vida. O Simplific transcreve e grava tudo na Memória Permanente."
+              commands={[
+                "🎤 [Áudio]: Gastei 20 no pão e marca reunião amanhã",
+                "Lembre que minha esposa se chama Rayany",
+                "Estou gastando muito com iFood? Analise minha saúde."
+              ]}
+            />
+          </div>
+        </div>
 
-        {/* 4. Cartões e Metas */}
-        <FeatureCard 
-          icon={CreditCard}
-          color="bg-orange-500"
-          title="Cartões & Metas"
-          description="Gerencie limites, pague faturas e acompanhe seus objetivos de vida."
-          commands={[
-            "Qual o limite do meu cartão Nubank?",
-            "Quero pagar a fatura do Inter",
-            "Guardar 200 reais na meta Viagem",
-            "Como estão minhas metas?"
-          ]}
-        />
-
-        {/* 5. Relatórios Visuais */}
-        <FeatureCard 
-          icon={BarChart3}
-          color="bg-pink-500"
-          title="Relatórios Visuais"
-          description="Peça gráficos e resumos completos para entender para onde seu dinheiro vai."
-          commands={[
-            "Me manda um resumo visual desse mês",
-            "Gera um gráfico dos meus gastos de janeiro",
-            "Quais são minhas maiores despesas?",
-            "Resumo das pendências"
-          ]}
-        />
-
-        {/* 6. Consultoria e Dicas */}
-        <FeatureCard 
-          icon={Sparkles}
-          color="bg-indigo-500"
-          title="Dicas & Conselhos"
-          description="Receba orientações personalizadas baseadas no seu comportamento financeiro."
-          commands={[
-            "Estou gastando muito com iFood?",
-            "Me dê uma dica para economizar esse mês",
-            "Analise minha saúde financeira",
-            "O que acha de eu financiar um carro agora?"
-          ]}
-        />
-      </div>
-
-      {/* Seção de Dica Extra */}
-      <div className="bg-gray-900 rounded-2xl p-8 md:p-10 text-center relative overflow-hidden shadow-xl">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-green-900/40 via-transparent to-transparent pointer-events-none"></div>
-        
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Fale naturalmente 🗣️</h2>
-          <p className="text-gray-300 text-base mb-8">
-            Você não precisa decorar comandos robóticos. O Simplific entende sua linguagem natural, gírias e até áudios longos.
-          </p>
+        {/* Seção de Dica Extra */}
+        <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden shadow-2xl border border-slate-800">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-transparent to-transparent pointer-events-none"></div>
           
-          <div className="grid md:grid-cols-2 gap-6 text-left">
-            <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
-              <p className="text-red-400 text-xs font-bold uppercase mb-2">Evite ser robótico</p>
-              <p className="text-gray-400 line-through text-sm">"Cadastrar despesa valor 50 categoria alimentação"</p>
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Apenas fale naturalmente 🗣️</h2>
+            <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
+              Esqueça os robôs de "Digite 1 para X". O Simplific entende o seu jeito de falar, gírias, áudios enormes e atende a pedidos múltiplos de uma vez só!
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-6 text-left">
+              <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-700">
+                <p className="text-rose-400 text-xs font-bold uppercase mb-3 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-rose-500"></span> Evite ser robótico</p>
+                <p className="text-slate-500 line-through text-base">"Comando: Lançar. Valor: 50. Categoria: Alimentação. Status: Pago."</p>
+              </div>
+              <div className="bg-emerald-950/40 p-6 rounded-2xl border border-emerald-800/50 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                <p className="text-emerald-400 text-xs font-bold uppercase mb-3 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Fale como quiser</p>
+                <p className="text-white text-base leading-relaxed">"Cara, comi um burguer de 50 conto no cartão black, lança aí. E já pesquisa um hotel em SP pro dia 10."</p>
+              </div>
             </div>
-            <div className="bg-green-900/30 p-4 rounded-xl border border-green-500/30">
-              <p className="text-green-400 text-xs font-bold uppercase mb-2">Fale como quiser</p>
-              <p className="text-white text-sm">"Cara, acabei de comer um burguer de 50 reais. Anota aí pra mim!"</p>
-            </div>
-          </div>
 
-          <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-6 text-sm text-gray-400">
-             <span className="flex items-center gap-2"><Mic size={16} /> Aceita Áudios</span>
-             <span className="flex items-center gap-2"><UserPlus size={16} /> Reconhece seu Sócio/Cônjuge</span>
+            <div className="mt-10 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-sm font-medium text-slate-400">
+               <span className="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50"><Mic size={16} className="text-emerald-400"/> Aceita Áudios</span>
+               <span className="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50"><UserPlus size={16} className="text-emerald-400"/> Identifica Sócio/Cônjuge</span>
+               <span className="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50"><FileText size={16} className="text-emerald-400"/> Lê Imagens e Comprovantes</span>
+            </div>
           </div>
         </div>
-      </div>
+        
       </div>
     </div>
   );
