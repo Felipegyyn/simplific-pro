@@ -625,8 +625,9 @@ const Inicio = ({ user }) => {
           </Card>
         </div>
 
-       {/* COLUNAS DIREITAS (GRÁFICOS E INDICADORES) */}
-        <div className="col-span-1 lg:col-span-2 space-y-6 flex flex-col h-[724px]">
+                {/* COLUNAS DIREITAS (GRÁFICOS E INDICADORES) */}
+        <div className="col-span-1 lg:col-span-2 space-y-6">
+
           
           {/* GRÁFICO DE SALDO POR CONTA */}
           <Card className="border-border shadow-sm flex flex-col flex-1 min-h-[350px] overflow-hidden">
@@ -846,12 +847,11 @@ const Inicio = ({ user }) => {
               </form>
             </DialogContent>
           </Dialog>
-
-{/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-[300px] shrink-0">
+                  {/* ▼▼▼ NOVA FILEIRA: AGENDA E METAS ▼▼▼ */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* WIDGET AGENDA */}
-            <Card className="border-border shadow-sm flex flex-col overflow-hidden">
+            <Card className="border-border shadow-sm overflow-hidden flex flex-col">
               <CardHeader className="py-3 px-4 border-b bg-indigo-800 text-white flex flex-row items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2 text-indigo-100">
                   <Calendar className="h-4 w-4" /> Próximos Eventos
@@ -860,14 +860,14 @@ const Inicio = ({ user }) => {
                   Gerenciar
                 </Button>
               </CardHeader>
-              <CardContent className="p-0 overflow-y-auto flex-1 flex flex-col">
+              <CardContent className="p-0 flex-1 flex flex-col">
                 {eventosProximos.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
                     <Calendar className="h-8 w-8 text-gray-300 mb-2" />
                     <p className="text-sm text-muted-foreground">Sua agenda está livre!</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-border/50">
+                  <div className="divide-y divide-border/50 flex-1">
                     {eventosProximos.map(e => (
                       <div key={e.id} className="p-3 flex justify-between items-center hover:bg-muted/30">
                         <div className="flex flex-col">
@@ -881,7 +881,7 @@ const Inicio = ({ user }) => {
                 )}
                 
                 {/* Botão Novo Evento Rápido */}
-                <div className="mt-auto p-3 border-t bg-muted/10">
+                <div className="p-3 border-t bg-muted/10 mt-auto">
                   <Dialog open={isEventoModalOpen} onOpenChange={setIsEventoModalOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="w-full border-dashed border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400">
@@ -911,7 +911,7 @@ const Inicio = ({ user }) => {
             </Card>
 
             {/* WIDGET METAS */}
-            <Card className="border-border shadow-sm flex flex-col overflow-hidden">
+            <Card className="border-border shadow-sm overflow-hidden flex flex-col">
               <CardHeader className="py-3 px-4 border-b bg-violet-800 text-white flex flex-row items-center justify-between">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2 text-violet-100">
                   <Target className="h-4 w-4" /> Visão de Metas
@@ -946,7 +946,7 @@ const Inicio = ({ user }) => {
                 </div>
 
                 {/* Botão Adicionar Valor em Meta */}
-                <div className="mt-auto">
+                <div className="mt-auto pt-2">
                   <Dialog open={isAddValorMetaModalOpen} onOpenChange={setIsAddValorMetaModalOpen}>
                     <DialogTrigger asChild>
                       <Button className="w-full bg-violet-600 hover:bg-violet-700 shadow-sm">
@@ -985,6 +985,7 @@ const Inicio = ({ user }) => {
 
           </div>
           {/* ▲▲▲ FIM DA NOVA FILEIRA ▲▲▲ */}
+
         </div>
       </div>
     </div>
