@@ -231,6 +231,9 @@ const Inicio = ({ user }) => {
     if (nameLower.includes('dm')) return 'vocedm.com.br';
     if (nameLower.includes('porto')) return 'portoseguro.com.br';
     if (nameLower.includes('picpay')) return 'picpay.com';
+    if (nameLower.includes('sicredi')) return 'sicredi.com.br';
+    if (nameLower.includes('sicoob')) return 'sicooob.com.br';
+
 
 
     
