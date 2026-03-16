@@ -133,7 +133,7 @@ const HomePage = () => {
       ]
     },
     {
-      title: "Superpoderes da IA",
+      title: "Superpoderes do Simplific",
       color: "bg-orange-500",
       items: [
         { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
@@ -323,7 +323,7 @@ const HomePage = () => {
                     <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
                     <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
                     <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20">
-                        <span className="bg-green-900/40 text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><CheckCircle size={14}/> Automático via IA</span>
+                        <span className="bg-green-900/40 text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><CheckCircle size={14}/> Automático via inteligência</span>
                     </div>
 
                     {/* Linha 2 */}
