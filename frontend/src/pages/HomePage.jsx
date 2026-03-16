@@ -351,7 +351,7 @@ const HomePage = () => {
                       <Button onClick={handleBuyClick} className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-bold text-lg py-8 px-10 rounded-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
                           {currentPlan.buttonText} <ArrowRight className="ml-2" />
                       </Button>
-                      <p className="text-center text-xs text-gray-600 mt-3">Pagamento seguro via Mercado Pago</p>
+                      <p className="text-center text-xs text-gray-600 mt-3">Pagamento seguro via Asaas</p>
                 </div>
             </div>
           </div>
