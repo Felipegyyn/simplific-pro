@@ -109,7 +109,7 @@ const HomePage = () => {
       title: "Gestão do Dia a Dia",
       color: "bg-blue-500",
       items: [
-        { icon: Wallet, title: "Lançamentos Mágicos", desc: "Mande um áudio ou texto: 'Gastei 50 no iFood no Nubank'. A IA categoriza, deduz do limite e atualiza seu saldo na hora." },
+        { icon: Wallet, title: "Lançamentos Mágicos", desc: "Mande um áudio ou texto: 'Gastei 50 no iFood no Nubank'. O Simplific categoriza, deduz do limite e atualiza seu saldo na hora." },
         { icon: FileText, title: "Leitura de Comprovantes", desc: "Tirou foto da nota fiscal ou recebeu um comprovante de PIX? Envie a imagem para o WhatsApp e o Simplific anota tudo sozinho." },
         { icon: CreditCard, title: "Gestão de Cartões", desc: "Acompanhe limites disponíveis, pague faturas abertas e controle parcelamentos sem precisar abrir o aplicativo do banco." }
       ]
@@ -120,7 +120,7 @@ const HomePage = () => {
       items: [
         { icon: Target, title: "Criação de Metas", desc: "Crie objetivos (ex: Viagem Europa) e injete valores diretamente pelo chat para ver seu patrimônio crescer a cada dia." },
         { icon: TrendingUp, title: "Mercado & Investimentos", desc: "Consulte cotações na bolsa (PETR4, MXRF11), veja notícias em tempo real e registre suas compras de ações e FIIs." },
-        { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte à IA: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ela faz cálculos matemáticos complexos para você." }
+        { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte ao Simplific: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ela faz cálculos matemáticos complexos para você." }
       ]
     },
     {
@@ -128,16 +128,16 @@ const HomePage = () => {
       color: "bg-purple-500",
       items: [
         { icon: Video, title: "Agendamento Automático", desc: "Peça: 'Marque reunião com o Carlos'. O Simplific cria o evento na agenda, gera o link do Google Meet e envia o convite via WhatsApp." },
-        { icon: Calendar, title: "Lembretes Inteligentes", desc: "Agende lembretes rápidos para cancelar assinaturas, pagar boletos ou cobrar pessoas. A IA te avisa direto no chat." },
+        { icon: Calendar, title: "Lembretes Inteligentes", desc: "Agende lembretes rápidos para cancelar assinaturas, pagar boletos ou cobrar pessoas. O Simplific te avisa direto no chat." },
         { icon: Users, title: "Conta Casal/Sócios", desc: "Adicione um segundo número de celular na sua conta. O Simplific sabe com quem está falando e mantém as finanças unificadas." }
       ]
     },
     {
-      title: "Superpoderes da IA",
+      title: "Superpoderes do Simplific",
       color: "bg-orange-500",
       items: [
         { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
-        { icon: Search, title: "Pesquisa na Internet", desc: "A IA sai do WhatsApp para pesquisar voos, hotéis, preços atualizados de produtos e notícias, trazendo os links de compra direto pra você." },
+        { icon: Search, title: "Pesquisa na Internet", desc: "O Simplific sai do WhatsApp para pesquisar voos, hotéis, preços atualizados de produtos e notícias, trazendo os links de compra direto pra você." },
         { icon: Brain, title: "Memória Permanente", desc: "Conte fatos da sua vida. O Simplific guarda em sua memória de longo prazo o nome da sua esposa, filhos e bens, personalizando seu atendimento." }
       ]
     }
@@ -170,7 +170,7 @@ const HomePage = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed text-justify md:text-left">
-              O Simplific Pro é o primeiro <strong>Assessor Financeiro e Pessoal movido a IA no seu WhatsApp</strong>. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro, sua agenda e seus investimentos sem você precisar abrir planilhas.
+              O Simplific Pro é o primeiro <strong>Assessor Financeiro e Pessoal movido a inteligência no seu WhatsApp</strong>. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro, sua agenda e seus investimentos sem você precisar abrir planilhas.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full md:w-auto">
@@ -250,7 +250,7 @@ const HomePage = () => {
             <p className="text-sm text-gray-500 uppercase tracking-widest font-bold mb-8">Porque empreendedores e casais escolhem o Simplific</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
                 <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">+15 Anos</span><span className="text-xs text-gray-500">De experiência dos fundadores</span></div>
-                <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">24h/7</span><span className="text-xs text-gray-500">Disponibilidade da IA</span></div>
+                <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">24h/7</span><span className="text-xs text-gray-500">Disponibilidade do Simplific</span></div>
                 <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">100%</span><span className="text-xs text-gray-500">Seguro e Criptografado</span></div>
                 <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">4.9/5</span><span className="text-xs text-gray-500">Satisfação dos usuários</span></div>
             </div>
