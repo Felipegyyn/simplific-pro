@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { 
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
-  ArrowRight, Linkedin, Users, Calendar, Video // <--- ÍCONES NOVOS ADICIONADOS
+  ArrowRight, Linkedin, Users, Calendar, Video,
+  Wallet, FileText, TrendingUp, Brain, Search, Mic // ÍCONES NOVOS
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -45,7 +46,6 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  // 1. ALTERAÇÃO: 'annual' agora é o padrão
   const [billingCycle, setBillingCycle] = useState('annual');
 
   useEffect(() => {
@@ -68,15 +68,13 @@ const HomePage = () => {
   }, []);
 
   const handleBuyClick = () => {
-    // Rastreamento do Pixel (Valores Atualizados)
     if (window.fbq) {
       window.fbq('track', 'InitiateCheckout', {
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
-        value: billingCycle === 'monthly' ? 29.90 : 199.00, // <--- AJUSTADO AQUI
+        value: billingCycle === 'monthly' ? 29.90 : 199.00,
         currency: 'BRL'
       });
     }
-    // Redirecionamento
     if (billingCycle === 'monthly') {
         navigate('/checkout');
     } else {
@@ -84,10 +82,9 @@ const HomePage = () => {
     }
   };
 
-// 2. ALTERAÇÃO: Objeto de Preços Atualizado
   const pricing = {
     annual: {
-        oldPrice: "R$ 358,80", // (29,90 * 12)
+        oldPrice: "R$ 358,80",
         priceDisplay: "16,58",
         priceSuffix: "/mês",
         subDetail: "No plano anual. Ou R$ 199,00 à vista",
@@ -95,7 +92,7 @@ const HomePage = () => {
         badge: "💎 MELHOR ESCOLHA: 45% OFF"
       },
     monthly: {
-      oldPrice: null, // Sem preço antigo ("de/por") no mensal padrão
+      oldPrice: null,
       priceDisplay: "29,90",        
       priceSuffix: "/mês",  
       subDetail: "Sem fidelidade. Cancele quando quiser.",
@@ -105,6 +102,46 @@ const HomePage = () => {
   };
 
   const currentPlan = pricing[billingCycle];
+
+  // ESTRUTURA DE FUNCIONALIDADES (O DOSSIÊ DO SIMPLIFIC)
+  const featureCategories = [
+    {
+      title: "Gestão do Dia a Dia",
+      color: "bg-blue-500",
+      items: [
+        { icon: Wallet, title: "Lançamentos Mágicos", desc: "Mande um áudio ou texto: 'Gastei 50 no iFood no Nubank'. A IA categoriza, deduz do limite e atualiza seu saldo na hora." },
+        { icon: FileText, title: "Leitura de Comprovantes", desc: "Tirou foto da nota fiscal ou recebeu um comprovante de PIX? Envie a imagem para o WhatsApp e o Simplific anota tudo sozinho." },
+        { icon: CreditCard, title: "Gestão de Cartões", desc: "Acompanhe limites disponíveis, pague faturas abertas e controle parcelamentos sem precisar abrir o aplicativo do banco." }
+      ]
+    },
+    {
+      title: "Patrimônio e Futuro",
+      color: "bg-green-500",
+      items: [
+        { icon: Target, title: "Criação de Metas", desc: "Crie objetivos (ex: Viagem Europa) e injete valores diretamente pelo chat para ver seu patrimônio crescer a cada dia." },
+        { icon: TrendingUp, title: "Mercado & Investimentos", desc: "Consulte cotações na bolsa (PETR4, MXRF11), veja notícias em tempo real e registre suas compras de ações e FIIs." },
+        { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte à IA: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ela faz cálculos matemáticos complexos para você." }
+      ]
+    },
+    {
+      title: "Produtividade Pessoal",
+      color: "bg-purple-500",
+      items: [
+        { icon: Video, title: "Agendamento Automático", desc: "Peça: 'Marque reunião com o Carlos'. O Simplific cria o evento na agenda, gera o link do Google Meet e envia o convite via WhatsApp." },
+        { icon: Calendar, title: "Lembretes Inteligentes", desc: "Agende lembretes rápidos para cancelar assinaturas, pagar boletos ou cobrar pessoas. A IA te avisa direto no chat." },
+        { icon: Users, title: "Conta Casal/Sócios", desc: "Adicione um segundo número de celular na sua conta. O Simplific sabe com quem está falando e mantém as finanças unificadas." }
+      ]
+    },
+    {
+      title: "Superpoderes da IA",
+      color: "bg-orange-500",
+      items: [
+        { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
+        { icon: Search, title: "Pesquisa na Internet", desc: "A IA sai do WhatsApp para pesquisar voos, hotéis, preços atualizados de produtos e notícias, trazendo os links de compra direto pra você." },
+        { icon: Brain, title: "Memória Permanente", desc: "Conte fatos da sua vida. O Simplific guarda em sua memória de longo prazo o nome da sua esposa, filhos e bens, personalizando seu atendimento." }
+      ]
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-black font-sans text-gray-100 selection:bg-green-500 selection:text-black overflow-x-hidden">
@@ -128,12 +165,12 @@ const HomePage = () => {
             <h1 className="text-4xl md:text-7xl font-bold leading-tight tracking-tight text-white">
               Sua vida financeira, <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
-                finalmente organizada.
+                totalmente autônoma.
               </span>
             </h1>
             
             <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed text-justify md:text-left">
-              O Simplific Pro une a inteligência de um <strong>Assessor Financeiro via IA no WhatsApp</strong> com a clareza de um Dashboard profissional. Tenha controle total sem perder tempo.
+              O Simplific Pro é o primeiro <strong>Assessor Financeiro e Pessoal movido a IA no seu WhatsApp</strong>. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro, sua agenda e seus investimentos sem você precisar abrir planilhas.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full md:w-auto">
@@ -210,7 +247,7 @@ const HomePage = () => {
       {/* --- FAIXA DE VALIDACAO --- */}
       <div className="border-y border-gray-900 bg-gray-950/50 py-12">
         <div className="container mx-auto px-4 text-center">
-            <p className="text-sm text-gray-500 uppercase tracking-widest font-bold mb-8">Porque mais de 1.000 pessoas escolheram o Simplific</p>
+            <p className="text-sm text-gray-500 uppercase tracking-widest font-bold mb-8">Porque empreendedores e casais escolhem o Simplific</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
                 <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">+15 Anos</span><span className="text-xs text-gray-500">De experiência dos fundadores</span></div>
                 <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">24h/7</span><span className="text-xs text-gray-500">Disponibilidade da IA</span></div>
@@ -220,33 +257,47 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* --- FUNCIONALIDADES (ATUALIZADA) --- */}
+      {/* --- FUNCIONALIDADES (O DOSSIÊ REFORMULADO) --- */}
       <section id="beneficios" className="py-32 bg-black relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Tudo o que você precisa. <span className="text-green-500">Nada do que sobra.</span></h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">Desenvolvemos uma ferramenta focada em resultado prático. Sem gráficos complexos que ninguém entende.</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Tudo o que você precisa. <span className="text-green-500">Direto no WhatsApp.</span></h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">Esqueça a obrigação de abrir aplicativos e categorizar gastos na mão. A nossa tecnologia trabalha para você, não o contrário.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: BarChart3, title: "Visão 360º", desc: "Seu patrimônio, gastos e receitas em uma única tela limpa e intuitiva. Planeje sua vida financeira com orçamentos claros e intuitivos" },
-              { icon: MessageCircle, title: "IA no WhatsApp", desc: "Converse com suas finanças. Mande áudios, textos ou fotos e o Simplific registra tudo. Receitas, despesas, metas compromissos e tudo relacionado às suas finanças e dia a dia" },
-              { icon: Target, title: "Metas Reais", desc: "Defina objetivos e o sistema te diz exatamente quanto economizar por dia para chegar lá. Tire os sonhos do papel" },
-              { icon: CreditCard, title: "Gestão de Cartões", desc: "Controle datas de vencimento, gastos e limites para nunca mais pagar juros." },
-              { icon: Smartphone, title: "Zero Digitação", desc: "Esqueça planilhas manuais. A tecnologia trabalha para você, não o contrário. O Simplific te aconselha, orienta e te lembra" },
-              { icon: ShieldCheck, title: "Investimentos", desc: "Integração inteligente com corretoras para você acompanhar a evolução do seu patrimônio. Simule investimentos e o tempo para a liberdade financeira. Acompanhe tudo no Simplific" },
-              // --- NOVAS FUNCIONALIDADES ---
-              { icon: Users, title: "Conta Compartilhada", desc: "Finanças a dois? Adicione um segundo número de WhatsApp para que seu cônjuge, sócio ou quem você quiser que também interaja com o Simplific na mesma conta." },
-              { icon: Calendar, title: "Agenda Integrada", desc: "Conecte sua agenda do Google, IOS e Outlook. O Simplific visualiza seus compromissos e ajuda a organizar sua rotina financeira e pessoal em um só lugar." },
-              { icon: Video, title: "Agendamento Automático", desc: "Peça para o Simplific: 'Marque uma reunião com o Carlos'. Ele cria o evento, gera o link do Google Meet e envia o convite por E-mail e WhatsApp para o contato." },
-            ].map((item, index) => (
-              <div key={index} className="p-8 bg-gray-900/30 rounded-xl border border-gray-800 hover:border-green-500/50 hover:bg-gray-900 transition-all group">
-                  <div className="w-12 h-12 bg-green-900/20 text-green-500 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"><item.icon size={24} /></div>
-                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                  <p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p>
+
+          <div className="space-y-16">
+            {featureCategories.map((category, index) => (
+              <div key={index} className="relative">
+                {/* Linha da Categoria */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div className={`h-10 w-2 rounded-full ${category.color}`}></div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-white">{category.title}</h3>
+                </div>
+                
+                {/* Grid de Cards da Categoria */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  {category.items.map((item, idx) => (
+                    <div key={idx} className="p-8 bg-gray-900/30 rounded-2xl border border-gray-800 hover:border-gray-600 hover:bg-gray-900/80 transition-all group">
+                        <div className="w-12 h-12 bg-gray-800 text-gray-300 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:text-green-400 group-hover:bg-green-900/20 transition-all">
+                          <item.icon size={24} />
+                        </div>
+                        <h4 className="text-xl font-bold text-white mb-3">{item.title}</h4>
+                        <p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
+
+          {/* Destaque Plataforma Web */}
+          <div className="mt-24 bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 text-center border border-gray-700 shadow-2xl relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+             <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Acompanhe tudo na sua Sala de Comando 🖥️</h3>
+             <p className="text-gray-300 max-w-2xl mx-auto mb-8">Enquanto o seu WhatsApp faz o trabalho sujo do dia a dia, a nossa Plataforma Web Premium gera gráficos profundos, fluxos de caixa e painéis lindíssimos para você analisar seu patrimônio na tela grande.</p>
+             <MessageCircle className="mx-auto text-green-500 opacity-50" size={48} />
+          </div>
+
         </div>
       </section>
 
@@ -256,12 +307,11 @@ const HomePage = () => {
           <div className="text-center mb-12">
             <span className="text-green-500 font-bold tracking-wider text-sm uppercase mb-2 block">Welcome Offer</span>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Comece sem compromisso</h2>
-            <p className="text-gray-400">Preparamos uma condição especial para você conhecer a plataforma.</p>
+            <p className="text-gray-400">Preparamos uma condição especial para você ter seu próprio assessor.</p>
           </div>
           
           <div className="flex justify-center mb-10">
             <div className="bg-gray-900 p-1 rounded-lg inline-flex relative">
-                {/* 3. ALTERAÇÃO: Lógica dos botões invertida para refletir a escolha */}
                 <button onClick={() => setBillingCycle('annual')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-green-600 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
                     Anual
                     <span className="bg-white text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-black">-45%</span>
@@ -288,7 +338,6 @@ const HomePage = () => {
                         </div>
                     </div>
                     
-                    {/* 4. ALTERAÇÃO: Texto Pequeno e Descritivo */}
                     <p className="text-gray-300 font-medium text-lg border-l-4 border-green-500 pl-4 py-1">
                         {currentPlan.subDetail}
                     </p>
@@ -359,12 +408,12 @@ const HomePage = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-white">Dúvidas Frequentes</h2>
           <div className="space-y-4">
             <FaqItem 
-    question="O plano mensal tem fidelidade?" 
-    answer="Não. O valor é de R$ 29,90 mensais e você tem total liberdade. Pode usar por um mês e cancelar no próximo se desejar, sem multas ou taxas surpresas." 
-/>
+                question="O plano mensal tem fidelidade?" 
+                answer="Não. O valor é de R$ 29,90 mensais e você tem total liberdade. Pode usar por um mês e cancelar no próximo se desejar, sem multas ou taxas surpresas." 
+            />
             <FaqItem question="Posso parcelar o plano anual?" answer="Sim! O plano anual de R$ 199,00 oferece o maior desconto (apenas R$ 16,58/mês) e você pode parcelá-lo em até 12x no cartão de crédito." />
             <FaqItem question="Meus dados bancários ficam salvos?" answer="Nós não temos acesso às suas senhas bancárias e não realizamos movimentações. O Simplific apenas lê e organiza as informações para você. Usamos criptografia de ponta a ponta com segurança nível bancário." />
-            <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a mágica. Você pode registrar gastos, consultar saldo e pedir relatórios apenas mandando áudios ou textos para nossa IA no WhatsApp. O Dashboard serve para quando você quiser uma visão mais profunda." />
+            <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a mágica. Você pode registrar gastos, consultar saldo, marcar reuniões e pedir relatórios apenas mandando áudios ou textos no WhatsApp. O Dashboard Web serve para quando você quiser uma visão analítica mais profunda." />
             <FaqItem question="Como cancelo se não gostar?" answer="Diretamente pelo seu painel, com um clique. Sem ligar para ninguém, sem burocracia. Queremos que você fique pelos resultados, não por obrigação." />
           </div>
         </div>
