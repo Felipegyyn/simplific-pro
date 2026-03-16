@@ -7,7 +7,8 @@ import {
   CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
   ArrowRight, Linkedin, Users, Calendar, Video,
-  Wallet, FileText, TrendingUp, Brain, Search, Mic // ÍCONES NOVOS
+  Wallet, FileText, TrendingUp, Brain, Search, Mic,
+  XCircle, Minus // <-- NOVOS ÍCONES IMPORTADOS PARA A COMPARAÇÃO
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -103,7 +104,6 @@ const HomePage = () => {
 
   const currentPlan = pricing[billingCycle];
 
-  // ESTRUTURA DE FUNCIONALIDADES (O DOSSIÊ DO SIMPLIFIC)
   const featureCategories = [
     {
       title: "Gestão do Dia a Dia",
@@ -120,7 +120,7 @@ const HomePage = () => {
       items: [
         { icon: Target, title: "Criação de Metas", desc: "Crie objetivos (ex: Viagem Europa) e injete valores diretamente pelo chat para ver seu patrimônio crescer a cada dia." },
         { icon: TrendingUp, title: "Mercado & Investimentos", desc: "Consulte cotações na bolsa (PETR4, MXRF11), veja notícias em tempo real e registre suas compras de ações e FIIs." },
-        { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte ao Simplific: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ela faz cálculos matemáticos complexos para você." }
+        { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte ao Simplific: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ele faz cálculos matemáticos complexos para você." }
       ]
     },
     {
@@ -133,7 +133,7 @@ const HomePage = () => {
       ]
     },
     {
-      title: "Superpoderes do Simplific",
+      title: "Superpoderes da IA",
       color: "bg-orange-500",
       items: [
         { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
@@ -257,7 +257,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* --- FUNCIONALIDADES (O DOSSIÊ REFORMULADO) --- */}
+      {/* --- FUNCIONALIDADES --- */}
       <section id="beneficios" className="py-32 bg-black relative">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
@@ -268,13 +268,11 @@ const HomePage = () => {
           <div className="space-y-16">
             {featureCategories.map((category, index) => (
               <div key={index} className="relative">
-                {/* Linha da Categoria */}
                 <div className="flex items-center gap-4 mb-8">
                   <div className={`h-10 w-2 rounded-full ${category.color}`}></div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white">{category.title}</h3>
                 </div>
                 
-                {/* Grid de Cards da Categoria */}
                 <div className="grid md:grid-cols-3 gap-6">
                   {category.items.map((item, idx) => (
                     <div key={idx} className="p-8 bg-gray-900/30 rounded-2xl border border-gray-800 hover:border-gray-600 hover:bg-gray-900/80 transition-all group">
@@ -290,18 +288,78 @@ const HomePage = () => {
             ))}
           </div>
 
-          {/* Destaque Plataforma Web */}
           <div className="mt-24 bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 text-center border border-gray-700 shadow-2xl relative overflow-hidden">
              <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-[80px] rounded-full pointer-events-none"></div>
              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Acompanhe tudo na sua Sala de Comando 🖥️</h3>
              <p className="text-gray-300 max-w-2xl mx-auto mb-8">Enquanto o seu WhatsApp faz o trabalho sujo do dia a dia, a nossa Plataforma Web Premium gera gráficos profundos, fluxos de caixa e painéis lindíssimos para você analisar seu patrimônio na tela grande.</p>
              <MessageCircle className="mx-auto text-green-500 opacity-50" size={48} />
           </div>
-
         </div>
       </section>
 
-      {/* --- OFERTA (ATUALIZADA) --- */}
+      {/* --- NOVA SEÇÃO: COMPARAÇÃO (US VS THEM) --- */}
+      <section className="py-24 bg-gray-950 border-t border-gray-900 relative">
+        <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center mb-16">
+                <span className="text-green-500 font-bold tracking-widest text-sm uppercase mb-2 block">Por que somos diferentes?</span>
+                <h2 className="text-3xl md:text-5xl font-bold text-white">A armadilha da configuração infinita acabou.</h2>
+                <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Veja por que o Simplific Pro é a evolução natural das ferramentas financeiras antigas que dão trabalho em vez de ajudar.</p>
+            </div>
+
+            <div className="overflow-x-auto pb-8">
+                <div className="min-w-[700px] grid grid-cols-4 gap-4 md:gap-6 items-center">
+                    
+                    {/* Cabeçalho da Tabela */}
+                    <div className="col-span-1"></div>
+                    <div className="text-center p-4 text-gray-400 font-bold uppercase tracking-wider text-sm">Planilhas (Excel/Notion)</div>
+                    <div className="text-center p-4 text-gray-400 font-bold uppercase tracking-wider text-sm">Apps Tradicionais</div>
+                    <div className="text-center p-6 bg-green-900/20 border border-green-500/30 rounded-t-2xl text-green-400 font-black uppercase tracking-wider text-lg relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-green-500 shadow-[0_0_10px_#22c55e]"></div>
+                        Simplific Pro
+                    </div>
+
+                    {/* Linha 1 */}
+                    <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Preenchimento Manual</div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
+                    <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20">
+                        <span className="bg-green-900/40 text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><CheckCircle size={14}/> Automático via IA</span>
+                    </div>
+
+                    {/* Linha 2 */}
+                    <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Interface Principal</div>
+                    <div className="text-center p-4 text-gray-500 text-sm border-b border-gray-800">Computador</div>
+                    <div className="text-center p-4 text-gray-500 text-sm border-b border-gray-800">App Pesado</div>
+                    <div className="text-center p-4 bg-green-900/10 border-x border-b border-green-500/20 text-white font-bold">
+                        WhatsApp + Dashboard Web
+                    </div>
+
+                    {/* Linha 3 */}
+                    <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Lê Notas Fiscais e Áudio</div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+                    <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20"><CheckCircle className="text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] rounded-full" /></div>
+
+                    {/* Linha 4 */}
+                    <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Agenda e Reuniões Automáticas</div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+                    <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+                    <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20"><CheckCircle className="text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] rounded-full" /></div>
+
+                    {/* Linha 5 */}
+                    <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Tempo gasto por dia</div>
+                    <div className="text-center p-4 text-red-400 text-sm font-bold border-b border-gray-800">20 Minutos</div>
+                    <div className="text-center p-4 text-orange-400 text-sm font-bold border-b border-gray-800">10 Minutos</div>
+                    <div className="text-center p-4 bg-green-900/10 border-x border-b border-green-500/20 rounded-b-2xl shadow-[0_10px_20px_rgba(34,197,94,0.05)]">
+                        <span className="text-green-400 font-black text-lg">10 Segundos</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+      </section>
+
+      {/* --- OFERTA --- */}
       <section id="oferta" className="py-24 bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-12">
