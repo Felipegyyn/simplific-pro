@@ -197,23 +197,19 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
 
     prompt = f"""
     Você é um assistente especialista em extração de dados financeiros de extratos e comprovantes brasileiros.
-    Sua tarefa é analisar o texto abaixo, identificar CADA transação (entrada ou saída) e retorná-las como um array de objetos JSON.
+    Sua tarefa é analisar o texto abaixo, identificar a transação e retorná-la como um array de objetos JSON.
 
-    REGRAS CRÍTICAS PARA ANÁLISE E FORMATO DA RESPOSTA:
-    1.  **Formato de Saída JSON:** Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: 
-        "data" (string, no formato "AAAA-MM-DD"), 
-        "descricao" (string), 
-        "valor" (número de ponto flutuante),
-        "conta_origem" (string ou null).
-    2.  **Determinação da 'conta_origem':** Procure no texto inteiro por nomes de bancos ou instituições de onde o dinheiro saiu ou entrou (ex: "Instituição: Nu Pagamentos", "Banco Itaú S.A.", "Bradesco", "Banco Inter"). 
-        - Extraia apenas o NOME COMERCIAL principal do banco (ex: "Nubank", "Itaú", "Bradesco", "Inter").
-        - Se não encontrar nenhuma menção a banco, retorne null.
-    3.  **Determinação do Valor:**
-        * Para despesas/débitos (saídas ou pagamentos de comprovantes), o valor deve ser NEGATIVO. (Ex: -159.00)
-        * Para receitas/créditos (entradas ou recebimentos PIX), o valor deve ser POSITIVO. (Ex: 159.00)
-    4.  **Datas:** Se a data estiver incompleta (apenas dia/mês), assuma o ano atual: {ano_atual}.
-    5.  **Valores Numéricos:** Converta todos os valores para o formato numérico padrão (usando ponto como separador decimal).
-    6.  **Resposta Pura:** NÃO inclua texto introdutório, explicações ou formatação markdown (como ```json) na resposta, apenas o array JSON cru.
+    REGRAS CRÍTICAS PARA ANÁLISE:
+    1.  **Formato de Saída JSON:** Cada objeto JSON no array deve ter: "data" (AAAA-MM-DD), "descricao" (string), "valor" (número flutuante), "conta_origem" (string ou null).
+    2.  **Identificando o Documento:**
+        * Se for um EXTRATO (várias transações): Mantenha a descrição original de cada linha.
+        * Se for um ÚNICO COMPROVANTE (Pix, Transferência, Pagamento): Crie uma descrição clara e objetiva para o usuário. Exemplo: "Pix para João da Silva" ou "Pagamento de Boleto Enel".
+    3.  **Determinação do Valor (MUITO IMPORTANTE):**
+        * Se for um comprovante de PAGAMENTO ou ENVIO de Pix (o dinheiro SAIU da conta), o valor DEVE ser um número NEGATIVO (Ex: -581.19).
+        * Se for um comprovante de RECEBIMENTO (o dinheiro ENTROU na conta), o valor DEVE ser POSITIVO.
+    4.  **Conta de Origem:** Procure no texto por nomes de bancos comerciais (ex: "PicPay", "Nubank", "Itaú", "Bradesco"). Retorne apenas o nome comercial. Se não achar, retorne null.
+    5.  **Datas:** Se a data estiver incompleta, assuma o ano atual: {ano_atual}.
+    6.  **Resposta Pura:** NÃO inclua formatação markdown (como ```json) na resposta, apenas o array JSON cru.
 
     TEXTO A SER ANALISADO:
     ---

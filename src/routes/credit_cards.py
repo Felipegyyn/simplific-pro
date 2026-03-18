@@ -245,6 +245,7 @@ def listar_faturas():
     # 5. Processa os resultados e calcula a data de vencimento
     for fatura, cartao in faturas_e_cartoes:
         data_vencimento_calculada = None
+        incluir_no_resultado = True # <--- Flag para decidir se a fatura vai pro JSON
 
         try:
             if cartao and cartao.due_day:
@@ -258,30 +259,33 @@ def listar_faturas():
                 data_vencimento_real = date(ano_vencimento, mes_vencimento, int(cartao.due_day))
                 data_vencimento_calculada = data_vencimento_real.isoformat()
 
-                # ▼▼▼ APLICA O FILTRO DE DATA AQUI ▼▼▼
-                # Como a data_vencimento não é uma coluna nativa da tabela (ela é calculada),
-                # nós filtramos os resultados no Python depois de calcular.
-                if start_date and data_vencimento_real < start_date:
-                    continue # Pula essa fatura, pois é mais antiga que a data inicial
+                # ▼▼▼ FILTRO DE DATA BLINDADO ▼▼▼
+                if start_date:
+                    if data_vencimento_real < start_date:
+                        incluir_no_resultado = False 
                 
-                if end_date and data_vencimento_real > end_date:
-                    continue # Pula essa fatura, pois é mais nova que a data final
+                if end_date:
+                    if data_vencimento_real > end_date:
+                        incluir_no_resultado = False
                 # ▲▲▲ FIM DO FILTRO DE DATA ▲▲▲
 
         except (TypeError, ValueError) as e:
-            print(f"AVISO: Não foi possível calcular a data de vencimento para a fatura ID {fatura.id}. Erro: {e}")
+            print(f"AVISO: Erro ao calcular data para a fatura ID {fatura.id}. Erro: {e}")
             data_vencimento_calculada = None
 
-        resultado.append({
-            'id': fatura.id,
-            'cartao_id': fatura.cartao_id,
-            'valor_total': fatura.valor_total,
-            'mes': fatura.mes,
-            'ano': fatura.ano,
-            'status': fatura.status,
-            'data_vencimento': data_vencimento_calculada,
-            'created_at': fatura.created_at.isoformat() if fatura.created_at else None
-        })
+        # Só adiciona no JSON final se passou pelo filtro
+        if incluir_no_resultado:
+            resultado.append({
+                'id': fatura.id,
+                'cartao_id': fatura.cartao_id,
+                'cartao_nome': cartao.name if cartao else 'Desconhecido', # <-- Útil pro front
+                'valor_total': fatura.valor_total,
+                'mes': fatura.mes,
+                'ano': fatura.ano,
+                'status': fatura.status,
+                'data_vencimento': data_vencimento_calculada,
+                'created_at': fatura.created_at.isoformat() if fatura.created_at else None
+            })
         
     return jsonify(resultado), 200
 

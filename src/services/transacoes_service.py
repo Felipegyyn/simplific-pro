@@ -293,27 +293,45 @@ def processar_comprovante_imagem(user_id, image_url):
             if not categoria_final:
                  return {"status": "erro", "mensagem": "Não encontrei sua categoria 'Outros'. Por favor, verifique suas categorias na plataforma."}
 
-        # ▼▼▼ NOVA LÓGICA DE BUSCA DA CONTA BANCÁRIA ▼▼▼
+        # ▼▼▼ NOVA LÓGICA: BUSCA DE MÚLTIPLAS CONTAS BANCÁRIAS ▼▼▼
         bank_account_id_final = None
         nome_banco_encontrado = ""
+        conta_banco_exata = None
+        precisa_perguntar = False
+        opcoes_contas_str = ""
 
         if conta_origem_ia:
             print(f"INFO: IA identificou possível conta de origem: '{conta_origem_ia}'")
-            # Faz uma busca flexível (ILIKE) pelo nome do banco nas contas do usuário
-            conta_banco = BankAccount.query.filter(
+            # Faz a busca flexível e traz TODAS as contas que batem com o nome
+            contas_banco = BankAccount.query.filter(
                 BankAccount.user_id == user_id,
                 BankAccount.bank_name.ilike(f"%{conta_origem_ia}%")
-            ).first()
+            ).all()
 
-            if conta_banco:
-                bank_account_id_final = conta_banco.id
-                nome_banco_encontrado = conta_banco.bank_name
-                print(f"SUCESSO: Conta bancária vinculada: {nome_banco_encontrado} (ID: {bank_account_id_final})")
+            if len(contas_banco) == 1:
+                # 1. ACHOU SÓ UMA CONTA: Fluxo normal e automático!
+                conta_banco_exata = contas_banco[0]
+                bank_account_id_final = conta_banco_exata.id
+                nome_banco_encontrado = conta_banco_exata.bank_name
+                print(f"SUCESSO: Conta única vinculada: {nome_banco_encontrado}")
+
+            elif len(contas_banco) > 1:
+                # 2. ACHOU MAIS DE UMA CONTA: Aciona o alerta!
+                print(f"AVISO: Múltiplas contas encontradas para o banco '{conta_origem_ia}'.")
+                precisa_perguntar = True
+                
+                # Monta um textinho com as opções para enviar no WhatsApp
+                nomes_contas = [f"{c.bank_name} (final {c.account_number[-4:] if c.account_number else 'X'})" for c in contas_banco]
+                opcoes_contas_str = " ou ".join(nomes_contas)
+                
+                # Deixamos bank_account_id_final como None para não chutar a conta errada e bagunçar o saldo
+
             else:
-                print(f"AVISO: O banco '{conta_origem_ia}' foi lido no comprovante, mas o usuário não possui essa conta cadastrada.")
+                # 3. NÃO ACHOU NENHUMA CONTA: Segue a vida sem vincular
+                print(f"AVISO: O banco '{conta_origem_ia}' foi lido, mas o usuário não tem essa conta.")
         # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
 
-        # --- Passo 5: Salvar no Banco ---
+        # --- Passo 5: Salvar no Banco E Atualizar Saldo ---
         novo_lancamento = Transaction(
             user_id=user_id,
             date=datetime.strptime(data_str, '%Y-%m-%d').date(),
@@ -321,26 +339,39 @@ def processar_comprovante_imagem(user_id, image_url):
             category_id=categoria_final.id,
             value=abs(valor),
             description=f"[Comprovante] {descricao}",
-            status='confirmada', # Confirma a transação
+            status='confirmada',
             format='variavel',
             payment_form='a_vista',
             receipt_image_url=permanent_url,
-            bank_account_id=bank_account_id_final # <-- AQUI! Vincula o ID se achou, ou None se não achou
+            bank_account_id=bank_account_id_final # Fica preenchido ou None dependendo da checagem
         )
         
         db.session.add(novo_lancamento)
-        db.session.commit()
 
+        # Atualiza o saldo SOMENTE se tivermos certeza absoluta de qual conta é (1 match exato)
+        if bank_account_id_final and conta_banco_exata:
+            if tipo_transacao == 'entrada':
+                conta_banco_exata.current_balance += float(abs(valor))
+            elif tipo_transacao == 'saida':
+                conta_banco_exata.current_balance -= float(abs(valor))
+
+        db.session.commit()
         print(f"SUCESSO: Lançamento criado (ID: {novo_lancamento.id})")
         
-        # Formata a mensagem de resposta dinâmica
         valor_formatado = format_currency_brl(abs(valor))
-        msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else ""
         
-        return {
-            "status": "sucesso",
-            "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma."
-        }
+        # --- RESPOSTA DINÂMICA PARA O USUÁRIO ---
+        if precisa_perguntar:
+            return {
+                "status": "sucesso",
+                "mensagem": f"Legal! 🧾 Salvei o lançamento de *{valor_formatado}* ({descricao}). \n\n🤔 Mas notei que você tem mais de uma conta para esse banco ({opcoes_contas_str}). Por segurança, deixei sem vínculo. Qual delas você quer usar para eu atualizar?"
+            }
+        else:
+            msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else ""
+            return {
+                "status": "sucesso",
+                "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma."
+            }
 
     except Exception as e:
         db.session.rollback()

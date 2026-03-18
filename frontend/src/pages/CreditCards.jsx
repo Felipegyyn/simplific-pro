@@ -342,18 +342,19 @@ const carregarFaturas = async (listaDeCartoes) => {
         queryParams.push(`status=${filtroStatusFatura}`);
       }
       
-      // ▼▼▼ NOVO CÓDIGO DE QUERY PARAMS ▼▼▼
-      if (dataInicioFiltro) {
-        queryParams.push(`start_date=${dataInicioFiltro}`);
+      // ▼▼▼ CÓDIGO DE QUERY PARAMS CORRIGIDO ▼▼▼
+      if (dataInicioFiltro && dataInicioFiltro.trim() !== '') {
+        queryParams.push(`start_date=${dataInicioFiltro.split('T')[0]}`);
       }
-      if (dataFimFiltro) {
-        queryParams.push(`end_date=${dataFimFiltro}`);
+      if (dataFimFiltro && dataFimFiltro.trim() !== '') {
+        queryParams.push(`end_date=${dataFimFiltro.split('T')[0]}`);
       }
 
       if (queryParams.length > 0) {
         url += `?${queryParams.join('&')}`;
       }
-      // ▲▲▲ FIM DO CÓDIGO DE QUERY PARAMS ▲▲▲
+      console.log("Chamando URL:", url); // <--- Adicione isso para você ver no inspecionar elemento
+      // ▲▲▲ FIM DO CÓDIGO DE QUERY PARAMS CORRIGIDO ▲▲▲
 
       const respostaFaturas = await apiService.get(url);
       
