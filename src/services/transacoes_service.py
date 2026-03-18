@@ -331,7 +331,18 @@ def processar_comprovante_imagem(user_id, image_url):
                 print(f"AVISO: O banco '{conta_origem_ia}' foi lido, mas o usuário não tem essa conta.")
         # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
 
-        # --- Passo 5: Salvar no Banco E Atualizar Saldo ---
+        # --- Passo 5: Decisão de Salvar ou Perguntar ---
+        valor_formatado = format_currency_brl(abs(valor))
+
+        # 1. SE ACHOU MAIS DE UMA CONTA: Aborta o salvamento e avisa!
+        if precisa_perguntar:
+            tipo_str = "saída (despesa)" if tipo_transacao == "saida" else "entrada (receita)"
+            return {
+                "status": "sucesso",
+                "mensagem": f"🧾 Identifiquei um comprovante de {tipo_str} no valor de *{valor_formatado}* ({descricao}). \n\n🤔 Mas notei que você tem mais de uma conta para o banco {conta_origem_ia} ({opcoes_contas_str}). \n\nPor segurança, eu não lancei nada no sistema ainda. Me responda qual dessas contas devo usar e eu farei o lançamento completo!"
+            }
+
+        # 2. SE ACHOU SÓ 1 CONTA (OU NENHUMA): Salva normalmente e atualiza saldo
         novo_lancamento = Transaction(
             user_id=user_id,
             date=datetime.strptime(data_str, '%Y-%m-%d').date(),
@@ -343,12 +354,10 @@ def processar_comprovante_imagem(user_id, image_url):
             format='variavel',
             payment_form='a_vista',
             receipt_image_url=permanent_url,
-            bank_account_id=bank_account_id_final # Fica preenchido ou None dependendo da checagem
+            bank_account_id=bank_account_id_final
         )
-        
         db.session.add(novo_lancamento)
 
-        # Atualiza o saldo SOMENTE se tivermos certeza absoluta de qual conta é (1 match exato)
         if bank_account_id_final and conta_banco_exata:
             if tipo_transacao == 'entrada':
                 conta_banco_exata.current_balance += float(abs(valor))
@@ -356,22 +365,12 @@ def processar_comprovante_imagem(user_id, image_url):
                 conta_banco_exata.current_balance -= float(abs(valor))
 
         db.session.commit()
-        print(f"SUCESSO: Lançamento criado (ID: {novo_lancamento.id})")
         
-        valor_formatado = format_currency_brl(abs(valor))
-        
-        # --- RESPOSTA DINÂMICA PARA O USUÁRIO ---
-        if precisa_perguntar:
-            return {
-                "status": "sucesso",
-                "mensagem": f"Legal! 🧾 Salvei o lançamento de *{valor_formatado}* ({descricao}). \n\n🤔 Mas notei que você tem mais de uma conta para esse banco ({opcoes_contas_str}). Por segurança, deixei sem vínculo. Qual delas você quer usar para eu atualizar?"
-            }
-        else:
-            msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else ""
-            return {
-                "status": "sucesso",
-                "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma."
-            }
+        msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else " (sem vínculo de conta)"
+        return {
+            "status": "sucesso",
+            "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma e o saldo atualizado."
+        }
 
     except Exception as e:
         db.session.rollback()

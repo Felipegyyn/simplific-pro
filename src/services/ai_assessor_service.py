@@ -101,10 +101,10 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                                 "response": {"resultado": resultado_turbinado}
                             }
                         })
-                        
-                    elif nome_funcao == "vincular_conta_ultima_transacao":
-                        identificador = argumentos.get("identificador_conta", "")
-                        print(f"🔧 [LOOP AGENTE] Executando Vínculo de Conta com: '{identificador}'")
+                    
+                    else:
+                        # É uma ferramenta de banco de dados (agenda, meta, lançamentos)
+                        print(f"🔧 [LOOP AGENTE] Interceptando ação final: {nome_funcao}")
                         
                         from src.services.transacoes_service import vincular_conta_ultima_transacao
                         resultado_vinculo = vincular_conta_ultima_transacao(user_id, identificador)
