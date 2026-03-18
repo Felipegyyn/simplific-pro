@@ -101,26 +101,21 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                                 "response": {"resultado": resultado_turbinado}
                             }
                         })
+                        
+                    elif nome_funcao == "vincular_conta_ultima_transacao":
+                        identificador = argumentos.get("identificador_conta", "")
+                        print(f"🔧 [LOOP AGENTE] Executando Vínculo de Conta com: '{identificador}'")
+                        
+                        from src.services.transacoes_service import vincular_conta_ultima_transacao
+                        resultado_vinculo = vincular_conta_ultima_transacao(user_id, identificador)
+                        
+                        respostas_das_ferramentas.append({
+                            "function_response": {
+                                "name": "vincular_conta_ultima_transacao",
+                                "response": resultado_vinculo
+                            }
+                        })
 
-                    
-                    # ▼▼▼ O BLOCO NOVO ENTRA EXATAMENTE AQUI ▼▼▼
-                        elif nome_funcao == "vincular_conta_ultima_transacao":
-                            identificador = argumentos.get("identificador_conta", "")
-                            print(f"🔧 [LOOP AGENTE] Executando Vínculo de Conta com: '{identificador}'")
-                            
-                            # Importamos a função que criamos no Passo 2
-                            from src.services.transacoes_service import vincular_conta_ultima_transacao
-                            resultado_vinculo = vincular_conta_ultima_transacao(user_id, identificador)
-                            
-                            # Devolvemos o resultado para o Gemini ler
-                            respostas_das_ferramentas.append({
-                                "function_response": {
-                                    "name": "vincular_conta_ultima_transacao",
-                                    "response": resultado_vinculo
-                                }
-                            })
-                        # ▲▲▲ FIM DO BLOCO NOVO ▲▲▲
-                    
                     else:
                         # É uma ferramenta de banco de dados (agenda, meta, lançamentos)
                         print(f"🔧 [LOOP AGENTE] Interceptando ação final: {nome_funcao}")
