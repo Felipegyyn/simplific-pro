@@ -228,6 +228,22 @@ simplific_tools = [
                 }
             },
 
+            # 16. Vincular Conta em Transação Solta
+            {
+                "name": "vincular_conta_ultima_transacao",
+                "description": "Vincula uma conta bancária à última transação solta do usuário e atualiza o saldo da conta. Acione APENAS quando o usuário estiver respondendo qual conta ele usou após você ter avisado que encontrou múltiplas contas do mesmo banco.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "identificador_conta": {
+                            "type": "STRING", 
+                            "description": "O texto que o usuário usou para identificar a conta. Pode ser os últimos números (ex: '1234', 'final 8821') ou o nome/tipo (ex: 'conta PJ', 'nubank da empresa')."
+                        }
+                    },
+                    "required": ["identificador_conta"]
+                }
+            }
+
             # 15. Metas
             {
                 "name": "add_value_to_goal",

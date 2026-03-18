@@ -377,3 +377,65 @@ def processar_comprovante_imagem(user_id, image_url):
         db.session.rollback()
         print(f"ERRO CRÍTICO ao processar comprovante de imagem: {e}")
         return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar seu comprovante. A equipe já foi notificada."}
+
+# ▼▼▼ ADICIONE NO FINAL DO ARQUIVO ▼▼▼
+def vincular_conta_ultima_transacao(user_id, identificador_conta):
+    from src.models.financial import Transaction
+    from src.models.extended_modules import BankAccount
+    from src.models.db import db
+    import re
+
+    try:
+        # 1. Pega a ÚLTIMA transação confirmada, mas que está sem conta vinculada
+        ultima_transacao = Transaction.query.filter_by(
+            user_id=user_id, 
+            bank_account_id=None,
+            status='confirmada'
+        ).order_by(Transaction.created_at.desc()).first()
+
+        if not ultima_transacao:
+            return {"status": "erro", "mensagem": "Não encontrei nenhuma transação recente aguardando vínculo de conta."}
+
+        # 2. Busca todas as contas do usuário para tentarmos o match
+        contas_usuario = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
+        conta_escolhida = None
+        
+        # Limpa o texto do usuário (tira a palavra 'final', 'conta', etc)
+        identificador_limpo = identificador_conta.lower().replace("final", "").replace("conta", "").strip()
+        # Se for só números, pega só os números
+        numeros_na_fala = re.sub(r'[^0-9]', '', identificador_limpo)
+
+        for conta in contas_usuario:
+            # Tenta casar pelo número da conta (se o usuário mandou números)
+            if numeros_na_fala and conta.account_number and numeros_na_fala in conta.account_number:
+                conta_escolhida = conta
+                break
+            # Tenta casar pelo nome da conta
+            elif identificador_limpo and identificador_limpo in conta.bank_name.lower():
+                conta_escolhida = conta
+                break
+
+        if not conta_escolhida:
+            return {"status": "erro", "mensagem": f"Não consegui identificar a conta a partir de '{identificador_conta}'. Pode me dizer os 4 últimos números exatos dela?"}
+
+        # 3. Faz o vínculo!
+        ultima_transacao.bank_account_id = conta_escolhida.id
+        
+        # 4. Atualiza o Saldo!
+        if ultima_transacao.type == 'entrada':
+            conta_escolhida.current_balance += float(ultima_transacao.value)
+        elif ultima_transacao.type == 'saida':
+            conta_escolhida.current_balance -= float(ultima_transacao.value)
+        
+        db.session.commit()
+
+        # Resposta que o Gemini vai ler para montar a mensagem final
+        return {
+            "status": "sucesso", 
+            "mensagem": f"Pronto! Vinculei os R$ {ultima_transacao.value} na conta '{conta_escolhida.bank_name}' e já atualizei o saldo lá."
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro CRÍTICO ao vincular conta: {e}")
+        return {"status": "erro", "mensagem": "Deu um erro interno ao tentar atualizar a conta e o saldo."}
