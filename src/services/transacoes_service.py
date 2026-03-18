@@ -5,7 +5,8 @@ from src.services.ai_assessor_service import categorizar_descricao_transacao, ex
 from src.models.db import db
 from collections import defaultdict
 import re
-from src.models.financial import Transaction, Category, BankAccount
+from src.models.financial import Transaction, Category
+from src.models.extended_modules import BankAccount
 from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
 from sqlalchemy import func, case
 # ▼▼▼ ADICIONE ESTAS NOVAS IMPORTAÇÕES ▼▼▼
