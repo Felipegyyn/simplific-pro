@@ -189,30 +189,33 @@ def categorizar_descricao_transacao(user_id, descricao):
 
 def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     """
-    Usa o Gemini para analisar um bloco de texto de um extrato e retornar
-    uma lista estruturada de transações em formato JSON.
+    Usa o Gemini para analisar um bloco de texto de um extrato ou comprovante
+    e retornar uma lista estruturada de transações em formato JSON.
+    AGORA COM IDENTIFICAÇÃO DE INSTITUIÇÃO FINANCEIRA (CONTA DE ORIGEM).
     """
     ano_atual = datetime.now().year
 
     prompt = f"""
-    Você é um assistente especialista em extração de dados financeiros de extratos bancários brasileiros.
+    Você é um assistente especialista em extração de dados financeiros de extratos e comprovantes brasileiros.
     Sua tarefa é analisar o texto abaixo, identificar CADA transação (entrada ou saída) e retorná-las como um array de objetos JSON.
 
     REGRAS CRÍTICAS PARA ANÁLISE E FORMATO DA RESPOSTA:
-    1.  **Ignorar Conteúdo Não Transacional:** Desconsidere totalmente cabeçalhos, rodapés, "Saldo Anterior", "Saldo do Dia", "Saldo Bloqueado", "Aplicacao Financeira", "Rendimentos", "Tributos", ou qualquer linha que não seja uma transação financeira explícita de débito ou crédito.
-    2.  **Formato de Saída JSON:** Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: "data" (string, no formato "AAAA-MM-DD"), "descricao" (string), e "valor" (número de ponto flutuante).
+    1.  **Formato de Saída JSON:** Cada objeto JSON no array deve ter EXATAMENTE as seguintes chaves: 
+        "data" (string, no formato "AAAA-MM-DD"), 
+        "descricao" (string), 
+        "valor" (número de ponto flutuante),
+        "conta_origem" (string ou null).
+    2.  **Determinação da 'conta_origem':** Procure no texto inteiro por nomes de bancos ou instituições de onde o dinheiro saiu ou entrou (ex: "Instituição: Nu Pagamentos", "Banco Itaú S.A.", "Bradesco", "Banco Inter"). 
+        - Extraia apenas o NOME COMERCIAL principal do banco (ex: "Nubank", "Itaú", "Bradesco", "Inter").
+        - Se não encontrar nenhuma menção a banco, retorne null.
     3.  **Determinação do Valor:**
-        * Para despesas/débitos (saídas), o valor deve ser um número NEGATIVO. (Ex: -159.00)
-        * Para receitas/créditos (entradas), o valor deve ser um número POSITIVO. (Ex: 159.00)
-        * Observe indicadores como "D", "C", "DÉB", "CRÉD", "-" ou ausência de sinal para determinar o tipo da transação e o sinal do valor.
-    4.  **Datas:**
-        * Se a data estiver incompleta (apenas dia/mês, ex: "03/01"), assuma o ano atual: {ano_atual}.
-        * Se a descrição contiver "DD/MM" ou "MM/AAAA", como "TAR PLANO ADAPT 1 06/25", priorize a data explícita da linha. Se a data da linha for mais genérica, e a descrição indicar um mês/ano específico para a transação, use o ano e mês da descrição com o dia da transação, se plausível. Caso contrário, use a data da linha com o ano atual.
-    5.  **Valores Numéricos:** Converta todos os valores para o formato numérico padrão (usando ponto como separador decimal). Por exemplo, "1.638,46" deve virar 1638.46, e "404,54C" deve virar 404.54.
-    6.  **Resposta Pura:** NÃO inclua qualquer texto introdutório, explicações ou formatação adicional na sua resposta, além do array JSON puro.
-    7.  **Array Vazio:** Se nenhuma transação for encontrada após seguir todas as regras, retorne um array JSON vazio: [].
+        * Para despesas/débitos (saídas ou pagamentos de comprovantes), o valor deve ser NEGATIVO. (Ex: -159.00)
+        * Para receitas/créditos (entradas ou recebimentos PIX), o valor deve ser POSITIVO. (Ex: 159.00)
+    4.  **Datas:** Se a data estiver incompleta (apenas dia/mês), assuma o ano atual: {ano_atual}.
+    5.  **Valores Numéricos:** Converta todos os valores para o formato numérico padrão (usando ponto como separador decimal).
+    6.  **Resposta Pura:** NÃO inclua texto introdutório, explicações ou formatação markdown (como ```json) na resposta, apenas o array JSON cru.
 
-    TEXTO DO EXTRATO A SER ANALISADO:
+    TEXTO A SER ANALISADO:
     ---
     {texto_do_extrato}
     ---

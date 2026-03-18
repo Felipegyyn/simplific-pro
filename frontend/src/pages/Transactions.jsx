@@ -91,6 +91,7 @@ const Transactions = ({ user, onLogout }) => {
     amount: '',
     type: 'expense',
     category: '',
+    bank_account_id: 'none',
     transaction_date: '',
     status: 'pendente'
   });
@@ -262,6 +263,7 @@ const Transactions = ({ user, onLogout }) => {
       amount: (transacao.amount || 0).toString(),
       type: transacao.type === 'entrada' ? 'income' : 'expense',
       category: transacao.category,
+      bank_account_id: transacao.bank_account_id ? transacao.bank_account_id.toString() : 'none', // <--- LINHA ADICIONADA
       transaction_date: transacao.transaction_date,
       status: transacao.status
     });
@@ -828,6 +830,7 @@ const Transactions = ({ user, onLogout }) => {
                   value: Math.abs(parseFloat(editFormData.amount)),
                   type: tipoSelecionado,
                   category_id: categoriaObj.id,
+                  bank_account_id: editFormData.bank_account_id === 'none' ? null : parseInt(editFormData.bank_account_id), // <--- LINHA ADICIONADA
                   date: editFormData.transaction_date,
                   status: editFormData.status
                 };
@@ -853,6 +856,26 @@ const Transactions = ({ user, onLogout }) => {
                     </Select>
                   </div>
                 </div>
+
+                {/* ▼▼▼ NOVO CAMPO DE CONTA BANCÁRIA NA EDIÇÃO ▼▼▼ */}
+                <div>
+                  <Label htmlFor="edit_bank_account">Conta Bancária (Opcional)</Label>
+                  <Select value={editFormData.bank_account_id} onValueChange={(value) => setEditFormData(prev => ({...prev, bank_account_id: value}))}>
+                      <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma conta" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="none">Nenhuma</SelectItem>
+                          {contas.map(conta => (
+                              <SelectItem key={conta.id} value={conta.id.toString()}>
+                                  {conta.bank_name} - Ag: {conta.agency} CC: {conta.account_number}
+                              </SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                </div>
+                {/* ▲▲▲ FIM DO NOVO CAMPO ▲▲▲ */}
+
                 <div>
                   <Label htmlFor="edit_category">Categoria *</Label>
                   <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>

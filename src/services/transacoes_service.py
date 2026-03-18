@@ -5,7 +5,7 @@ from src.services.ai_assessor_service import categorizar_descricao_transacao, ex
 from src.models.db import db
 from collections import defaultdict
 import re
-from src.models.financial import Transaction, Category
+from src.models.financial import Transaction, Category, BankAccount
 from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
 from sqlalchemy import func, case
 # ▼▼▼ ADICIONE ESTAS NOVAS IMPORTAÇÕES ▼▼▼
@@ -262,31 +262,55 @@ def processar_comprovante_imagem(user_id, image_url):
             print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
             return {"status": "info", "mensagem": "Entendi o comprovante, mas não achei o valor ou a data. Pode me dizer qual é?"}
 
-        # --- Passo 4: Categorizar (IA) ---
+        # ... (código anterior da função processar_comprovante_imagem continua igual até a extração das variáveis) ...
+
+        # Pega a primeira transação (comprovantes geralmente são de 1 item)
+        transacao_ia = transacoes_extraidas[0]
+        valor = float(transacao_ia.get('valor', 0))
+        descricao = transacao_ia.get('descricao', 'Sem descrição')
+        data_str = transacao_ia.get('data')
+        conta_origem_ia = transacao_ia.get('conta_origem') # <-- NOVO: Pega o banco identificado pela IA
+
+        if valor == 0 or not data_str:
+            print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
+            return {"status": "info", "mensagem": "Entendi o comprovante, mas não achei o valor ou a data. Pode me dizer qual é?"}
+
+        # --- Passo 4: Categorizar (IA) e Buscar Conta Bancária ---
         tipo_transacao = 'entrada' if valor > 0 else 'saida'
-        # Reutiliza a função de categorização
         nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
 
         # Busca o ID da Categoria no banco
         categoria_final = Category.query.filter(
             Category.user_id == user_id,
-            Category.name.ilike(nome_categoria_ia), # Usa ilike para ser case-insensitive
+            Category.name.ilike(nome_categoria_ia),
             Category.type == tipo_transacao
         ).first()
 
         # Fallback para categoria "Outros"
         if not categoria_final:
-            categoria_fallback_name = 'Outros' # Nome padrão
-            categoria_final = Category.query.filter_by(
-                user_id=user_id,
-                name=categoria_fallback_name,
-                type=tipo_transacao
-            ).first()
-            
-            # Se nem "Outros" existir... (situação rara)
+            categoria_final = Category.query.filter_by(user_id=user_id, name='Outros', type=tipo_transacao).first()
             if not categoria_final:
-                 print(f"ERRO CRÍTICO: Categoria 'Outros' do tipo '{tipo_transacao}' não encontrada para user_id {user_id}.")
                  return {"status": "erro", "mensagem": "Não encontrei sua categoria 'Outros'. Por favor, verifique suas categorias na plataforma."}
+
+        # ▼▼▼ NOVA LÓGICA DE BUSCA DA CONTA BANCÁRIA ▼▼▼
+        bank_account_id_final = None
+        nome_banco_encontrado = ""
+
+        if conta_origem_ia:
+            print(f"INFO: IA identificou possível conta de origem: '{conta_origem_ia}'")
+            # Faz uma busca flexível (ILIKE) pelo nome do banco nas contas do usuário
+            conta_banco = BankAccount.query.filter(
+                BankAccount.user_id == user_id,
+                BankAccount.bank_name.ilike(f"%{conta_origem_ia}%")
+            ).first()
+
+            if conta_banco:
+                bank_account_id_final = conta_banco.id
+                nome_banco_encontrado = conta_banco.bank_name
+                print(f"SUCESSO: Conta bancária vinculada: {nome_banco_encontrado} (ID: {bank_account_id_final})")
+            else:
+                print(f"AVISO: O banco '{conta_origem_ia}' foi lido no comprovante, mas o usuário não possui essa conta cadastrada.")
+        # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
 
         # --- Passo 5: Salvar no Banco ---
         novo_lancamento = Transaction(
@@ -294,25 +318,27 @@ def processar_comprovante_imagem(user_id, image_url):
             date=datetime.strptime(data_str, '%Y-%m-%d').date(),
             type=tipo_transacao,
             category_id=categoria_final.id,
-            value=abs(valor), # Salva sempre o valor positivo
+            value=abs(valor),
             description=f"[Comprovante] {descricao}",
-            status='confirmada', # IMPORTANTE: Salva como pendente
+            status='confirmada', # Confirma a transação
             format='variavel',
             payment_form='a_vista',
-            receipt_image_url=permanent_url # <-- AQUI! Salvamos a URL do Cloudinary
+            receipt_image_url=permanent_url,
+            bank_account_id=bank_account_id_final # <-- AQUI! Vincula o ID se achou, ou None se não achou
         )
         
         db.session.add(novo_lancamento)
         db.session.commit()
 
-        print(f"SUCESSO: Lançamento pendente criado (ID: {novo_lancamento.id})")
+        print(f"SUCESSO: Lançamento criado (ID: {novo_lancamento.id})")
         
-        # Formata a moeda para a resposta
+        # Formata a mensagem de resposta dinâmica
         valor_formatado = format_currency_brl(abs(valor))
+        msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else ""
         
         return {
             "status": "sucesso",
-            "mensagem": f"Legal! 🧾 Seu comprovante foi processado e o lançamento de *{valor_formatado}* ({descricao}) já está *confirmado*."
+            "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma."
         }
 
     except Exception as e:

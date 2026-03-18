@@ -63,6 +63,13 @@ const CreditCards = ({ user, onLogout }) => {
 
   const [filtroStatusFatura, setFiltroStatusFatura] = useState('aberta'); // 'aberta', 'paga', ou 'todas'
 
+  // ▼▼▼ ADICIONE ESTES NOVOS ESTADOS ▼▼▼
+  const [dataInicioFiltro, setDataInicioFiltro] = useState('');
+  const [dataFimFiltro, setDataFimFiltro] = useState('');
+  // ▲▲▲ FIM DOS NOVOS ESTADOS ▲▲▲
+
+
+
 const loadCartoes = async () => {
   try {
     setLoading(true);
@@ -319,20 +326,37 @@ const handleUpdateCard = async (e) => {
   }
 };
 
-  // Carregar cartões da API
+ // Carregar cartões e faturas quando os filtros mudarem
   useEffect(() => {
     loadCartoes();
-  }, [filtroStatusFatura]); // <--- Adicione a variável do filtro aqui
+  }, [filtroStatusFatura, dataInicioFiltro, dataFimFiltro]); // <--- Adicione as datas aqui
 
 
 const carregarFaturas = async (listaDeCartoes) => { 
-  try {
-    // Constrói a URL da API dinamicamente com base no filtro selecionado
-let url = '/api/faturas';
-if (filtroStatusFatura !== 'todas') {
-  url += `?status=${filtroStatusFatura}`;
-}
-const respostaFaturas = await apiService.get(url);
+    try {
+      // Constrói a URL da API dinamicamente com base no filtro selecionado
+      let url = '/api/faturas';
+      const queryParams = [];
+
+      if (filtroStatusFatura !== 'todas') {
+        queryParams.push(`status=${filtroStatusFatura}`);
+      }
+      
+      // ▼▼▼ NOVO CÓDIGO DE QUERY PARAMS ▼▼▼
+      if (dataInicioFiltro) {
+        queryParams.push(`start_date=${dataInicioFiltro}`);
+      }
+      if (dataFimFiltro) {
+        queryParams.push(`end_date=${dataFimFiltro}`);
+      }
+
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`;
+      }
+      // ▲▲▲ FIM DO CÓDIGO DE QUERY PARAMS ▲▲▲
+
+      const respostaFaturas = await apiService.get(url);
+      
 
     // Usamos Promise.all para buscar as transações de todas as faturas em paralelo, o que é mais rápido.
     const faturasComTransacoes = await Promise.all(
@@ -1185,13 +1209,15 @@ if (sucesso) {
               <DialogHeader>
                 <DialogTitle>Filtrar Faturas por Período</DialogTitle>
               </DialogHeader>
+              
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="data_inicio">Data Início</Label>
                   <Input
                     id="data_inicio"
                     type="date"
-                    defaultValue="2024-01-01"
+                    value={dataInicioFiltro}
+                    onChange={(e) => setDataInicioFiltro(e.target.value)} // <--- AMARROU O ESTADO AQUI
                   />
                 </div>
                 <div>
@@ -1199,19 +1225,35 @@ if (sucesso) {
                   <Input
                     id="data_fim"
                     type="date"
-                    defaultValue="2024-12-31"
+                    value={dataFimFiltro}
+                    onChange={(e) => setDataFimFiltro(e.target.value)} // <--- AMARROU O ESTADO AQUI
                   />
                 </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsPeriodoModalOpen(false)}>
-                    Cancelar
+                <div className="flex justify-between items-center pt-4">
+                  {/* Botão de Limpar (Opcional, mas útil) */}
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => {
+                        setDataInicioFiltro('');
+                        setDataFimFiltro('');
+                        setIsPeriodoModalOpen(false);
+                    }}
+                  >
+                    Limpar Filtro
                   </Button>
-                  <Button onClick={() => {
-                    alert('Filtro aplicado com sucesso!');
-                    setIsPeriodoModalOpen(false);
-                  }}>
-                    Aplicar Filtro
-                  </Button>
+
+                  <div className="flex space-x-2">
+                    <Button type="button" variant="outline" onClick={() => setIsPeriodoModalOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button onClick={() => {
+                      setIsPeriodoModalOpen(false); // <--- FECHA O MODAL. O useEffect cuida de carregar os dados!
+                    }}>
+                      Aplicar Filtro
+                    </Button>
+                  </div>
                 </div>
               </div>
             </DialogContent>

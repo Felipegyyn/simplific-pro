@@ -47,7 +47,9 @@ const Schedule = ({ user, onLogout }) => {
     type: 'pagamento',
     amount: '',
     priority: 'média',
-    category: ''
+    category: '',
+    is_recurring: 'nao', // <--- NOVO
+    recurrence_count: '' // <--- NOVO
   });
 
   // ▼▼▼ LÓGICA DE SINCRONIZAÇÃO ▼▼▼
@@ -223,9 +225,18 @@ const Schedule = ({ user, onLogout }) => {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
+    
+    // Se marcou como recorrente, exige a quantidade
+    if (formData.is_recurring === 'sim' && (!formData.recurrence_count || formData.recurrence_count < 2)) {
+        alert('Por favor, informe uma quantidade válida de meses (mínimo 2).');
+        return;
+    }
+
     criarEvento({
       ...formData,
-      amount: formData.amount ? parseFloat(formData.amount) : null
+      amount: formData.amount ? parseFloat(formData.amount) : null,
+      is_recurring: formData.is_recurring === 'sim',
+      recurrence_count: formData.is_recurring === 'sim' ? parseInt(formData.recurrence_count) : 1
     });
   };
 
@@ -509,6 +520,39 @@ const Schedule = ({ user, onLogout }) => {
       </Select>
     </div>
   </div>
+
+    {/* ▼▼▼ BLOCO DE RECORRÊNCIA ADICIONADO AQUI ▼▼▼ */}
+  <div className="grid grid-cols-2 gap-4">
+    <div>
+      <Label htmlFor="is_recurring">Evento Recorrente?</Label>
+      <Select value={formData.is_recurring} onValueChange={(value) => handleInputChange('is_recurring', value)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="nao">Não</SelectItem>
+          <SelectItem value="sim">Sim (Mensal)</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+    
+    {formData.is_recurring === 'sim' && (
+      <div>
+        <Label htmlFor="recurrence_count">Duração (Meses)</Label>
+        <Input
+          id="recurrence_count"
+          type="number"
+          min="2"
+          max="120"
+          value={formData.recurrence_count}
+          onChange={(e) => handleInputChange('recurrence_count', e.target.value)}
+          placeholder="Ex: 2"
+          required
+        />
+      </div>
+    )}
+  </div>
+  {/* ▲▲▲ FIM DO BLOCO DE RECORRÊNCIA ▲▲▲ */}
 
   <div className="flex justify-end space-x-2 pt-4">
     <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>

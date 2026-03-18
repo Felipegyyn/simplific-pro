@@ -23,6 +23,9 @@ const BANCOS_BRASIL = [
   { code: '290', name: 'PagBank' },
   { code: '212', name: 'Banco Original' },
   { code: '655', name: 'Neon' },
+  { code: '756', name: 'Sicoob' },
+  { code: '748', name: 'Sicredi' },
+  { code: '380', name: 'PicPay' },
   { code: '000', name: 'Outro / Carteira Física' }
 ];
 

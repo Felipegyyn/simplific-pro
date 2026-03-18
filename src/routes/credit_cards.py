@@ -216,30 +216,37 @@ def criar_fatura():
 @active_user_required # <-- TRAVA APLICADA
 def listar_faturas():
     from src.models.extended_modules import Fatura, CreditCard
-    from datetime import date
+    from datetime import date, datetime
     user_id = get_jwt_identity()
 
-    # 1. Pega o parâmetro 'status' da URL. Ex: /api/faturas?status=aberta
+    # 1. Pega os parâmetros da URL
     status_filter = request.args.get('status')
+    start_date_str = request.args.get('start_date') # <-- NOVO
+    end_date_str = request.args.get('end_date')     # <-- NOVO
 
     # 2. Inicia a construção da query no banco de dados
     query = db.session.query(Fatura, CreditCard).join(
         CreditCard, Fatura.cartao_id == CreditCard.id
     ).filter(Fatura.user_id == user_id)
 
-    # 3. Se um filtro de status foi fornecido E é válido, adiciona à query
+    # 3. Filtro de Status
     if status_filter and status_filter in ['aberta', 'paga']:
         query = query.filter(Fatura.status == status_filter)
 
-    # 4. Executa a query final e ordena o resultado
+    # 4. Executa a query base para buscar todas as faturas do usuário
     faturas_e_cartoes = query.order_by(Fatura.ano.desc(), Fatura.mes.desc()).all()
 
     resultado = []
+    
+    # Prepara as datas de filtro (se existirem)
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+
+    # 5. Processa os resultados e calcula a data de vencimento
     for fatura, cartao in faturas_e_cartoes:
-        data_vencimento_calculada = None  # Começa com None por segurança
+        data_vencimento_calculada = None
 
         try:
-            # Tenta calcular a data de vencimento apenas se o dia do vencimento existir
             if cartao and cartao.due_day:
                 mes_vencimento = fatura.mes + 1
                 ano_vencimento = fatura.ano
@@ -247,12 +254,21 @@ def listar_faturas():
                     mes_vencimento = 1
                     ano_vencimento += 1
                 
-                # Garante que o dia do vencimento é um inteiro antes de usar
-                data_vencimento_calculada = date(ano_vencimento, mes_vencimento, int(cartao.due_day)).isoformat()
+                # Calcula a data exata do vencimento desta fatura
+                data_vencimento_real = date(ano_vencimento, mes_vencimento, int(cartao.due_day))
+                data_vencimento_calculada = data_vencimento_real.isoformat()
+
+                # ▼▼▼ APLICA O FILTRO DE DATA AQUI ▼▼▼
+                # Como a data_vencimento não é uma coluna nativa da tabela (ela é calculada),
+                # nós filtramos os resultados no Python depois de calcular.
+                if start_date and data_vencimento_real < start_date:
+                    continue # Pula essa fatura, pois é mais antiga que a data inicial
+                
+                if end_date and data_vencimento_real > end_date:
+                    continue # Pula essa fatura, pois é mais nova que a data final
+                # ▲▲▲ FIM DO FILTRO DE DATA ▲▲▲
 
         except (TypeError, ValueError) as e:
-            # Se ocorrer um erro (ex: due_day é inválido), loga o erro no terminal do servidor
-            # mas não quebra a aplicação. A data permanecerá como None.
             print(f"AVISO: Não foi possível calcular a data de vencimento para a fatura ID {fatura.id}. Erro: {e}")
             data_vencimento_calculada = None
 
@@ -263,13 +279,11 @@ def listar_faturas():
             'mes': fatura.mes,
             'ano': fatura.ano,
             'status': fatura.status,
-            'data_vencimento': data_vencimento_calculada,  # Sempre inclui a chave no JSON
+            'data_vencimento': data_vencimento_calculada,
             'created_at': fatura.created_at.isoformat() if fatura.created_at else None
         })
         
     return jsonify(resultado), 200
-
-# Em credit_cards.py
 
 @credit_cards_bp.route('/credit-cards/<int:card_id>/transactions', methods=['POST'])
 @jwt_required()

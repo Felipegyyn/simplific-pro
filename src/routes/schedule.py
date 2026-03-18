@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.routes.user import active_user_required
 from datetime import datetime, timedelta
+import calendar # <--- ADICIONE ESTA LINHA AQUI
 from src.models.db import db
 from src.models.extended import ScheduleEvent
 from src.models.user import User
@@ -18,6 +19,8 @@ def get_schedule_events():
     user_id = get_jwt_identity()
     events = ScheduleEvent.query.filter_by(user_id=user_id).all()
     return jsonify([event.to_dict() for event in events])
+
+# ▼▼▼ SUBSTITUA A FUNÇÃO create_schedule_event POR ESTA ▼▼▼
 
 # ▼▼▼ SUBSTITUA A FUNÇÃO create_schedule_event POR ESTA ▼▼▼
 
@@ -38,73 +41,91 @@ def create_schedule_event():
     amount = data.get('amount')
     category = data.get('category')
     
-    # 2. CAPTURA NOVOS DADOS (MEET/EMAIL)
+    # 2. Captura novos dados (Meet, Email e RECORRÊNCIA)
     create_meet = data.get('create_meet', False)
     attendee_email = data.get('attendee_email')
+    is_recurring = data.get('is_recurring', False)
+    recurrence_count = data.get('recurrence_count', 1)
 
     # 3. Validação
     if not title or not date_str or not event_type:
         return jsonify({'error': 'Título, data e tipo são obrigatórios'}), 400
 
     try:
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        base_date = datetime.strptime(date_str, '%Y-%m-%d').date()
     except ValueError:
         return jsonify({'error': 'Data inválida'}), 400
 
-    # 4. Criação Local
-    event = ScheduleEvent(
-        user_id=user_id,
-        title=title,
-        description=description,
-        date=date,
-        time=time_str,
-        type=event_type,
-        priority=priority,
-        value=float(amount) if amount else None,
-        category=category
-    )
+    # Ajusta e garante que a contagem é um número inteiro válido
+    if not is_recurring or not isinstance(recurrence_count, int) or recurrence_count < 1:
+        recurrence_count = 1
 
-    db.session.add(event)
-    db.session.commit() # <--- O evento é salvo aqui com sucesso!
+    user = User.query.get(user_id)
+    created_events = []
 
-    # ▼▼▼ INTEGRAÇÃO GOOGLE CORRIGIDA ▼▼▼
-    # Envolvemos em um TRY para que, se o Google falhar, o usuário não veja erro 500
-    try:
-        user = User.query.get(user_id)
-        if user.google_calendar_token:
-            print("Sincronizando com Google Calendar...")
-            
-            # Chama passando os parâmetros extras
-            google_result = add_event_to_google(
-                user, 
-                event, 
-                attendee_email=attendee_email, 
-                create_meet=create_meet
-            )
-            
-            if google_result:
-                # --- CORREÇÃO DO ERRO 'dict' ---
-                if isinstance(google_result, dict):
-                    # Extrai só o ID string para o banco (Isso evita o erro 500)
-                    event.google_event_id = google_result.get('id')
+    # --- Função Mágica para somar meses considerando os finais de mês (28/30/31) ---
+    def add_months(sourcedate, months):
+        month = sourcedate.month - 1 + months
+        year = int(sourcedate.year + month / 12)
+        month = month % 12 + 1
+        day = min(sourcedate.day, calendar.monthrange(year, month)[1])
+        return datetime(year, month, day).date()
+
+    # 4. O Loop de Criação (Roda 1 vez se for evento único, ou X vezes se for recorrente)
+    for i in range(recurrence_count):
+        # Soma os meses na data base (o primeiro loop soma 0)
+        current_date = add_months(base_date, i)
+        
+        # Adiciona o sufixo visual se for recorrente, ex: "Seguro Carro (1/12)"
+        current_title = f"{title} ({i+1}/{recurrence_count})" if is_recurring else title
+
+        event = ScheduleEvent(
+            user_id=user_id,
+            title=current_title,
+            description=description,
+            date=current_date,
+            time=time_str,
+            type=event_type,
+            priority=priority,
+            value=float(amount) if amount else None,
+            category=category
+        )
+
+        db.session.add(event)
+        db.session.commit() # Salva um a um para garantir o ID e a ordem correta
+        created_events.append(event)
+
+        # --- INTEGRAÇÃO GOOGLE ---
+        try:
+            if user and user.google_calendar_token:
+                print(f"Sincronizando evento '{current_title}' com Google Calendar...")
+                
+                google_result = add_event_to_google(
+                    user, 
+                    event, 
+                    attendee_email=attendee_email, 
+                    create_meet=create_meet
+                )
+                
+                if google_result:
+                    if isinstance(google_result, dict):
+                        event.google_event_id = google_result.get('id')
+                        
+                        meet_link = google_result.get('meet_link')
+                        if meet_link:
+                            desc_atual = event.description or ""
+                            event.description = f"{desc_atual}\n\nLink da Reunião: {meet_link}".strip()
+                    else:
+                        event.google_event_id = google_result
                     
-                    # Se tiver link, adiciona na descrição
-                    meet_link = google_result.get('meet_link')
-                    if meet_link:
-                        desc_atual = event.description or ""
-                        event.description = f"{desc_atual}\n\nLink da Reunião: {meet_link}".strip()
-                else:
-                    # Fallback para string simples (compatibilidade)
-                    event.google_event_id = google_result
-                
-                db.session.commit()
-                
-    except Exception as e:
-        # Se der erro aqui, apenas logamos. O usuário recebe "Sucesso" pois o evento local existe.
-        print(f"Erro na integração Google (Ignorado para não travar o app): {e}")
-    # ▲▲▲ FIM INTEGRAÇÃO ▲▲▲
+                    db.session.commit()
+                    
+        except Exception as e:
+            print(f"Erro na integração Google para o evento '{current_title}': {e}")
+            # Ignora o erro para que o loop não pare e continue criando os próximos meses
 
-    return jsonify({'success': True, 'event': event.to_dict()}), 201
+    # Retorna o primeiro evento gerado para manter a compatibilidade do Frontend
+    return jsonify({'success': True, 'event': created_events[0].to_dict()}), 201
 
 # ▼▼▼ SUBSTITUA A FUNÇÃO update_schedule_event PELA VERSÃO ABAIXO ▼▼▼
 @schedule_bp.route('/schedule/<int:event_id>', methods=['PUT'])
