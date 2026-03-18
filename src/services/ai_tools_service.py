@@ -242,7 +242,7 @@ simplific_tools = [
                     },
                     "required": ["identificador_conta"]
                 }
-            }
+            },
 
             # 15. Metas
             {
