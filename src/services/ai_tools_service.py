@@ -228,6 +228,21 @@ simplific_tools = [
                 }
             },
 
+            # 16. Vincular Conta do Comprovante
+            {
+                "name": "vincular_conta_ultima_transacao",
+                "description": "Finaliza o lançamento de um comprovante. Use isso quando o usuário responder com uma opção numérica (ex: '1' ou '2'). REGRA CRÍTICA: Você DEVE ler a sua mensagem anterior no histórico para ver qual conta o usuário escolheu e extrair APENAS os 4 últimos dígitos da conta correspondente à opção para enviar nesta função.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "digitos_conta": {
+                            "type": "STRING", 
+                            "description": "Apenas os 4 últimos dígitos numéricos da conta escolhida (ex: '2345'). Não mande a opção 1 ou 2, mande os dígitos que estavam escritos na opção."
+                        }
+                    },
+                    "required": ["digitos_conta"]
+                }
+            },
 
             # 15. Metas
             {

@@ -276,24 +276,19 @@ def processar_comprovante_imagem(user_id, image_url):
             print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
             return {"status": "info", "mensagem": "Entendi o comprovante, mas não achei o valor ou a data. Pode me dizer qual é?"}
 
-        # --- Passo 4: Categorizar (IA) e Buscar Conta Bancária ---
+        # --- Passo 4: Categorizar e Criar o Menu Numérico ---
         tipo_transacao = 'entrada' if valor > 0 else 'saida'
         nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
 
-        # Busca o ID da Categoria no banco
         categoria_final = Category.query.filter(
-            Category.user_id == user_id,
-            Category.name.ilike(nome_categoria_ia),
-            Category.type == tipo_transacao
+            Category.user_id == user_id, Category.name.ilike(nome_categoria_ia), Category.type == tipo_transacao
         ).first()
 
-        # Fallback para categoria "Outros"
         if not categoria_final:
             categoria_final = Category.query.filter_by(user_id=user_id, name='Outros', type=tipo_transacao).first()
             if not categoria_final:
-                 return {"status": "erro", "mensagem": "Não encontrei sua categoria 'Outros'. Por favor, verifique suas categorias na plataforma."}
+                 return {"status": "erro", "mensagem": "Categoria 'Outros' não encontrada."}
 
-        # ▼▼▼ NOVA LÓGICA: BUSCA DE MÚLTIPLAS CONTAS BANCÁRIAS ▼▼▼
         bank_account_id_final = None
         nome_banco_encontrado = ""
         conta_banco_exata = None
@@ -301,48 +296,27 @@ def processar_comprovante_imagem(user_id, image_url):
         opcoes_contas_str = ""
 
         if conta_origem_ia:
-            print(f"INFO: IA identificou possível conta de origem: '{conta_origem_ia}'")
-            # Faz a busca flexível e traz TODAS as contas que batem com o nome
             contas_banco = BankAccount.query.filter(
-                BankAccount.user_id == user_id,
-                BankAccount.bank_name.ilike(f"%{conta_origem_ia}%")
+                BankAccount.user_id == user_id, BankAccount.bank_name.ilike(f"%{conta_origem_ia}%")
             ).all()
 
             if len(contas_banco) == 1:
-                # 1. ACHOU SÓ UMA CONTA: Fluxo normal e automático!
                 conta_banco_exata = contas_banco[0]
                 bank_account_id_final = conta_banco_exata.id
                 nome_banco_encontrado = conta_banco_exata.bank_name
-                print(f"SUCESSO: Conta única vinculada: {nome_banco_encontrado}")
-
             elif len(contas_banco) > 1:
-                # 2. ACHOU MAIS DE UMA CONTA: Aciona o alerta!
-                print(f"AVISO: Múltiplas contas encontradas para o banco '{conta_origem_ia}'.")
                 precisa_perguntar = True
-                
-                # Monta um textinho com as opções para enviar no WhatsApp
-                nomes_contas = [f"{c.bank_name} (final {c.account_number[-4:] if c.account_number else 'X'})" for c in contas_banco]
-                opcoes_contas_str = " ou ".join(nomes_contas)
-                
-                # Deixamos bank_account_id_final como None para não chutar a conta errada e bagunçar o saldo
+                lista_opcoes = []
+                # Gera a lista: 1 - PicPay (final 2345)
+                for i, c in enumerate(contas_banco, 1):
+                    final_conta = c.account_number[-4:] if c.account_number else 'XXXX'
+                    lista_opcoes.append(f"*{i}* - {c.bank_name} (final {final_conta})")
+                opcoes_contas_str = "\n".join(lista_opcoes)
 
-            else:
-                # 3. NÃO ACHOU NENHUMA CONTA: Segue a vida sem vincular
-                print(f"AVISO: O banco '{conta_origem_ia}' foi lido, mas o usuário não tem essa conta.")
-        # ▲▲▲ FIM DA NOVA LÓGICA ▲▲▲
+        # --- Passo 5: Salvar Congelado ou Confirmado ---
+        # A Mágica: Se tem dúvida, salva como 'aguardando_conta'
+        status_transacao = 'aguardando_conta' if precisa_perguntar else 'confirmada'
 
-        # --- Passo 5: Decisão de Salvar ou Perguntar ---
-        valor_formatado = format_currency_brl(abs(valor))
-
-        # 1. SE ACHOU MAIS DE UMA CONTA: Aborta o salvamento e avisa!
-        if precisa_perguntar:
-            tipo_str = "saída (despesa)" if tipo_transacao == "saida" else "entrada (receita)"
-            return {
-                "status": "sucesso",
-                "mensagem": f"🧾 Identifiquei um comprovante de {tipo_str} no valor de *{valor_formatado}* ({descricao}). \n\n🤔 Mas notei que você tem mais de uma conta para o banco {conta_origem_ia} ({opcoes_contas_str}). \n\nPor segurança, eu não lancei nada no sistema ainda. Me responda qual dessas contas devo usar e eu farei o lançamento completo!"
-            }
-
-        # 2. SE ACHOU SÓ 1 CONTA (OU NENHUMA): Salva normalmente e atualiza saldo
         novo_lancamento = Transaction(
             user_id=user_id,
             date=datetime.strptime(data_str, '%Y-%m-%d').date(),
@@ -350,7 +324,7 @@ def processar_comprovante_imagem(user_id, image_url):
             category_id=categoria_final.id,
             value=abs(valor),
             description=f"[Comprovante] {descricao}",
-            status='confirmada',
+            status=status_transacao, 
             format='variavel',
             payment_form='a_vista',
             receipt_image_url=permanent_url,
@@ -358,19 +332,21 @@ def processar_comprovante_imagem(user_id, image_url):
         )
         db.session.add(novo_lancamento)
 
-        if bank_account_id_final and conta_banco_exata:
+        # Só abate o saldo se tiver certeza e for confirmada
+        if not precisa_perguntar and bank_account_id_final and conta_banco_exata:
             if tipo_transacao == 'entrada':
                 conta_banco_exata.current_balance += float(abs(valor))
             elif tipo_transacao == 'saida':
                 conta_banco_exata.current_balance -= float(abs(valor))
 
         db.session.commit()
+        valor_formatado = format_currency_brl(abs(valor))
         
-        msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else " (sem vínculo de conta)"
-        return {
-            "status": "sucesso",
-            "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma e o saldo atualizado."
-        }
+        if precisa_perguntar:
+            return {"status": "sucesso", "mensagem": f"🧾 Identifiquei um comprovante de *{valor_formatado}* ({descricao}).\n\n🤔 Mas notei que você tem mais de uma conta para esse banco:\n\n{opcoes_contas_str}\n\nResponda apenas com o *número da opção* (ex: 1) para eu finalizar o lançamento!"}
+        else:
+            msg_conta = f" no banco *{nome_banco_encontrado}*" if bank_account_id_final else ""
+            return {"status": "sucesso", "mensagem": f"Legal! 🧾 Comprovante processado. O lançamento de *{valor_formatado}*{msg_conta} já está *confirmado* na sua plataforma."}
 
     except Exception as e:
         db.session.rollback()
@@ -438,3 +414,46 @@ def vincular_conta_ultima_transacao(user_id, identificador_conta):
         db.session.rollback()
         print(f"Erro CRÍTICO ao vincular conta: {e}")
         return {"status": "erro", "mensagem": "Deu um erro interno ao tentar atualizar a conta e o saldo."}
+
+def vincular_conta_ultima_transacao(user_id, digitos_conta):
+    from src.models.financial import Transaction
+    from src.models.extended_modules import BankAccount
+    from src.models.db import db
+
+    try:
+        # Busca EXATAMENTE o comprovante que congelamos agora a pouco
+        transacao_pendente = Transaction.query.filter_by(
+            user_id=user_id, status='aguardando_conta'
+        ).order_by(Transaction.created_at.desc()).first()
+
+        if not transacao_pendente:
+            return {"status": "erro", "mensagem": "Não encontrei nenhum comprovante aguardando vinculação de conta."}
+
+        # Procura a conta bancária pelos 4 últimos dígitos
+        contas_usuario = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
+        conta_escolhida = None
+        
+        for conta in contas_usuario:
+            if conta.account_number and conta.account_number.endswith(str(digitos_conta).strip()):
+                conta_escolhida = conta
+                break
+
+        if not conta_escolhida:
+            return {"status": "erro", "mensagem": f"Não consegui achar uma conta com o final {digitos_conta}."}
+
+        # Descongela e amarra
+        transacao_pendente.bank_account_id = conta_escolhida.id
+        transacao_pendente.status = 'confirmada'
+        
+        # Atualiza o saldo!
+        if transacao_pendente.type == 'entrada':
+            conta_escolhida.current_balance += float(transacao_pendente.value)
+        elif transacao_pendente.type == 'saida':
+            conta_escolhida.current_balance -= float(transacao_pendente.value)
+        
+        db.session.commit()
+        return {"status": "sucesso", "mensagem": f"Pronto! Vinculei os R$ {transacao_pendente.value} na conta '{conta_escolhida.bank_name}' e o saldo já foi atualizado. ✅"}
+
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": "Erro interno ao atualizar a conta."}

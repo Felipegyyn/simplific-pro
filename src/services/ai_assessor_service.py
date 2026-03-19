@@ -101,6 +101,21 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
                                 "response": {"resultado": resultado_turbinado}
                             }
                         })
+
+                    # ▼▼▼ O BLOCO NOVO ENTRA AQUI ▼▼▼
+                    elif nome_funcao == "vincular_conta_ultima_transacao":
+                        digitos = argumentos.get("digitos_conta", "")
+                        from src.services.transacoes_service import vincular_conta_ultima_transacao
+                        resultado_vinculo = vincular_conta_ultima_transacao(user_id, digitos)
+                        
+                        respostas_das_ferramentas.append({
+                            "function_response": {
+                                "name": "vincular_conta_ultima_transacao",
+                                "response": resultado_vinculo
+                            }
+                        })
+                    # ▲▲▲ FIM DO BLOCO NOVO ▲▲▲
+
                     else:
                         # É uma ferramenta de banco de dados (agenda, meta, lançamentos)
                         print(f"🔧 [LOOP AGENTE] Interceptando ação final: {nome_funcao}")
