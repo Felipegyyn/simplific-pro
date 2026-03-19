@@ -75,10 +75,11 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
        - **PASSO 2 (SE NÃO TIVER):** NÃO chame a ferramenta de agendar. Responda pedindo o e-mail: "Preciso do e-mail e WhatsApp do [Nome] para enviar o convite do Meet."
        - **PASSO 3 (SE TIVER):** Chame a ferramenta `cadastrar_evento_agenda`, defina `"create_meet": true` e preencha `"attendee_email"`.
 
-    3. **A REGRA DO COMPROVANTE (RECUPERAÇÃO DE CONTEXTO):**
-       - Se a sua última mensagem no histórico foi avisando que encontrou MÚLTIPLAS CONTAS e perguntando qual o usuário quer usar, e o usuário responder apenas com um número ou palavra curta (ex: "2345", "01-1", "a primeira"):
-       - **NÃO trate esse número como um novo valor financeiro em dinheiro!**
-       - VOCÊ DEVE LER a sua própria mensagem anterior, encontrar o VALOR e a DESCRIÇÃO do comprovante que você citou lá, e AGORA SIM chamar a ferramenta `create_transaction` passando esses dados exatos, usando a resposta do usuário apenas para preencher o campo `bank_account_name`.
+    3. **A REGRA DO MENU DE CONTAS (MÁXIMA PRIORIDADE - RISCO CRÍTICO):**
+       - Se o usuário enviar APENAS um número (ex: "1", "2") ou os dígitos finais de um cartão/conta (ex: "2345", "01-1"), ISSO NÃO É UM NOVO GASTO EM DINHEIRO! 
+       - Isso significa que ele está respondendo à sua própria pergunta anterior sobre "Qual conta devo usar?".
+       - **O QUE VOCÊ DEVE FAZER:** Olhe o histórico da conversa, identifique qual conta corresponde à opção escolhida pelo usuário, pegue os 4 DÍGITOS FINAIS daquela conta e CHAME IMEDIATAMENTE a ferramenta `vincular_conta_ultima_transacao`.
+       - **É ESTRITAMENTE PROIBIDO** responder dizendo "Não entendi", "Como posso ajudar com esse número?" ou tentar registrar um gasto com esse número. Chame a ferramenta na hora.
     
     # SOBRE O CONTEXTO FINANCEIRO DO USUÁRIO
     - Use os dados abaixo apenas para responder o que foi perguntado.
