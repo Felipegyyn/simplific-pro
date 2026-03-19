@@ -231,16 +231,16 @@ simplific_tools = [
             # 16. Vincular Conta do Comprovante
             {
                 "name": "vincular_conta_ultima_transacao",
-                "description": "Use esta função OBRIGATORIAMENTE e IMEDIATAMENTE se o usuário enviar apenas um número de opção (ex: '1', '2') ou dígitos de conta (ex: '2345'). Isso serve para confirmar a conta de um comprovante que está pendente no sistema. Leia o histórico para deduzir os dígitos corretos da conta escolhida.",
+                "description": "Se o usuário responder com APENAS um número (ex: '1', '2' ou '2345') logo após você ter listado as opções de contas bancárias, OBRIGATORIAMENTE chame esta função. Apenas repasse o número digitado.",
                 "parameters": {
                     "type": "OBJECT",
                     "properties": {
-                        "digitos_conta": {
+                        "opcao_usuario": {
                             "type": "STRING", 
-                            "description": "Apenas os 4 ou 5 últimos dígitos numéricos da conta escolhida (ex: '2345' ou '01-1'). Se o usuário digitou a opção '2', olhe no histórico quais eram os dígitos da conta número 2 e preencha aqui."
+                            "description": "Exatamente o número ou texto que o usuário digitou (ex: '1', '2' ou '2345')."
                         }
                     },
-                    "required": ["digitos_conta"]
+                    "required": ["opcao_usuario"]
                 }
             },
 

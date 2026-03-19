@@ -313,9 +313,13 @@ def processar_comprovante_imagem(user_id, image_url):
                     lista_opcoes.append(f"*{i}* - {c.bank_name} (final {final_conta})")
                 opcoes_contas_str = "\n".join(lista_opcoes)
 
-        # --- Passo 5: Salvar Congelado ou Confirmado ---
-        # A Mágica: Se tem dúvida, salva como 'aguardando_conta'
+        # --- Passo 5: Salvar Congelado e Armazenar Opções ---
         status_transacao = 'aguardando_conta' if precisa_perguntar else 'confirmada'
+        descricao_salvar = f"[Comprovante] {descricao}"
+        
+        # Se precisar perguntar, escondemos o banco na descrição para o Python lembrar depois
+        if precisa_perguntar:
+            descricao_salvar += f" | AI_BANK:{conta_origem_ia}"
 
         novo_lancamento = Transaction(
             user_id=user_id,
@@ -323,7 +327,7 @@ def processar_comprovante_imagem(user_id, image_url):
             type=tipo_transacao,
             category_id=categoria_final.id,
             value=abs(valor),
-            description=f"[Comprovante] {descricao}",
+            description=descricao_salvar,
             status=status_transacao, 
             format='variavel',
             payment_form='a_vista',
@@ -332,7 +336,7 @@ def processar_comprovante_imagem(user_id, image_url):
         )
         db.session.add(novo_lancamento)
 
-        # Só abate o saldo se tiver certeza e for confirmada
+        # Abate o saldo só se tiver certeza
         if not precisa_perguntar and bank_account_id_final and conta_banco_exata:
             if tipo_transacao == 'entrada':
                 conta_banco_exata.current_balance += float(abs(valor))
@@ -415,13 +419,13 @@ def vincular_conta_ultima_transacao(user_id, identificador_conta):
         print(f"Erro CRÍTICO ao vincular conta: {e}")
         return {"status": "erro", "mensagem": "Deu um erro interno ao tentar atualizar a conta e o saldo."}
 
-def vincular_conta_ultima_transacao(user_id, digitos_conta):
+def vincular_conta_ultima_transacao(user_id, opcao_usuario):
     from src.models.financial import Transaction
     from src.models.extended_modules import BankAccount
     from src.models.db import db
 
     try:
-        # Busca EXATAMENTE o comprovante que congelamos agora a pouco
+        # 1. Pega o comprovante congelado
         transacao_pendente = Transaction.query.filter_by(
             user_id=user_id, status='aguardando_conta'
         ).order_by(Transaction.created_at.desc()).first()
@@ -429,30 +433,52 @@ def vincular_conta_ultima_transacao(user_id, digitos_conta):
         if not transacao_pendente:
             return {"status": "erro", "mensagem": "Não encontrei nenhum comprovante aguardando vinculação de conta."}
 
-        # Procura a conta bancária pelos 4 últimos dígitos
-        contas_usuario = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
         conta_escolhida = None
-        
-        for conta in contas_usuario:
-            if conta.account_number and conta.account_number.endswith(str(digitos_conta).strip()):
-                conta_escolhida = conta
-                break
+
+        # 2. Lê a "memória oculta" que deixamos na descrição
+        if " | AI_BANK:" in transacao_pendente.description:
+            partes = transacao_pendente.description.split(" | AI_BANK:")
+            descricao_limpa = partes[0]
+            banco_ia = partes[1].strip()
+
+            # Refaz a mesma lista de contas na mesma ordem do menu
+            contas_banco = BankAccount.query.filter(
+                BankAccount.user_id == user_id, BankAccount.bank_name.ilike(f"%{banco_ia}%")
+            ).all()
+
+            try:
+                # Transforma a opção digitada (ex: "2") no índice da lista
+                indice = int(opcao_usuario.strip()) - 1
+                if 0 <= indice < len(contas_banco):
+                    conta_escolhida = contas_banco[indice]
+            except ValueError:
+                pass
+
+            # Limpa a sujeira que deixamos na descrição
+            transacao_pendente.description = descricao_limpa
+
+        # Fallback: Se o usuário teimar em mandar os 4 dígitos ao invés do "2"
+        if not conta_escolhida:
+            todas_contas = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
+            for c in todas_contas:
+                if c.account_number and c.account_number.endswith(opcao_usuario.strip()):
+                    conta_escolhida = c
+                    break
 
         if not conta_escolhida:
-            return {"status": "erro", "mensagem": f"Não consegui achar uma conta com o final {digitos_conta}."}
+            return {"status": "erro", "mensagem": f"Não consegui identificar a opção '{opcao_usuario}'. Por favor, confira o número e tente novamente."}
 
-        # Descongela e amarra
+        # 3. Descongela, Vincula e Abate o Saldo
         transacao_pendente.bank_account_id = conta_escolhida.id
         transacao_pendente.status = 'confirmada'
         
-        # Atualiza o saldo!
         if transacao_pendente.type == 'entrada':
             conta_escolhida.current_balance += float(transacao_pendente.value)
         elif transacao_pendente.type == 'saida':
             conta_escolhida.current_balance -= float(transacao_pendente.value)
         
         db.session.commit()
-        return {"status": "sucesso", "mensagem": f"Pronto! Vinculei os R$ {transacao_pendente.value} na conta '{conta_escolhida.bank_name}' e o saldo já foi atualizado. ✅"}
+        return {"status": "sucesso", "mensagem": f"Pronto! Vinculei na conta '{conta_escolhida.bank_name}' e o saldo já foi atualizado. ✅"}
 
     except Exception as e:
         db.session.rollback()
