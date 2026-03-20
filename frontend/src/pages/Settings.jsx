@@ -159,7 +159,7 @@ const Settings = ({ user, onLogout }) => {
                   <CardTitle className="text-lg text-blue-900 dark:text-blue-100">Conta Compartilhada</CardTitle>
                 </div>
                 <CardDescription className="text-blue-700/80 dark:text-blue-300/70">
-                  Adicione um sócio ou cônjuge para interagir com o bot.
+                  Adicione um sócio ou cônjuge para interagir com o Simplific.
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid sm:grid-cols-2 gap-4">
