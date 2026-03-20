@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PageHeader from '@/components/PageHeader';
 import {
   Wallet, TrendingUp, MessageCircle, CreditCard, Sparkles, Mic, BarChart3, Video,
   UserPlus, FileText, Target, Brain, Search, Receipt, Building2, Calculator,
   Trophy, Users, Package, Link2, Bell, Globe, PieChart, Award, ArrowUpDown,
-  Shield, Calendar, ChevronDown, ChevronUp, Zap, LineChart, FileUp, Star, DollarSign, Smartphone
+  Shield, Calendar, Zap, LineChart, FileUp, Star, DollarSign, Smartphone
 } from 'lucide-react';
 
 // ── Componente de preview de chat WhatsApp ──────────────────────────────────
@@ -26,7 +26,7 @@ const ChatPreview = ({ messages }) => (
       <div className="w-7 h-7 rounded-full bg-emerald-400 flex items-center justify-center">
         <Sparkles size={12} className="text-white" />
       </div>
-      <span className="text-white text-xs font-semibold">Simplific IA</span>
+      <span className="text-white text-xs font-semibold">Simplific Pro</span>
     </div>
     {messages.map((msg, i) => (
       <ChatBubble key={i} text={msg.text} isBot={msg.isBot} />
@@ -36,7 +36,6 @@ const ChatPreview = ({ messages }) => (
 
 // ── Card de funcionalidade ──────────────────────────────────────────────────
 const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, preview }) => {
-  const [expanded, setExpanded] = useState(false);
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-border hover:shadow-md transition-all hover:-translate-y-1 flex flex-col h-full overflow-hidden">
       <div className="p-6 flex flex-col flex-grow">
@@ -56,26 +55,20 @@ const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, p
         {preview && <ChatPreview messages={preview} />}
 
         <div className="mt-4">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground mb-3">
             <MessageCircle size={12} className="text-emerald-500" />
             Exemplos de comandos
-            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-          </button>
-          {expanded && (
-            <div className="mt-3 bg-muted/50 rounded-xl p-3 border border-border/50 space-y-2">
-              {commands.map((cmd, idx) => (
-                <div key={idx} className="flex gap-2 items-start">
-                  <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1 rounded-full mt-0.5 shrink-0">
-                    <MessageCircle size={10} className="text-emerald-700 dark:text-emerald-400" />
-                  </div>
-                  <p className="text-xs text-foreground font-medium italic">"{cmd}"</p>
+          </div>
+          <div className="bg-muted/50 rounded-xl p-3 border border-border/50 space-y-2">
+            {commands.map((cmd, idx) => (
+              <div key={idx} className="flex gap-2 items-start">
+                <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1 rounded-full mt-0.5 shrink-0">
+                  <MessageCircle size={10} className="text-emerald-700 dark:text-emerald-400" />
                 </div>
-              ))}
-            </div>
-          )}
+                <p className="text-xs text-foreground font-medium italic">"{cmd}"</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -573,61 +566,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
-        {/* SEÇÃO 5 — MÓDULO EMPRESARIAL                                      */}
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        <div className="mb-14">
-          <SectionHeader
-            color="bg-slate-700"
-            icon={Building2}
-            title="Módulo Empresarial"
-            subtitle="Para MEIs, autônomos e pequenas empresas gerenciarem clientes, fornecedores e fluxo de caixa."
-          />
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            <FeatureCard
-              icon={Users}
-              color="bg-slate-700"
-              title="Clientes e Fornecedores"
-              description="Cadastro completo de stakeholders (CPF/CNPJ, endereço, telefone, e-mail). Gerencie quem te deve e quem você deve, com visão clara do relacionamento comercial."
-              commands={[
-                'Cadastra o cliente João Silva, CPF 123.456.789-00',
-                'Me mostra todos os meus clientes cadastrados',
-                'Qual o contato do fornecedor ABC Distribuidora?',
-                'Atualiza o e-mail da cliente Maria para novo@email.com',
-              ]}
-            />
-
-            <FeatureCard
-              icon={Package}
-              color="bg-amber-700"
-              title="Inventário de Produtos"
-              description="Controle o estoque da sua empresa: cadastre produtos com preço de custo e venda, registre entradas e saídas e acompanhe o valor total do inventário em tempo real."
-              commands={[
-                'Adiciona 50 unidades do produto Camiseta P ao estoque',
-                'Qual o saldo em estoque do produto X?',
-                'Baixa 10 unidades de Camiseta M por venda',
-                'Me mostra o inventário completo',
-              ]}
-            />
-
-            <FeatureCard
-              icon={DollarSign}
-              color="bg-green-700"
-              title="Contas a Pagar e a Receber"
-              description="Cadastre e controle todas as obrigações financeiras da empresa: notas a pagar a fornecedores, parcelas de contratos e recebimentos de clientes — com status e data de vencimento."
-              commands={[
-                'Tenho que pagar 1.200 para o fornecedor X dia 15',
-                'O cliente Y me deve 3.500 com vencimento amanhã',
-                'Quais contas vencem essa semana?',
-                'Marca como pago o boleto do fornecedor ABC',
-              ]}
-            />
-
-          </div>
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════════════ */}
-        {/* SEÇÃO 6 — CONEXÕES E INTEGRAÇÕES                                  */}
+        {/* SEÇÃO 5 — CONEXÕES E INTEGRAÇÕES                                  */}
         {/* ══════════════════════════════════════════════════════════════════ */}
         <div className="mb-14">
           <SectionHeader
@@ -643,7 +582,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               color="bg-emerald-600"
               title="Open Finance — Sincronização Bancária"
               description="Conecte seus cartões de crédito via Open Finance (Pluggy). O sistema importa automaticamente as transações, categoriza com IA e organiza por fatura — sem precisar lançar nada manualmente."
-              badge="Open Finance"
+              badge="Em breve"
               commands={[
                 'Conecta meu Nubank no sistema',
                 'Sincroniza as transações do meu cartão Itaú',
