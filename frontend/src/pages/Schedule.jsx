@@ -27,6 +27,7 @@ const Schedule = ({ user, onLogout }) => {
   // Estados puramente de UI para o calendário visual
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState(null);
   
   // Estados para eventos e modal
   const [eventos, setEventos] = useState([]);
@@ -700,8 +701,10 @@ const Schedule = ({ user, onLogout }) => {
                                 {eventosNoDia.slice(0, 3).map(evento => (
                                   <span
                                     key={evento.id}
+                                    onClick={(e) => { e.stopPropagation(); setSelectedCalendarEvent(evento); }}
                                     className={[
-                                      'text-[10px] leading-tight px-1 py-0.5 rounded text-white truncate',
+                                      'text-[10px] leading-tight px-1 py-0.5 rounded text-white truncate cursor-pointer',
+                                      'hover:opacity-80 hover:scale-[1.02] transition-all',
                                       evento.is_completed
                                         ? 'bg-gray-400 line-through'
                                         : (tipoCorCalendario[evento.type] || 'bg-gray-500'),
@@ -1129,6 +1132,99 @@ const Schedule = ({ user, onLogout }) => {
             </DialogContent>
           </Dialog>
           {/* ▲▲▲ FIM DO NOVO MODAL DE EDIÇÃO ▲▲▲ */}
+
+          {/* ── MODAL DE DETALHE DO EVENTO (CALENDÁRIO) ─────────────────── */}
+          <Dialog open={!!selectedCalendarEvent} onOpenChange={(open) => { if (!open) setSelectedCalendarEvent(null); }}>
+            <DialogContent className="sm:max-w-[460px]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 flex-wrap">
+                  {selectedCalendarEvent && getTipoBadge(selectedCalendarEvent.type)}
+                  <span className="text-base font-bold dark:text-slate-100">
+                    {selectedCalendarEvent?.title}
+                  </span>
+                </DialogTitle>
+              </DialogHeader>
+
+              {selectedCalendarEvent && (
+                <div className="space-y-4">
+                  {/* Status + Prioridade */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {getStatusIcon(selectedCalendarEvent.is_completed)}
+                    <span className="text-sm text-gray-600 dark:text-slate-400">
+                      {selectedCalendarEvent.is_completed ? 'Concluído' : 'Pendente'}
+                    </span>
+                    {getPrioridadeBadge(selectedCalendarEvent.priority)}
+                  </div>
+
+                  {/* Descrição */}
+                  {selectedCalendarEvent.description && (
+                    <p className="text-sm text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+                      {selectedCalendarEvent.description}
+                    </p>
+                  )}
+
+                  {/* Grid de informações */}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+                      <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Data</p>
+                      <p className="font-semibold dark:text-slate-200">{formatarData(selectedCalendarEvent.date)}</p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+                      <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Horário</p>
+                      <p className="font-semibold dark:text-slate-200">{selectedCalendarEvent.time || '—'}</p>
+                    </div>
+                    {selectedCalendarEvent.category && (
+                      <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+                        <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Categoria</p>
+                        <p className="font-semibold dark:text-slate-200">{selectedCalendarEvent.category}</p>
+                      </div>
+                    )}
+                    {selectedCalendarEvent.value && (
+                      <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+                        <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Valor</p>
+                        <p className={`font-bold text-base ${selectedCalendarEvent.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
+                          R$ {selectedCalendarEvent.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Ações */}
+                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
+                    {!selectedCalendarEvent.is_completed && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { marcarConcluido(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
+                        className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Concluir
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { abrirModalEdicao(selectedCalendarEvent); setSelectedCalendarEvent(null); }}
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Editar
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { excluirEvento(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
+                      className="text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Excluir
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+          {/* ── FIM MODAL DE DETALHE DO EVENTO ───────────────────────────── */}
         </div>
     </div>
   );
