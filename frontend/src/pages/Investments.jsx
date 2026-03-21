@@ -17,6 +17,7 @@ import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
 import InvestmentDetailModal from './InvestmentDetailModal';
 import HomeBroker from '@/components/HomeBroker';
+import StockTicker from '@/components/StockTicker';
 const formatCurrency = (value) => {
   return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
@@ -422,6 +423,7 @@ const handleCalculate = async (e) => {
                         </div>
                       
                     </header>
+        <StockTicker />
         <div className="p-4 sm:p-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold">Carteira de Investimentos</h2>
