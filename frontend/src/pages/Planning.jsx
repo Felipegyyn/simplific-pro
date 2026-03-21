@@ -435,6 +435,60 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
   carregarDadosOrcamento();
 }, [abaAtiva]);
 
+  // ── Dados raw para filtro mensal do orçamento (novo, não altera useEffect existente) ──
+  const [rawPlanosOrcamento, setRawPlanosOrcamento] = useState([]);
+  const [rawTransacoesOrcamento, setRawTransacoesOrcamento] = useState([]);
+  const [filtroMesOrcamento, setFiltroMesOrcamento] = useState('');
+  const [filtroAnoOrcamento, setFiltroAnoOrcamento] = useState(String(new Date().getFullYear()));
+
+  useEffect(() => {
+    if (abaAtiva !== 'orcamento') return;
+    const carregarRaw = async () => {
+      try {
+        const [planosResp, transacoesResp] = await Promise.all([
+          apiService.get('/api/planning'),
+          apiService.get('/api/transactions')
+        ]);
+        setRawPlanosOrcamento(planosResp.plannings || []);
+        setRawTransacoesOrcamento(transacoesResp.transacoes || transacoesResp.transactions || []);
+      } catch (e) {
+        console.error('Erro ao carregar dados raw do orçamento:', e);
+      }
+    };
+    carregarRaw();
+  }, [abaAtiva]);
+
+  const orcamentosComTipo = useMemo(() => {
+    if (rawPlanosOrcamento.length === 0) return orcamentos.map(o => ({ ...o, tipo: '' }));
+
+    let planos = rawPlanosOrcamento;
+    let transacoes = rawTransacoesOrcamento;
+
+    if (filtroAnoOrcamento) {
+      const ano = parseInt(filtroAnoOrcamento);
+      planos = planos.filter(p => new Date(p.date || p.start_date).getFullYear() === ano);
+      transacoes = transacoes.filter(t => new Date(t.transaction_date || t.date).getFullYear() === ano);
+    }
+    if (filtroMesOrcamento) {
+      const mes = parseInt(filtroMesOrcamento);
+      planos = planos.filter(p => new Date(p.date || p.start_date).getMonth() + 1 === mes);
+      transacoes = transacoes.filter(t => new Date(t.transaction_date || t.date).getMonth() + 1 === mes);
+    }
+
+    const nomes = [...new Set(planos.map(p => p.category_name).filter(Boolean))];
+    return nomes.map(nomeCategoria => {
+      const planosCategoria = planos.filter(p => p.category_name === nomeCategoria);
+      const planejado = planosCategoria.reduce((acc, p) => acc + parseFloat(p.total_amount || 0), 0);
+      const tipo = planosCategoria[0]?.type || '';
+      const gasto = transacoes
+        .filter(t => t.category === nomeCategoria)
+        .reduce((acc, t) => acc + parseFloat(t.value || t.amount || 0), 0);
+      const disponivel = planejado - gasto;
+      const progresso = planejado > 0 ? (gasto / planejado) * 100 : 0;
+      return { categoria: nomeCategoria, tipo, orcado: planejado, gasto, disponivel, progresso };
+    });
+  }, [rawPlanosOrcamento, rawTransacoesOrcamento, filtroMesOrcamento, filtroAnoOrcamento, orcamentos]);
+
   const [newCategory, setNewCategory] = useState({ name: '', type: '' });
 
 const handleCreateCategory = async (e) => {
@@ -452,6 +506,17 @@ const handleCreateCategory = async (e) => {
     alert('Erro ao criar categoria.');
   }
 };
+
+  const getPlanRowBorderClass = (plan) => {
+    if (plan.status !== 'confirmed') return 'border-l-4 border-l-orange-400';
+    return plan.type === 'entrada' ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-red-500';
+  };
+
+  const getOrcBorderClass = (progresso) => {
+    if (progresso > 90) return 'border-l-4 border-l-red-500';
+    if (progresso > 70) return 'border-l-4 border-l-yellow-400';
+    return 'border-l-4 border-l-green-500';
+  };
 
   const getProgressColor = (progresso) => {
     if (progresso <= 50) return 'bg-green-500';
@@ -1007,93 +1072,78 @@ useEffect(() => {
   </div>
 </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {planejamentos.map((plan) => (
-                  <Card key={plan.id} className="relative">
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <p className="text-lg text-gray-600 dark:text-slate-400 font-semibold">
-                          {plan.category_name}
-                        </p>
-                          <p className={`text-sm font-semibold ${plan.type === 'saida' ? 'text-red-600' : 'text-blue-600'}`}>
-                          {plan.type}
-                        </p>
-                          <h3 className="text-base font-semibold mt-1">{plan.title}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {new Date(plan.start_date).toLocaleDateString()}
-                        </p>
-                          {plan.observations && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Descrição: {plan.observations}
-                        </p>
+              {/* ── DRE Planejamentos ── */}
+              {(() => {
+                const PlanRow = ({ plan }) => (
+                  <div className={`${getPlanRowBorderClass(plan)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-sm dark:text-slate-100">{plan.category_name}</h3>
+                        {plan.status === 'confirmed' && (
+                          <span className="px-2 py-0.5 text-xs font-bold text-black bg-lime-400 rounded">CONFIRMADO</span>
                         )}
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                          {plan.status !== 'confirmed' && (
-                          <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => confirmarPlanejamento(plan.id)}
-                          title="Confirmar Planejamento"
-                          >
-                          Confirmar
-                          </Button>
-                          )}
-
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => abrirModalEdicao(plan)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => excluirPlanejamento(plan.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
                       </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Valor Total</p>
-                          <p className="text-xl font-bold text-blue-600 dark:text-blue-400">R$ {plan.total_amount.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Valor Gasto</p>
-                          <p className="text-xl font-bold text-red-600 dark:text-red-400">R$ {(plan.spent_amount || 0).toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Disponível</p>
-                          <p className="text-xl font-bold text-green-600">R$ {(plan.total_amount - (plan.spent_amount || 0)).toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Progresso</p>
-                          <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{((plan.progress ?? 0).toFixed(1))}%</p>
-                        </div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-500 dark:text-slate-400 mb-2">
+                        <span><span className="font-medium">Data:</span> {new Date(plan.start_date).toLocaleDateString()}</span>
+                        {plan.observations && <span><span className="font-medium">Obs:</span> {plan.observations}</span>}
                       </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Progresso do Planejamento</span>
-                          <span>{(plan.progress || 0).toFixed(1)}%</span>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
+                        <span className="text-blue-600 font-semibold">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-red-500 font-semibold">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-green-600 font-semibold">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                          <div className={`h-2 rounded-full ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
                         </div>
-                        <Progress value={plan.progress || 0} className="h-3" />
+                        <span className="text-xs font-medium text-gray-500 dark:text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
                       </div>
-                      {plan.status === 'confirmed' && (
-                      <div className="absolute bottom-2 left-2 px-2 py-1 text-xs font-bold text-black bg-lime-400 rounded">
-                      CONFIRMADO
-                      </div>
+                    </div>
+                    <div className="flex gap-1 mt-3 sm:mt-0 sm:ml-4 shrink-0">
+                      {plan.status !== 'confirmed' && (
+                        <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)}>Confirmar</Button>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(plan)}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="outline" size="sm" onClick={() => excluirPlanejamento(plan.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                );
+
+                const entradas = planejamentos.filter(p => p.type === 'entrada');
+                const saidas = planejamentos.filter(p => p.type === 'saida');
+
+                return (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                          <TrendingUp className="h-5 w-5" /> Entradas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {entradas.length > 0
+                          ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma entrada planejada</p>
+                        }
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                          <Target className="h-5 w-5" /> Saídas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {saidas.length > 0
+                          ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma saída planejada</p>
+                        }
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })()}
             </TabsContent>
 
             {/* Orçamento por Categoria */}
@@ -1204,46 +1254,93 @@ useEffect(() => {
 
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {orcamentos.map((orc, index) => (
-                  <Card key={index}>
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-semibold dark:text-gray-100">{orc.categoria}</h3>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Orçado</p>
-                          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">R$ {orc.orcado.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Gasto</p>
-                          <p className="text-lg font-bold text-red-600dark:text-red-400">R$ {orc.gasto.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Disponível</p>
-                          <p className="text-lg font-bold text-green-600">R$ {(orc.orcado - orc.gasto).toLocaleString()}</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Utilização do Orçamento</span>
-                          <span className={`font-medium ${orc.progresso > 90 ? 'text-red-600' : orc.progresso > 70 ? 'text-yellow-600' : 'text-green-600'}`}>
-                            {orc.progresso.toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-3">
-                          <div 
-                            className={`h-3 rounded-full ${getProgressColor(orc.progresso)}`}
-                            style={{ width: `${Math.min(orc.progresso, 100)}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+              {/* ── Filtro mês/ano ── */}
+              <div className="flex flex-wrap gap-4 items-end mb-2">
+                <div>
+                  <Label className="block mb-1 text-sm">Ano</Label>
+                  <select
+                    value={filtroAnoOrcamento}
+                    onChange={(e) => setFiltroAnoOrcamento(e.target.value)}
+                    className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+                  >
+                    {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map(a => (
+                      <option key={a} value={String(a)}>{a}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label className="block mb-1 text-sm">Mês</Label>
+                  <select
+                    value={filtroMesOrcamento}
+                    onChange={(e) => setFiltroMesOrcamento(e.target.value)}
+                    className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+                  >
+                    <option value="">Todos</option>
+                    {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
+                      <option key={i+1} value={String(i+1)}>{m}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
+
+              {/* ── DRE Orçamento ── */}
+              {(() => {
+                const OrcRow = ({ orc }) => (
+                  <div className={`${getOrcBorderClass(orc.progresso)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm dark:text-slate-100 mb-2">{orc.categoria}</h3>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
+                        <span className="text-blue-600 font-semibold">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-red-500 font-semibold">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-green-600 font-semibold">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                          <div className={`h-2 rounded-full ${getProgressColor(orc.progresso)}`} style={{ width: `${Math.min(orc.progresso, 100)}%` }} />
+                        </div>
+                        <span className={`text-xs font-medium w-12 text-right ${orc.progresso > 90 ? 'text-red-600' : orc.progresso > 70 ? 'text-yellow-600' : 'text-green-600'}`}>
+                          {orc.progresso.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+
+                const entradasOrc = orcamentosComTipo.filter(o => o.tipo === 'entrada');
+                const saidasOrc = orcamentosComTipo.filter(o => o.tipo === 'saida');
+
+                return (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                          <TrendingUp className="h-5 w-5" /> Entradas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {entradasOrc.length > 0
+                          ? entradasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhum orçamento de entrada encontrado</p>
+                        }
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                          <Target className="h-5 w-5" /> Saídas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {saidasOrc.length > 0
+                          ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhum orçamento de saída encontrado</p>
+                        }
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })()}
             </TabsContent>
           </Tabs>
 
