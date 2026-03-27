@@ -389,45 +389,58 @@ const Schedule = ({ user, onLogout }) => {
           </div>
 
 
-          {/* Cards de Resumo */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                  <Calendar className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          {/* Card de Resumo Agrupado */}
+          <Card className="mb-8 border-orange-500 border-2">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Próximos Eventos */}
+                <div className="flex items-center">
+                  <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
+                    <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Próximos Eventos</p>
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{eventosProximos.length}</p>
                   </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <Clock className="h-8 w-8 text-green-600 dark:text-green-400" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Hoje</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{eventosHoje.length}</p>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <DollarSign className="h-8 w-8 text-red-600 dark:text-red-400" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pagamentos Pendentes</p>
-                  <p className="text-2xl font-bold text-red-600 dark:text-red-400">R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+
+                {/* Hoje */}
+                <div className="flex items-center">
+                  <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
+                    <Clock className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Hoje</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{eventosHoje.length}</p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <AlertTriangle className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Atrasados</p>
-                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{eventosAtrasados.length}</p>
+
+                {/* Pagamentos Pendentes */}
+                <div className="flex items-center">
+                  <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full">
+                    <DollarSign className="h-6 w-6 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pagamentos Pendentes</p>
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+
+                {/* Atrasados */}
+                <div className="flex items-center">
+                  <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full">
+                    <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Atrasados</p>
+                    <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{eventosAtrasados.length}</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           <Tabs defaultValue="calendario" className="space-y-6">
 <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
