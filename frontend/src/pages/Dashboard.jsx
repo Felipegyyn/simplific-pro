@@ -573,166 +573,162 @@ const tutorials = [
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Card de Resumo Financeiro */}
+        <Card className="overflow-hidden">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">Total Receitas</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalReceitas)}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-100 text-sm font-medium">Total Receitas</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalReceitas)}</p>
+                  </div>
+                  <div className="bg-green-400 bg-opacity-30 rounded-full p-3">
+                    <TrendingUp className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className="flex items-center mt-4">
+                  <ArrowUpRight className="h-4 w-4 mr-1" />
+                  <span className="text-sm text-green-100">{receitaPercentual.toFixed(1)}% vs mês anterior</span>
+                </div>
               </div>
-              <div className="bg-green-400 bg-opacity-30 rounded-full p-3">
-                <TrendingUp className="h-6 w-6" />
+
+              <div className="p-4 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-100 text-sm font-medium">Total Despesas</p>
+                    <p className="text-2xl font-bold">{formatCurrency(totalDespesas)}</p>
+                  </div>
+                  <div className="bg-red-400 bg-opacity-30 rounded-full p-3">
+                    <TrendingDown className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className="flex items-center mt-4">
+                  <ArrowDownRight className="h-4 w-4 mr-1" />
+                  <span className="text-sm text-red-100">{despesaPercentual > 0 ? '+' : ''}{despesaPercentual.toFixed(1)}% vs mês anterior</span>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center mt-4">
-              <ArrowUpRight className="h-4 w-4 mr-1" />
-              <span className="text-sm text-green-100">{receitaPercentual.toFixed(1)}% vs mês anterior</span>
+
+              <div className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-100 text-sm font-medium">Saldo Líquido</p>
+                    <p className="text-2xl font-bold">{formatCurrency(saldoLiquido)}</p>
+                  </div>
+                  <div className="bg-blue-400 bg-opacity-30 rounded-full p-3">
+                    <Wallet className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className={`flex items-center mt-4 ${statusSaldo.color}`}>
+                  <statusSaldo.Icon className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{statusSaldo.text}</span>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm font-medium">Investimentos</p>
+                    <p className="text-2xl font-bold">{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</p>
+                  </div>
+                  <div className="bg-purple-400 bg-opacity-30 rounded-full p-3">
+                    <Building2 className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className="flex items-center mt-4">
+                  {dashboardData.summary.investmentsProfitability >= 0 ? (
+                    <ArrowUpRight className="h-4 w-4 mr-1" />
+                  ) : (
+                    <ArrowDownRight className="h-4 w-4 mr-1" />
+                  )}
+                  <span className="text-sm text-purple-100">
+                    {dashboardData.summary.investmentsProfitability.toFixed(2)}% rentabilidade
+                  </span>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-red-500 to-red-600 text-white">
+        {/* Card de Status e Metas */}
+        <Card className="overflow-hidden">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-red-100 text-sm font-medium">Total Despesas</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalDespesas)}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Metas Ativas</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.metasAtivas}</p>
+                  </div>
+                  <Target className="h-8 w-8 text-orange-500" />
+                </div>
+                <div className="mt-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {dashboardData.summary.metasConcluidas} concluídas
+                  </Badge>
+                </div>
               </div>
-              <div className="bg-red-400 bg-opacity-30 rounded-full p-3">
-                <TrendingDown className="h-6 w-6" />
-              </div>
-            </div>
-            <div className="flex items-center mt-4">
-              <ArrowDownRight className="h-4 w-4 mr-1" />
-              <span className="text-sm text-red-100">{despesaPercentual > 0 ? '+' : ''}{despesaPercentual.toFixed(1)}% vs mês anterior</span>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Saldo Líquido</p>
-                <p className="text-2xl font-bold">{formatCurrency(saldoLiquido)}</p>
+              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                   <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Próximos Eventos</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.proximosEventos}</p>
+                  </div>
+                  <Calendar className="h-8 w-8 text-pink-500" />
+                </div>
+                <div className="mt-2">
+                  <Badge variant="outline" className="text-xs">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Esta semana
+                  </Badge>
+                </div>
               </div>
-              <div className="bg-blue-400 bg-opacity-30 rounded-full p-3">
-                <Wallet className="h-6 w-6" />
-              </div>
-            </div>
-            <div className={`flex items-center mt-4 ${statusSaldo.color}`}>
-              <statusSaldo.Icon className="h-4 w-4 mr-1" />
-              <span className="text-sm">{statusSaldo.text}</span>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm font-medium">Investimentos</p>
-                <p className="text-2xl font-bold">{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</p>
+              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Limite disponível</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">
+                      {formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}
+                    </p>
+                  </div>
+                  <CreditCard className="h-8 w-8 text-purple-500" />
+                </div>
+                <div className="mt-2">
+                  {dashboardData.summary.limiteTotalCartoes > 0 && 
+                   (dashboardData.summary.limiteDisponivelCartoes / dashboardData.summary.limiteTotalCartoes <= 0.1) ? (
+                    <Badge variant="destructive" className="text-xs">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Atenção
+                    </Badge>
+                  ) : (
+                   <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Tudo certo
+                    </Badge>
+                  )}
+                </div>
               </div>
-              <div className="bg-purple-400 bg-opacity-30 rounded-full p-3">
-                <Building2 className="h-6 w-6" />
-              </div>
-            </div>
-            <div className="flex items-center mt-4">
-              {dashboardData.summary.investmentsProfitability >= 0 ? (
-                <ArrowUpRight className="h-4 w-4 mr-1" />
-              ) : (
-                <ArrowDownRight className="h-4 w-4 mr-1" />
-              )}
-              <span className="text-sm text-purple-100">
-                {dashboardData.summary.investmentsProfitability.toFixed(2)}% rentabilidade
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Metas Ativas</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.metasAtivas}</p>
+              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Status Geral</p>
+                    <p className={`text-2xl font-bold ${dashboardData.overallStatus.color}`}>
+                      {dashboardData.overallStatus.text}
+                    </p>
+                  </div>
+                  <dashboardData.overallStatus.Icon className={`h-8 w-8 ${dashboardData.overallStatus.color}`} />
+                </div>
+                <div className="mt-2">
+                  <Badge variant="default" className={`text-xs ${dashboardData.overallStatus.badgeColor}`}>
+                    <dashboardData.overallStatus.Icon className="h-3 w-3 mr-1" />
+                    {dashboardData.overallStatus.badgeText}
+                  </Badge>
+                </div>
               </div>
-              <Target className="h-8 w-8 text-orange-500" />
-            </div>
-            <div className="mt-2">
-              <Badge variant="secondary" className="text-xs">
-                {dashboardData.summary.metasConcluidas} concluídas
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-               <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Próximos Eventos</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.proximosEventos}</p>
-              </div>
-              <Calendar className="h-8 w-8 text-pink-500" />
-            </div>
-            <div className="mt-2">
-              <Badge variant="outline" className="text-xs">
-                <Clock className="h-3 w-3 mr-1" />
-                Esta semana
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Limite disponível</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">
-                  {formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}
-                </p>
-              </div>
-              <CreditCard className="h-8 w-8 text-purple-500" />
-            </div>
-            <div className="mt-2">
-              {dashboardData.summary.limiteTotalCartoes > 0 && 
-               (dashboardData.summary.limiteDisponivelCartoes / dashboardData.summary.limiteTotalCartoes <= 0.1) ? (
-                <Badge variant="destructive" className="text-xs">
-                  <AlertTriangle className="h-3 w-3 mr-1" />
-                  Atenção
-                </Badge>
-              ) : (
-               <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Tudo certo
-                </Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Status Geral</p>
-                <p className={`text-2xl font-bold ${dashboardData.overallStatus.color}`}>
-                  {dashboardData.overallStatus.text}
-                </p>
-              </div>
-              <dashboardData.overallStatus.Icon className={`h-8 w-8 ${dashboardData.overallStatus.color}`} />
-            </div>
-            <div className="mt-2">
-              <Badge variant="default" className={`text-xs ${dashboardData.overallStatus.badgeColor}`}>
-                <dashboardData.overallStatus.Icon className="h-3 w-3 mr-1" />
-                {dashboardData.overallStatus.badgeText}
-              </Badge>
             </div>
           </CardContent>
         </Card>
