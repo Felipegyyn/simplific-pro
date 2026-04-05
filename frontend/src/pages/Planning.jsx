@@ -1187,108 +1187,53 @@ useEffect(() => {
                 </Dialog>
 
                 <Dialog>
-  <DialogTrigger asChild>
-    <Dialog>
-  <DialogTrigger asChild>
-    <Button>
-      <Plus className="h-4 w-4 mr-2" />
-      Nova Categoria
-    </Button>
-  </DialogTrigger>
-  <DialogContent className="sm:max-w-[400px]">
-  <DialogHeader>
-    <DialogTitle>Nova Categoria</DialogTitle>
-  </DialogHeader>
-  {/* ▼▼▼ SUBSTITUA O FORMULÁRIO INTEIRO POR ESTE ▼▼▼ */}
-  <form onSubmit={handleCreateCategory} className="space-y-4">
-    <div>
-      <Label htmlFor="new_category_name">Nome da Categoria</Label>
-      <Input
-        id="new_category_name"
-        value={newCategory.name}
-        onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
-        placeholder="Ex: Transporte, Salário..."
-        required
-      />
-    </div>
-
-    {/* CAMPO DE TIPO ADICIONADO */}
-    <div>
-      <Label htmlFor="new_category_type">Tipo</Label>
-      <select
-        id="new_category_type"
-        value={newCategory.type}
-        onChange={(e) => setNewCategory(prev => ({ ...prev, type: e.target.value }))}
-        required
-        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2 w-full mt-1 bg-white"
-      >
-        <option value="">Selecione o tipo</option>
-        <option value="entrada">Entrada</option>
-        <option value="saida">Saída</option>
-      </select>
-    </div>
-
-    <div className="flex justify-end space-x-2 pt-4">
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => {
-          const trigger = document.querySelector('[aria-controls="radix-r0"]'); // Adapte se necessário para fechar o modal
-          if(trigger) trigger.click();
-          setNewCategory({ name: '', type: '' });
-        }}
-      >
-        Cancelar
-      </Button>
-      <Button type="submit">Salvar</Button>
-    </div>
-  </form>
-</DialogContent>
-</Dialog>
-
-  </DialogTrigger>
-  <DialogContent className="sm:max-w-[425px]">
-    <DialogHeader>
-      <DialogTitle>Nova Categoria</DialogTitle>
-    </DialogHeader>
-    <form onSubmit={handleCreateCategory} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="category_name">Nome da Categoria</Label>
-        <Input
-          id="category_name"
-          name="category_name"
-          value={newCategory.name}
-          onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="category_type">Tipo</Label>
-        <select
-          id="category_type"
-          name="category_type"
-          value={newCategory.type}
-          onChange={(e) => setNewCategory(prev => ({ ...prev, type: e.target.value }))}
-          required
-          className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2 w-full"
-        >
-          <option value="">Selecione o tipo</option>
-          {tiposUnicos.map((tipo, index) => (
-          <option key={index} value={tipo}>
-            {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-          </option>
-))}
-
-        </select>
-      </div>
-      <div className="flex justify-end space-x-2">
-        <Button type="submit">Salvar</Button>
-      </div>
-    </form>
-  </DialogContent>
-</Dialog>
-
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Categoria
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Nova Categoria</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateCategory} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="category_name">Nome da Categoria</Label>
+                        <Input
+                          id="category_name"
+                          name="category_name"
+                          value={newCategory.name}
+                          onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category_type">Tipo</Label>
+                        <select
+                          id="category_type"
+                          name="category_type"
+                          value={newCategory.type}
+                          onChange={(e) => setNewCategory(prev => ({ ...prev, type: e.target.value }))}
+                          required
+                          className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2 w-full mt-1 bg-white"
+                        >
+                          <option value="">Selecione o tipo</option>
+                          {tiposUnicos.map((tipo, index) => (
+                            <option key={index} value={tipo}>
+                              {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button type="submit">Salvar</Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
+            </div>
 
               {/* ── Filtro mês/ano ── */}
               <div className="flex flex-wrap gap-4 items-end mb-2">
