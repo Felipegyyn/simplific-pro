@@ -295,6 +295,40 @@ const excluirPlanejamento = async (id) => {
   }
 };
 
+const handleExcluirOrcamento = async (orc) => {
+  if (!orc.planningIds || orc.planningIds.length === 0) return;
+  
+  const confirmMsg = orc.planningIds.length > 1 
+    ? `Tem certeza que deseja excluir os ${orc.planningIds.length} planejamentos da categoria "${orc.categoria}" neste período?`
+    : `Tem certeza que deseja excluir o planejamento da categoria "${orc.categoria}" neste período?`;
+
+  if (!window.confirm(confirmMsg)) return;
+
+  try {
+    setLoading(true);
+    // Exclui todos os planejamentos vinculados àquela categoria no período
+    await Promise.all(orc.planningIds.map(id => apiService.delete(`/api/planning/${id}`)));
+    
+    // Recarrega os dados para atualizar a interface
+    await loadPlanejamentos();
+    
+    // Recarrega os dados raw para atualizar a aba de orçamento
+    const [planosResp, transacoesResp] = await Promise.all([
+      apiService.get('/api/planning'),
+      apiService.get('/api/transactions')
+    ]);
+    setRawPlanosOrcamento(planosResp.plannings || []);
+    setRawTransacoesOrcamento(transacoesResp.transacoes || transacoesResp.transactions || []);
+    
+    alert('Orçamento excluído com sucesso!');
+  } catch (error) {
+    console.error('Erro ao excluir orçamento:', error);
+    alert('Erro ao excluir orçamento. Tente novamente.');
+  } finally {
+    setLoading(false);
+  }
+};
+
   // Função para abrir modal de edição
   const abrirModalEdicao = (planejamento) => {
   setSelectedPlanejamento(planejamento);
@@ -478,6 +512,7 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
     const nomes = [...new Set(planos.map(p => p.category_name).filter(Boolean))];
     return nomes.map(nomeCategoria => {
       const planosCategoria = planos.filter(p => p.category_name === nomeCategoria);
+      const planningIds = planosCategoria.map(p => p.id); // Captura os IDs para exclusão
       const planejado = planosCategoria.reduce((acc, p) => acc + parseFloat(p.total_amount || 0), 0);
       const tipo = planosCategoria[0]?.type || '';
       const gasto = transacoes
@@ -485,7 +520,7 @@ alert('Planejamento cadastrado com sucesso!'); // ✅ ALERTA AQUI
         .reduce((acc, t) => acc + parseFloat(t.value || t.amount || 0), 0);
       const disponivel = planejado - gasto;
       const progresso = planejado > 0 ? (gasto / planejado) * 100 : 0;
-      return { categoria: nomeCategoria, tipo, orcado: planejado, gasto, disponivel, progresso };
+      return { categoria: nomeCategoria, tipo, orcado: planejado, gasto, disponivel, progresso, planningIds };
     });
   }, [rawPlanosOrcamento, rawTransacoesOrcamento, filtroMesOrcamento, filtroAnoOrcamento, orcamentos]);
 
@@ -837,158 +872,6 @@ useEffect(() => {
             <TabsContent value="planejamentos" className="space-y-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Novo Planejamento
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Criar Novo Planejamento</DialogTitle>
-                    </DialogHeader>
-                   <form onSubmit={handleSubmit} className="space-y-4">
-  <div className="space-y-2">
-  <Label htmlFor="type">Tipo</Label>
-  <Select
-    value={formData.type}
-    onValueChange={(value) => handleSelectChange('type', value)}
-    required
-  >
-    <SelectTrigger id="type">
-      <SelectValue placeholder="Selecione o tipo" />
-    </SelectTrigger>
-    <SelectContent>
-      {tiposUnicos.map((tipo, index) => (
-        <SelectItem key={index} value={tipo}>
-          {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-</div>
-
-  <div className="space-y-2">
-  <Label htmlFor="category_id">Categoria</Label>
-  <Select
-    value={formData.category_id}
-    onValueChange={(value) => handleSelectChange('category_id', value)}
-    required
-    disabled={!formData.type} // Bônus: desabilita se o tipo não for escolhido
-  >
-    <SelectTrigger id="category_id">
-      <SelectValue placeholder="Selecione a categoria" />
-    </SelectTrigger>
-    <SelectContent className="max-h-[250px] overflow-y-auto">
-      {/* Este filtro mostra apenas categorias do tipo selecionado */}
-      {categories
-        .filter(cat => cat.type === formData.type)
-        .map((cat) => (
-          <SelectItem key={cat.id} value={cat.id.toString()}>
-            {cat.name}
-          </SelectItem>
-        ))}
-    </SelectContent>
-  </Select>
-</div>
-
-  <div className="space-y-2">
-  <Label htmlFor="form">Forma</Label>
-  <Select
-    id="form"
-    name="form"
-    value={formData.form}
-    onValueChange={(value) => handleSelectChange('form', value)}
-    required
-  >
-    <SelectTrigger>
-      <SelectValue placeholder="Selecione a forma" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="fixo">Fixo</SelectItem>
-      <SelectItem value="variavel">Variável</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
-
-  <div className="space-y-2">
-    <Label htmlFor="value">Valor (R$)</Label>
-    <Input
-      id="value"
-      name="value"
-      type="number"
-      value={formData.value}
-      onChange={handleInputChange}
-      placeholder="0,00"
-      required
-    />
-  </div>
-
-  <div className="space-y-2">
-    <Label htmlFor="date">Data</Label>
-    <Input
-      id="date"
-      name="date"
-      type="date"
-      value={formData.date}
-      onChange={handleInputChange}
-      required
-    />
-  </div>
-
-  <div className="space-y-2">
-  <Label htmlFor="is_recurring">
-    <input
-      type="checkbox"
-      id="is_recurring"
-      name="is_recurring"
-      checked={formData.is_recurring || false}
-      onChange={handleInputChange}
-      className="mr-2"
-    />
-    Recorrente
-  </Label>
-</div>
-
-{formData.is_recurring && (
-  <div className="space-y-2">
-    <Label htmlFor="recurrence_period">Período da Recorrência (em meses)</Label>
-    <Input
-      id="recurrence_period"
-      name="recurrence_period"
-      type="number"
-      value={formData.recurrence_period}
-      onChange={handleInputChange}
-      placeholder="Ex: 3"
-      required={formData.is_recurring}
-    />
-  </div>
-)}
-
-  <div className="space-y-2">
-    <Label htmlFor="observations">Observações</Label>
-    <Input
-      id="observations"
-      name="observations"
-      value={formData.observations}
-      onChange={handleInputChange}
-      placeholder="Observações do planejamento"
-    />
-  </div>
-
-  <div className="flex justify-end space-x-2">
-    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-      Cancelar
-    </Button>
-    <Button type="submit">
-      Criar Planejamento
-    </Button>
-  </div>
-</form>
-
-                  </DialogContent>
-                </Dialog>
               </div>
   {/* Nova estrutura para alinhar os filtros e o resumo */}
 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
@@ -1148,8 +1031,161 @@ useEffect(() => {
 
             {/* Orçamento por Categoria */}
             <TabsContent value="orcamento" className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <h3 className="text-lg font-semibold dark:text-gray-100">Orçamento por Categoria</h3>
+                <div className="flex gap-2">
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Novo Planejamento
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Criar Novo Planejamento</DialogTitle>
+                    </DialogHeader>
+                   <form onSubmit={handleSubmit} className="space-y-4">
+  <div className="space-y-2">
+  <Label htmlFor="type">Tipo</Label>
+  <Select
+    value={formData.type}
+    onValueChange={(value) => handleSelectChange('type', value)}
+    required
+  >
+    <SelectTrigger id="type">
+      <SelectValue placeholder="Selecione o tipo" />
+    </SelectTrigger>
+    <SelectContent>
+      {tiposUnicos.map((tipo, index) => (
+        <SelectItem key={index} value={tipo}>
+          {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+</div>
+
+  <div className="space-y-2">
+  <Label htmlFor="category_id">Categoria</Label>
+  <Select
+    value={formData.category_id}
+    onValueChange={(value) => handleSelectChange('category_id', value)}
+    required
+    disabled={!formData.type} 
+  >
+    <SelectTrigger id="category_id">
+      <SelectValue placeholder="Selecione a categoria" />
+    </SelectTrigger>
+    <SelectContent className="max-h-[250px] overflow-y-auto">
+      {categories
+        .filter(cat => cat.type === formData.type)
+        .map((cat) => (
+          <SelectItem key={cat.id} value={cat.id.toString()}>
+            {cat.name}
+          </SelectItem>
+        ))}
+    </SelectContent>
+  </Select>
+</div>
+
+  <div className="space-y-2">
+  <Label htmlFor="form">Forma</Label>
+  <Select
+    id="form"
+    name="form"
+    value={formData.form}
+    onValueChange={(value) => handleSelectChange('form', value)}
+    required
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Selecione a forma" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="fixo">Fixo</SelectItem>
+      <SelectItem value="variavel">Variável</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+
+  <div className="space-y-2">
+    <Label htmlFor="value">Valor (R$)</Label>
+    <Input
+      id="value"
+      name="value"
+      type="number"
+      value={formData.value}
+      onChange={handleInputChange}
+      placeholder="0,00"
+      required
+    />
+  </div>
+
+  <div className="space-y-2">
+    <Label htmlFor="date">Data</Label>
+    <Input
+      id="date"
+      name="date"
+      type="date"
+      value={formData.date}
+      onChange={handleInputChange}
+      required
+    />
+  </div>
+
+  <div className="space-y-2">
+  <Label htmlFor="is_recurring">
+    <input
+      type="checkbox"
+      id="is_recurring"
+      name="is_recurring"
+      checked={formData.is_recurring || false}
+      onChange={handleInputChange}
+      className="mr-2"
+    />
+    Recorrente
+  </Label>
+</div>
+
+{formData.is_recurring && (
+  <div className="space-y-2">
+    <Label htmlFor="recurrence_period">Período da Recorrência (em meses)</Label>
+    <Input
+      id="recurrence_period"
+      name="recurrence_period"
+      type="number"
+      value={formData.recurrence_period}
+      onChange={handleInputChange}
+      placeholder="Ex: 3"
+      required={formData.is_recurring}
+    />
+  </div>
+)}
+
+  <div className="space-y-2">
+    <Label htmlFor="observations">Observações</Label>
+    <Input
+      id="observations"
+      name="observations"
+      value={formData.observations}
+      onChange={handleInputChange}
+      placeholder="Observações do planejamento"
+    />
+  </div>
+
+  <div className="flex justify-end space-x-2">
+    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+      Cancelar
+    </Button>
+    <Button type="submit">
+      Criar Planejamento
+    </Button>
+  </div>
+</form>
+
+                  </DialogContent>
+                </Dialog>
+
                 <Dialog>
   <DialogTrigger asChild>
     <Dialog>
@@ -1302,6 +1338,18 @@ useEffect(() => {
                           {orc.progresso.toFixed(1)}%
                         </span>
                       </div>
+                    </div>
+                    {/* Botão de Excluir Orçamento */}
+                    <div className="mt-3 sm:mt-0 sm:ml-4 shrink-0">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleExcluirOrcamento(orc)}
+                        title="Excluir planejamentos desta categoria neste mês"
+                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 );
