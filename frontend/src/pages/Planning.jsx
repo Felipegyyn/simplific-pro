@@ -1038,7 +1038,7 @@ useEffect(() => {
                   <DialogTrigger asChild>
                     <Button>
                       <Plus className="h-4 w-4 mr-2" />
-                      Novo Planejamento
+                      Criar orçamento
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
