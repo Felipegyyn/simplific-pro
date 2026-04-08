@@ -693,8 +693,8 @@ useEffect(() => {
           >
             <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
               <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
-              <TabsTrigger value="planejamentos">Planejamentos</TabsTrigger>
               <TabsTrigger value="orcamento">Orçamento por Categoria</TabsTrigger>
+              <TabsTrigger value="planejamentos">Planejamentos</TabsTrigger>
             </TabsList>
 
             {/* Visão Geral */}
@@ -866,167 +866,6 @@ useEffect(() => {
 
 
               {/* Planejamentos Ativos */}
-            </TabsContent>
-
-            {/* Planejamentos */}
-            <TabsContent value="planejamentos" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
-              </div>
-  {/* Nova estrutura para alinhar os filtros e o resumo */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
-  
-  {/* Coluna 1: Todos os Filtros */}
-  <div className="flex flex-wrap gap-4 items-end">
-    <div>
-      <Label className="block mb-1">Categoria</Label>
-      <select
-        value={filtroCategoria}
-        onChange={(e) => setFiltroCategoria(e.target.value)}
-        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-      >
-        <option value="">Todas</option>
-        {categoriasUnicas.length > 0 &&
-          categoriasUnicas.map((cat, index) => (
-            <option key={index} value={cat}>{cat}</option>
-          ))
-        }
-      </select>
-    </div>
-    <div>
-      <Label className="block mb-1">Tipo</Label>
-      <select
-        value={filtroTipo}
-        onChange={(e) => setFiltroTipo(e.target.value)}
-        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-      >
-        <option value="">Todos</option>
-        {tiposUnicos.length > 0 &&
-          tiposUnicos.map((tipo, index) => (
-            <option key={index} value={tipo}>{tipo}</option>
-          ))
-        }
-      </select>
-    </div>
-    <div>
-      <Label className="block mb-1">Início</Label>
-      <Input
-        type="date"
-        value={filtroInicio}
-        onChange={(e) => setFiltroInicio(e.target.value)}
-        className="px-3 py-2"
-      />
-    </div>
-    <div>
-      <Label className="block mb-1">Fim</Label>
-      <Input
-        type="date"
-        value={filtroFim}
-        onChange={(e) => setFiltroFim(e.target.value)}
-        className="px-3 py-2"
-      />
-    </div>
-  </div>
-
-  {/* Coluna 2: O Minicard de Resumo */}
-  <div className="flex items-end">
-    <Card className="w-full p-3 bg-slate-800 border-slate-700">
-      <div className="flex items-center justify-around text-xs text-slate-400">
-        <div className="text-center">
-          <span>Planejado</span>
-          <p className="text-sm font-bold text-blue-400">
-            {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-        <div className="text-center">
-          <span>Realizado</span>
-          <p className="text-sm font-bold text-red-400">
-            {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-        <div className="text-center">
-          <span>A realizar</span>
-          <p className="text-sm font-bold text-green-400">
-            {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-      </div>
-    </Card>
-  </div>
-</div>
-
-              {/* ── DRE Planejamentos ── */}
-              {(() => {
-                const PlanRow = ({ plan }) => (
-                  <div className={`${getPlanRowBorderClass(plan)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-sm dark:text-slate-100">{plan.category_name}</h3>
-                        {plan.status === 'confirmed' && (
-                          <span className="px-2 py-0.5 text-xs font-bold text-black bg-lime-400 rounded">CONFIRMADO</span>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-500 dark:text-slate-400 mb-2">
-                        <span><span className="font-medium">Data:</span> {new Date(plan.start_date).toLocaleDateString()}</span>
-                        {plan.observations && <span><span className="font-medium">Obs:</span> {plan.observations}</span>}
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
-                        <span className="text-blue-600 font-semibold">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-red-500 font-semibold">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-green-600 font-semibold">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                          <div className={`h-2 rounded-full ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
-                        </div>
-                        <span className="text-xs font-medium text-gray-500 dark:text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1 mt-3 sm:mt-0 sm:ml-4 shrink-0">
-                      {plan.status !== 'confirmed' && (
-                        <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)}>Confirmar</Button>
-                      )}
-                      <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(plan)}><Edit className="h-4 w-4" /></Button>
-                      <Button variant="outline" size="sm" onClick={() => excluirPlanejamento(plan.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-                );
-
-                const entradas = planejamentos.filter(p => p.type === 'entrada');
-                const saidas = planejamentos.filter(p => p.type === 'saida');
-
-                return (
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                          <TrendingUp className="h-5 w-5" /> Entradas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {entradas.length > 0
-                          ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma entrada planejada</p>
-                        }
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                          <Target className="h-5 w-5" /> Saídas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {saidas.length > 0
-                          ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma saída planejada</p>
-                        }
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })()}
             </TabsContent>
 
             {/* Orçamento por Categoria */}
@@ -1328,6 +1167,167 @@ useEffect(() => {
                         {saidasOrc.length > 0
                           ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
                           : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhum orçamento de saída encontrado</p>
+                        }
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })()}
+            </TabsContent>
+
+            {/* Planejamentos */}
+            <TabsContent value="planejamentos" className="space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
+              </div>
+  {/* Nova estrutura para alinhar os filtros e o resumo */}
+<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
+  
+  {/* Coluna 1: Todos os Filtros */}
+  <div className="flex flex-wrap gap-4 items-end">
+    <div>
+      <Label className="block mb-1">Categoria</Label>
+      <select
+        value={filtroCategoria}
+        onChange={(e) => setFiltroCategoria(e.target.value)}
+        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+      >
+        <option value="">Todas</option>
+        {categoriasUnicas.length > 0 &&
+          categoriasUnicas.map((cat, index) => (
+            <option key={index} value={cat}>{cat}</option>
+          ))
+        }
+      </select>
+    </div>
+    <div>
+      <Label className="block mb-1">Tipo</Label>
+      <select
+        value={filtroTipo}
+        onChange={(e) => setFiltroTipo(e.target.value)}
+        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+      >
+        <option value="">Todos</option>
+        {tiposUnicos.length > 0 &&
+          tiposUnicos.map((tipo, index) => (
+            <option key={index} value={tipo}>{tipo}</option>
+          ))
+        }
+      </select>
+    </div>
+    <div>
+      <Label className="block mb-1">Início</Label>
+      <Input
+        type="date"
+        value={filtroInicio}
+        onChange={(e) => setFiltroInicio(e.target.value)}
+        className="px-3 py-2"
+      />
+    </div>
+    <div>
+      <Label className="block mb-1">Fim</Label>
+      <Input
+        type="date"
+        value={filtroFim}
+        onChange={(e) => setFiltroFim(e.target.value)}
+        className="px-3 py-2"
+      />
+    </div>
+  </div>
+
+  {/* Coluna 2: O Minicard de Resumo */}
+  <div className="flex items-end">
+    <Card className="w-full p-3 bg-slate-800 border-slate-700">
+      <div className="flex items-center justify-around text-xs text-slate-400">
+        <div className="text-center">
+          <span>Planejado</span>
+          <p className="text-sm font-bold text-blue-400">
+            {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+        <div className="text-center">
+          <span>Realizado</span>
+          <p className="text-sm font-bold text-red-400">
+            {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+        <div className="text-center">
+          <span>A realizar</span>
+          <p className="text-sm font-bold text-green-400">
+            {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </p>
+        </div>
+      </div>
+    </Card>
+  </div>
+</div>
+
+              {/* ── DRE Planejamentos ── */}
+              {(() => {
+                const PlanRow = ({ plan }) => (
+                  <div className={`${getPlanRowBorderClass(plan)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-sm dark:text-slate-100">{plan.category_name}</h3>
+                        {plan.status === 'confirmed' && (
+                          <span className="px-2 py-0.5 text-xs font-bold text-black bg-lime-400 rounded">CONFIRMADO</span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-500 dark:text-slate-400 mb-2">
+                        <span><span className="font-medium">Data:</span> {new Date(plan.start_date).toLocaleDateString()}</span>
+                        {plan.observations && <span><span className="font-medium">Obs:</span> {plan.observations}</span>}
+                      </div>
+                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
+                        <span className="text-blue-600 font-semibold">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-red-500 font-semibold">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-green-600 font-semibold">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
+                          <div className={`h-2 rounded-full ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
+                        </div>
+                        <span className="text-xs font-medium text-gray-500 dark:text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 mt-3 sm:mt-0 sm:ml-4 shrink-0">
+                      {plan.status !== 'confirmed' && (
+                        <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)}>Confirmar</Button>
+                      )}
+                      <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(plan)}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="outline" size="sm" onClick={() => excluirPlanejamento(plan.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                );
+
+                const entradas = planejamentos.filter(p => p.type === 'entrada');
+                const saidas = planejamentos.filter(p => p.type === 'saida');
+
+                return (
+                  <div className="space-y-4">
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                          <TrendingUp className="h-5 w-5" /> Entradas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {entradas.length > 0
+                          ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma entrada planejada</p>
+                        }
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                          <Target className="h-5 w-5" /> Saídas
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {saidas.length > 0
+                          ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma saída planejada</p>
                         }
                       </CardContent>
                     </Card>
