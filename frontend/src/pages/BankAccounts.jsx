@@ -26,6 +26,7 @@ const BANCOS_BRASIL = [
   { code: '756', name: 'Sicoob' },
   { code: '748', name: 'Sicredi' },
   { code: '380', name: 'PicPay' },
+  { code: '208', name: 'BTG Pactual' },
   { code: '000', name: 'Outro / Carteira Física' }
 ];
 
