@@ -542,26 +542,50 @@ def executar_acao_simplific(user_id, acao, from_number):
             nome_cartao = dados.get('card_name')
             valor = dados.get('value')
             
-            # Lógica para encontrar o cartão pelo nome
-            card = CreditCard.query.filter(CreditCard.user_id == user_id, CreditCard.name.ilike(f'%{nome_cartao}%')).first()
+            # Busca todos os cartões do usuário para comparar
+            cards = CreditCard.query.filter_by(user_id=user_id, is_active=True).all()
+            
+            card = None
+            if nome_cartao:
+                # Busca robusta: tenta encontrar o nome do cartão dentro da string ou vice-versa
+                card = next((c for c in cards if nome_cartao.lower() in c.name.lower() or c.name.lower() in nome_cartao.lower()), None)
+
             if not card:
-                return f"Não encontrei um cartão com o nome '{nome_cartao}'."
+                if len(cards) == 1:
+                    card = cards[0] # Se só tem um, assume que é ele
+                else:
+                    # Inicia conversa para selecionar o cartão se houver múltiplos e nenhum identificado
+                    gasto_data = {
+                        'description': dados.get('description'),
+                        'value': valor,
+                        'installments': dados.get('installments', 1),
+                        'category_id': 6
+                    }
+                    user_sessions[from_number] = {
+                        'contexto': 'selecionar_cartao_para_gasto',
+                        'gasto_data': gasto_data,
+                        'lista_cartoes': [{'id': c.id, 'name': c.name, 'available_limit': c.available_limit} for c in cards]
+                    }
+                    resposta = f"Entendi o gasto de {format_currency_brl(valor)}. Em qual cartão você quer lançar? 👇\n"
+                    for idx, c in enumerate(cards, start=1):
+                        resposta += f"{idx}. {c.name} (Disp: {format_currency_brl(c.available_limit)})\n"
+                    return resposta
 
             # Prepara os dados para o serviço
             gasto_data = {
                 'description': dados.get('description'),
                 'value': valor,
-                'installments': dados.get('installments', 1)
+                'installments': dados.get('installments', 1),
+                'category_id': 6
             }
             
             # Chama o serviço correto que atualiza a fatura e o limite
             success, message = process_card_transaction(user_id, card.id, gasto_data)
 
-            # Retorna None para que a resposta original e amigável do Simplific seja usada
             if success:
-                return None
+                return f"✅ Lançado: *{dados.get('description')}* ({format_currency_brl(valor)}) no cartão *{card.name}*."
             else:
-                return message # Retorna a mensagem de erro se houver
+                return f"❌ Erro: {message}"
 
         elif tipo_acao == 'add_value_to_goal':
             dados = dados_acao
@@ -1456,17 +1480,22 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
             gasto_data = sessao['gasto_data']
 
             if 1 <= idx_escolhido <= len(lista_cartoes):
-                cartao_escolhido = lista_cartoes[idx_escolhido - 1]
-
-                # Checa o limite novamente
-                if gasto_data['value'] > cartao_escolhido['available_limit']:
+                cartao_escolhido_resumo = lista_cartoes[idx_escolhido - 1]
+                
+                # Busca o objeto real do cartão para o serviço
+                card = CreditCard.query.get(cartao_escolhido_resumo['id'])
+                if not card:
                     remover_sessao(from_number)
-                    return f"❌ Limite insuficiente no cartão *{cartao_escolhido['name']}*! Ação cancelada."
+                    return "❌ Erro: Cartão não encontrado no banco de dados."
 
-                # Lança a transação
-                create_credit_card_transaction(cartao_escolhido['id'], payload=gasto_data)
+                # Lança a transação usando o SERVIÇO CORRETO
+                success, message = process_card_transaction(user_id, card.id, gasto_data)
+                
                 remover_sessao(from_number)
-                return f"✅ Gasto lançado com sucesso no cartão *{cartao_escolhido['name']}*!"
+                if success:
+                    return f"✅ Gasto lançado com sucesso no cartão *{card.name}*!"
+                else:
+                    return f"❌ Erro: {message}"
             else:
                 remover_sessao(from_number)
                 return 'Opção inválida. Ação cancelada.'

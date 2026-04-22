@@ -912,26 +912,42 @@ const carregarFaturas = async (listaDeCartoes) => {
 
             {/* Faturas */}
             <TabsContent value="faturas" className="space-y-6">
-              <div className="flex justify-start items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <h3 className="text-lg font-semibold dark:text-slate-100">Faturas dos Cartões</h3>
-              {/* ▼▼▼ NOVO CONTAINER PARA OS FILTROS ▼▼▼ */}
-    <div className="flex items-center gap-2">
-      <Select value={filtroStatusFatura} onValueChange={setFiltroStatusFatura}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Filtrar por status..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="todas">Todas as Faturas</SelectItem>
-          <SelectItem value="aberta">Em Aberto</SelectItem>
-          <SelectItem value="paga">Pagas</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    {/* ▲▲▲ FIM DO CONTAINER ▲▲▲ */}
-                <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Filtrar por Período
-                </Button>
+                
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Seletor de Cartão */}
+                  <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Todos os cartões" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Cartões</SelectItem>
+                      {cartoes.map(c => (
+                        <SelectItem key={c.id} value={c.id.toString()}>
+                          {c.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Seletor de Status */}
+                  <Select value={filtroStatusFatura} onValueChange={setFiltroStatusFatura}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Filtrar por status..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todas">Todas as Faturas</SelectItem>
+                      <SelectItem value="aberta">Em Aberto</SelectItem>
+                      <SelectItem value="paga">Pagas</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Filtrar por Período
+                  </Button>
+                </div>
               </div>
 
               <Card>
@@ -949,14 +965,16 @@ const carregarFaturas = async (listaDeCartoes) => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                        {faturas.length === 0 ? (
+                        {faturas.filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter).length === 0 ? (
                           <tr>
                             <td colSpan="6" className="px-6 py-10 text-center text-gray-500">
                               Nenhuma fatura encontrada.
                             </td>
                           </tr>
                         ) : (
-                          faturas.map((fatura) => (
+                          faturas
+                            .filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter)
+                            .map((fatura) => (
                             <tr key={fatura.id} className="bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
                               <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                                 {fatura.cartao_nome}
