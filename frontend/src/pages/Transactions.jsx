@@ -43,9 +43,10 @@ const Transactions = ({ user, onLogout }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTransacao, setSelectedTransacao] = useState(null);
   
-  // Estados de Contas
+  // Estados de Contas e Cartões
   const [contas, setContas] = useState([]);
-  const [selectedContas, setSelectedContas] = useState([]); // <--- NOVO ESTADO DE FILTRO
+  const [cartoes, setCartoes] = useState([]); // <--- NOVO ESTADO
+  const [selectedContas, setSelectedContas] = useState([]); 
 
   const [formData, setFormData] = useState({
     description: '',
@@ -53,6 +54,7 @@ const Transactions = ({ user, onLogout }) => {
     type: 'expense',
     category: '',
     bank_account_id: 'none',
+    credit_card_id: 'none', // <--- NOVO CAMPO
     transaction_date: getLocalDate(),
     status: 'pendente'
   });
@@ -73,7 +75,7 @@ const Transactions = ({ user, onLogout }) => {
 
       const categoriaData = {
         name: novaCategoria,
-        type: formData.type === 'income' ? 'entrada' : 'saida'
+        type: (formData.type === 'income' ? 'entrada' : 'saida')
       };
 
       await apiService.post('/api/categories', categoriaData);
@@ -92,6 +94,7 @@ const Transactions = ({ user, onLogout }) => {
     type: 'expense',
     category: '',
     bank_account_id: 'none',
+    credit_card_id: 'none', // <--- NOVO CAMPO
     transaction_date: '',
     status: 'pendente'
   });
@@ -104,6 +107,7 @@ const Transactions = ({ user, onLogout }) => {
     loadTransacoes();
     loadCategorias();
     loadContas();
+    loadCartoes(); // <--- CHAMADA NOVA
   }, []);
 
   const loadContas = async () => {
@@ -112,6 +116,15 @@ const Transactions = ({ user, onLogout }) => {
         setContas(data || []);
     } catch (error) {
         console.error("Erro ao carregar contas:", error);
+    }
+  };
+
+  const loadCartoes = async () => {
+    try {
+        const data = await apiService.get('/api/credit-cards');
+        setCartoes(data || []);
+    } catch (error) {
+        console.error("Erro ao carregar cartões:", error);
     }
   };
 
@@ -192,6 +205,7 @@ const Transactions = ({ user, onLogout }) => {
     setCategoriasLoading(true);
     await loadCategorias();
     await loadContas();
+    await loadCartoes(); // <--- CARREGA CARTÕES TAMBÉM
     setCategoriasLoading(false);
     setIsModalOpen(true);
   };
@@ -216,6 +230,7 @@ const Transactions = ({ user, onLogout }) => {
         type: 'expense',
         category: '',
         bank_account_id: 'none',
+        credit_card_id: 'none', // <--- RESET NOVO CAMPO
         transaction_date: getLocalDate(),
         status: 'pendente'
       });
@@ -224,6 +239,32 @@ const Transactions = ({ user, onLogout }) => {
       alert('Erro ao criar transação. Tente novamente.');
     }
   };
+
+  // ▼▼▼ NOVA FUNÇÃO PARA LANÇAR NO CARTÃO ▼▼▼
+  const criarTransacaoCartao = async (cardId, dados) => {
+    try {
+      await apiService.post(`/api/credit-cards/${cardId}/transactions`, dados);
+      setIsModalOpen(false);
+      alert("✅ Gasto lançado no cartão com sucesso!");
+      
+      setFormData({
+        description: '',
+        amount: '',
+        type: 'expense',
+        category: '',
+        bank_account_id: 'none',
+        credit_card_id: 'none',
+        transaction_date: getLocalDate(),
+        status: 'pendente'
+      });
+      
+      eventService.emit('transactionsChanged'); 
+    } catch (error) {
+      console.error('Erro ao lançar no cartão:', error);
+      alert('Erro ao lançar gasto no cartão. Verifique o limite.');
+    }
+  };
+  // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
   const confirmarTransacao = async (id) => {
     try {
@@ -302,10 +343,15 @@ const Transactions = ({ user, onLogout }) => {
       return;
     }
 
-    if (!formData.bank_account_id || formData.bank_account_id === 'none') {
+    if (formData.type !== 'credit_card' && (!formData.bank_account_id || formData.bank_account_id === 'none')) {
         if (!window.confirm("Nenhuma conta adicionada, deseja continuar?")) {
             return;
         }
+    }
+
+    if (formData.type === 'credit_card' && (!formData.credit_card_id || formData.credit_card_id === 'none')) {
+      alert('Por favor, selecione um cartão de crédito.');
+      return;
     }
 
     const amount = parseFloat(formData.amount);
@@ -322,24 +368,38 @@ const Transactions = ({ user, onLogout }) => {
         }
     }
 
-    const categoriaSelecionada = categorias.find(cat => cat.name === formData.category && cat.type === (formData.type === 'income' ? 'entrada' : 'saida'));
+    const targetType = formData.type === 'income' ? 'entrada' : 'saida';
+    const categoriaSelecionada = categorias.find(cat => cat.name === formData.category && cat.type === targetType);
 
     if (!categoriaSelecionada) {
       alert('Categoria inválida.');
       return;
     }
 
-    criarTransacao({
-      description: formData.description,
-      value: finalAmount,
-      type: formData.type === 'income' ? 'entrada' : 'saida',
-      category_id: buscarCategoryId(formData.category),
-      bank_account_id: formData.bank_account_id === 'none' ? null : parseInt(formData.bank_account_id),
-      date: formData.transaction_date,
-      status: formData.status,
-      format: 'variavel',
-      payment_form: 'a_vista'
-    });
+    if (formData.type === 'credit_card') {
+      // Lançar no CARTÃO DE CRÉDITO
+      criarTransacaoCartao(parseInt(formData.credit_card_id), {
+        description: formData.description,
+        value: finalAmount,
+        category_id: categoriaSelecionada.id,
+        date: formData.transaction_date,
+        payment_method: 'a_vista',
+        installments: 1
+      });
+    } else {
+      // Lançar como TRANSAÇÃO NORMAL
+      criarTransacao({
+        description: formData.description,
+        value: finalAmount,
+        type: targetType,
+        category_id: categoriaSelecionada.id,
+        bank_account_id: formData.bank_account_id === 'none' ? null : parseInt(formData.bank_account_id),
+        date: formData.transaction_date,
+        status: formData.status,
+        format: 'variavel',
+        payment_form: 'a_vista'
+      });
+    }
   };
 
   const handleInputChange = (field, value) => {
@@ -606,6 +666,7 @@ const Transactions = ({ user, onLogout }) => {
                       type: 'expense', 
                       category: '',
                       bank_account_id: 'none',
+                      credit_card_id: 'none', // <--- RESET NOVO CAMPO
                       transaction_date: getLocalDate(),
                       status: 'pendente'
                     });
@@ -636,14 +697,38 @@ const Transactions = ({ user, onLogout }) => {
                           <SelectContent>
                             <SelectItem value="income">Receita</SelectItem>
                             <SelectItem value="expense">Despesa</SelectItem>
+                            <SelectItem value="credit_card">💳 Cartão de Crédito</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
+                      {/* Campo Cartão de Crédito - SÓ APARECE SE TIPO FOR credit_card */}
+                      {formData.type === 'credit_card' && (
+                        <div>
+                          <Label htmlFor="credit_card">Selecione o Cartão *</Label>
+                          <Select value={formData.credit_card_id} onValueChange={(val) => handleInputChange('credit_card_id', val)}>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Selecione um cartão" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                  {cartoes.map(cartao => (
+                                      <SelectItem key={cartao.id} value={cartao.id.toString()}>
+                                          {cartao.name} (Final {cartao.last_digits})
+                                      </SelectItem>
+                                  ))}
+                              </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
                       {/* Campo Conta Bancária */}
-                      <div>
+                      <div className={formData.type === 'credit_card' ? 'opacity-50 pointer-events-none' : ''}>
                         <Label htmlFor="bank_account">Conta Bancária (Opcional)</Label>
-                        <Select value={formData.bank_account_id} onValueChange={(val) => handleInputChange('bank_account_id', val)}>
+                        <Select 
+                          disabled={formData.type === 'credit_card'} 
+                          value={formData.type === 'credit_card' ? 'none' : formData.bank_account_id} 
+                          onValueChange={(val) => handleInputChange('bank_account_id', val)}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Selecione uma conta" />
                             </SelectTrigger>
@@ -665,7 +750,11 @@ const Transactions = ({ user, onLogout }) => {
                             <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                             <SelectContent className="max-h-[250px] overflow-y-auto">
                               {(Array.isArray(categorias) ? categorias : [])
-                                .filter((cat) => cat?.type === (formData.type === 'income' ? 'entrada' : 'saida'))
+                                .filter((cat) => {
+                                  // Se for Receita, mostra entrada. Se for Despesa ou Cartão, mostra saida.
+                                  const targetType = formData.type === 'income' ? 'entrada' : 'saida';
+                                  return cat?.type === targetType;
+                                })
                                 .map((cat, index) => (
                                   <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>
                                 ))}
