@@ -70,14 +70,13 @@ const CreditCards = ({ user, onLogout }) => {
   // ▲▲▲ FIM DOS NOVOS ESTADOS ▲▲▲
 
   // ▼▼▼ NOVOS ESTADOS PARA LAYOUT ▼▼▼
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCardFilter, setSelectedCardFilter] = useState('all');
   const [expandedCardId, setExpandedCardId] = useState(null);
   // ▲▲▲ FIM DOS NOVOS ESTADOS ▲▲▲
 
-  const filteredCartoes = Array.isArray(cartoes) ? cartoes.filter(cartao => 
-    cartao.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cartao.numero.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredCartoes = selectedCardFilter === 'all' 
+    ? (Array.isArray(cartoes) ? cartoes : [])
+    : (Array.isArray(cartoes) ? cartoes.filter(c => c.id.toString() === selectedCardFilter) : []);
 
   const getFaturasDoCartao = (cartaoId) => {
     return faturas
