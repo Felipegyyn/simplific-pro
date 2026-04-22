@@ -416,10 +416,10 @@ const carregarFaturas = async (listaDeCartoes) => {
   }
 };
 
-  // Calcular totais
-  const limiteTotal = cartoes.reduce((sum, cartao) => sum + cartao.limite, 0);
-  const usadoTotal = cartoes.reduce((sum, cartao) => sum + cartao.usado, 0);
-  const disponivelTotal = cartoes.reduce((sum, cartao) => sum + cartao.disponivel, 0);
+  // Calcular totais (baseado nos cartões filtrados)
+  const limiteTotal = filteredCartoes.reduce((sum, cartao) => sum + cartao.limite, 0);
+  const usadoTotal = filteredCartoes.reduce((sum, cartao) => sum + cartao.usado, 0);
+  const disponivelTotal = filteredCartoes.reduce((sum, cartao) => sum + cartao.disponivel, 0);
 
   const getUtilizacaoColor = (percentual) => {
     if (percentual <= 30) return 'text-green-600';
