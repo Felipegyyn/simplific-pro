@@ -211,7 +211,23 @@ return false;
     }
   };
 
+  const excluirFatura = async (fatura) => {
+    const isPaga = fatura.status === 'paga';
+    const msg = isPaga 
+      ? "Essa fatura está paga, deseja realmente excluir? (Isso não reverterá o saldo da sua conta bancária)"
+      : "Tem certeza que deseja excluir esta fatura? O limite utilizado será reestabelecido no cartão.";
 
+    if (window.confirm(msg)) {
+      try {
+        await apiService.delete(`/api/faturas/${fatura.id}`);
+        loadCartoes(); // Recarrega cartões e faturas
+        alert('✅ Fatura excluída com sucesso!');
+      } catch (error) {
+        console.error('Erro ao excluir fatura:', error);
+        alert('❌ Erro ao excluir fatura.');
+      }
+    }
+  };
 
   // Função para visualizar fatura completa
   const visualizarFatura = (fatura) => {
@@ -977,6 +993,14 @@ const carregarFaturas = async (listaDeCartoes) => {
                                     Confirmar
                                   </Button>
                                 )}
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  onClick={() => excluirFatura(fatura)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </td>
                             </tr>
                           ))

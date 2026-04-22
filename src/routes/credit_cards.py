@@ -448,6 +448,40 @@ def delete_credit_card_transaction(transaction_id):
         db.session.rollback()
         return jsonify({'error': f'Erro ao excluir transação: {str(e)}'}), 500
 
+@credit_cards_bp.route('/faturas/<int:fatura_id>', methods=['DELETE'])
+@jwt_required()
+@active_user_required
+def delete_fatura(fatura_id):
+    user_id = get_jwt_identity()
+    
+    # 1. Busca a fatura
+    fatura = Fatura.query.filter_by(id=fatura_id, user_id=user_id).first()
+    if not fatura:
+        return jsonify({'error': 'Fatura não encontrada'}), 404
+
+    # 2. Busca o cartão vinculado
+    card = CreditCard.query.filter_by(id=fatura.cartao_id, user_id=user_id).first()
+
+    try:
+        # 3. Se a fatura estiver 'aberta', restaura o limite do cartão
+        if fatura.status == 'aberta' and card:
+            card.available_limit = float(card.available_limit) + float(fatura.valor_total)
+            if card.available_limit > card.limit:
+                card.available_limit = card.limit
+
+        # 4. Deleta todas as transações vinculadas à fatura
+        CreditCardTransaction.query.filter_by(fatura_id=fatura_id).delete()
+
+        # 5. Deleta a fatura
+        db.session.delete(fatura)
+        db.session.commit()
+
+        return jsonify({'message': 'Fatura e transações excluídas com sucesso.'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Erro ao excluir fatura: {str(e)}'}), 500
+
 
 
 
