@@ -528,15 +528,21 @@ const carregarFaturas = async (listaDeCartoes) => {
                 <h3 className="text-lg font-semibold dark:text-slate-100">Meus Cartões</h3>
 
                 <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                  {/* Search Input */}
-                  <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      className="pl-10"
-                      placeholder="Filtrar cartões..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                  {/* Seletor de Filtro de Cartão */}
+                  <div className="w-full sm:w-64">
+                    <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filtrar por cartão..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Cartões</SelectItem>
+                        {cartoes.map(c => (
+                          <SelectItem key={c.id} value={c.id.toString()}>
+                            {c.nome}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -912,87 +918,74 @@ const carregarFaturas = async (listaDeCartoes) => {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {faturas.map((fatura) => (
-                  <Card key={fatura.id}>
-                    <CardHeader>
-                      <div className="flex justify-between items-center">
-                        <CardTitle className="text-lg">{fatura.cartao_nome}</CardTitle>
-                        <Badge className={fatura.status === 'aberta' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'}>
-                          {fatura.status === 'aberta' ? 'Em Aberto' : 'Paga'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-slate-400">
-                        Referência: {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                      </p>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-slate-400">Valor Total</p>
-                          <p className="text-xl font-bold text-red-600 dark:text-red-400">
-  R$ {(Number(fatura.valor_total) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-slate-400">Pagamento Mínimo</p>
-                          <p className="text-xl font-bold text-yellow-600">
-  R$ {(Number(fatura.valor_minimo) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-slate-400">Vencimento</p>
-                          <p className="text-xl font-bold text-purple-600">
-                            {formatDateForDisplay(fatura.data_vencimento)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        <h4 className="font-semibold">Principais Transações</h4>
-                        {fatura.transacoes.slice(0, 4).map((transacao, index) => (
-                          <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-slate-800 last:border-b-0">
-                            <div>
-                              <p className="font-medium">{transacao.description}</p>
-                              <p className="text-sm text-gray-600 dark:text-slate-400">{formatDateForDisplay(transacao.date)}</p>
-                            </div>
-                            <p className="font-bold text-red-600 dark:text-red-400">
-  R$ {(Number(transacao.value) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex justify-between items-center mt-6 pt-4 border-t dark:border-slate-800">
-                        <Button 
-                          variant="outline"
-                          onClick={() => visualizarFatura(fatura)}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          Ver Fatura Completa
-                        </Button>
-                        {fatura.status === 'aberta' && (
-                          <Button onClick={() => pagarFatura(fatura)}>
-                            <DollarSign className="h-4 w-4 mr-2" />
-                            Confirmar Fatura
-                          </Button>
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
+                        <tr>
+                          <th className="px-6 py-3">Cartão</th>
+                          <th className="px-6 py-3">Referência</th>
+                          <th className="px-6 py-3">Vencimento</th>
+                          <th className="px-6 py-3">Valor Total</th>
+                          <th className="px-6 py-3">Status</th>
+                          <th className="px-6 py-3 text-right">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+                        {faturas.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="px-6 py-10 text-center text-gray-500">
+                              Nenhuma fatura encontrada.
+                            </td>
+                          </tr>
+                        ) : (
+                          faturas.map((fatura) => (
+                            <tr key={fatura.id} className="bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                                {fatura.cartao_nome}
+                              </td>
+                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                                {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                              </td>
+                              <td className="px-6 py-4 text-purple-600 font-medium">
+                                {formatDateForDisplay(fatura.data_vencimento)}
+                              </td>
+                              <td className="px-6 py-4 font-bold text-red-600 dark:text-red-400">
+                                R$ {(Number(fatura.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-6 py-4">
+                                <Badge className={fatura.status === 'aberta' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'}>
+                                  {fatura.status === 'aberta' ? 'Em Aberto' : 'Paga'}
+                                </Badge>
+                              </td>
+                              <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => visualizarFatura(fatura)}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Detalhes
+                                </Button>
+                                {fatura.status === 'aberta' && (
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => pagarFatura(fatura)}
+                                  >
+                                    <DollarSign className="h-4 w-4 mr-1" />
+                                    Confirmar
+                                  </Button>
+                                )}
+                              </td>
+                            </tr>
+                          ))
                         )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
 
