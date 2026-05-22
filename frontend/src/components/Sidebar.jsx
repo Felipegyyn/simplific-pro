@@ -172,29 +172,29 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   return (
     <div 
       className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
-        "bg-background/95 backdrop-blur-xl border-border/60", 
+        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen transition-all duration-300 ease-in-out md:relative",
+        "glass-panel rounded-none border-y-0 border-l-0 border-white/5", 
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         isDesktopOpen ? "md:w-64" : "md:w-20"
       )}
     >
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
-        className="absolute -right-3 top-9 bg-background border border-border rounded-full p-1.5 z-10 text-muted-foreground hover:text-foreground shadow-sm transition-colors hidden md:block"
+        className="absolute -right-3 top-9 bg-slate-900 border border-white/10 rounded-full p-1.5 z-10 text-slate-400 hover:text-white shadow-xl transition-colors hidden md:block"
       >
         {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>
 
       <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
-        <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0" />
+        <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0 brightness-110" />
         {isDesktopOpen && (
-            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent whitespace-nowrap">
+            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
                 Simplific Pro
             </span>
         )}
       </div>
 
-      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-border pb-4">
+      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-none pb-4">
         {visibleMenu.map((group) => {
           const isOpen = openMenus[group.title];
           const isChildActive = group.items.some(item => !item.isExternal && location.pathname === item.path);
@@ -206,7 +206,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 className={cn(
                   "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen ? "bg-accent/50 text-foreground font-medium" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  (!isOpen && isChildActive) || isOpen ? "bg-white/5 text-white font-medium shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <group.icon 
@@ -230,14 +230,14 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 )}
 
                 {!isDesktopOpen && (
-                  <span className="absolute left-14 bg-popover text-popover-foreground px-2 py-1 rounded-md text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border">
+                  <span className="absolute left-14 glass-panel px-3 py-1.5 rounded-lg text-xs shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border-white/10">
                     {group.title}
                   </span>
                 )}
               </button>
 
               {isDesktopOpen && isOpen && (
-                <div className="space-y-1 ml-4 border-l border-border/50 pl-2 animate-in slide-in-from-top-2 duration-200">
+                <div className="space-y-1 ml-4 border-l border-white/5 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => {
                     if (item.isExternal) {
                       return (
@@ -248,7 +248,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           rel="noopener noreferrer"
                           className={cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            "text-muted-foreground hover:text-green-600 hover:bg-green-50"
+                            "text-slate-400 hover:text-cyan-400 hover:bg-white/5"
                           )}
                         >
                           <item.icon className="h-4 w-4 mr-3 opacity-70" />
@@ -266,8 +266,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
                             isActive 
-                              ? "bg-primary/10 text-primary font-medium" 
-                              : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                              ? "active-gradient text-cyan-400 font-medium" 
+                              : "text-slate-400 hover:text-white hover:bg-white/5"
                           )
                         }
                       >
@@ -283,7 +283,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-border/60 bg-muted/20 mt-auto">
+      <div className="p-4 border-t border-white/5 bg-white/2 mt-auto">
         <input
             type="file"
             ref={fileInputRef}
@@ -291,32 +291,32 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             className="hidden"
             accept="image/png, image/jpeg"
         />
-        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-accent/50 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
+        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-white/5 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
           <div className="relative shrink-0">
             {user?.profile_image_url ? (
-                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-sm border border-border" />
+                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-md border border-white/10" />
             ) : (
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary border border-primary/20">
+                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center font-bold text-cyan-400 border border-cyan-500/20">
                     {user?.name?.charAt(0).toUpperCase()}
                 </div>
             )}
             {isUploading && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-[1px]">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-cyan-400 border-t-transparent"></div>
                 </div>
             )}
           </div>
           {isDesktopOpen && (
             <div className="flex-1 overflow-hidden">
-              <p className="font-medium text-sm truncate text-foreground">{user?.name}</p>
-              <p className="text-xs text-muted-foreground truncate">Editar foto</p>
+              <p className="font-medium text-sm truncate text-white">{user?.name}</p>
+              <p className="text-xs text-slate-400 truncate">Editar perfil</p>
             </div>
           )}
         </div>
         <button 
           onClick={handleLogoutClick}
           className={cn(
-            "flex items-center w-full mt-2 p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
+            "flex items-center w-full mt-2 p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/5 transition-colors",
             !isDesktopOpen && "justify-center"
           )}
           title="Sair"

@@ -448,87 +448,73 @@ const tutorials = [
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+    <div className="space-y-6">
       <WhatsNewModal />
-      <header className="bg-white dark:bg-slate-900 shadow-sm border-b dark:border-slate-700">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-            <h1 className="text-xl font-bold text-green-800 dark:text-green-400">Simplific Pro</h1>
-          </div>
-          <div className="flex items-center space-x-2 sm:space-x-4">
-          {/* ▼▼▼ COLE O NOVO COMPONENTE DE DROPDOWN AQUI ▼▼▼ */}
-    <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Tutoriais
-            </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Guia Rápido</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {tutorials.map((tutorial) => (
-                <DropdownMenuItem key={tutorial.name} asChild>
-                    <a href={tutorial.url} target="_blank" rel="noopener noreferrer">
-                        {tutorial.name}
-                    </a>
-                </DropdownMenuItem>
-            ))}
-        </DropdownMenuContent>
-    </DropdownMenu>
-    {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
-
-            <Dialog open={isNotificationCenterOpen} onOpenChange={setIsNotificationCenterOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="relative">
-                  {unreadCount > 0 ? <BellRing className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
-                  {unreadCount > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs p-0"
-                    >
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </Badge>
-                  )}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Central de Notificações</DialogTitle>
-                </DialogHeader>
-                <NotificationCenter
-                  notifications={notifications}
-                  onMarkAsRead={handleMarkAsRead}
-                  onClearAll={handleClearAllNotifications}
-                />
-              </DialogContent>
-            </Dialog>
-            
-            <span className="hidden sm:inline text-sm text-gray-600 dark:text-slate-300">
-              Seja bem-vindo - <strong>{user?.name || 'Usuário'}</strong>
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onLogout}
-              className="flex items-center space-x-2"
-            >
-              <LogOut size={16} />
-              <span>Sair</span>
-            </Button>
-          </div>
+      
+      {/* Page Header Area */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Olá, {user?.name?.split(' ')[0]}
+          </h1>
+          <p className="text-slate-400 mt-1">Bem-vindo de volta ao seu centro de controle.</p>
         </div>
-      </header>
 
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium dark:text-slate-200">Filtrar por:</span>
+        <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-white/5">
+                <BookOpen className="h-4 w-4 mr-2 text-cyan-400" />
+                Tutoriais
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="glass-panel border-white/10 text-slate-200">
+              <DropdownMenuLabel>Guia Rápido</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/5" />
+              {tutorials.map((tutorial) => (
+                <DropdownMenuItem key={tutorial.name} className="hover:bg-white/5 cursor-pointer">
+                  <a href={tutorial.url} target="_blank" rel="noopener noreferrer" className="w-full">
+                    {tutorial.name}
+                  </a>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Dialog open={isNotificationCenterOpen} onOpenChange={setIsNotificationCenterOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-white/5 relative">
+                {unreadCount > 0 ? <BellRing className="h-4 w-4 text-cyan-400" /> : <Bell className="h-4 w-4" />}
+                {unreadCount > 0 && (
+                  <Badge 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-[10px] p-0 bg-cyan-500 text-white border-none shadow-lg shadow-cyan-900/40"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="glass-panel border-white/10 text-slate-200 max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Central de Notificações</DialogTitle>
+              </DialogHeader>
+              <NotificationCenter
+                notifications={notifications}
+                onMarkAsRead={handleMarkAsRead}
+                onClearAll={handleClearAllNotifications}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6">
+        <div className="flex items-center gap-2 glass-panel p-1 pr-3 border-white/5">
           <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-32 border-none bg-transparent focus:ring-0">
               <SelectValue placeholder="Mês" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass-panel border-white/10">
               <SelectItem value="1">Janeiro</SelectItem>
               <SelectItem value="2">Fevereiro</SelectItem>
               <SelectItem value="3">Março</SelectItem>
@@ -544,10 +530,10 @@ const tutorials = [
             </SelectContent>
           </Select>
           <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-            <SelectTrigger className="w-24">
+            <SelectTrigger className="w-24 border-none bg-transparent focus:ring-0">
               <SelectValue placeholder="Ano" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass-panel border-white/10">
               <SelectItem value="2023">2023</SelectItem>
               <SelectItem value="2024">2024</SelectItem>
               <SelectItem value="2025">2025</SelectItem>
@@ -556,304 +542,195 @@ const tutorials = [
               <SelectItem value="2028">2028</SelectItem>
             </SelectContent>
           </Select>
-                  {/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
-          {/*<Button
-          onClick={handleGenerateVisualReport}
-            disabled={isGeneratingReport}
-            variant="outline"
-            className="ml-2"
-          >
-            {isGeneratingReport ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 dark:border-gray-100 mr-2"></div>
-            ) : (
-              <Image className="h-4 w-4 mr-2" />
-            )}
-            {isGeneratingReport ? 'Gerando...' : 'Gerar Resumo Visual'}
-          </Button>*/}
+        </div>
+      </div>
+
+      {/* Grid de Cards Principais */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
+              <TrendingUp className="h-5 w-5 text-emerald-400" />
+            </div>
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/10">
+              +{receitaPercentual.toFixed(1)}%
+            </span>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Receitas</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(totalReceitas)}</h3>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-red-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/20">
+              <TrendingDown className="h-5 w-5 text-red-400" />
+            </div>
+            <span className="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded-full border border-red-500/10">
+              {despesaPercentual > 0 ? '+' : ''}{despesaPercentual.toFixed(1)}%
+            </span>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Despesas</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(totalDespesas)}</h3>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/20">
+              <Wallet className="h-5 w-5 text-blue-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Saldo Líquido</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(saldoLiquido)}</h3>
+          <div className="mt-4 flex items-center gap-1">
+            <statusSaldo.Icon className={cn("h-3 w-3", saldoLiquido >= 0 ? "text-emerald-400" : "text-orange-400")} />
+            <span className={cn("text-[10px] font-medium", saldoLiquido >= 0 ? "text-emerald-400" : "text-orange-400")}>{statusSaldo.text}</span>
+          </div>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-purple-500/20 rounded-lg border border-purple-500/20">
+              <Building2 className="h-5 w-5 text-purple-400" />
+            </div>
+            <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full border", 
+              dashboardData.summary.investmentsProfitability >= 0 
+                ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/10" 
+                : "text-red-400 bg-red-500/10 border-red-500/10"
+            )}>
+              {dashboardData.summary.investmentsProfitability.toFixed(2)}%
+            </span>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Investimentos</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</h3>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Card de Resumo Financeiro */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 text-sm font-medium">Total Receitas</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalReceitas)}</p>
-                  </div>
-                  <div className="bg-green-400 bg-opacity-30 rounded-full p-3">
-                    <TrendingUp className="h-6 w-6" />
-                  </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  <ArrowUpRight className="h-4 w-4 mr-1" />
-                  <span className="text-sm text-green-100">{receitaPercentual.toFixed(1)}% vs mês anterior</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-red-100 text-sm font-medium">Total Despesas</p>
-                    <p className="text-2xl font-bold">{formatCurrency(totalDespesas)}</p>
-                  </div>
-                  <div className="bg-red-400 bg-opacity-30 rounded-full p-3">
-                    <TrendingDown className="h-6 w-6" />
-                  </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  <ArrowDownRight className="h-4 w-4 mr-1" />
-                  <span className="text-sm text-red-100">{despesaPercentual > 0 ? '+' : ''}{despesaPercentual.toFixed(1)}% vs mês anterior</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 text-sm font-medium">Saldo Líquido</p>
-                    <p className="text-2xl font-bold">{formatCurrency(saldoLiquido)}</p>
-                  </div>
-                  <div className="bg-blue-400 bg-opacity-30 rounded-full p-3">
-                    <Wallet className="h-6 w-6" />
-                  </div>
-                </div>
-                <div className={`flex items-center mt-4 ${statusSaldo.color}`}>
-                  <statusSaldo.Icon className="h-4 w-4 mr-1" />
-                  <span className="text-sm">{statusSaldo.text}</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 text-sm font-medium">Investimentos</p>
-                    <p className="text-2xl font-bold">{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</p>
-                  </div>
-                  <div className="bg-purple-400 bg-opacity-30 rounded-full p-3">
-                    <Building2 className="h-6 w-6" />
-                  </div>
-                </div>
-                <div className="flex items-center mt-4">
-                  {dashboardData.summary.investmentsProfitability >= 0 ? (
-                    <ArrowUpRight className="h-4 w-4 mr-1" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 mr-1" />
-                  )}
-                  <span className="text-sm text-purple-100">
-                    {dashboardData.summary.investmentsProfitability.toFixed(2)}% rentabilidade
-                  </span>
-                </div>
-              </div>
+        <div className="glass-panel p-6 border-white/5">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-cyan-400" />
+                    Status Operacional
+                </h3>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Card de Status e Metas */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Metas Ativas</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.metasAtivas}</p>
-                  </div>
-                  <Target className="h-8 w-8 text-orange-500" />
+            <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-slate-400 text-xs">Metas Ativas</p>
+                    <div className="flex items-center justify-between mt-1">
+                        <span className="text-xl font-bold text-white">{dashboardData.summary.metasAtivas}</span>
+                        <Target className="h-4 w-4 text-orange-400" />
+                    </div>
                 </div>
-                <div className="mt-2">
-                  <Badge variant="secondary" className="text-xs">
-                    {dashboardData.summary.metasConcluidas} concluídas
-                  </Badge>
+                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-slate-400 text-xs">Próximos Eventos</p>
+                    <div className="flex items-center justify-between mt-1">
+                        <span className="text-xl font-bold text-white">{dashboardData.summary.proximosEventos}</span>
+                        <Calendar className="h-4 w-4 text-pink-400" />
+                    </div>
                 </div>
-              </div>
-
-              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                   <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Próximos Eventos</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">{dashboardData.summary.proximosEventos}</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-pink-500" />
+                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-slate-400 text-xs">Limite Cartões</p>
+                    <div className="flex items-center justify-between mt-1">
+                        <span className="text-xl font-bold text-white">{formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}</span>
+                        <CreditCard className="h-4 w-4 text-purple-400" />
+                    </div>
                 </div>
-                <div className="mt-2">
-                  <Badge variant="outline" className="text-xs">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Esta semana
-                  </Badge>
+                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                    <p className="text-slate-400 text-xs">Score Financeiro</p>
+                    <div className="flex items-center justify-between mt-1">
+                        <span className={cn("text-xl font-bold", dashboardData.overallStatus.color.replace('text-', 'text-'))}>{dashboardData.overallStatus.text}</span>
+                        <dashboardData.overallStatus.Icon className={cn("h-4 w-4", dashboardData.overallStatus.color.replace('text-', 'text-'))} />
+                    </div>
                 </div>
-              </div>
-
-              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Limite disponível</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-slate-50">
-                      {formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}
-                    </p>
-                  </div>
-                  <CreditCard className="h-8 w-8 text-purple-500" />
-                </div>
-                <div className="mt-2">
-                  {dashboardData.summary.limiteTotalCartoes > 0 && 
-                   (dashboardData.summary.limiteDisponivelCartoes / dashboardData.summary.limiteTotalCartoes <= 0.1) ? (
-                    <Badge variant="destructive" className="text-xs">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      Atenção
-                    </Badge>
-                  ) : (
-                   <Badge variant="default" className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Tudo certo
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-800">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm font-medium dark:text-slate-400">Status Geral</p>
-                    <p className={`text-2xl font-bold ${dashboardData.overallStatus.color}`}>
-                      {dashboardData.overallStatus.text}
-                    </p>
-                  </div>
-                  <dashboardData.overallStatus.Icon className={`h-8 w-8 ${dashboardData.overallStatus.color}`} />
-                </div>
-                <div className="mt-2">
-                  <Badge variant="default" className={`text-xs ${dashboardData.overallStatus.badgeColor}`}>
-                    <dashboardData.overallStatus.Icon className="h-3 w-3 mr-1" />
-                    {dashboardData.overallStatus.badgeText}
-                  </Badge>
-                </div>
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+        </div>
 
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-               <TrendingDown className="h-5 w-5 mr-2 text-red-600 dark:text-slate-50" />
-                Top 5 Maiores Gastos
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="glass-panel p-6 border-white/5">
+            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-red-400" />
+                Maiores Gastos
+            </h3>
+            <div className="space-y-4">
               {dashboardData.chartData.top5Expenses.map((gasto, index) => (
                 <div key={index}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium dark:text-slate-200">{gasto.name}</span>
-                    <span className="font-bold">{formatCurrency(gasto.value)}</span>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-slate-300">{gasto.name}</span>
+                    <span className="font-bold text-white">{formatCurrency(gasto.value)}</span>
                   </div>
-                  <div className="flex items-center">
-                    <Progress value={gasto.percent} className="h-2 flex-1" />
-                    <span className="text-xs text-gray-500 w-12 text-right">{gasto.percent.toFixed(0)}%</span>
+                  <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div 
+                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500" 
+                        style={{ width: `${gasto.percent}%` }}
+                    ></div>
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <PieChartIcon className="h-5 w-5 mr-2 text-blue-600 dark:text-slate-50" />
-                Gastos por Categoria
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={dashboardData.chartData.categories}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} vertical={false} />
-                  <XAxis type="number" hide />
-                  <YAxis 
-                  type="category" 
-                  dataKey="name" 
-                  stroke="#888888" // Cor mais suave
-                  fontSize={12} 
-                  tickLine={false} // Remove os tracinhos
-                  axisLine={false} // Remove a linha vertical preta
-                  width={100} 
-                />
-                
-                  <Tooltip
-                    contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
-                    formatter={(value) => [formatCurrency(value), 'Valor Gasto']}
-                  />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                    {dashboardData.chartData.categories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-               <TrendingUp className="h-5 w-5 mr-2 text-green-600 dark:text-slate-50" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="glass-panel p-6 border-white/5">
+            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-emerald-400" />
                 Evolução Financeira
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            </h3>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={dashboardData.chartData.evolution}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis 
                     dataKey="month" 
-                    stroke="#888888" 
-                    fontSize={12} 
+                    stroke="rgba(255,255,255,0.4)" 
+                    fontSize={10} 
                     tickLine={false} 
                     axisLine={false} 
                   />
                  <YAxis 
-                  stroke="#888888" 
-                  fontSize={12} 
+                  stroke="rgba(255,255,255,0.4)" 
+                  fontSize={10} 
                   tickLine={false} 
                   axisLine={false} 
-                  tickFormatter={(value) => `R$${value}`} // Opcional: Formata o eixo Y
+                  tickFormatter={(value) => `R$${value}`}
                 />
-                  <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={2} />
-                  <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={2} />
-                  <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={2} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                    itemStyle={{ fontSize: '12px' }}
+                    formatter={(value) => [formatCurrency(value), '']} 
+                  />
+                  <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: '#ef4444' }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Planejado vs. Realizado</span>
+          <div className="glass-panel p-6 border-white/5">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <PieChartIcon className="h-5 w-5 text-purple-400" />
+                    Planejado vs. Realizado
+                </h3>
                 <div className="flex items-center gap-2">
                   <Select value={pvrTypeFilter} onValueChange={setPvrTypeFilter}>
-                    <SelectTrigger className="w-28 h-8 text-xs">
+                    <SelectTrigger className="w-28 h-8 text-[10px] glass-panel border-white/10">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-panel border-white/10">
                       <SelectItem value="saida">Despesas</SelectItem>
                       <SelectItem value="entrada">Receitas</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={pvrCategoryFilter} onValueChange={setPvrCategoryFilter}>
-                    <SelectTrigger className="w-36 h-8 text-xs">
+                    <SelectTrigger className="w-36 h-8 text-[10px] glass-panel border-white/10">
                       <SelectValue placeholder="Categoria..." />
                     </SelectTrigger>
-                    <SelectContent className="max-h-[250px] overflow-y-auto">
+                    <SelectContent className="glass-panel border-white/10 max-h-[250px]">
                       <SelectItem value="all">Todas</SelectItem> 
                       {categories
                         .filter(cat => cat.type === pvrTypeFilter)
@@ -863,62 +740,59 @@ const tutorials = [
                     </SelectContent>
                   </Select>
                 </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            </div>
+            <div className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={pvrData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                   <XAxis 
-  dataKey="month" 
-  stroke="#888888" 
-  fontSize={12} 
-  tickLine={false} 
-  axisLine={false} 
-/>
+                    dataKey="month" 
+                    stroke="rgba(255,255,255,0.4)" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false} 
+                  />
                   <YAxis 
-  stroke="#888888" 
-  fontSize={12} 
-  tickLine={false} 
-  axisLine={false} 
-/>
-                  <Tooltip formatter={(value) => formatCurrency(value)} />
-                  <Legend />
-                  <Bar dataKey="planejado" fill="#a78bfa" name="Planejado" radius={[4, 4, 0, 0]} />
-                  <Line type="monotone" dataKey="realizado" stroke="#10b981" strokeWidth={3} name="Realizado" />
+                    stroke="rgba(255,255,255,0.4)" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false} 
+                  />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
+                    formatter={(value) => [formatCurrency(value), '']} 
+                  />
+                  <Legend iconType="circle" />
+                  <Bar dataKey="planejado" fill="rgba(167, 139, 250, 0.4)" name="Planejado" radius={[4, 4, 0, 0]} />
+                  <Line type="monotone" dataKey="realizado" stroke="#10b981" strokeWidth={3} name="Realizado" dot={{ r: 4, fill: '#10b981' }} />
                 </ComposedChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </div>
       </div>
 
-
-{/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
-{/* ▼▼▼ SUBSTITUA O COMPONENTE <Dialog> INTEIRO POR ESTE ▼▼▼ */}
-<Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-  <DialogContent className="max-w-3xl">
-    <DialogHeader>
-      <DialogTitle>Seu Resumo Visual</DialogTitle>
-    </DialogHeader>
-    <div className="mt-4">
-      {generatedImageUrl ? (
-        <>
-          <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full" />
-          <Button asChild className="mt-4 w-full">
-            <a href={generatedImageUrl} download={`resumo_simplific_${selectedYear}_${selectedMonth}.png`}>
-              <Download className="h-4 w-4 mr-2" />
-              Baixar Imagem
-            </a>
-          </Button>
-        </>
-      ) : (
-        <p>Carregando imagem...</p>
-      )}
-    </div>
-  </DialogContent>
-</Dialog>
-{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
+      <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
+        <DialogContent className="glass-panel border-white/10 text-slate-200 max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Seu Resumo Visual</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {generatedImageUrl ? (
+              <>
+                <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full border border-white/10" />
+                <Button asChild className="mt-4 w-full bg-cyan-600 hover:bg-cyan-700">
+                  <a href={generatedImageUrl} download={`resumo_simplific_${selectedYear}_${selectedMonth}.png`}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar Imagem
+                  </a>
+                </Button>
+              </>
+            ) : (
+              <p className="text-center py-8 text-slate-400 italic">Carregando imagem...</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -513,204 +513,213 @@ const Transactions = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
-      <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
+    <div className="min-h-screen bg-transparent text-slate-200">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mr-4">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate('/dashboard')} 
+                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
+              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">Bem-vindo, {user.name}</span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <span className="text-sm text-slate-400 hidden sm:block">Bem-vindo, {user.name}</span>
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" /> Sair
               </Button>
             </div>
           </div>
+        </div>
       </header>
 
-      <div className="py-6">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold">Lançamentos Financeiros</h2>
-            <p className="text-gray-600 dark:text-gray-400">Gerencie suas receitas e despesas</p>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Lançamentos Financeiros
+          </h2>
+          <p className="text-slate-400">Gerencie suas receitas e despesas com precisão tecnológica</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <TrendingUp className="h-12 w-12 text-emerald-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Total Receitas</p>
+            <p className="text-2xl font-bold text-white">R$ {totalReceitas.toLocaleString()}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }} />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0"><TrendingUp className="h-8 w-8 text-green-600 ark:text-green-400" /></div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Receitas</p>
-                    <p className="text-2xl font-bold text-green-600 ark:text-green-400">R$ {totalReceitas.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0"><TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400" /></div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Despesas</p>
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">R$ {totalDespesas.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0"><DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" /></div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Saldo Líquido</p>
-                    <p className={`text-2xl font-bold ${saldoLiquido >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                      R$ {saldoLiquido.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0"><Clock className="h-8 w-8 text-yellow-600 dark:text-yellow-400" /></div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pendentes</p>
-                    <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{totalPendentes}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <TrendingDown className="h-12 w-12 text-rose-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Total Despesas</p>
+            <p className="text-2xl font-bold text-white">R$ {totalDespesas.toLocaleString()}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-rose-500 rounded-full" style={{ width: '100%' }} />
+            </div>
           </div>
 
-          <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
-            <TabsList className="grid w-full sm:w-auto grid-cols-4">
-                <TabsTrigger value="todas">Todas</TabsTrigger>
-                <TabsTrigger value="receita">Receitas</TabsTrigger>
-                <TabsTrigger value="despesa">Despesas</TabsTrigger>
-                <TabsTrigger value="pendentes">Pendentes</TabsTrigger>
-            </TabsList>
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <DollarSign className="h-12 w-12 text-cyan-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Saldo Líquido</p>
+            <p className={`text-2xl font-bold ${saldoLiquido >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              R$ {saldoLiquido.toLocaleString()}
+            </p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full ${saldoLiquido >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: '100%' }} />
+            </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="flex gap-4 items-center">
-                <div>
-                  <Label htmlFor="data_inicial"></Label>
-                  <Input id="data_inicial" type="date" value={dataInicial} onChange={(e) => setDataInicial(e.target.value)} className="w-36" />
-                </div>
-                <div>
-                  <Label htmlFor="data_final"></Label>
-                  <Input id="data_final" type="date" value={dataFinal} onChange={(e) => setDataFinal(e.target.value)} className="w-36" />
-                </div>
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Clock className="h-12 w-12 text-amber-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Pendentes</p>
+            <p className="text-2xl font-bold text-white">{totalPendentes}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-500 rounded-full" style={{ width: '100%' }} />
+            </div>
+          </div>
+        </div>
+
+        <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
+          <TabsList className="grid w-full sm:w-auto grid-cols-4 glass-panel p-1 border-white/5">
+              <TabsTrigger value="todas" className="data-[state=active]:active-gradient">Todas</TabsTrigger>
+              <TabsTrigger value="receita" className="data-[state=active]:active-gradient">Receitas</TabsTrigger>
+              <TabsTrigger value="despesa" className="data-[state=active]:active-gradient">Despesas</TabsTrigger>
+              <TabsTrigger value="pendentes" className="data-[state=active]:active-gradient">Pendentes</TabsTrigger>
+          </TabsList>
+
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+            <div className="flex gap-2 items-center">
+              <Input 
+                type="date" 
+                value={dataInicial} 
+                onChange={(e) => setDataInicial(e.target.value)} 
+                className="w-36 glass-panel border-white/10 text-xs h-9" 
+              />
+              <span className="text-slate-500">até</span>
+              <Input 
+                type="date" 
+                value={dataFinal} 
+                onChange={(e) => setDataFinal(e.target.value)} 
+                className="w-36 glass-panel border-white/10 text-xs h-9" 
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-center">
+              <Popover>
+                  <PopoverTrigger asChild>
+                      <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-300 h-9">
+                          <Wallet className="h-4 w-4 mr-2" />
+                          Contas
+                          {selectedContas.length > 0 && (
+                              <Badge className="ml-2 bg-cyan-500/20 text-cyan-400 border-none h-5">
+                                  {selectedContas.length}
+                              </Badge>
+                          )}
+                      </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 glass-panel border-white/10 text-slate-200 p-3" align="end">
+                      <div className="space-y-2">
+                          <h4 className="font-medium text-xs text-slate-400 mb-2 uppercase tracking-wider">Filtrar por Conta:</h4>
+                          {contas.length === 0 ? (
+                              <p className="text-xs text-slate-500 italic">Nenhuma conta cadastrada.</p>
+                          ) : (
+                              contas.map(conta => (
+                                  <div key={conta.id} className="flex items-center space-x-2 p-1 hover:bg-white/5 rounded transition-colors cursor-pointer" onClick={() => toggleContaFilter(conta.id.toString())}>
+                                      <Checkbox 
+                                          id={`filter-conta-${conta.id}`} 
+                                          checked={selectedContas.includes(conta.id.toString())}
+                                          onCheckedChange={() => {}}
+                                          className="border-white/20 data-[state=checked]:bg-cyan-500"
+                                      />
+                                      <label className="text-sm text-slate-300 cursor-pointer flex-1">
+                                          {conta.bank_name}
+                                      </label>
+                                  </div>
+                              ))
+                          )}
+                          {selectedContas.length > 0 && (
+                              <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10" onClick={() => setSelectedContas([])}>
+                                  Limpar Filtro
+                              </Button>
+                          )}
+                      </div>
+                  </PopoverContent>
+              </Popover>
+
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 h-4 w-4" />
+                <Input 
+                  placeholder="Buscar lançamentos..." 
+                  value={busca} 
+                  onChange={(e) => setBusca(e.target.value)} 
+                  className="pl-10 w-full sm:w-64 glass-panel border-white/10 text-sm h-9" 
+                />
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
-                
-                {/* ▼▼▼ NOVO BOTÃO DE FILTRAR CONTAS ▼▼▼ */}
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" className="border-dashed h-10">
-                            <Wallet className="h-4 w-4 mr-2" />
-                            Contas
-                            {selectedContas.length > 0 && (
-                                <span className="ml-2 rounded bg-blue-100 text-blue-700 px-1.5 py-0.5 text-xs font-bold">
-                                    {selectedContas.length}
-                                </span>
-                            )}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-56 p-3" align="end">
-                        <div className="space-y-2">
-                            <h4 className="font-medium text-sm text-gray-500 mb-2">Filtrar por Conta:</h4>
-                            {contas.length === 0 ? (
-                                <p className="text-xs text-gray-400">Nenhuma conta cadastrada.</p>
-                            ) : (
-                                contas.map(conta => (
-                                    <div key={conta.id} className="flex items-center space-x-2">
-                                        <Checkbox 
-                                            id={`filter-conta-${conta.id}`} 
-                                            checked={selectedContas.includes(conta.id.toString())}
-                                            onCheckedChange={() => toggleContaFilter(conta.id.toString())}
-                                        />
-                                        <label 
-                                            htmlFor={`filter-conta-${conta.id}`} 
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                                        >
-                                            {conta.bank_name}
-                                        </label>
-                                    </div>
-                                ))
-                            )}
-                            {selectedContas.length > 0 && (
-                                <Button variant="ghost" size="sm" className="w-full mt-2 text-xs h-8" onClick={() => setSelectedContas([])}>
-                                    Limpar Filtro
-                                </Button>
-                            )}
-                        </div>
-                    </PopoverContent>
-                </Popover>
-                {/* ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ */}
-
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
-                  <Input placeholder="Buscar transações..." value={busca} onChange={(e) => setBusca(e.target.value)} className="pl-10 w-full sm:w-64" />
-                </div>
-                
+              
+              <div className="flex gap-2">
                 <Dialog open={isModalOpen} onOpenChange={(open) => {
                   if (open) {
                     carregarCategoriasAntesDeAbrir();
-                    setFormData({
-                      description: '',
-                      amount: '',
-                      type: 'expense', 
-                      category: '',
-                      bank_account_id: 'none',
-                      credit_card_id: 'none', // <--- RESET NOVO CAMPO
-                      transaction_date: getLocalDate(),
-                      status: 'pendente'
-                    });
                   } else {
                     setIsModalOpen(false);
                   }
                 }}>
                   <DialogTrigger asChild>
-                  <Button size="icon" className="w-10 h-10 bg-green-700 hover:bg-green-800" title="Novo Lançamento">
-                  <Plus className="h-6 w-6" />
-                  </Button>
+                    <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20 h-9 px-4">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Novo Lançamento
+                    </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px] px-6" aria-describedby="descricaoDialog">
-                    <p id="descricaoDialog" className="sr-only">Formulário para criar nova transação financeira.</p>
+                  <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]" aria-describedby="descricaoDialog">
                     <DialogHeader className="mb-4">
-                      <DialogTitle className="text-lg font-semibold">Nova Transação</DialogTitle>
+                      <DialogTitle className="text-white">Novo Lançamento</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                      <div>
-                        <Label htmlFor="description">Descrição *</Label>
-                        <Input id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Supermercado, Salário..." required />
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="description" className="text-slate-300">Descrição *</Label>
+                        <Input id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Supermercado, Salário..." required className="glass-panel border-white/10" />
                       </div>
 
-                      <div>
-                        <Label htmlFor="type">Tipo *</Label>
-                        <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="income">Receita</SelectItem>
-                            <SelectItem value="expense">Despesa</SelectItem>
-                            <SelectItem value="credit_card">💳 Cartão de Crédito</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                          <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                            <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10">
+                              <SelectItem value="income">Receita</SelectItem>
+                              <SelectItem value="expense">Despesa</SelectItem>
+                              <SelectItem value="credit_card">💳 Cartão de Crédito</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="amount" className="text-slate-300">Valor *</Label>
+                          <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required className="glass-panel border-white/10" />
+                        </div>
                       </div>
 
-                      {/* Campo Cartão de Crédito - SÓ APARECE SE TIPO FOR credit_card */}
                       {formData.type === 'credit_card' && (
-                        <div>
-                          <Label htmlFor="credit_card">Selecione o Cartão *</Label>
+                        <div className="space-y-2">
+                          <Label htmlFor="credit_card" className="text-slate-300">Selecione o Cartão *</Label>
                           <Select value={formData.credit_card_id} onValueChange={(val) => handleInputChange('credit_card_id', val)}>
-                              <SelectTrigger>
+                              <SelectTrigger className="glass-panel border-white/10">
                                   <SelectValue placeholder="Selecione um cartão" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="glass-panel border-white/10">
                                   {cartoes.map(cartao => (
                                       <SelectItem key={cartao.id} value={cartao.id.toString()}>
                                           {cartao.name} (Final {cartao.last_digits})
@@ -721,37 +730,35 @@ const Transactions = ({ user, onLogout }) => {
                         </div>
                       )}
 
-                      {/* Campo Conta Bancária */}
-                      <div className={formData.type === 'credit_card' ? 'opacity-50 pointer-events-none' : ''}>
-                        <Label htmlFor="bank_account">Conta Bancária (Opcional)</Label>
+                      <div className={formData.type === 'credit_card' ? 'opacity-50 pointer-events-none' : 'space-y-2'}>
+                        <Label htmlFor="bank_account" className="text-slate-300">Conta Bancária (Opcional)</Label>
                         <Select 
                           disabled={formData.type === 'credit_card'} 
                           value={formData.type === 'credit_card' ? 'none' : formData.bank_account_id} 
                           onValueChange={(val) => handleInputChange('bank_account_id', val)}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger className="glass-panel border-white/10">
                                 <SelectValue placeholder="Selecione uma conta" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="glass-panel border-white/10">
                                 <SelectItem value="none">Nenhuma</SelectItem>
                                 {contas.map(conta => (
                                     <SelectItem key={conta.id} value={conta.id.toString()}>
-                                        {conta.bank_name} - Ag: {conta.agency} CC: {conta.account_number}
+                                        {conta.bank_name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                       </div>
 
-                      <div>
-                        <Label htmlFor="category">Categoria *</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="category" className="text-slate-300">Categoria *</Label>
                         <div className="flex items-center gap-2">
                           <Select key={formData.type + categorias.length} value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                            <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                            <SelectContent className="max-h-[250px] overflow-y-auto">
+                            <SelectTrigger className="glass-panel border-white/10 flex-1"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10 max-h-[250px]">
                               {(Array.isArray(categorias) ? categorias : [])
                                 .filter((cat) => {
-                                  // Se for Receita, mostra entrada. Se for Despesa ou Cartão, mostra saida.
                                   const targetType = formData.type === 'income' ? 'entrada' : 'saida';
                                   return cat?.type === targetType;
                                 })
@@ -760,286 +767,287 @@ const Transactions = ({ user, onLogout }) => {
                                 ))}
                             </SelectContent>
                           </Select>
-                          <Input
-                            type="text" placeholder="+" className="w-10 h-10 text-center p-0" maxLength={1}
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            className="w-10 h-10 border-white/10 hover:bg-white/5"
                             onClick={() => {
-                              if (categoriasLoading) { alert('As categorias ainda estão carregando. Tente novamente em instantes.'); return; }
-                              if (!formData.type) { alert('Por favor, selecione o tipo antes de adicionar uma categoria.'); return; }
-                              const nomeCategoria = prompt('Digite o nome da nova categoria:');
-                              if (nomeCategoria) { adicionarCategoria(nomeCategoria.trim()); }
+                              if (categoriasLoading) return;
+                              if (!formData.type) { alert('Selecione o tipo primeiro.'); return; }
+                              const nome = prompt('Nova categoria:');
+                              if (nome) adicionarCategoria(nome.trim());
                             }}
-                            readOnly
-                          />
+                          >
+                            +
+                          </Button>
                         </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="amount">Valor *</Label>
-                        <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="transaction_date" className="text-slate-300">Data</Label>
+                          <Input id="transaction_date" type="date" value={formData.transaction_date} onChange={(e) => handleInputChange('transaction_date', e.target.value)} className="glass-panel border-white/10" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="status" className="text-slate-300">Status</Label>
+                          <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                            <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10">
+                              <SelectItem value="confirmada">Confirmada</SelectItem>
+                              <SelectItem value="pendente">Pendente</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
 
-                      <div>
-                        <Label htmlFor="transaction_date">Data</Label>
-                        <Input id="transaction_date" type="date" value={formData.transaction_date} onChange={(e) => handleInputChange('transaction_date', e.target.value)} />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="status">Status</Label>
-                        <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="confirmada">Confirmada</SelectItem>
-                            <SelectItem value="pendente">Pendente</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="flex justify-between pt-4">
-                        <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
-                        <Button type="submit" className="bg-green-700 hover:bg-green-800">Criar Transação</Button>
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Criar Transação</Button>
                       </div>
                     </form>
                   </DialogContent>
                 </Dialog>
                 
-                <Button variant="outline" size="icon" className="w-10 h-10 ml-2" onClick={() => fileInputRef.current.click()} disabled={isUploading} title="Importar Extrato">
-                {isUploading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-                  </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="w-9 h-9 border-white/10 hover:bg-white/5 text-slate-300" 
+                  onClick={() => fileInputRef.current.click()} 
+                  disabled={isUploading} 
+                  title="Importar Extrato"
+                >
+                  {isUploading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                </Button>
                 <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".pdf" className="hidden" />
               </div>
             </div>
+          </div>
 
-            {uploadResult && (
-              <div className={`p-3 rounded-md text-sm mb-4 ${uploadResult.success ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'}`}>
+          {uploadResult && (
+            <div className={`p-4 rounded-lg text-sm mb-6 glass-panel border-white/10 ${uploadResult.success ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+              <div className="flex items-center gap-2">
+                {uploadResult.success ? <CheckCircle className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
                 {uploadResult.message}
               </div>
-            )}
+            </div>
+          )}
 
-            <TabsContent value={filtroAtivo} className="space-y-4">
-              {/* ── helper: linha de lançamento ── */}
-              {(() => {
-                const LancamentoRow = ({ transacao, showTipo }) => (
-                  <div className={`${getRowBorderClass(transacao)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-sm dark:text-slate-100">{transacao.description}</h3>
-                        {showTipo && getTipoBadge(transacao.type)}
-                        {getStatusBadge(transacao.status)}
-                      </div>
-                      <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-500 dark:text-slate-400">
-                        <span><span className="font-medium">Categoria:</span> {transacao.category || 'Sem categoria'}</span>
-                        <span><span className="font-medium">Conta:</span> {transacao.account_label || '---'}</span>
-                        <span><span className="font-medium">Data:</span> {formatDateForDisplay(transacao.transaction_date)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 mt-3 sm:mt-0 sm:ml-4 w-full sm:w-auto justify-between sm:justify-end">
-                      <span className={`text-base font-bold whitespace-nowrap ${transacao.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                        R$ {(transacao.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                      <div className="flex gap-1">
-                        {transacao.status === 'pendente' && (
-                          <Button variant="outline" size="sm" onClick={() => confirmarTransacao(transacao.id)}>
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Confirmar
-                          </Button>
-                        )}
-                        <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(transacao)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => excluirTransacao(transacao)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                );
-
-                const receitasFiltradas = transacoesFiltradas.filter(t => t?.type === 'income');
-                const despesasFiltradas = transacoesFiltradas.filter(t => t?.type === 'expense');
-
-                if (filtroAtivo === 'todas') {
-                  return (
-                    <>
-                      {/* ── CARD RECEITAS ── */}
-                      <Card>
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                            <TrendingUp className="h-5 w-5" />
-                            Receitas
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {receitasFiltradas.length > 0
-                            ? receitasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
-                            : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma receita encontrada</p>
-                          }
-                        </CardContent>
-                      </Card>
-
-                      {/* ── CARD DESPESAS ── */}
-                      <Card>
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                            <TrendingDown className="h-5 w-5" />
-                            Despesas
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          {despesasFiltradas.length > 0
-                            ? despesasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
-                            : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma despesa encontrada</p>
-                          }
-                        </CardContent>
-                      </Card>
-                    </>
-                  );
-                }
-
-                // Abas: receita / despesa / pendentes
-                const titulo = filtroAtivo === 'receita' ? 'Receitas'
-                             : filtroAtivo === 'despesa' ? 'Despesas'
-                             : 'Transações Pendentes';
-
-                return (
-                  <Card>
-                    <CardHeader className="pb-3">
-                      {filtroAtivo === 'pendentes' ? (
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                          <CardTitle>{titulo}</CardTitle>
-                          <div className="flex items-center gap-4">
-                            <div className="text-center p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
-                              <p className="text-xs font-medium text-green-700 dark:text-green-300">Receitas</p>
-                              <p className="text-lg font-bold text-green-600">
-                                R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                            <div className="text-center p-2 rounded-lg bg-red-50 dark:bg-red-900/20">
-                              <p className="text-xs font-medium text-red-700 dark:text-red-300">Despesas</p>
-                              <p className="text-lg font-bold text-red-600">
-                                R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <CardTitle>{titulo}</CardTitle>
+          <TabsContent value={filtroAtivo} className="space-y-6">
+            {(() => {
+              const LancamentoRow = ({ transacao, showTipo }) => (
+                <div className={`${getRowBorderClass(transacao)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
+                  <div className="flex-1 z-10">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-sm text-white">{transacao.description}</h3>
+                      {showTipo && (
+                        <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                          {transacao.type === 'income' ? 'Receita' : 'Despesa'}
+                        </Badge>
                       )}
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {transacoesFiltradas.length > 0
-                        ? transacoesFiltradas.map(t => t && <LancamentoRow key={t.id} transacao={t} showTipo={filtroAtivo === 'pendentes'} />)
-                        : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-6">Nenhuma transação encontrada</p>
-                      }
-                    </CardContent>
-                  </Card>
+                      <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.status === 'confirmada' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                        {transacao.status === 'confirmada' ? 'Confirmada' : 'Pendente'}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] text-slate-500">
+                      <span><span className="font-medium text-slate-400">Categoria:</span> {transacao.category || 'Sem categoria'}</span>
+                      <span><span className="font-medium text-slate-400">Conta:</span> {transacao.account_label || '---'}</span>
+                      <span><span className="font-medium text-slate-400">Data:</span> {formatDateForDisplay(transacao.transaction_date)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 mt-4 sm:mt-0 sm:ml-4 w-full sm:w-auto justify-between sm:justify-end z-10">
+                    <span className={`text-lg font-bold whitespace-nowrap ${transacao.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      R$ {(transacao.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {transacao.status === 'pendente' && (
+                        <Button variant="ghost" size="sm" onClick={() => confirmarTransacao(transacao.id)} className="h-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 px-2">
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Confirmar
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(transacao)} className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/5">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => excluirTransacao(transacao)} className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {/* Subtle background glow on hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-r ${transacao.type === 'income' ? 'from-emerald-500/0 to-emerald-500/5' : 'from-rose-500/0 to-rose-500/5'} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                </div>
+              );
+
+              const receitasFiltradas = transacoesFiltradas.filter(t => t?.type === 'income');
+              const despesasFiltradas = transacoesFiltradas.filter(t => t?.type === 'expense');
+
+              if (filtroAtivo === 'todas') {
+                return (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* ── CARD RECEITAS ── */}
+                    <div className="glass-panel p-6 border-white/5 h-fit">
+                      <div className="flex items-center gap-2 text-emerald-400 mb-6">
+                        <TrendingUp className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Receitas</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {receitasFiltradas.length > 0
+                          ? receitasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
+                          : <p className="text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma receita encontrada</p>
+                        }
+                      </div>
+                    </div>
+
+                    {/* ── CARD DESPESAS ── */}
+                    <div className="glass-panel p-6 border-white/5 h-fit">
+                      <div className="flex items-center gap-2 text-rose-400 mb-6">
+                        <TrendingDown className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Despesas</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {despesasFiltradas.length > 0
+                          ? despesasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
+                          : <p className="text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma despesa encontrada</p>
+                        }
+                      </div>
+                    </div>
+                  </div>
                 );
-              })()}
-            </TabsContent>
-          </Tabs>
+              }
 
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[500px] px-6">
-              <DialogHeader>
-                <DialogTitle>Editar Transação</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                if (!editFormData.description || !editFormData.amount || !editFormData.category) {
-                  alert('Por favor, preencha todos os campos obrigatórios.');
-                  return;
-                }
-                const tipoSelecionado = editFormData.type === 'income' ? 'entrada' : 'saida';
-                const categoriaObj = categorias.find(cat => cat.name === editFormData.category && cat.type === tipoSelecionado);
-                if (!categoriaObj) { alert('Categoria inválida. Por favor, selecione uma da lista.'); return; }
-                
-                const payload = {
-                  description: editFormData.description,
-                  value: Math.abs(parseFloat(editFormData.amount)),
-                  type: tipoSelecionado,
-                  category_id: categoriaObj.id,
-                  bank_account_id: editFormData.bank_account_id === 'none' ? null : parseInt(editFormData.bank_account_id), // <--- LINHA ADICIONADA
-                  date: editFormData.transaction_date,
-                  status: editFormData.status
-                };
-                editarTransacao(selectedTransacao.id, payload);
-              }} className="space-y-4">
-                <div>
-                  <Label htmlFor="edit_description">Descrição *</Label>
-                  <Input id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} required />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit_amount">Valor *</Label>
-                    <Input id="edit_amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))} required />
+              const titulo = filtroAtivo === 'receita' ? 'Receitas'
+                           : filtroAtivo === 'despesa' ? 'Despesas'
+                           : 'Lançamentos Pendentes';
+
+              return (
+                <div className="glass-panel p-6 border-white/5">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h4 className="font-semibold uppercase tracking-wider text-sm text-white">{titulo}</h4>
+                    {filtroAtivo === 'pendentes' && (
+                      <div className="flex items-center gap-4">
+                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-center min-w-[120px]">
+                          <p className="text-[10px] uppercase font-bold text-emerald-500/70 mb-0.5">Receitas</p>
+                          <p className="text-sm font-bold text-emerald-400">
+                            R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-center min-w-[120px]">
+                          <p className="text-[10px] uppercase font-bold text-rose-500/70 mb-0.5">Despesas</p>
+                          <p className="text-sm font-bold text-rose-400">
+                            R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="edit_type">Tipo *</Label>
-                    <Select value={editFormData.type} onValueChange={(value) => setEditFormData(prev => ({...prev, type: value}))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="income">Receita</SelectItem>
-                        <SelectItem value="expense">Despesa</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {transacoesFiltradas.length > 0
+                      ? transacoesFiltradas.map(t => t && <LancamentoRow key={t.id} transacao={t} showTipo={filtroAtivo === 'pendentes'} />)
+                      : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhum lançamento encontrado</p>
+                    }
                   </div>
                 </div>
+              );
+            })()}
+          </TabsContent>
+        </Tabs>
 
-                {/* ▼▼▼ NOVO CAMPO DE CONTA BANCÁRIA NA EDIÇÃO ▼▼▼ */}
-                <div>
-                  <Label htmlFor="edit_bank_account">Conta Bancária (Opcional)</Label>
-                  <Select value={editFormData.bank_account_id} onValueChange={(value) => setEditFormData(prev => ({...prev, bank_account_id: value}))}>
-                      <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma conta" />
-                      </SelectTrigger>
-                      <SelectContent>
-                          <SelectItem value="none">Nenhuma</SelectItem>
-                          {contas.map(conta => (
-                              <SelectItem key={conta.id} value={conta.id.toString()}>
-                                  {conta.bank_name} - Ag: {conta.agency} CC: {conta.account_number}
-                              </SelectItem>
-                          ))}
-                      </SelectContent>
-                  </Select>
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="text-white">Editar Lançamento</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const tipoSelecionado = editFormData.type === 'income' ? 'entrada' : 'saida';
+              const categoriaObj = categorias.find(cat => cat.name === editFormData.category && cat.type === tipoSelecionado);
+              const payload = {
+                description: editFormData.description,
+                value: Math.abs(parseFloat(editFormData.amount)),
+                type: tipoSelecionado,
+                category_id: categoriaObj?.id,
+                bank_account_id: editFormData.bank_account_id === 'none' ? null : parseInt(editFormData.bank_account_id),
+                date: editFormData.transaction_date,
+                status: editFormData.status
+              };
+              editarTransacao(selectedTransacao.id, payload);
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit_description" className="text-slate-300">Descrição *</Label>
+                <Input id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} required className="glass-panel border-white/10" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit_amount" className="text-slate-300">Valor *</Label>
+                  <Input id="edit_amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))} required className="glass-panel border-white/10" />
                 </div>
-                {/* ▲▲▲ FIM DO NOVO CAMPO ▲▲▲ */}
-
-                <div>
-                  <Label htmlFor="edit_category">Categoria *</Label>
-                  <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>
-                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                    <SelectContent className="max-h-[250px] overflow-y-auto">
-                      {(Array.isArray(categorias) ? categorias : [])
-                        .filter((cat) => cat.type === (editFormData.type === 'income' ? 'entrada' : 'saida'))
-                        .map((cat, index) => <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>)}
+                <div className="space-y-2">
+                  <Label htmlFor="edit_type" className="text-slate-300">Tipo *</Label>
+                  <Select value={editFormData.type} onValueChange={(value) => setEditFormData(prev => ({...prev, type: value}))}>
+                    <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10">
+                      <SelectItem value="income">Receita</SelectItem>
+                      <SelectItem value="expense">Despesa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit_transaction_date">Data</Label>
-                    <Input id="edit_transaction_date" type="date" value={editFormData.transaction_date} onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))} />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit_status">Status</Label>
-                    <Select value={editFormData.status} onValueChange={(value) => setEditFormData(prev => ({...prev, status: value}))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="confirmada">Confirmada</SelectItem>
-                        <SelectItem value="pendente">Pendente</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit_bank_account" className="text-slate-300">Conta Bancária</Label>
+                <Select value={editFormData.bank_account_id} onValueChange={(value) => setEditFormData(prev => ({...prev, bank_account_id: value}))}>
+                    <SelectTrigger className="glass-panel border-white/10">
+                        <SelectValue placeholder="Selecione uma conta" />
+                    </SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10">
+                        <SelectItem value="none">Nenhuma</SelectItem>
+                        {contas.map(conta => (
+                            <SelectItem key={conta.id} value={conta.id.toString()}>
+                                {conta.bank_name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit_category" className="text-slate-300">Categoria *</Label>
+                <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>
+                  <SelectTrigger className="glass-panel border-white/10"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                    {(Array.isArray(categorias) ? categorias : [])
+                      .filter((cat) => cat.type === (editFormData.type === 'income' ? 'entrada' : 'saida'))
+                      .map((cat, index) => <SelectItem key={index} value={cat.name}>{cat.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit_transaction_date" className="text-slate-300">Data</Label>
+                  <Input id="edit_transaction_date" type="date" value={editFormData.transaction_date} onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))} className="glass-panel border-white/10" />
                 </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                  <Button type="submit">Salvar Alterações</Button>
+                <div className="space-y-2">
+                  <Label htmlFor="edit_status" className="text-slate-300">Status</Label>
+                  <Select value={editFormData.status} onValueChange={(value) => setEditFormData(prev => ({...prev, status: value}))}>
+                    <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10">
+                      <SelectItem value="confirmada">Confirmada</SelectItem>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
+
 };
 
 export default Transactions;

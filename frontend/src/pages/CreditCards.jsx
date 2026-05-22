@@ -450,921 +450,716 @@ const carregarFaturas = async (listaDeCartoes) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
+    <div className="min-h-screen bg-transparent text-slate-200">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
-                className="mr-4"
+                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
+              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-slate-400 hidden sm:block">
                 Bem-vindo, {user.name}
               </span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
             </div>
           </div>
-        
+        </div>
       </header>
 
       {/* Main Content */}
-      
-        <div className="px-4 py-6 sm:px-0">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold">Cartões de Crédito</h2>
-            <p className="text-gray-600 dark:text-gray-400">Gerencie seus cartões e faturas</p>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Cartões de Crédito
+          </h2>
+          <p className="text-slate-400">Gerencie seus cartões e faturas com precisão tecnológica</p>
+        </div>
+
+        {/* Cards de Resumo */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <CreditCard className="h-12 w-12 text-cyan-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Limite Total</p>
+            <p className="text-2xl font-bold text-white">R$ {limiteTotal.toLocaleString()}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+            </div>
           </div>
 
-          {/* Cards de Resumo */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <CreditCard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Limite Total</p>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ {limiteTotal.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <DollarSign className="h-8 w-8 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Limite Usado</p>
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">R$ {usadoTotal.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Limite Disponível</p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">R$ {disponivelTotal.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <DollarSign className="h-12 w-12 text-rose-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Limite Usado</p>
+            <p className="text-2xl font-bold text-white">R$ {usadoTotal.toLocaleString()}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-rose-500 rounded-full" style={{ width: `${(usadoTotal / limiteTotal) * 100}%` }} />
+            </div>
           </div>
 
-          <Tabs defaultValue="cartoes" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="cartoes">Meus Cartões</TabsTrigger>
-              <TabsTrigger value="faturas">Faturas</TabsTrigger>
-            </TabsList>
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <TrendingUp className="h-12 w-12 text-emerald-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Limite Disponível</p>
+            <p className="text-2xl font-bold text-white">R$ {disponivelTotal.toLocaleString()}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(disponivelTotal / limiteTotal) * 100}%` }} />
+            </div>
+          </div>
+        </div>
 
-            {/* Meus Cartões */}
-            <TabsContent value="cartoes" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h3 className="text-lg font-semibold dark:text-slate-100">Meus Cartões</h3>
+        <Tabs defaultValue="cartoes" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 glass-panel p-1 border-white/5">
+            <TabsTrigger value="cartoes" className="data-[state=active]:active-gradient">Meus Cartões</TabsTrigger>
+            <TabsTrigger value="faturas" className="data-[state=active]:active-gradient">Faturas</TabsTrigger>
+          </TabsList>
 
-                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                  {/* Seletor de Filtro de Cartão */}
-                  <div className="w-full sm:w-64">
-                    <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Filtrar por cartão..." />
+          {/* Meus Cartões */}
+          <TabsContent value="cartoes" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+              <h3 className="text-lg font-semibold text-white">Meus Cartões</h3>
+
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
+                  <SelectTrigger className="w-full sm:w-64 glass-panel border-white/10 text-xs h-9">
+                    <SelectValue placeholder="Filtrar por cartão..." />
+                  </SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="all">Todos os Cartões</SelectItem>
+                    {cartoes.map(c => (
+                      <SelectItem key={c.id} value={c.id.toString()}>
+                        {c.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20 h-9">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Manual
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle className="text-white">Adicionar Novo Cartão</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name" className="text-slate-300">Nome do Cartão *</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            placeholder="Ex: Meu Cartão"
+                            required
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="brand" className="text-slate-300">Bandeira *</Label>
+                          <Select value={formData.brand} onValueChange={(value) => handleInputChange('brand', value)}>
+                            <SelectTrigger className="glass-panel border-white/10">
+                              <SelectValue placeholder="Selecione..." />
+                            </SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10">
+                              <SelectItem value="Visa">Visa</SelectItem>
+                              <SelectItem value="Mastercard">Mastercard</SelectItem>
+                              <SelectItem value="Elo">Elo</SelectItem>
+                              <SelectItem value="American Express">American Express</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="card_number" className="text-slate-300">Número (Final 4 dígitos) *</Label>
+                          <Input
+                            id="card_number"
+                            value={formData.card_number}
+                            onChange={(e) => handleInputChange('card_number', e.target.value)}
+                            placeholder="**** **** **** 1234"
+                            maxLength="19"
+                            required
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="limit_amount" className="text-slate-300">Limite (R$) *</Label>
+                          <Input
+                            id="limit_amount"
+                            type="number"
+                            step="0.01"
+                            value={formData.limit_amount}
+                            onChange={(e) => handleInputChange('limit_amount', e.target.value)}
+                            placeholder="0,00"
+                            required
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="due_date" className="text-slate-300">Dia do Vencimento</Label>
+                        <Select value={formData.due_date} onValueChange={(value) => handleInputChange('due_date', value)}>
+                          <SelectTrigger className="glass-panel border-white/10">
+                            <SelectValue placeholder="Selecione o dia..." />
+                          </SelectTrigger>
+                          <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                            {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
+                              <SelectItem key={day} value={day.toString()}>
+                                Dia {day}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                          Cancelar
+                        </Button>
+                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                          Adicionar Cartão
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            {/* Edit Modal */}
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+              <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-white">Editar Cartão</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleUpdateCard} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-name" className="text-slate-300">Nome do Cartão *</Label>
+                      <Input
+                        id="edit-name"
+                        value={editingCard?.nome || ''}
+                        onChange={(e) => handleEditInputChange('nome', e.target.value)}
+                        placeholder="Ex: Meu Cartão"
+                        required
+                        className="glass-panel border-white/10"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-brand" className="text-slate-300">Bandeira *</Label>
+                      <Select value={editingCard?.bandeira || ''} onValueChange={(value) => handleEditInputChange('bandeira', value)}>
+                        <SelectTrigger className="glass-panel border-white/10">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="Visa">Visa</SelectItem>
+                          <SelectItem value="Mastercard">Mastercard</SelectItem>
+                          <SelectItem value="Elo">Elo</SelectItem>
+                          <SelectItem value="American Express">American Express</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-card_number" className="text-slate-300">Número do Cartão *</Label>
+                      <Input
+                        id="edit-card_number"
+                        value={editingCard?.numero || ''}
+                        onChange={(e) => handleEditInputChange('numero', e.target.value)}
+                        placeholder="**** **** **** 1234"
+                        maxLength="19"
+                        required
+                        readOnly
+                        className="glass-panel border-white/10 opacity-50 cursor-not-allowed"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-limit_amount" className="text-slate-300">Limite (R$) *</Label>
+                      <Input
+                        id="edit-limit_amount"
+                        type="number"
+                        step="0.01"
+                        value={editingCard?.limite || ''}
+                        onChange={(e) => handleEditInputChange('limite', e.target.value)}
+                        placeholder="0,00"
+                        required
+                        className="glass-panel border-white/10"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-due_date" className="text-slate-300">Dia do Vencimento</Label>
+                    <Select value={editingCard?.due_day?.toString() || ''} onValueChange={(value) => handleEditInputChange('due_day', value)}>
+                      <SelectTrigger className="glass-panel border-white/10">
+                        <SelectValue placeholder="Selecione o dia..." />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos os Cartões</SelectItem>
-                        {cartoes.map(c => (
-                          <SelectItem key={c.id} value={c.id.toString()}>
-                            {c.nome}
+                      <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                        {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
+                          <SelectItem key={day} value={day.toString()}>
+                            Dia {day}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
 
-                  <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Adicionar Manual
-                      </Button>
-                    </DialogTrigger>
-
-                    <DialogContent className="sm:max-w-[500px]">
-                      <DialogHeader>
-                        <DialogTitle>Adicionar Novo Cartão</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="name">Nome do Cartão *</Label>
-                            <Input
-                              id="name"
-                              value={formData.name}
-                              onChange={(e) => handleInputChange('name', e.target.value)}
-                              placeholder="Ex: Nubank Roxinho"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="brand">Bandeira *</Label>
-                            <Select value={formData.brand} onValueChange={(value) => handleInputChange('brand', value)}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Visa">Visa</SelectItem>
-                                <SelectItem value="Mastercard">Mastercard</SelectItem>
-                                <SelectItem value="Elo">Elo</SelectItem>
-                                <SelectItem value="American Express">American Express</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="card_number">Número do Cartão *</Label>
-                            <Input
-                              id="card_number"
-                              value={formData.card_number}
-                              onChange={(e) => handleInputChange('card_number', e.target.value)}
-                              placeholder="**** **** **** 1234"
-                              maxLength="19"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="limit_amount">Limite (R$) *</Label>
-                            <Input
-                              id="limit_amount"
-                              type="number"
-                              step="0.01"
-                              value={formData.limit_amount}
-                              onChange={(e) => handleInputChange('limit_amount', e.target.value)}
-                              placeholder="5000.00"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="due_date">Dia do Vencimento</Label>
-                          <Select value={formData.due_date} onValueChange={(value) => handleInputChange('due_date', value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o dia..." />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[250px] overflow-y-auto">
-                              {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
-                                <SelectItem key={day} value={day.toString()}>
-                                  Dia {day}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="flex justify-end space-x-2 pt-4">
-                          <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                            Cancelar
-                          </Button>
-                          <Button type="submit">
-                            Adicionar Cartão
-                          </Button>
-                        </div>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-
-              {/* Edit Modal (shared) */}
-              <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-                <DialogContent className="sm:max-w-[500px]">
-                  <DialogHeader>
-                    <DialogTitle>Editar Cartão</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleUpdateCard} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name">Nome do Cartão *</Label>
-                        <Input
-                          id="name"
-                          value={editingCard?.nome || ''}
-                          onChange={(e) => handleEditInputChange('nome', e.target.value)}
-                          placeholder="Ex: Nubank Roxinho"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="edit-brand">Bandeira *</Label>
-                        <Select value={editingCard?.bandeira || ''} onValueChange={(value) => handleEditInputChange('bandeira', value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Visa">Visa</SelectItem>
-                            <SelectItem value="Mastercard">Mastercard</SelectItem>
-                            <SelectItem value="Elo">Elo</SelectItem>
-                            <SelectItem value="American Express">American Express</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="edit-card_number">Número do Cartão *</Label>
-                        <Input
-                          id="edit-card_number"
-                          value={editingCard?.numero || ''}
-                          onChange={(e) => handleEditInputChange('numero', e.target.value)}
-                          placeholder="**** **** **** 1234"
-                          maxLength="19"
-                          required
-                          readOnly
-                          className="bg-gray-100 dark:bg-slate-800 cursor-not-allowed"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="edit-limit_amount">Limite (R$) *</Label>
-                        <Input
-                          id="edit-limit_amount"
-                          type="number"
-                          step="0.01"
-                          value={editingCard?.limite || ''}
-                          onChange={(e) => handleEditInputChange('limite', e.target.value)}
-                          placeholder="5000.00"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="edit-due_date">Dia do Vencimento</Label>
-                      <Select value={editingCard?.due_day?.toString() || ''} onValueChange={(value) => handleEditInputChange('due_day', value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o dia..." />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-[250px] overflow-y-auto">
-                          {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
-                            <SelectItem key={day} value={day.toString()}>
-                              Dia {day}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex justify-end space-x-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
-                        Cancelar
-                      </Button>
-                      <Button type="submit">
-                        Salvar alterações
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
-
-              <Card>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
-                        <tr>
-                          <th className="px-6 py-3">Cartão</th>
-                          <th className="px-6 py-3">Vencimento</th>
-                          <th className="px-6 py-3">Limite Total</th>
-                          <th className="px-6 py-3">Limite Disponível</th>
-                          <th className="px-6 py-3 text-right">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                        {filteredCartoes.length === 0 ? (
-                          <tr>
-                            <td colSpan="5" className="px-6 py-10 text-center text-gray-500">
-                              Nenhum cartão encontrado.
-                            </td>
-                          </tr>
-                        ) : (
-                          filteredCartoes.map((cartao) => (
-                            <React.Fragment key={cartao.id}>
-                              <tr className="bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center">
-                                    <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg mr-3">
-                                      <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                                    </div>
-                                    <div>
-                                      <div className="font-semibold text-gray-900 dark:text-white">{cartao.nome}</div>
-                                      <div className="text-xs text-gray-500">{cartao.numero} ({cartao.bandeira})</div>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                  <div className="flex items-center text-gray-700 dark:text-gray-300">
-                                    <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                                    Dia {cartao.due_day}
-                                  </div>
-                                </td>
-                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                  R$ {cartao.limite.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </td>
-                                <td className="px-6 py-4 font-medium text-green-600 dark:text-green-400">
-                                  R$ {cartao.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </td>
-                                <td className="px-6 py-4 text-right">
-                                  <div className="flex justify-end gap-1">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      onClick={() => abrirModalGasto(cartao)}
-                                      title="Lançar Gasto"
-                                      className="h-8 w-8"
-                                    >
-                                      <Plus className="h-4 w-4" />
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      onClick={() => abrirModalEdicao(cartao)}
-                                      title="Editar"
-                                      className="h-8 w-8"
-                                    >
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      onClick={() => excluirCartao(cartao.id)}
-                                      title="Excluir"
-                                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="ml-2 h-8"
-                                      onClick={() => setExpandedCardId(expandedCardId === cartao.id ? null : cartao.id)}
-                                    >
-                                      {expandedCardId === cartao.id ? (
-                                        <ChevronUp className="h-4 w-4 mr-1" />
-                                      ) : (
-                                        <ChevronDown className="h-4 w-4 mr-1" />
-                                      )}
-                                      Detalhes
-                                    </Button>
-                                  </div>
-                                </td>
-                              </tr>
-                              {expandedCardId === cartao.id && (
-                                <tr>
-                                  <td colSpan="5" className="px-6 py-4 bg-gray-50/50 dark:bg-slate-800/30">
-                                    <div className="space-y-4">
-                                      <div className="flex justify-between items-center">
-                                        <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-500">Histórico de Faturas</h4>
-                                        <Badge variant="outline">Total: {getFaturasDoCartao(cartao.id).length} faturas</Badge>
-                                      </div>
-                                      
-                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {getFaturasDoCartao(cartao.id).length === 0 ? (
-                                          <div className="col-span-full py-6 text-center text-gray-500 text-sm italic">
-                                            Nenhuma fatura encontrada para este cartão.
-                                          </div>
-                                        ) : (
-                                          getFaturasDoCartao(cartao.id).map((fatura) => (
-                                            <Card key={fatura.id} className="bg-white dark:bg-slate-900 shadow-sm border-gray-200 dark:border-slate-700">
-                                              <CardContent className="p-4">
-                                                <div className="flex justify-between items-start mb-3">
-                                                  <div>
-                                                    <p className="text-xs font-medium text-gray-500 uppercase">Período</p>
-                                                    <p className="font-bold text-gray-900 dark:text-white">
-                                                      {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                                                    </p>
-                                                  </div>
-                                                  <Badge className={fatura.status === 'aberta' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'}>
-                                                    {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
-                                                  </Badge>
-                                                </div>
-                                                
-                                                <div className="space-y-2 mb-4">
-                                                  <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-500">Total:</span>
-                                                    <span className="font-bold text-red-600 dark:text-red-400">
-                                                      R$ {fatura.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                    </span>
-                                                  </div>
-                                                  <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-500">Vencimento:</span>
-                                                    <span className="font-medium">{formatDateForDisplay(fatura.data_vencimento)}</span>
-                                                  </div>
-                                                </div>
-
-                                                <Button 
-                                                  variant="ghost" 
-                                                  size="sm" 
-                                                  className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
-                                                  onClick={() => visualizarFatura(fatura)}
-                                                >
-                                                  <Eye className="h-3 w-3 mr-2" />
-                                                  Ver transações
-                                                </Button>
-                                              </CardContent>
-                                            </Card>
-                                          ))
-                                        )}
-                                      </div>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
-                            </React.Fragment>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Faturas */}
-            <TabsContent value="faturas" className="space-y-6">
-              <div className="flex flex-wrap items-center gap-4">
-                <h3 className="text-lg font-semibold dark:text-slate-100">Faturas dos Cartões</h3>
-                
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Seletor de Cartão */}
-                  <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Todos os cartões" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Cartões</SelectItem>
-                      {cartoes.map(c => (
-                        <SelectItem key={c.id} value={c.id.toString()}>
-                          {c.nome}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {/* Seletor de Status */}
-                  <Select value={filtroStatusFatura} onValueChange={setFiltroStatusFatura}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filtrar por status..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="todas">Todas as Faturas</SelectItem>
-                      <SelectItem value="aberta">Em Aberto</SelectItem>
-                      <SelectItem value="paga">Pagas</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)}>
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Filtrar por Período
-                  </Button>
-                </div>
-              </div>
-
-              <Card>
-                <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-slate-800 dark:text-gray-400">
-                        <tr>
-                          <th className="px-6 py-3">Cartão</th>
-                          <th className="px-6 py-3">Referência</th>
-                          <th className="px-6 py-3">Vencimento</th>
-                          <th className="px-6 py-3">Valor Total</th>
-                          <th className="px-6 py-3">Status</th>
-                          <th className="px-6 py-3 text-right">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                        {faturas.filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter).length === 0 ? (
-                          <tr>
-                            <td colSpan="6" className="px-6 py-10 text-center text-gray-500">
-                              Nenhuma fatura encontrada.
-                            </td>
-                          </tr>
-                        ) : (
-                          faturas
-                            .filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter)
-                            .map((fatura) => (
-                            <tr key={fatura.id} className="bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
-                              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                                {fatura.cartao_nome}
-                              </td>
-                              <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                                {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                              </td>
-                              <td className="px-6 py-4 text-purple-600 font-medium">
-                                {formatDateForDisplay(fatura.data_vencimento)}
-                              </td>
-                              <td className="px-6 py-4 font-bold text-red-600 dark:text-red-400">
-                                R$ {(Number(fatura.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </td>
-                              <td className="px-6 py-4">
-                                <Badge className={fatura.status === 'aberta' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'}>
-                                  {fatura.status === 'aberta' ? 'Em Aberto' : 'Paga'}
-                                </Badge>
-                              </td>
-                              <td className="px-6 py-4 text-right flex justify-end gap-2">
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => visualizarFatura(fatura)}
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Detalhes
-                                </Button>
-                                {fatura.status === 'aberta' && (
-                                  <Button 
-                                    size="sm"
-                                    onClick={() => pagarFatura(fatura)}
-                                  >
-                                    <DollarSign className="h-4 w-4 mr-1" />
-                                    Confirmar
-                                  </Button>
-                                )}
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  className="text-red-600 hover:text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                  onClick={() => excluirFatura(fatura)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-
-          {/* Modal para Lançar Gasto no Cartão */}
-          <Dialog open={isGastoModalOpen} onOpenChange={setIsGastoModalOpen}>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Lançar Gasto no Cartão</DialogTitle>
-                <p className="text-sm text-gray-600 dark:text-slate-400">
-                  {selectedCartao?.nome}
-                </p>
-              </DialogHeader>
-              <form onSubmit={async (e) => {
-                 e.preventDefault();
-                if (!gastoFormData.description || !gastoFormData.amount) {
-                  alert('Por favor, preencha todos os campos obrigatórios.');
-                  return;
-                }
-  const categoriaId = gastoFormData.category ? parseInt(gastoFormData.category) : null;
-
-if (!categoriaId || isNaN(categoriaId)) {
-  alert("Você precisa selecionar uma categoria válida.");
-  return;
-}
-
-const payload = {
-  description: gastoFormData.description,
-  value: parseFloat(gastoFormData.amount),
-  date: gastoFormData.date,
-  category_id: parseInt(gastoFormData.category),
-  payment_method: gastoFormData.payment_method, // <-- ADICIONE ESTA LINHA
-  installments: gastoFormData.installments      // <-- ADICIONE ESTA LINHA
-};
-
-console.log("Enviando gasto:", payload);
-
-const sucesso = await lancarGastoCartao(selectedCartao.id, payload);
-
-if (sucesso) {
-  alert('✅ Gasto lançado no cartão com sucesso!');
-
-  // Fechar modal
-  setIsGastoModalOpen(false);
-
-  // Resetar campos
-  setGastoFormData({
-    description: '',
-    amount: '',
-    category: '',
-    date: new Date().toISOString().split('T')[0]
-  });
-
-  // Recarregar cartões e faturas
-  await loadCartoes();
-} else {
-  alert('❌ Erro ao lançar o gasto. Tente novamente. ');
-}
-
-
-
-              }} className="space-y-4">
-                <div>
-                  <Label htmlFor="description">Descrição *</Label>
-                  <Input
-                    id="description"
-                    value={gastoFormData.description}
-                    onChange={(e) => setGastoFormData(prev => ({...prev, description: e.target.value}))}
-                    placeholder="Ex: Supermercado, Restaurante..."
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="amount">Valor *</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      value={gastoFormData.amount}
-                      onChange={(e) => setGastoFormData(prev => ({...prev, amount: e.target.value}))}
-                      placeholder="0,00"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="date">Data</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={gastoFormData.date}
-                      onChange={(e) => setGastoFormData(prev => ({...prev, date: e.target.value}))}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Categoria</Label>
-                  <Select value={gastoFormData.category} onValueChange={(value) => setGastoFormData(prev => ({...prev, category: value}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">🍽️ Alimentação</SelectItem>
-                      <SelectItem value="2">🚌 Transporte</SelectItem>
-                      <SelectItem value="3">🎉 Lazer</SelectItem>
-                      <SelectItem value="4">💊 Saúde</SelectItem>
-                      <SelectItem value="5">📚 Educação</SelectItem>
-                      <SelectItem value="6">🛍️ Compras</SelectItem>
-                      <SelectItem value="7">🛠️ Serviços</SelectItem>
-                      <SelectItem value="8">📦 Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* ▼▼▼ ADICIONE ESTE BLOCO INTEIRO ▼▼▼ */}
-<div className="grid grid-cols-2 gap-4">
-  <div>
-    <Label htmlFor="payment_method">Forma de Pagamento</Label>
-    <Select 
-      value={gastoFormData.payment_method} 
-      onValueChange={(value) => setGastoFormData(prev => ({...prev, payment_method: value, installments: 1}))}
-    >
-      <SelectTrigger id="payment_method">
-        <SelectValue placeholder="Selecione..." />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="a_vista">Crédito à Vista</SelectItem>
-        <SelectItem value="parcelado">Parcelado</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-
-  {/* Este campo só aparece se a forma de pagamento for "parcelado" */}
-  {gastoFormData.payment_method === 'parcelado' && (
-    <div>
-      <Label htmlFor="installments">Nº de Parcelas</Label>
-      <Input
-        id="installments"
-        type="number"
-        min="2"
-        max="24"
-        value={gastoFormData.installments}
-        onChange={(e) => setGastoFormData(prev => ({...prev, installments: parseInt(e.target.value) || 1}))}
-      />
-    </div>
-  )}
-</div>
-{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsGastoModalOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit">
-                    Lançar Gasto
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          {/* Modal para Visualizar Fatura Completa */}
-          <Dialog open={isFaturaModalOpen} onOpenChange={setIsFaturaModalOpen}>
-            <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Fatura Completa</DialogTitle>
-                {selectedFatura && (
-                  <p className="text-sm text-gray-600 dark:text-slate-400">
-                    {selectedFatura.cartao_nome} - {new Date(selectedFatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                  </p>
-                )}
-              </DialogHeader>
-              
-              {selectedFatura && (
-                <div className="space-y-6">
-                  {/* Resumo da Fatura */}
-                  <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 dark:text-slate-400">Valor Total</p>
-                      <p className="text-xl font-bold text-red-600 dark:text-red-400">
-  R$ {(Number(selectedFatura.valor_total) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 dark:text-slate-400">Pagamento Mínimo</p>
-                      <p className="text-xl font-bold text-yellow-600">
-  R$ {(Number(selectedFatura.valor_minimo) || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  })}
-</p>
-
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 dark:text-slate-400">Vencimento</p>
-                      <p className="text-xl font-bold text-purple-600">
-                        {formatDateForDisplay(selectedFatura.data_vencimento)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Lista Completa de Transações */}
-                  <div>
-                    <h4 className="font-semibold mb-4">Todas as Transações</h4>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {selectedFatura.transacoes.map((transacao, index) => (
-  <div key={index} className="flex justify-between items-center py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-lg group">
-    
-    {/* Detalhes da Compra */}
-    <div className="flex-1">
-      <p className="font-medium text-slate-700 dark:text-slate-200">{transacao.description}</p>
-      <p className="text-sm text-gray-600 dark:text-slate-400">
-        {formatDateForDisplay(transacao.date)}
-        {/* Mostra qual é a parcela se for parcelado */}
-        {transacao.installments > 1 && (
-            <span className="ml-2 text-xs bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded text-slate-500">
-                Parcela {transacao.current_installment}/{transacao.installments}
-            </span>
-        )}
-      </p>
-    </div>
-    
-    {/* Valor e Botão de Excluir */}
-    <div className="flex items-center gap-4">
-      <p className="font-bold text-red-600 dark:text-red-400">
-        R$ {(Number(transacao.value) || 0).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        })}
-      </p>
-      
-     {/* Botão de Lixeira (Só aparece se a fatura estiver 'aberta') */}
-      {selectedFatura.status === 'aberta' && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            // CORREÇÃO AQUI: 
-            // opacity-100 (visível no mobile) 
-            // md:opacity-0 (invisível no desktop por padrão)
-            // md:group-hover:opacity-100 (visível no desktop ao passar o mouse)
-            className="h-8 w-8 text-gray-400 hover:text-red-600 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-            onClick={() => excluirTransacao(transacao.id)}
-            title="Excluir despesa"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-      )}
-    </div>
-  </div>
-))}
-                    </div>
-                  </div>
-
-                  {/* Botões de Ação */}
-                  <div className="flex justify-between items-center pt-4 border-t">
-                    <Button variant="outline" onClick={() => setIsFaturaModalOpen(false)}>
-                      Fechar
-                    </Button>
-                    {selectedFatura.status === 'aberta' && (
-                      <Button onClick={() => {
-                        pagarFatura(selectedFatura);
-                        setIsFaturaModalOpen(false);
-                      }}>
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        Confirmar Fatura
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-
-          {/* Modal para Filtrar por Período */}
-          <Dialog open={isPeriodoModalOpen} onOpenChange={setIsPeriodoModalOpen}>
-            <DialogContent className="sm:max-w-[400px]">
-              <DialogHeader>
-                <DialogTitle>Filtrar Faturas por Período</DialogTitle>
-              </DialogHeader>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="data_inicio">Data Início</Label>
-                  <Input
-                    id="data_inicio"
-                    type="date"
-                    value={dataInicioFiltro}
-                    onChange={(e) => setDataInicioFiltro(e.target.value)} // <--- AMARROU O ESTADO AQUI
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="data_fim">Data Fim</Label>
-                  <Input
-                    id="data_fim"
-                    type="date"
-                    value={dataFimFiltro}
-                    onChange={(e) => setDataFimFiltro(e.target.value)} // <--- AMARROU O ESTADO AQUI
-                  />
-                </div>
-                <div className="flex justify-between items-center pt-4">
-                  {/* Botão de Limpar (Opcional, mas útil) */}
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    onClick={() => {
-                        setDataInicioFiltro('');
-                        setDataFimFiltro('');
-                        setIsPeriodoModalOpen(false);
-                    }}
-                  >
-                    Limpar Filtro
-                  </Button>
-
-                  <div className="flex space-x-2">
-                    <Button type="button" variant="outline" onClick={() => setIsPeriodoModalOpen(false)}>
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">
                       Cancelar
                     </Button>
-                    <Button onClick={() => {
-                      setIsPeriodoModalOpen(false); // <--- FECHA O MODAL. O useEffect cuida de carregar os dados!
-                    }}>
-                      Aplicar Filtro
+                    <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                      Salvar alterações
                     </Button>
                   </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredCartoes.length === 0 ? (
+                <div className="col-span-2 py-12 glass-card border-dashed flex flex-col items-center justify-center text-slate-500">
+                  <CreditCard className="h-12 w-12 mb-4 opacity-20" />
+                  <p>Nenhum cartão encontrado.</p>
+                </div>
+              ) : (
+                filteredCartoes.map((cartao) => (
+                  <div key={cartao.id} className="flex flex-col">
+                    <div className="glass-card p-6 border-white/10 hover:bg-white/5 transition-all group relative overflow-hidden">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="flex items-center">
+                          <div className="bg-cyan-500/20 p-3 rounded-xl mr-4 group-hover:scale-110 transition-transform">
+                            <CreditCard className="h-6 w-6 text-cyan-400" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors">{cartao.nome}</h3>
+                            <p className="text-xs text-slate-500 uppercase tracking-widest">{cartao.bandeira} • {cartao.numero}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="icon" onClick={() => abrirModalGasto(cartao)} className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10"><Plus className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => abrirModalEdicao(cartao)} className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/5"><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => excluirCartao(cartao.id)} className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10"><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Limite Disponível</p>
+                          <p className="text-lg font-bold text-emerald-400">R$ {cartao.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Dia Vencimento</p>
+                          <p className="text-lg font-bold text-white flex items-center justify-end">
+                            <Calendar className="h-4 w-4 mr-2 text-slate-400" />
+                            {cartao.due_day}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center text-[10px] uppercase tracking-tighter">
+                          <span className="text-slate-500">Utilização do Limite</span>
+                          <span className={getUtilizacaoColor((cartao.usado / cartao.limite) * 100)}>
+                            {((cartao.usado / cartao.limite) * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor((cartao.usado / cartao.limite) * 100)}`} style={{ width: `${(cartao.usado / cartao.limite) * 100}%` }} />
+                        </div>
+                      </div>
+
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="w-full mt-6 text-xs text-slate-400 hover:text-white hover:bg-white/5 h-8 border border-white/5"
+                        onClick={() => setExpandedCardId(expandedCardId === cartao.id ? null : cartao.id)}
+                      >
+                        {expandedCardId === cartao.id ? <ChevronUp className="h-4 w-4 mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
+                        {expandedCardId === cartao.id ? 'Ocultar Histórico' : 'Ver Histórico de Faturas'}
+                      </Button>
+
+                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+
+                    {expandedCardId === cartao.id && (
+                      <div className="mt-2 space-y-2 animate-in slide-in-from-top-2 duration-300">
+                        {getFaturasDoCartao(cartao.id).length === 0 ? (
+                          <div className="glass-panel p-4 text-center text-xs text-slate-500 italic border-dashed">
+                            Nenhuma fatura encontrada.
+                          </div>
+                        ) : (
+                          getFaturasDoCartao(cartao.id).map((fatura) => (
+                            <div key={fatura.id} className="glass-panel p-4 flex justify-between items-center border-white/5 hover:bg-white/5 transition-all">
+                              <div>
+                                <p className="text-xs font-bold text-white">
+                                  {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                                </p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-tighter">Vence em: {formatDateForDisplay(fatura.data_vencimento)}</p>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                  <p className="text-sm font-bold text-rose-400">R$ {fatura.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                                  <Badge className={`border-none text-[8px] uppercase font-bold px-1 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                                    {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
+                                  </Badge>
+                                </div>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-400" onClick={() => visualizarFatura(fatura)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Faturas */}
+          <TabsContent value="faturas" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+              <h3 className="text-lg font-semibold text-white">Controle de Faturas</h3>
+              
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
+                  <SelectTrigger className="w-[180px] glass-panel border-white/10 text-xs h-9">
+                    <SelectValue placeholder="Todos os cartões" />
+                  </SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="all">Todos os Cartões</SelectItem>
+                    {cartoes.map(c => (
+                      <SelectItem key={c.id} value={c.id.toString()}>
+                        {c.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={filtroStatusFatura} onValueChange={setFiltroStatusFatura}>
+                  <SelectTrigger className="w-[180px] glass-panel border-white/10 text-xs h-9">
+                    <SelectValue placeholder="Status..." />
+                  </SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="todas">Todas as Faturas</SelectItem>
+                    <SelectItem value="aberta">Em Aberto</SelectItem>
+                    <SelectItem value="paga">Pagas</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)} className="border-white/10 hover:bg-white/5 text-slate-300 h-9">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Período
+                </Button>
+              </div>
+            </div>
+
+            <div className="glass-panel border-white/5 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-[10px] text-slate-500 uppercase tracking-widest bg-white/5 border-b border-white/5">
+                    <tr>
+                      <th className="px-6 py-4">Cartão</th>
+                      <th className="px-6 py-4">Referência</th>
+                      <th className="px-6 py-4">Vencimento</th>
+                      <th className="px-6 py-4">Valor Total</th>
+                      <th className="px-6 py-4 text-center">Status</th>
+                      <th className="px-6 py-4 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {faturas.filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter).length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-12 text-center text-slate-500 italic">
+                          Nenhuma fatura encontrada.
+                        </td>
+                      </tr>
+                    ) : (
+                      faturas
+                        .filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter)
+                        .map((fatura) => (
+                        <tr key={fatura.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-6 py-4 font-bold text-white">
+                            {fatura.cartao_nome}
+                          </td>
+                          <td className="px-6 py-4 text-slate-400 capitalize">
+                            {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                          </td>
+                          <td className="px-6 py-4 text-purple-400 font-medium">
+                            {formatDateForDisplay(fatura.data_vencimento)}
+                          </td>
+                          <td className="px-6 py-4 font-bold text-rose-400">
+                            R$ {(Number(fatura.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <Badge className={`border-none text-[8px] uppercase font-bold px-1.5 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                              {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => visualizarFatura(fatura)}
+                                className="h-8 text-cyan-400 hover:bg-cyan-400/10"
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Detalhes
+                              </Button>
+                              {fatura.status === 'aberta' && (
+                                <Button 
+                                  size="sm"
+                                  onClick={() => pagarFatura(fatura)}
+                                  className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  <DollarSign className="h-4 w-4 mr-1" />
+                                  Confirmar
+                                </Button>
+                              )}
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-8 text-rose-400 hover:bg-rose-400/10"
+                                onClick={() => excluirFatura(fatura)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Modal Lançar Gasto */}
+        <Dialog open={isGastoModalOpen} onOpenChange={setIsGastoModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle className="text-white">Lançar Gasto no Cartão</DialogTitle>
+              <p className="text-xs text-slate-500 uppercase tracking-widest">{selectedCartao?.nome}</p>
+            </DialogHeader>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (!gastoFormData.description || !gastoFormData.amount || !gastoFormData.category) {
+                alert('Preencha os campos obrigatórios.'); return;
+              }
+              const payload = {
+                description: gastoFormData.description,
+                value: parseFloat(gastoFormData.amount),
+                date: gastoFormData.date,
+                category_id: parseInt(gastoFormData.category),
+                payment_method: gastoFormData.payment_method,
+                installments: gastoFormData.installments
+              };
+              const sucesso = await lancarGastoCartao(selectedCartao.id, payload);
+              if (sucesso) {
+                alert('✅ Gasto lançado com sucesso!');
+                setIsGastoModalOpen(false);
+                setGastoFormData({ description: '', amount: '', category: '', date: new Date().toISOString().split('T')[0], payment_method: 'a_vista', installments: 1 });
+                await loadCartoes();
+              }
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="gasto-description" className="text-slate-300">Descrição *</Label>
+                <Input id="gasto-description" value={gastoFormData.description} onChange={(e) => setGastoFormData(prev => ({...prev, description: e.target.value}))} placeholder="Ex: Restaurante..." required className="glass-panel border-white/10" />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="gasto-amount" className="text-slate-300">Valor *</Label>
+                  <Input id="gasto-amount" type="number" step="0.01" value={gastoFormData.amount} onChange={(e) => setGastoFormData(prev => ({...prev, amount: e.target.value}))} placeholder="0,00" required className="glass-panel border-white/10" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gasto-date" className="text-slate-300">Data</Label>
+                  <Input id="gasto-date" type="date" value={gastoFormData.date} onChange={(e) => setGastoFormData(prev => ({...prev, date: e.target.value}))} className="glass-panel border-white/10" />
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      
+
+              <div className="space-y-2">
+                <Label htmlFor="gasto-category" className="text-slate-300">Categoria *</Label>
+                <Select value={gastoFormData.category} onValueChange={(value) => setGastoFormData(prev => ({...prev, category: value}))}>
+                  <SelectTrigger className="glass-panel border-white/10">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="1">🍽️ Alimentação</SelectItem>
+                    <SelectItem value="2">🚌 Transporte</SelectItem>
+                    <SelectItem value="3">🎉 Lazer</SelectItem>
+                    <SelectItem value="4">💊 Saúde</SelectItem>
+                    <SelectItem value="5">📚 Educação</SelectItem>
+                    <SelectItem value="6">🛍️ Compras</SelectItem>
+                    <SelectItem value="7">🛠️ Serviços</SelectItem>
+                    <SelectItem value="8">📦 Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="payment_method" className="text-slate-300">Forma Pagamento</Label>
+                  <Select value={gastoFormData.payment_method} onValueChange={(value) => setGastoFormData(prev => ({...prev, payment_method: value, installments: 1}))}>
+                    <SelectTrigger className="glass-panel border-white/10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10">
+                      <SelectItem value="a_vista">À Vista</SelectItem>
+                      <SelectItem value="parcelado">Parcelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {gastoFormData.payment_method === 'parcelado' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="installments" className="text-slate-300">Parcelas</Label>
+                    <Input id="installments" type="number" min="2" max="24" value={gastoFormData.installments} onChange={(e) => setGastoFormData(prev => ({...prev, installments: parseInt(e.target.value) || 1}))} className="glass-panel border-white/10" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="ghost" onClick={() => setIsGastoModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Lançar Gasto</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Fatura Completa */}
+        <Dialog open={isFaturaModalOpen} onOpenChange={setIsFaturaModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-white">Detalhamento da Fatura</DialogTitle>
+              {selectedFatura && (
+                <p className="text-xs text-slate-500 uppercase tracking-widest">{selectedFatura.cartao_nome} • {new Date(selectedFatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</p>
+              )}
+            </DialogHeader>
+            
+            {selectedFatura && (
+              <div className="space-y-6 mt-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="glass-panel p-4 border-white/5 text-center">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Valor Total</p>
+                    <p className="text-lg font-bold text-rose-400">R$ {Number(selectedFatura.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div className="glass-panel p-4 border-white/5 text-center">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Pag. Mínimo</p>
+                    <p className="text-lg font-bold text-amber-400">R$ {Number(selectedFatura.valor_minimo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div className="glass-panel p-4 border-white/5 text-center">
+                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Vencimento</p>
+                    <p className="text-lg font-bold text-purple-400">{formatDateForDisplay(selectedFatura.data_vencimento)}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 border-b border-white/5 pb-2">Transações</h4>
+                  <div className="space-y-2">
+                    {selectedFatura.transacoes.map((transacao, index) => (
+                      <div key={index} className="glass-panel p-3 flex justify-between items-center border-white/5 group hover:bg-white/5">
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-white">{transacao.description}</p>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] text-slate-500">{formatDateForDisplay(transacao.date)}</span>
+                            {transacao.installments > 1 && (
+                              <Badge className="bg-white/5 text-slate-400 border-none text-[8px] px-1.5 py-0">
+                                Parcela {transacao.current_installment}/{transacao.installments}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <p className="text-sm font-bold text-rose-400">R$ {Number(transacao.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          {selectedFatura.status === 'aberta' && (
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirTransacao(transacao.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-6 border-t border-white/5">
+                  <Button variant="ghost" onClick={() => setIsFaturaModalOpen(false)} className="text-slate-400">Fechar</Button>
+                  {selectedFatura.status === 'aberta' && (
+                    <Button onClick={() => { pagarFatura(selectedFatura); setIsFaturaModalOpen(false); }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                      <DollarSign className="h-4 w-4 mr-2" /> Confirmar Pagamento
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Período */}
+        <Dialog open={isPeriodoModalOpen} onOpenChange={setIsPeriodoModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="text-white">Filtrar por Período</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="data_inicio" className="text-slate-300 text-xs">Início</Label>
+                  <Input id="data_inicio" type="date" value={dataInicioFiltro} onChange={(e) => setDataInicioFiltro(e.target.value)} className="glass-panel border-white/10" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="data_fim" className="text-slate-300 text-xs">Fim</Label>
+                  <Input id="data_fim" type="date" value={dataFimFiltro} onChange={(e) => setDataFimFiltro(e.target.value)} className="glass-panel border-white/10" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-4">
+                <Button variant="ghost" className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 h-9" onClick={() => { setDataInicioFiltro(''); setDataFimFiltro(''); setIsPeriodoModalOpen(false); }}>
+                  Limpar
+                </Button>
+                <div className="flex gap-2">
+                  <Button variant="ghost" onClick={() => setIsPeriodoModalOpen(false)} className="text-slate-400 h-9">Cancelar</Button>
+                  <Button onClick={() => setIsPeriodoModalOpen(false)} className="bg-cyan-600 hover:bg-cyan-700 text-white h-9 px-4">Aplicar</Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
+
 };
 
 export default CreditCards;

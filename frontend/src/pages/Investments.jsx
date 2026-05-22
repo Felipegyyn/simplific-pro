@@ -395,631 +395,529 @@ const handleCalculate = async (e) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
-      <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
-                      
-                        <div className="flex justify-between items-center h-16">
-                          <div className="flex items-center">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => navigate('/dashboard')}
-                              className="mr-4"
-                            >
-                              <ArrowLeft className="h-4 w-4 mr-2" />
-                              Voltar
-                            </Button>
-                            <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-                          </div>
-                          <div className="flex items-center space-x-4">
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
-                              Bem-vindo, {user.name}
-                            </span>
-                            <Button variant="outline" size="sm" onClick={onLogout}>
-                              <LogOut className="h-4 w-4 mr-2" />
-                              Sair
-                            </Button>
-                          </div>
-                        </div>
-                      
-                    </header>
-        <StockTicker />
-        <div className="p-4 sm:p-6">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold">Carteira de Investimentos</h2>
-            <p className="text-gray-600 dark:text-gray-400">Acompanhe seus investimentos e rentabilidade</p>
+    <div className="min-h-screen bg-transparent text-slate-200">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate('/dashboard')}
+                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-slate-400 hidden sm:block">
+                Bem-vindo, {user.name}
+              </span>
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sair
+              </Button>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            {/* Cards de Resumo (já usam os valores calculados) */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Total Investido</p>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Valor Atual</p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  {lucroTotal >= 0 ? <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" /> : <TrendingDown className="h-8 w-8 text-red-600" />}
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Lucro/Prejuízo</p>
-                    <p className={`text-2xl font-bold ${getRentabilidadeColor(lucroTotal)}`}>R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                   <BarChart3 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                   <div className="ml-4">
-                     <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Rentabilidade</p>
-                     <p className={`text-2xl font-bold ${getRentabilidadeColor(rentabilidadeTotal)}`}>{(rentabilidadeTotal ?? 0).toFixed(2)}%</p>
-                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-            <Tabs defaultValue="carteira" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5">
-              <TabsTrigger value="carteira">Carteira</TabsTrigger>
-               <TabsTrigger value="home-broker">Home Broker</TabsTrigger> 
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="analise">Análise</TabsTrigger>
-              <TabsTrigger value="calculadora">Calculadora</TabsTrigger>
-            </TabsList>
-
-            {/* ADICIONE ESTE NOVO BLOCO DE CONTEÚDO */}
-            <TabsContent value="home-broker">
-            <HomeBroker />
-            </TabsContent>
-            
-            <TabsContent value="carteira" className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold dark:text-slate-100">Meus Investimentos</h3>
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button><Plus className="h-4 w-4 mr-2" />Novo Investimento</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px]">
-  <DialogHeader>
-    <DialogTitle>Novo Investimento</DialogTitle>
-  </DialogHeader>
-  <form onSubmit={handleSubmit} className="space-y-4">
-    <div>
-      <Label htmlFor="name">Nome do Investimento *</Label>
-      <Input
-        id="name"
-        value={formData.name}
-        onChange={(e) => handleInputChange('name', e.target.value)}
-        placeholder="Ex: Tesouro Selic 2029, ITSA4"
-        required
-      />
-    </div>
-    
-    <div>
-      <Label htmlFor="type">Tipo *</Label>
-      <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Selecione..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Renda Fixa">Renda Fixa</SelectItem>
-          <SelectItem value="Ações">Ações</SelectItem>
-          <SelectItem value="FII">Fundos Imobiliários</SelectItem>
-          <SelectItem value="Criptomoedas">Criptomoedas</SelectItem>
-          <SelectItem value="Fundos">Fundos de Investimento</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-
-    <div className="grid grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="initial_value">Valor Investido (R$) *</Label>
-        <Input
-          id="initial_value"
-          type="number"
-          step="0.01"
-          value={formData.initial_value}
-          onChange={(e) => handleInputChange('initial_value', e.target.value)}
-          placeholder="5000.00"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="current_value">Valor Atual (R$)</Label>
-        <Input
-          id="current_value"
-          type="number"
-          step="0.01"
-          value={formData.current_value}
-          onChange={(e) => handleInputChange('current_value', e.target.value)}
-          placeholder="Deixe vazio para usar valor investido"
-        />
-      </div>
-    </div>
-
-    <div className="grid grid-cols-2 gap-4">
-        <div>
-            <Label htmlFor="purchase_date">Data da Compra *</Label>
-            <Input
-            id="purchase_date"
-            type="date"
-            value={formData.purchase_date}
-            onChange={(e) => handleInputChange('purchase_date', e.target.value)}
-            required
-            />
         </div>
-        {/* Bloco Condicional para Ticker ou Rentabilidade */}
-{['Ações', 'FII'].includes(formData.type) ? (
-    <div>
-        <Label htmlFor="ticker">Ticker *</Label>
-        <Input
-            id="ticker"
-            value={formData.ticker}
-            onChange={(e) => handleInputChange('ticker', e.target.value.toUpperCase())}
-            placeholder="Ex: ITSA4, MXRF11"
-            required
-        />
-    </div>
-) : (
-    <div>
-        <Label htmlFor="expected_monthly_yield">Rentabilidade Esperada (% a.m.)</Label>
-        <Input
-            id="expected_monthly_yield"
-            type="number"
-            step="0.01"
-            value={formData.expected_monthly_yield}
-            onChange={(e) => handleInputChange('expected_monthly_yield', e.target.value)}
-            placeholder="Ex: 1.2"
-        />
-    </div>
-)}
-    </div>
-    <div className="flex justify-end space-x-2 pt-4">
-      <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-        Cancelar
-      </Button>
-      <Button type="submit">
-        Adicionar Investimento
-      </Button>
-    </div>
-  </form>
-</DialogContent>
-                </Dialog>
-              </div>
+      </header>
 
-{/* ▼▼▼ COLE O NOVO MODAL DE EDIÇÃO AQUI ▼▼▼ */}
-        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                    <DialogTitle>Editar Investimento</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleUpdateInvestment} className="space-y-4">
-                    <div>
-                        <Label htmlFor="edit-name">Nome do Investimento *</Label>
-                        <Input
-                        id="edit-name"
-                        value={editFormData.name}
-                        onChange={(e) => handleEditInputChange('name', e.target.value)}
-                        required
-                        />
+      <StockTicker />
+      
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Carteira de Investimentos
+          </h2>
+          <p className="text-slate-400">Acompanhe seus investimentos e rentabilidade com precisão tecnológica</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <DollarSign className="h-12 w-12 text-cyan-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Total Investido</p>
+            <p className="text-2xl font-bold text-white">R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+            </div>
+          </div>
+
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <TrendingUp className="h-12 w-12 text-emerald-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Valor Atual</p>
+            <p className="text-2xl font-bold text-white">R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }} />
+            </div>
+          </div>
+
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              {lucroTotal >= 0 ? <TrendingUp className="h-12 w-12 text-emerald-400" /> : <TrendingDown className="h-12 w-12 text-rose-400" />}
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Lucro/Prejuízo</p>
+            <p className={`text-2xl font-bold ${lucroTotal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full ${lucroTotal >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: '100%' }} />
+            </div>
+          </div>
+
+          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <BarChart3 className="h-12 w-12 text-purple-400" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 mb-1">Rentabilidade</p>
+            <p className={`text-2xl font-bold ${rentabilidadeTotal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {(rentabilidadeTotal ?? 0).toFixed(2)}%
+            </p>
+            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
+            </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="carteira" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 glass-panel p-1 border-white/5">
+            <TabsTrigger value="carteira" className="data-[state=active]:active-gradient">Carteira</TabsTrigger>
+            <TabsTrigger value="home-broker" className="data-[state=active]:active-gradient">Home Broker</TabsTrigger> 
+            <TabsTrigger value="performance" className="data-[state=active]:active-gradient">Performance</TabsTrigger>
+            <TabsTrigger value="analise" className="data-[state=active]:active-gradient">Análise</TabsTrigger>
+            <TabsTrigger value="calculadora" className="data-[state=active]:active-gradient">Calculadora</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="home-broker">
+            <div className="glass-panel p-6 border-white/5">
+              <HomeBroker />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="carteira" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+              <h3 className="text-lg font-semibold text-white">Meus Investimentos</h3>
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Investimento
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-white">Novo Investimento</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-slate-300">Nome do Investimento *</Label>
+                      <Input id="name" value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} placeholder="Ex: Tesouro Selic, ITSA4..." required className="glass-panel border-white/10" />
                     </div>
-                    <div>
-                        <Label htmlFor="edit-type">Tipo *</Label>
-                        <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Renda Fixa">Renda Fixa</SelectItem>
-                            <SelectItem value="Ações">Ações</SelectItem>
-                            <SelectItem value="FII">Fundos Imobiliários</SelectItem>
-                            <SelectItem value="Criptomoedas">Criptomoedas</SelectItem>
-                            <SelectItem value="Fundos">Fundos de Investimento</SelectItem>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                      <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                        <SelectTrigger className="glass-panel border-white/10">
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="Renda Fixa">Renda Fixa</SelectItem>
+                          <SelectItem value="Ações">Ações</SelectItem>
+                          <SelectItem value="FII">Fundos Imobiliários</SelectItem>
+                          <SelectItem value="Criptomoedas">Criptomoedas</SelectItem>
+                          <SelectItem value="Fundos">Fundos de Investimento</SelectItem>
                         </SelectContent>
-                        </Select>
+                      </Select>
                     </div>
+
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                        <Label htmlFor="edit-initial_value">Valor Investido (R$)</Label>
-                        <Input
-                            id="edit-initial_value"
-                            type="number" step="0.01"
-                            value={editFormData.initial_value}
-                            onChange={(e) => handleEditInputChange('initial_value', e.target.value)}
-                        />
-                        </div>
-                        <div>
-                        <Label htmlFor="edit-current_value">Valor Atual (R$)</Label>
-                        <Input
-                            id="edit-current_value"
-                            type="number" step="0.01"
-                            value={editFormData.current_value}
-                            onChange={(e) => handleEditInputChange('current_value', e.target.value)}
-                        />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="initial_value" className="text-slate-300">Valor Investido (R$) *</Label>
+                        <Input id="initial_value" type="number" step="0.01" value={formData.initial_value} onChange={(e) => handleInputChange('initial_value', e.target.value)} placeholder="0,00" required className="glass-panel border-white/10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="current_value" className="text-slate-300">Valor Atual (R$)</Label>
+                        <Input id="current_value" type="number" step="0.01" value={formData.current_value} onChange={(e) => handleInputChange('current_value', e.target.value)} placeholder="Opcional" className="glass-panel border-white/10" />
+                      </div>
                     </div>
+
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                        <Label htmlFor="edit-purchase_date">Data da Compra *</Label>
-                        <Input
-                            id="edit-purchase_date"
-                            type="date"
-                            value={editFormData.purchase_date}
-                            onChange={(e) => handleEditInputChange('purchase_date', e.target.value)}
-                            required
-                        />
+                      <div className="space-y-2">
+                        <Label htmlFor="purchase_date" className="text-slate-300">Data da Compra *</Label>
+                        <Input id="purchase_date" type="date" value={formData.purchase_date} onChange={(e) => handleInputChange('purchase_date', e.target.value)} required className="glass-panel border-white/10" />
+                      </div>
+                      {['Ações', 'FII'].includes(formData.type) ? (
+                        <div className="space-y-2">
+                          <Label htmlFor="ticker" className="text-slate-300">Ticker *</Label>
+                          <Input id="ticker" value={formData.ticker} onChange={(e) => handleInputChange('ticker', e.target.value.toUpperCase())} placeholder="Ex: ITSA4" required className="glass-panel border-white/10" />
                         </div>
-                        {/* Bloco Condicional para Ticker ou Rentabilidade (Edição) */}
-{['Ações', 'FII'].includes(editFormData.type) ? (
-    <div>
-        <Label htmlFor="edit-ticker">Ticker *</Label>
-        <Input
-            id="edit-ticker"
-            value={editFormData.ticker}
-            onChange={(e) => handleEditInputChange('ticker', e.target.value.toUpperCase())}
-            placeholder="Ex: ITSA4, MXRF11"
-            required
-        />
-    </div>
-) : (
-    <div>
-        <Label htmlFor="edit-expected_monthly_yield">Rentabilidade Esperada (% a.m.)</Label>
-        <Input
-            id="edit-expected_monthly_yield"
-            type="number" step="0.01"
-            value={editFormData.expected_monthly_yield}
-            onChange={(e) => handleEditInputChange('expected_monthly_yield', e.target.value)}
-            placeholder="Ex: 1.2"
-        />
-    </div>
-)}
+                      ) : (
+                        <div className="space-y-2">
+                          <Label htmlFor="expected_monthly_yield" className="text-slate-300">Rentabilidade (% a.m.)</Label>
+                          <Input id="expected_monthly_yield" type="number" step="0.01" value={formData.expected_monthly_yield} onChange={(e) => handleInputChange('expected_monthly_yield', e.target.value)} placeholder="Ex: 1.2" className="glass-panel border-white/10" />
+                        </div>
+                      )}
                     </div>
                     <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                        <Button type="submit">Salvar Alterações</Button>
+                      <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                      <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Adicionar</Button>
                     </div>
-                </form>
-            </DialogContent>
-        </Dialog>
-        {/* --- FIM DO MODAL DE EDIÇÃO --- */}
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
 
-              {/* ========================================================== */}
-              {/* PASSO 4: ATUALIZAR A EXIBIÇÃO DOS CARDS INDIVIDUAIS */}
-              {/* ========================================================== */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {investimentosCalculados.map((inv) => (
-                  <Card key={inv.id}>
-                    <CardContent className="p-6">
-                      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold dark:text-slate-100">{inv.name}</h3>
-                            {getTipoBadge(inv.type)}
-                          </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <p className="font-medium text-gray-600 dark:text-slate-400">Valor Investido</p>
-                              <p className="text-blue-600 font-bold">R$ {(inv.initial_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-600 dark:text-slate-400">Valor Atual</p>
-                              {/* Usa o novo valor calculado */}
-                              <p className="text-green-600 font-bold">R$ {(inv.dynamic_current_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-600 dark:text-slate-400">Rentabilidade</p>
-                              {/* Usa a nova rentabilidade calculada */}
-                              <p className={`font-bold ${getRentabilidadeColor(inv.dynamic_profit_percentage)}`}>
-                                {(inv.dynamic_profit_percentage ?? 0) > 0 ? '+' : ''}{(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
-                              </p>
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-600 dark:text-slate-400">Data Compra</p>
-                              <p>{formatLocalDate(inv.purchase_date)}</p>
-                            </div>
-                          </div>
+            <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+              <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle className="text-white">Editar Investimento</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleUpdateInvestment} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name" className="text-slate-300">Nome do Investimento *</Label>
+                    <Input id="edit-name" value={editFormData.name} onChange={(e) => handleEditInputChange('name', e.target.value)} required className="glass-panel border-white/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-type" className="text-slate-300">Tipo *</Label>
+                    <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
+                      <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
+                      <SelectContent className="glass-panel border-white/10">
+                        <SelectItem value="Renda Fixa">Renda Fixa</SelectItem>
+                        <SelectItem value="Ações">Ações</SelectItem>
+                        <SelectItem value="FII">Fundos Imobiliários</SelectItem>
+                        <SelectItem value="Criptomoedas">Criptomoedas</SelectItem>
+                        <SelectItem value="Fundos">Fundos de Investimento</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-initial_value" className="text-slate-300">Valor Investido (R$)</Label>
+                      <Input id="edit-initial_value" type="number" step="0.01" value={editFormData.initial_value} onChange={(e) => handleEditInputChange('initial_value', e.target.value)} className="glass-panel border-white/10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-current_value" className="text-slate-300">Valor Atual (R$)</Label>
+                      <Input id="edit-current_value" type="number" step="0.01" value={editFormData.current_value} onChange={(e) => handleEditInputChange('current_value', e.target.value)} className="glass-panel border-white/10" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-purchase_date" className="text-slate-300">Data da Compra *</Label>
+                      <Input id="edit-purchase_date" type="date" value={editFormData.purchase_date} onChange={(e) => handleEditInputChange('purchase_date', e.target.value)} required className="glass-panel border-white/10" />
+                    </div>
+                    {['Ações', 'FII'].includes(editFormData.type) ? (
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-ticker" className="text-slate-300">Ticker *</Label>
+                        <Input id="edit-ticker" value={editFormData.ticker} onChange={(e) => handleEditInputChange('ticker', e.target.value.toUpperCase())} placeholder="Ex: ITSA4" required className="glass-panel border-white/10" />
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-expected_monthly_yield" className="text-slate-300">Rentabilidade (% a.m.)</Label>
+                        <Input id="edit-expected_monthly_yield" type="number" step="0.01" value={editFormData.expected_monthly_yield} onChange={(e) => handleEditInputChange('expected_monthly_yield', e.target.value)} className="glass-panel border-white/10" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                    <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {investimentosCalculados.map((inv) => (
+                <div key={inv.id} className="glass-card p-6 border-white/10 hover:bg-white/5 transition-all group relative overflow-hidden">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6 z-10 relative">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">{inv.name}</h3>
+                        <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${inv.type === 'Renda Fixa' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
+                          {inv.type}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[11px] uppercase tracking-wider">
+                        <div>
+                          <p className="text-slate-500 mb-1">Valor Investido</p>
+                          <p className="font-bold text-slate-200">R$ {(inv.initial_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                         </div>
-                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 ml-0 mt-4 sm:mt-0 sm:ml-4">
-                          <Button variant="outline" size="sm" onClick={() => abrirModalDetalhes(inv.id)}>
-                          <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(inv)}>
-                          <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => excluirInvestimento(inv.id)}><Trash2 className="h-4 w-4" /></Button>
+                        <div>
+                          <p className="text-slate-500 mb-1">Valor Atual</p>
+                          <p className="font-bold text-emerald-400">R$ {(inv.dynamic_current_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 mb-1">Rentabilidade</p>
+                          <p className={`font-bold ${(inv.dynamic_profit_percentage ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {(inv.dynamic_profit_percentage ?? 0) > 0 ? '+' : ''}{(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500 mb-1">Data Compra</p>
+                          <p className="font-bold text-slate-200">{formatLocalDate(inv.purchase_date)}</p>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Performance */}
-            <TabsContent value="performance" className="space-y-6">
-              <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Evolução da Carteira</CardTitle>
-    
-    {/* ▼▼▼ FILTRO DE ANO ADICIONADO AQUI ▼▼▼ */}
-    <div className="w-40">
-      <Select 
-        value={performanceYear} 
-        onValueChange={(value) => setPerformanceYear(Number(value))}
-      >
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035].map(year => (
-            <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  </CardHeader>
-  <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={evolucaoData}>
-                        <CartesianGrid stroke="hsl(var(--border))" />
-                        <XAxis dataKey="mes" />
-                        <YAxis />
-                        <Tooltip formatter={(value) => [`R$ ${value.toLocaleString()}`, 'Valor']} />
-                        <Line 
-                          type="monotone" 
-                          dataKey="valor" 
-                          stroke="#10b981" 
-                          strokeWidth={3}
-                          dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    </div>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10" onClick={() => abrirModalDetalhes(inv.id)}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white" onClick={() => abrirModalEdicao(inv)}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10" onClick={() => excluirInvestimento(inv.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <CardContent>
-  <p className="text-blue-500">Melhores Performances ✅ </p>
-  <div className="space-y-3">
-    {topPerformers.length > 0 ? (
-      topPerformers.map((inv) => (
-        <div key={inv.id} className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-          <div>
-            <p className="font-medium">{inv.name}</p>
-            <p className="text-sm text-gray-600 dark:text-slate-400">{inv.type}</p>
-          </div>
-          <p className="text-green-600 font-bold">
-            +{(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
-          </p>
-        </div>
-      ))
-    ) : (
-      <p className="text-gray-500 dark:text-slate-400 text-center py-4">Nenhum investimento com performance positiva.</p>
-    )}
-  </div>
-</CardContent>
-
-            <CardContent>
-  <p className="text-red-500">Atenção necessária‼️ </p>
-  <div className="space-y-3">
-    {bottomPerformers.length > 0 ? (
-      bottomPerformers.map((inv) => (
-        <div key={inv.id} className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-          <div>
-            <p className="font-medium">{inv.name}</p>
-            <p className="text-sm text-gray-600 dark:text-slate-400">{inv.type}</p>
-          </div>
-          <p className="text-red-600 font-bold">
-            {(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
-          </p>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4">
-        <p className="text-gray-500 dark:text-slate-400">Todos os investimentos estão positivos! 🎉</p>
-      </div>
-    )}
-  </div>
-</CardContent>
-              </div>
-            </TabsContent>
-
-{/* Análise */}
-<TabsContent value="analise" className="space-y-6">
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <Card>
-      <CardHeader>
-        <CardTitle>Distribuição por Tipo</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-80">
-          {pieChartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsPieChart>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  dataKey="value"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
-              </RechartsPieChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-500 dark:text-slate-400">
-              <p>Nenhum dado para exibir.</p>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>Resumo da Carteira</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-slate-400">Total de Ativos</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summaryData.total_assets}</p>
-            </div>
-            <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <p className="text-sm text-gray-600 dark:text-slate-400">Ativos Positivos</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{summaryData.positive_assets}</p>
-            </div>
-          </div>
-          
-          <div className="space-y-3 pt-2">
-            <h4 className="font-semibold dark:text-slate-100">Distribuição por Valor</h4>
-            {summaryData.distribution.length > 0 ? (
-              summaryData.distribution.map((item, index) => (
-                <div key={index} className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <div 
-                      className="w-4 h-4 rounded-full mr-3" 
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span>{item.name}</span>
-                  </div>
-                  <span className="font-medium dark:text-slate-100">R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </div>
-              ))
-            ) : (
-               <p className="text-gray-500 dark:text-slate-400 text-center py-4">Nenhum dado para exibir.</p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-</TabsContent>
+              ))}
+            </div>
+          </TabsContent>
 
-{/* calculadora de investimentos*/}
+          <TabsContent value="performance" className="space-y-6">
+            <div className="glass-panel p-6 border-white/5">
+              <div className="flex flex-row items-center justify-between mb-8">
+                <h4 className="font-semibold uppercase tracking-wider text-sm text-white">Evolução da Carteira</h4>
+                <div className="w-40">
+                  <Select value={performanceYear} onValueChange={(value) => setPerformanceYear(Number(value))}>
+                    <SelectTrigger className="glass-panel border-white/10 h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10">
+                      {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map(year => (
+                        <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={evolucaoData}>
+                    <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    <XAxis dataKey="mes" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(value) => `R$${(value/1000).toFixed(0)}k`} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                      itemStyle={{ color: '#fff' }}
+                      formatter={(value) => [`R$ ${value.toLocaleString()}`, 'Patrimônio']} 
+                    />
+                    <Line type="monotone" dataKey="valor" stroke="#0891b2" strokeWidth={3} dot={{ fill: '#0891b2', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
 
-<TabsContent value="calculadora" className="space-y-6">
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center">
-        <Calculator className="h-6 w-6 mr-2" />
-        Calculadora da Independência Financeira
-      </CardTitle>
-      <p className="text-gray-600 dark:text-gray-400 pt-2">
-        Simule o crescimento dos seus investimentos ao longo do tempo com aportes mensais.
-      </p>
-    </CardHeader>
-    <CardContent>
-    {/* Em Investments.jsx, dentro do <CardContent> da calculadora */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="text-[10px] uppercase font-bold text-emerald-400 tracking-widest mb-6">Melhores Performances</h4>
+                <div className="space-y-3">
+                  {topPerformers.length > 0 ? (
+                    topPerformers.map((inv) => (
+                      <div key={inv.id} className="flex justify-between items-center p-3 glass-card bg-emerald-500/5 border-emerald-500/10">
+                        <div>
+                          <p className="text-sm font-bold text-white">{inv.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase">{inv.type}</p>
+                        </div>
+                        <p className="text-emerald-400 font-bold">
+                          +{(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-slate-500 text-center py-8 text-xs italic">Nenhum dado positivo.</p>
+                  )}
+                </div>
+              </div>
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-  {/* Coluna do Formulário */}
-  <form onSubmit={handleCalculate} className="md:col-span-1 space-y-4">
-    <div>
-      <Label htmlFor="initialAmount">Aporte Inicial (R$)</Label>
-      <Input id="initialAmount" name="initialAmount" type="number" step="0.01" value={calculatorForm.initialAmount} onChange={handleCalculatorChange} placeholder="1000.00" />
-    </div>
-    <div>
-      <Label htmlFor="monthlyContribution">Aportes Mensais (R$)</Label>
-      <Input id="monthlyContribution" name="monthlyContribution" type="number" step="0.01" value={calculatorForm.monthlyContribution} onChange={handleCalculatorChange} placeholder="500.00" />
-    </div>
-    <div>
-      <Label htmlFor="annualRate">Rentabilidade Anual (%)</Label>
-      <Input id="annualRate" name="annualRate" type="number" step="0.01" value={calculatorForm.annualRate} onChange={handleCalculatorChange} placeholder="8.5" />
-    </div>
-    <div>
-      <Label htmlFor="periodYears">Período (anos)</Label>
-      <Input id="periodYears" name="periodYears" type="number" value={calculatorForm.periodYears} onChange={handleCalculatorChange} placeholder="10" />
-    </div>
-    <Button type="submit" className="w-full" disabled={isCalculating}>
-      {isCalculating ? 'Calculando...' : 'Calcular Projeção'}
-    </Button>
-  </form>
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="text-[10px] uppercase font-bold text-rose-400 tracking-widest mb-6">Atenção Necessária</h4>
+                <div className="space-y-3">
+                  {bottomPerformers.length > 0 ? (
+                    bottomPerformers.map((inv) => (
+                      <div key={inv.id} className="flex justify-between items-center p-3 glass-card bg-rose-500/5 border-rose-500/10">
+                        <div>
+                          <p className="text-sm font-bold text-white">{inv.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase">{inv.type}</p>
+                        </div>
+                        <p className="text-rose-400 font-bold">
+                          {(inv.dynamic_profit_percentage ?? 0).toFixed(2)}%
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-emerald-400 text-xs font-bold uppercase tracking-widest">Todos ativos saudáveis! 🎉</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
-  {/* Coluna de Resultados */}
-  <div className="md:col-span-2">
-    {calculatorResult ? (
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="text-center">
-            <CardHeader><CardTitle>Valor Acumulado</CardTitle></CardHeader>
-            <CardContent><p className="text-2xl font-bold text-green-600">{formatCurrency(calculatorResult.summary.final_amount)}</p></CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardHeader><CardTitle>Total Investido</CardTitle></CardHeader>
-            <CardContent><p className="text-2xl font-bold text-blue-600">{formatCurrency(calculatorResult.summary.total_invested)}</p></CardContent>
-          </Card>
-          <Card className="text-center">
-            <CardHeader><CardTitle>Total em Juros</CardTitle></CardHeader>
-            <CardContent><p className="text-2xl font-bold text-purple-600">{formatCurrency(calculatorResult.summary.total_gains)}</p></CardContent>
-          </Card>
-           <Card className="text-center">
-            <CardHeader><CardTitle>Período</CardTitle></CardHeader>
-            <CardContent><p className="text-2xl font-bold">{calculatorResult.summary.period_years} anos</p></CardContent>
-          </Card>
-        </div>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={calculatorResult.projection}>
-              <CartesianGrid stroke="hsl(var(--border))" />
-              <XAxis dataKey="year" unit=" anos" />
-              <YAxis tickFormatter={(value) => `R$${(value/1000).toFixed(0)}k`} />
-              <Tooltip formatter={(value) => [formatCurrency(value), 'Valor Acumulado']} />
-              <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    ) : (
-      <div className="flex items-center justify-center h-full bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-        <p className="text-gray-500">Preencha os dados e clique em "Calcular" para ver a simulação.</p>
-      </div>
-    )}
-  </div>
-</div>
-      {/* Esta parte será adicionada no próximo passo */}
-    </CardContent>
-  </Card>
-</TabsContent>
-          </Tabs>
-          {/* ▼▼▼ ADICIONE A CHAMADA PARA O NOVO MODAL AQUI ▼▼▼ */}
+          <TabsContent value="analise" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="font-semibold uppercase tracking-wider text-sm text-white mb-8">Distribuição por Tipo</h4>
+                <div className="h-80">
+                  {pieChartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                        <Pie
+                          data={pieChartData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={100}
+                          dataKey="value"
+                          paddingAngle={5}
+                        >
+                          {pieChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                          ))}
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                          formatter={(value) => `R$ ${value.toLocaleString()}`} 
+                        />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-slate-500 italic text-sm">
+                      Nenhum dado para exibir.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="font-semibold uppercase tracking-wider text-sm text-white mb-8">Resumo da Carteira</h4>
+                <div className="space-y-8">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-4 glass-card bg-cyan-500/5 border-cyan-500/10">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Total de Ativos</p>
+                      <p className="text-2xl font-bold text-cyan-400">{summaryData.total_assets}</p>
+                    </div>
+                    <div className="text-center p-4 glass-card bg-emerald-500/5 border-emerald-500/10">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 mb-2">Ativos Positivos</p>
+                      <p className="text-2xl font-bold text-emerald-400">{summaryData.positive_assets}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h5 className="text-[10px] uppercase font-bold text-slate-400 tracking-widest border-b border-white/5 pb-2">Distribuição por Valor</h5>
+                    <div className="space-y-3">
+                      {summaryData.distribution.length > 0 ? (
+                        summaryData.distribution.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center group">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full mr-3 group-hover:scale-150 transition-transform" style={{ backgroundColor: item.color }} />
+                              <span className="text-sm text-slate-300">{item.name}</span>
+                            </div>
+                            <span className="text-sm font-bold text-white">R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                        ))
+                      ) : (
+                         <p className="text-slate-500 text-center py-4 italic text-xs">Sem dados.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="calculadora" className="space-y-6">
+            <div className="glass-panel p-6 border-white/5">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="bg-cyan-500/20 p-2 rounded-lg">
+                  <Calculator className="h-6 w-6 text-cyan-400" />
+                </div>
+                <h4 className="text-lg font-bold text-white">Simulador de Independência Financeira</h4>
+              </div>
+              <p className="text-sm text-slate-400 mb-8 italic">Projete o futuro do seu patrimônio com base em aportes e rentabilidade esperada.</p>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <form onSubmit={handleCalculate} className="space-y-4 glass-card p-6 border-white/5 bg-white/5">
+                  <div className="space-y-2">
+                    <Label htmlFor="initialAmount" className="text-slate-300 text-xs">Aporte Inicial (R$)</Label>
+                    <Input id="initialAmount" name="initialAmount" type="number" step="0.01" value={calculatorForm.initialAmount} onChange={handleCalculatorChange} placeholder="0,00" className="glass-panel border-white/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="monthlyContribution" className="text-slate-300 text-xs">Aporte Mensal (R$)</Label>
+                    <Input id="monthlyContribution" name="monthlyContribution" type="number" step="0.01" value={calculatorForm.monthlyContribution} onChange={handleCalculatorChange} placeholder="0,00" className="glass-panel border-white/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="annualRate" className="text-slate-300 text-xs">Rentabilidade Anual (%)</Label>
+                    <Input id="annualRate" name="annualRate" type="number" step="0.01" value={calculatorForm.annualRate} onChange={handleCalculatorChange} placeholder="8.5" className="glass-panel border-white/10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="periodYears" className="text-slate-300 text-xs">Período (anos)</Label>
+                    <Input id="periodYears" name="periodYears" type="number" value={calculatorForm.periodYears} onChange={handleCalculatorChange} placeholder="10" className="glass-panel border-white/10" />
+                  </div>
+                  <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white mt-4" disabled={isCalculating}>
+                    {isCalculating ? 'Calculando...' : 'Calcular Projeção'}
+                  </Button>
+                </form>
+
+                <div className="lg:col-span-2">
+                  {calculatorResult ? (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="glass-card p-4 border-white/10 bg-emerald-500/5 text-center">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Acumulado</p>
+                          <p className="text-sm font-bold text-emerald-400">{formatCurrency(calculatorResult.summary.final_amount)}</p>
+                        </div>
+                        <div className="glass-card p-4 border-white/10 bg-cyan-500/5 text-center">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Investido</p>
+                          <p className="text-sm font-bold text-cyan-400">{formatCurrency(calculatorResult.summary.total_invested)}</p>
+                        </div>
+                        <div className="glass-card p-4 border-white/10 bg-purple-500/5 text-center">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Juros</p>
+                          <p className="text-sm font-bold text-purple-400">{formatCurrency(calculatorResult.summary.total_gains)}</p>
+                        </div>
+                        <div className="glass-card p-4 border-white/10 bg-white/5 text-center">
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Tempo</p>
+                          <p className="text-sm font-bold text-white">{calculatorResult.summary.period_years} anos</p>
+                        </div>
+                      </div>
+                      <div className="h-80 glass-panel p-6 border-white/5">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={calculatorResult.projection}>
+                            <CartesianGrid stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <XAxis dataKey="year" stroke="#64748b" fontSize={10} unit="y" />
+                            <YAxis stroke="#64748b" fontSize={10} tickFormatter={(value) => `R$${(value/1000).toFixed(0)}k`} />
+                            <Tooltip 
+                              contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                              formatter={(value) => [formatCurrency(value), 'Total']} 
+                            />
+                            <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 4 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full glass-panel border-dashed border-white/5 min-h-[300px]">
+                      <Calculator className="h-12 w-12 text-slate-800 mb-4" />
+                      <p className="text-slate-600 text-sm">Insira os parâmetros para gerar a simulação tecnológica.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+        
         <InvestmentDetailModal 
           isOpen={isDetailModalOpen} 
           onClose={() => setIsDetailModalOpen(false)} 
           investmentId={selectedInvestmentId}
           onUpdate={loadInvestimentos}
         />
-        </div>
-      
+      </div>
     </div>
   );
+
 };
             
             

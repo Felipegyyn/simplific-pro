@@ -649,413 +649,414 @@ useEffect(() => {
   
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100">
+    <div className="min-h-screen bg-transparent text-slate-200">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
-        
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
-                className="mr-4"
+                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
+              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-slate-400 hidden sm:block">
                 Bem-vindo, {user.name}
               </span>
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
             </div>
-
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-        <div className="p-4 sm:p-6">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold">Planejamento Financeiro</h2>
-            <p className="text-gray-600 dark:text-gray-400">Gerencie seus planejamentos e orçamentos</p>
-          </div>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Planejamento Financeiro
+          </h2>
+          <p className="text-slate-400">Gerencie seus planejamentos e orçamentos com precisão tecnológica</p>
+        </div>
 
-          <Tabs
+        <Tabs
           value={abaAtiva}
           onValueChange={(v) => setAbaAtiva(v)}
           className="space-y-6"
-          >
-            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3">
-              <TabsTrigger value="visao-geral">Visão Geral</TabsTrigger>
-              <TabsTrigger value="orcamento">Orçamento por Categoria</TabsTrigger>
-              <TabsTrigger value="planejamentos">Planejamentos</TabsTrigger>
-            </TabsList>
+        >
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 glass-panel p-1">
+            <TabsTrigger value="visao-geral" className="data-[state=active]:active-gradient">Visão Geral</TabsTrigger>
+            <TabsTrigger value="orcamento" className="data-[state=active]:active-gradient">Orçamento por Categoria</TabsTrigger>
+            <TabsTrigger value="planejamentos" className="data-[state=active]:active-gradient">Planejamentos</TabsTrigger>
+          </TabsList>
 
-            {/* Visão Geral */}
-            <TabsContent value="visao-geral" className="space-y-6">
-              {/* Cards de Resumo */}
-
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-  <div className="mb-0"> {/* Removido mb-4 daqui */}
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ano</label>
-    <select
-      value={filtroAnoVisaoGeral}
-      onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
-      className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-    >
-      {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
-        <option key={ano} value={ano}>{ano}</option>
-      ))}
-    </select>
-  </div>
-
-  <div>
-    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
-    <select
-      value={filtroTipoVisaoGeral}
-      onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
-      className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-    >
-      <option value="">Todos</option>
-      <option value="entrada">Entrada</option>
-      <option value="saida">Saída</option>
-    </select>
-  </div>
-</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Planejado</p>
-                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <DollarSign className="h-8 w-8 text-red-600 dark:text-red-400" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Realizado</p>
-                        <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                        R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <TrendingUp className="h-8 w-8 text-green-600" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total a realizar</p>
-                        <p className="text-2xl font-bold text-green-600">
-                        R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <BarChart3 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Progresso Médio</p>
-                        <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {resumo.progressoMedio.toFixed(1)}%
-                        </p>
-
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+          {/* Visão Geral */}
+          <TabsContent value="visao-geral" className="space-y-6">
+            {/* Filtros Visão Geral */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6 glass-panel p-4 border-white/5">
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Ano</label>
+                <select
+                  value={filtroAnoVisaoGeral}
+                  onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
+                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                >
+                  {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
+                    <option key={ano} value={ano}>{ano}</option>
+                  ))}
+                </select>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Tipo</label>
+                <select
+                  value={filtroTipoVisaoGeral}
+                  onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
+                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                >
+                  <option value="">Todos</option>
+                  <option value="entrada">Entrada</option>
+                  <option value="saida">Saída</option>
+                </select>
+              </div>
+            </div>
 
-  {/* Gráfico de Rosca - Entradas (profissional) */}
-<div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 rounded-lg shadow p-4">
-  <h4 className="font-semibold mb-2 dark:text-slate-200">Distribuição de Entradas</h4>
-  <ResponsiveContainer width="100%" height={250}>
-    <PieChart>
-      <Tooltip 
-      formatter={(value, name) => [`R$ ${value.toLocaleString()}`, name]} 
-    />
-      <Pie
-        data={graficoEntrada}
-        dataKey="value"
-        nameKey="name"
-        innerRadius={50}
-        outerRadius={100}
-        paddingAngle={5}
-        labelLine={false}
-        label={({ name, percent }) =>
-          `${name}: ${percent.toFixed(1)}%`
-        }
-      >
-        {graficoEntrada.map((_, index) => (
-          <Cell key={`entrada-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-    </PieChart>
-  </ResponsiveContainer>
-</div>
+            {/* Cards de Resumo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Target className="h-12 w-12 text-cyan-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Total Planejado</p>
+                <p className="text-2xl font-bold text-white">
+                  R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </p>
+                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+                </div>
+              </div>
 
-  {/* Gráfico de Rosca - Saídas (profissional) */}
-<div className="bg-white dark:bg-slate-800 dark:border dark:border-slate-700 rounded-lg shadow p-4">
-  <h4 className="font-semibold mb-2 dark:text-slate-200">Distribuição de Saídas</h4>
-  <ResponsiveContainer width="100%" height={250}>
-    <PieChart>
-      <Pie
-        data={graficoSaida}
-        dataKey="value"
-        nameKey="name"
-        innerRadius={50}
-        outerRadius={100}
-        paddingAngle={5}
-        labelLine={false}
-        label={({ name, percent }) =>
-          `${name}: ${percent.toFixed(1)}%`
-        }
-      >
-        {graficoSaida.map((_, index) => (
-          <Cell
-            key={`saida-${index}`}
-            fill={COLORS_SAIDAS[index % COLORS_SAIDAS.length]} // segundo array
-          />
-        ))}
-      </Pie>
-      <Tooltip
-        formatter={(value) =>
-          `R$ ${parseFloat(value).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`
-        }
-      />
-    </PieChart>
-  </ResponsiveContainer>
-</div>
+              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <DollarSign className="h-12 w-12 text-rose-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Total Realizado</p>
+                <p className="text-2xl font-bold text-white">
+                  R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </p>
+                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+                </div>
+              </div>
 
+              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <TrendingUp className="h-12 w-12 text-emerald-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Total a realizar</p>
+                <p className="text-2xl font-bold text-white">
+                  R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </p>
+                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.max(0, 100 - resumo.progressoMedio)}%` }} />
+                </div>
+              </div>
 
-</div>
+              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <BarChart3 className="h-12 w-12 text-purple-400" />
+                </div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Progresso Médio</p>
+                <p className="text-2xl font-bold text-white">
+                  {resumo.progressoMedio.toFixed(1)}%
+                </p>
+                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-purple-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+                </div>
+              </div>
+            </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+              {/* Gráfico de Rosca - Entradas */}
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="font-semibold mb-4 text-slate-200 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-cyan-500" />
+                  Distribuição de Entradas
+                </h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                      itemStyle={{ color: '#fff' }}
+                      formatter={(value, name) => [`R$ ${value.toLocaleString()}`, name]} 
+                    />
+                    <Pie
+                      data={graficoEntrada}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name}: ${percent.toFixed(1)}%`
+                      }
+                    >
+                      {graficoEntrada.map((_, index) => (
+                        <Cell key={`entrada-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
 
-              {/* Planejamentos Ativos */}
-            </TabsContent>
+              {/* Gráfico de Rosca - Saídas */}
+              <div className="glass-panel p-6 border-white/5">
+                <h4 className="font-semibold mb-4 text-slate-200 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-rose-500" />
+                  Distribuição de Saídas
+                </h4>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={graficoSaida}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name}: ${percent.toFixed(1)}%`
+                      }
+                    >
+                      {graficoSaida.map((_, index) => (
+                        <Cell
+                          key={`saida-${index}`}
+                          fill={COLORS_SAIDAS[index % COLORS_SAIDAS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.1)', color: '#fff' }}
+                      itemStyle={{ color: '#fff' }}
+                      formatter={(value) =>
+                        `R$ ${parseFloat(value).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                      }
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </TabsContent>
 
-            {/* Orçamento por Categoria */}
-            <TabsContent value="orcamento" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <h3 className="text-lg font-semibold dark:text-gray-100">Orçamento por Categoria</h3>
-                <div className="flex gap-2">
+          {/* Orçamento por Categoria */}
+          <TabsContent value="orcamento" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Orçamento por Categoria</h3>
+                <p className="text-sm text-slate-400">Controle seus gastos por categoria mensalmente</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20">
                       <Plus className="h-4 w-4 mr-2" />
                       Criar orçamento
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="glass-panel border-white/10 text-slate-200">
                     <DialogHeader>
-                      <DialogTitle>Criar Novo Planejamento</DialogTitle>
+                      <DialogTitle className="text-white">Criar Novo Planejamento</DialogTitle>
                     </DialogHeader>
-                   <form onSubmit={handleSubmit} className="space-y-4">
-  <div className="space-y-2">
-  <Label htmlFor="type">Tipo</Label>
-  <Select
-    value={formData.type}
-    onValueChange={(value) => handleSelectChange('type', value)}
-    required
-  >
-    <SelectTrigger id="type">
-      <SelectValue placeholder="Selecione o tipo" />
-    </SelectTrigger>
-    <SelectContent>
-      {tiposUnicos.map((tipo, index) => (
-        <SelectItem key={index} value={tipo}>
-          {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
-        </SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-</div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="type" className="text-slate-300">Tipo</Label>
+                        <Select
+                          value={formData.type}
+                          onValueChange={(value) => handleSelectChange('type', value)}
+                          required
+                        >
+                          <SelectTrigger id="type" className="glass-panel border-white/10">
+                            <SelectValue placeholder="Selecione o tipo" />
+                          </SelectTrigger>
+                          <SelectContent className="glass-panel border-white/10">
+                            {tiposUnicos.map((tipo, index) => (
+                              <SelectItem key={index} value={tipo}>
+                                {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-  <div className="space-y-2">
-  <Label htmlFor="category_id">Categoria</Label>
-  <Select
-    value={formData.category_id}
-    onValueChange={(value) => handleSelectChange('category_id', value)}
-    required
-    disabled={!formData.type} 
-  >
-    <SelectTrigger id="category_id">
-      <SelectValue placeholder="Selecione a categoria" />
-    </SelectTrigger>
-    <SelectContent className="max-h-[250px] overflow-y-auto">
-      {categories
-        .filter(cat => cat.type === formData.type)
-        .map((cat) => (
-          <SelectItem key={cat.id} value={cat.id.toString()}>
-            {cat.name}
-          </SelectItem>
-        ))}
-    </SelectContent>
-  </Select>
-</div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category_id" className="text-slate-300">Categoria</Label>
+                        <Select
+                          value={formData.category_id}
+                          onValueChange={(value) => handleSelectChange('category_id', value)}
+                          required
+                          disabled={!formData.type} 
+                        >
+                          <SelectTrigger id="category_id" className="glass-panel border-white/10">
+                            <SelectValue placeholder="Selecione a categoria" />
+                          </SelectTrigger>
+                          <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                            {categories
+                              .filter(cat => cat.type === formData.type)
+                              .map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id.toString()}>
+                                  {cat.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-  <div className="space-y-2">
-  <Label htmlFor="form">Forma</Label>
-  <Select
-    id="form"
-    name="form"
-    value={formData.form}
-    onValueChange={(value) => handleSelectChange('form', value)}
-    required
-  >
-    <SelectTrigger>
-      <SelectValue placeholder="Selecione a forma" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="fixo">Fixo</SelectItem>
-      <SelectItem value="variavel">Variável</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="form" className="text-slate-300">Forma</Label>
+                          <Select
+                            id="form"
+                            name="form"
+                            value={formData.form}
+                            onValueChange={(value) => handleSelectChange('form', value)}
+                            required
+                          >
+                            <SelectTrigger className="glass-panel border-white/10">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent className="glass-panel border-white/10">
+                              <SelectItem value="fixo">Fixo</SelectItem>
+                              <SelectItem value="variavel">Variável</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="value" className="text-slate-300">Valor (R$)</Label>
+                          <Input
+                            id="value"
+                            name="value"
+                            type="number"
+                            value={formData.value}
+                            onChange={handleInputChange}
+                            placeholder="0,00"
+                            required
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                      </div>
 
-  <div className="space-y-2">
-    <Label htmlFor="value">Valor (R$)</Label>
-    <Input
-      id="value"
-      name="value"
-      type="number"
-      value={formData.value}
-      onChange={handleInputChange}
-      placeholder="0,00"
-      required
-    />
-  </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="date" className="text-slate-300">Data</Label>
+                          <Input
+                            id="date"
+                            name="date"
+                            type="date"
+                            value={formData.date}
+                            onChange={handleInputChange}
+                            required
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2 pt-8">
+                          <input
+                            type="checkbox"
+                            id="is_recurring"
+                            name="is_recurring"
+                            checked={formData.is_recurring || false}
+                            onChange={handleInputChange}
+                            className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-600 focus:ring-cyan-500/50"
+                          />
+                          <Label htmlFor="is_recurring" className="text-slate-300">Recorrente</Label>
+                        </div>
+                      </div>
 
-  <div className="space-y-2">
-    <Label htmlFor="date">Data</Label>
-    <Input
-      id="date"
-      name="date"
-      type="date"
-      value={formData.date}
-      onChange={handleInputChange}
-      required
-    />
-  </div>
+                      {formData.is_recurring && (
+                        <div className="space-y-2">
+                          <Label htmlFor="recurrence_period" className="text-slate-300">Período da Recorrência (meses)</Label>
+                          <Input
+                            id="recurrence_period"
+                            name="recurrence_period"
+                            type="number"
+                            value={formData.recurrence_period}
+                            onChange={handleInputChange}
+                            placeholder="Ex: 3"
+                            required={formData.is_recurring}
+                            className="glass-panel border-white/10"
+                          />
+                        </div>
+                      )}
 
-  <div className="space-y-2">
-  <Label htmlFor="is_recurring">
-    <input
-      type="checkbox"
-      id="is_recurring"
-      name="is_recurring"
-      checked={formData.is_recurring || false}
-      onChange={handleInputChange}
-      className="mr-2"
-    />
-    Recorrente
-  </Label>
-</div>
+                      <div className="space-y-2">
+                        <Label htmlFor="observations" className="text-slate-300">Observações</Label>
+                        <Input
+                          id="observations"
+                          name="observations"
+                          value={formData.observations}
+                          onChange={handleInputChange}
+                          placeholder="Observações do planejamento"
+                          className="glass-panel border-white/10"
+                        />
+                      </div>
 
-{formData.is_recurring && (
-  <div className="space-y-2">
-    <Label htmlFor="recurrence_period">Período da Recorrência (em meses)</Label>
-    <Input
-      id="recurrence_period"
-      name="recurrence_period"
-      type="number"
-      value={formData.recurrence_period}
-      onChange={handleInputChange}
-      placeholder="Ex: 3"
-      required={formData.is_recurring}
-    />
-  </div>
-)}
-
-  <div className="space-y-2">
-    <Label htmlFor="observations">Observações</Label>
-    <Input
-      id="observations"
-      name="observations"
-      value={formData.observations}
-      onChange={handleInputChange}
-      placeholder="Observações do planejamento"
-    />
-  </div>
-
-  <div className="flex justify-end space-x-2">
-    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-      Cancelar
-    </Button>
-    <Button type="submit">
-      Criar Planejamento
-    </Button>
-  </div>
-</form>
-
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                          Cancelar
+                        </Button>
+                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                          Criar Planejamento
+                        </Button>
+                      </div>
+                    </form>
                   </DialogContent>
                 </Dialog>
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button>
+                    <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-300">
                       <Plus className="h-4 w-4 mr-2" />
                       Nova Categoria
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="glass-panel border-white/10 text-slate-200">
                     <DialogHeader>
-                      <DialogTitle>Nova Categoria</DialogTitle>
+                      <DialogTitle className="text-white">Nova Categoria</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateCategory} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="category_name">Nome da Categoria</Label>
+                        <Label htmlFor="category_name" className="text-slate-300">Nome da Categoria</Label>
                         <Input
                           id="category_name"
                           name="category_name"
                           value={newCategory.name}
                           onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
                           required
+                          className="glass-panel border-white/10"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="category_type">Tipo</Label>
+                        <Label htmlFor="category_type" className="text-slate-300">Tipo</Label>
                         <select
                           id="category_type"
                           name="category_type"
                           value={newCategory.type}
                           onChange={(e) => setNewCategory(prev => ({ ...prev, type: e.target.value }))}
                           required
-                          className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2 w-full mt-1 bg-white"
+                          className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm w-full outline-none focus:ring-2 focus:ring-cyan-500/50"
                         >
                           <option value="">Selecione o tipo</option>
                           {tiposUnicos.map((tipo, index) => (
@@ -1066,7 +1067,7 @@ useEffect(() => {
                         </select>
                       </div>
                       <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="submit">Salvar</Button>
+                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -1074,407 +1075,408 @@ useEffect(() => {
               </div>
             </div>
 
-              {/* ── Filtro mês/ano ── */}
-              <div className="flex flex-wrap gap-4 items-end mb-2">
+            {/* Filtros Orçamento */}
+            <div className="flex flex-wrap gap-4 items-end glass-panel p-4 border-white/5">
+              <div>
+                <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Ano</Label>
+                <select
+                  value={filtroAnoOrcamento}
+                  onChange={(e) => setFiltroAnoOrcamento(e.target.value)}
+                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500/50"
+                >
+                  {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map(a => (
+                    <option key={a} value={String(a)}>{a}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Mês</Label>
+                <select
+                  value={filtroMesOrcamento}
+                  onChange={(e) => setFiltroMesOrcamento(e.target.value)}
+                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500/50"
+                >
+                  <option value="">Todos</option>
+                  {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
+                    <option key={i+1} value={String(i+1)}>{m}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* DRE Orçamento */}
+            {(() => {
+              const OrcRow = ({ orc }) => (
+                <div className={`${getOrcBorderClass(orc.progresso)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
+                  <div className="flex-1 min-w-0 z-10">
+                    <h3 className="font-semibold text-sm text-white mb-2">{orc.categoria}</h3>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
+                      <span className="text-cyan-400 font-medium">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-400 font-medium">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-400 font-medium">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor(orc.progresso)}`} style={{ width: `${Math.min(orc.progresso, 100)}%` }} />
+                      </div>
+                      <span className={`text-xs font-bold w-12 text-right ${orc.progresso > 90 ? 'text-rose-500' : orc.progresso > 70 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                        {orc.progresso.toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleExcluirOrcamento(orc)}
+                      className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 h-8 w-8 p-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {/* Subtle background glow on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              );
+
+              const entradasOrc = orcamentosComTipo.filter(o => o.tipo === 'entrada');
+              const saidasOrc = orcamentosComTipo.filter(o => o.tipo === 'saida');
+
+              return (
+                <div className="space-y-6">
+                  <div className="glass-panel p-6 border-white/5">
+                    <div className="flex items-center gap-2 text-emerald-400 mb-6">
+                      <TrendingUp className="h-5 w-5" />
+                      <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {entradasOrc.length > 0
+                        ? entradasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                        : <p className="col-span-2 text-center text-sm text-slate-500 py-8 glass-card border-dashed">Nenhum orçamento de entrada encontrado</p>
+                      }
+                    </div>
+                  </div>
+
+                  <div className="glass-panel p-6 border-white/5">
+                    <div className="flex items-center gap-2 text-rose-400 mb-6">
+                      <Target className="h-5 w-5" />
+                      <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {saidasOrc.length > 0
+                        ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                        : <p className="col-span-2 text-center text-sm text-slate-500 py-8 glass-card border-dashed">Nenhum orçamento de saída encontrado</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </TabsContent>
+
+          {/* Planejamentos */}
+          <TabsContent value="planejamentos" className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
+              <h3 className="text-lg font-semibold text-white">Meus Planejamentos</h3>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Filtros */}
+              <div className="lg:col-span-2 glass-panel p-6 border-white/5 flex flex-wrap gap-4 items-end">
                 <div>
-                  <Label className="block mb-1 text-sm">Ano</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Categoria</Label>
                   <select
-                    value={filtroAnoOrcamento}
-                    onChange={(e) => setFiltroAnoOrcamento(e.target.value)}
-                    className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+                    value={filtroCategoria}
+                    onChange={(e) => setFiltroCategoria(e.target.value)}
+                    className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500/50"
                   >
-                    {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map(a => (
-                      <option key={a} value={String(a)}>{a}</option>
+                    <option value="">Todas</option>
+                    {categoriasUnicas.map((cat, index) => (
+                      <option key={index} value={cat}>{cat}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <Label className="block mb-1 text-sm">Mês</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Tipo</Label>
                   <select
-                    value={filtroMesOrcamento}
-                    onChange={(e) => setFiltroMesOrcamento(e.target.value)}
-                    className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
+                    value={filtroTipo}
+                    onChange={(e) => setFiltroTipo(e.target.value)}
+                    className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500/50"
                   >
                     <option value="">Todos</option>
-                    {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
-                      <option key={i+1} value={String(i+1)}>{m}</option>
+                    {tiposUnicos.map((tipo, index) => (
+                      <option key={index} value={tipo}>{tipo}</option>
                     ))}
                   </select>
                 </div>
+                <div>
+                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Início</Label>
+                  <Input
+                    type="date"
+                    value={filtroInicio}
+                    onChange={(e) => setFiltroInicio(e.target.value)}
+                    className="glass-panel border-white/10 text-xs h-9"
+                  />
+                </div>
+                <div>
+                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Fim</Label>
+                  <Input
+                    type="date"
+                    value={filtroFim}
+                    onChange={(e) => setFiltroFim(e.target.value)}
+                    className="glass-panel border-white/10 text-xs h-9"
+                  />
+                </div>
               </div>
 
-              {/* ── DRE Orçamento ── */}
-              {(() => {
-                const OrcRow = ({ orc }) => (
-                  <div className={`${getOrcBorderClass(orc.progresso)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm dark:text-slate-100 mb-2">{orc.categoria}</h3>
-                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
-                        <span className="text-blue-600 font-semibold">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-red-500 font-semibold">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-green-600 font-semibold">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                          <div className={`h-2 rounded-full ${getProgressColor(orc.progresso)}`} style={{ width: `${Math.min(orc.progresso, 100)}%` }} />
-                        </div>
-                        <span className={`text-xs font-medium w-12 text-right ${orc.progresso > 90 ? 'text-red-600' : orc.progresso > 70 ? 'text-yellow-600' : 'text-green-600'}`}>
-                          {orc.progresso.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                    {/* Botão de Excluir Orçamento */}
-                    <div className="mt-3 sm:mt-0 sm:ml-4 shrink-0">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleExcluirOrcamento(orc)}
-                        title="Excluir planejamentos desta categoria neste mês"
-                        className="text-red-500 hover:text-red-700 border-red-200 hover:border-red-300"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+              {/* Minicard de Resumo */}
+              <div className="glass-card border-white/10 p-6 flex flex-col justify-center bg-cyan-500/5">
+                <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Resumo Filtrado</span>
+                  <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-400">Planejado</span>
+                    <span className="text-sm font-bold text-cyan-400">
+                      {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
                   </div>
-                );
-
-                const entradasOrc = orcamentosComTipo.filter(o => o.tipo === 'entrada');
-                const saidasOrc = orcamentosComTipo.filter(o => o.tipo === 'saida');
-
-                return (
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                          <TrendingUp className="h-5 w-5" /> Entradas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {entradasOrc.length > 0
-                          ? entradasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhum orçamento de entrada encontrado</p>
-                        }
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                          <Target className="h-5 w-5" /> Saídas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {saidasOrc.length > 0
-                          ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhum orçamento de saída encontrado</p>
-                        }
-                      </CardContent>
-                    </Card>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-400">Realizado</span>
+                    <span className="text-sm font-bold text-rose-400">
+                      {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
                   </div>
-                );
-              })()}
-            </TabsContent>
-
-            {/* Planejamentos */}
-            <TabsContent value="planejamentos" className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <h3 className="text-lg font-semibold dark:text-gray-100">Meus Planejamentos</h3>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-400">A realizar</span>
+                    <span className="text-sm font-bold text-emerald-400">
+                      {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </span>
+                  </div>
+                </div>
               </div>
-  {/* Nova estrutura para alinhar os filtros e o resumo */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-4">
-  
-  {/* Coluna 1: Todos os Filtros */}
-  <div className="flex flex-wrap gap-4 items-end">
-    <div>
-      <Label className="block mb-1">Categoria</Label>
-      <select
-        value={filtroCategoria}
-        onChange={(e) => setFiltroCategoria(e.target.value)}
-        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-      >
-        <option value="">Todas</option>
-        {categoriasUnicas.length > 0 &&
-          categoriasUnicas.map((cat, index) => (
-            <option key={index} value={cat}>{cat}</option>
-          ))
-        }
-      </select>
-    </div>
-    <div>
-      <Label className="block mb-1">Tipo</Label>
-      <select
-        value={filtroTipo}
-        onChange={(e) => setFiltroTipo(e.target.value)}
-        className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2"
-      >
-        <option value="">Todos</option>
-        {tiposUnicos.length > 0 &&
-          tiposUnicos.map((tipo, index) => (
-            <option key={index} value={tipo}>{tipo}</option>
-          ))
-        }
-      </select>
-    </div>
-    <div>
-      <Label className="block mb-1">Início</Label>
-      <Input
-        type="date"
-        value={filtroInicio}
-        onChange={(e) => setFiltroInicio(e.target.value)}
-        className="px-3 py-2"
-      />
-    </div>
-    <div>
-      <Label className="block mb-1">Fim</Label>
-      <Input
-        type="date"
-        value={filtroFim}
-        onChange={(e) => setFiltroFim(e.target.value)}
-        className="px-3 py-2"
-      />
-    </div>
-  </div>
+            </div>
 
-  {/* Coluna 2: O Minicard de Resumo */}
-  <div className="flex items-end">
-    <Card className="w-full p-3 bg-slate-800 border-slate-700">
-      <div className="flex items-center justify-around text-xs text-slate-400">
-        <div className="text-center">
-          <span>Planejado</span>
-          <p className="text-sm font-bold text-blue-400">
-            {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-        <div className="text-center">
-          <span>Realizado</span>
-          <p className="text-sm font-bold text-red-400">
-            {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-        <div className="text-center">
-          <span>A realizar</span>
-          <p className="text-sm font-bold text-green-400">
-            {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </p>
-        </div>
-      </div>
-    </Card>
-  </div>
-</div>
-
-              {/* ── DRE Planejamentos ── */}
-              {(() => {
-                const PlanRow = ({ plan }) => (
-                  <div className={`${getPlanRowBorderClass(plan)} bg-white dark:bg-slate-800/30 rounded-r-lg px-4 py-3 flex flex-col sm:flex-row justify-between items-start hover:bg-gray-50 dark:hover:bg-slate-800/60 transition-colors`}>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-sm dark:text-slate-100">{plan.category_name}</h3>
-                        {plan.status === 'confirmed' && (
-                          <span className="px-2 py-0.5 text-xs font-bold text-black bg-lime-400 rounded">CONFIRMADO</span>
-                        )}
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-gray-500 dark:text-slate-400 mb-2">
-                        <span><span className="font-medium">Data:</span> {new Date(plan.start_date).toLocaleDateString()}</span>
-                        {plan.observations && <span><span className="font-medium">Obs:</span> {plan.observations}</span>}
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs mb-2">
-                        <span className="text-blue-600 font-semibold">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-red-500 font-semibold">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-green-600 font-semibold">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                          <div className={`h-2 rounded-full ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
-                        </div>
-                        <span className="text-xs font-medium text-gray-500 dark:text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1 mt-3 sm:mt-0 sm:ml-4 shrink-0">
-                      {plan.status !== 'confirmed' && (
-                        <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)}>Confirmar</Button>
+            {/* Lista de Planejamentos */}
+            {(() => {
+              const PlanRow = ({ plan }) => (
+                <div className={`${getPlanRowBorderClass(plan)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
+                  <div className="flex-1 min-w-0 z-10">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-sm text-white">{plan.category_name}</h3>
+                      {plan.status === 'confirmed' && (
+                        <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/20 text-[10px] uppercase font-bold px-1.5 py-0">
+                          Confirmado
+                        </Badge>
                       )}
-                      <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(plan)}><Edit className="h-4 w-4" /></Button>
-                      <Button variant="outline" size="sm" onClick={() => excluirPlanejamento(plan.id)}><Trash2 className="h-4 w-4" /></Button>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-tighter">
+                        {new Date(plan.start_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
+                      <span className="text-cyan-400 font-medium">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-400 font-medium">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-400 font-medium">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    {plan.observations && (
+                      <p className="text-[10px] text-slate-500 italic mb-3 line-clamp-1">"{plan.observations}"</p>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
                     </div>
                   </div>
-                );
-
-                const entradas = planejamentos.filter(p => p.type === 'entrada');
-                const saidas = planejamentos.filter(p => p.type === 'saida');
-
-                return (
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                          <TrendingUp className="h-5 w-5" /> Entradas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {entradas.length > 0
-                          ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma entrada planejada</p>
-                        }
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
-                          <Target className="h-5 w-5" /> Saídas
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        {saidas.length > 0
-                          ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
-                          : <p className="text-center text-sm text-gray-500 dark:text-slate-400 py-4">Nenhuma saída planejada</p>
-                        }
-                      </CardContent>
-                    </Card>
+                  <div className="flex gap-2 mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {plan.status !== 'confirmed' && (
+                      <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)} className="h-8 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
+                        Confirmar
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(plan)} className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/5">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => excluirPlanejamento(plan.id)} className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                );
-              })()}
-            </TabsContent>
-          </Tabs>
+                </div>
+              );
 
-          {/* Modal para Editar Planejamento */}
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Editar Planejamento</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={(e) => {
-  e.preventDefault();
-  editarPlanejamento(selectedPlanejamento.id, {
-    ...formData,
-    value: parseFloat(formData.value),
-    recurrence_period: parseInt(formData.recurrence_period) || 1
-  });
-}} className="space-y-4">
+              const entradas = planejamentos.filter(p => p.type === 'entrada');
+              const saidas = planejamentos.filter(p => p.type === 'saida');
 
-  <div className="space-y-2">
-    <Label htmlFor="type">Tipo</Label>
-    <select
-      id="type"
-      name="type"
-      value={formData.type}
-      onChange={handleInputChange}
-      required
-      className="border rounded dark:bg-slate-800 dark:border-slate-700 px-3 py-2 w-full"
-    >
-      <option value="">Selecione o tipo</option>
-      <option value="entrada">Entrada</option>
-      <option value="saida">Saída</option>
-      <option value="investimento">Investimento</option>
-    </select>
-  </div>
+              return (
+                <div className="space-y-8">
+                  <div className="glass-panel p-6 border-white/5">
+                    <div className="flex items-center gap-2 text-emerald-400 mb-6">
+                      <TrendingUp className="h-5 w-5" />
+                      <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {entradas.length > 0
+                        ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
+                        : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma entrada planejada</p>
+                      }
+                    </div>
+                  </div>
 
-  {/* DEPOIS (o código corrigido) */}
-  <div className="space-y-2">
-    <Label htmlFor="category_id">Categoria</Label>
-    <Select 
-      value={formData.category_id}
-      // A linha abaixo adapta a resposta para funcionar com sua função handleInputChange
-      onValueChange={(value) => handleInputChange({ target: { name: 'category_id', value } })}
-      required
-    >
-      <SelectTrigger>
-        <SelectValue placeholder="Selecione a categoria" />
-      </SelectTrigger>
-      <SelectContent className="max-h-[250px] overflow-y-auto">
-        {/* Este filtro extra garante que só apareçam categorias do tipo selecionado (entrada/saída) */}
-        {categories
-          .filter(cat => cat.type === formData.type)
-          .map((cat) => (
-            <SelectItem key={cat.id} value={cat.id.toString()}>
-              {cat.name}
-            </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>
+                  <div className="glass-panel p-6 border-white/5">
+                    <div className="flex items-center gap-2 text-rose-400 mb-6">
+                      <Target className="h-5 w-5" />
+                      <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {saidas.length > 0
+                        ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
+                        : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma saída planejada</p>
+                      }
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </TabsContent>
+        </Tabs>
 
-  <div className="space-y-2">
-    <Label htmlFor="value">Valor (R$)</Label>
-    <Input
-      id="value"
-      name="value"
-      type="number"
-      value={formData.value}
-      onChange={handleInputChange}
-      placeholder="0,00"
-      required
-    />
-  </div>
+        {/* Modal para Editar Planejamento */}
+        <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200">
+            <DialogHeader>
+              <DialogTitle className="text-white">Editar Planejamento</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              editarPlanejamento(selectedPlanejamento.id, {
+                ...formData,
+                value: parseFloat(formData.value),
+                recurrence_period: parseInt(formData.recurrence_period) || 1
+              });
+            }} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="type" className="text-slate-300">Tipo</Label>
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  required
+                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm w-full outline-none focus:ring-2 focus:ring-cyan-500/50"
+                >
+                  <option value="">Selecione o tipo</option>
+                  <option value="entrada">Entrada</option>
+                  <option value="saida">Saída</option>
+                  <option value="investimento">Investimento</option>
+                </select>
+              </div>
 
-  <div className="space-y-2">
-    <Label htmlFor="date">Data</Label>
-    <Input
-      id="date"
-      name="date"
-      type="date"
-      value={formData.date}
-      onChange={handleInputChange}
-      required
-    />
-  </div>
+              <div className="space-y-2">
+                <Label htmlFor="category_id" className="text-slate-300">Categoria</Label>
+                <Select 
+                  value={formData.category_id}
+                  onValueChange={(value) => handleInputChange({ target: { name: 'category_id', value } })}
+                  required
+                >
+                  <SelectTrigger className="glass-panel border-white/10">
+                    <SelectValue placeholder="Selecione a categoria" />
+                  </SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                    {categories
+                      .filter(cat => cat.type === formData.type)
+                      .map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.name}
+                        </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-  <div className="space-y-2">
-    <Label htmlFor="is_recurring">
-      <input
-        type="checkbox"
-        id="is_recurring"
-        name="is_recurring"
-        checked={formData.is_recurring || false}
-        onChange={handleInputChange}
-        className="mr-2"
-      />
-      Recorrente
-    </Label>
-  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="value" className="text-slate-300">Valor (R$)</Label>
+                  <Input
+                    id="value"
+                    name="value"
+                    type="number"
+                    value={formData.value}
+                    onChange={handleInputChange}
+                    placeholder="0,00"
+                    required
+                    className="glass-panel border-white/10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="date" className="text-slate-300">Data</Label>
+                  <Input
+                    id="date"
+                    name="date"
+                    type="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    required
+                    className="glass-panel border-white/10"
+                  />
+                </div>
+              </div>
 
-  {formData.is_recurring && (
-    <div className="space-y-2">
-      <Label htmlFor="recurrence_period">Período da Recorrência (em meses)</Label>
-      <Input
-        id="recurrence_period"
-        name="recurrence_period"
-        type="number"
-        value={formData.recurrence_period}
-        onChange={handleInputChange}
-        placeholder="Ex: 3"
-        required={formData.is_recurring}
-      />
-    </div>
-  )}
+              <div className="flex items-center space-x-2 py-2">
+                <input
+                  type="checkbox"
+                  id="is_recurring_edit"
+                  name="is_recurring"
+                  checked={formData.is_recurring || false}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-600 focus:ring-cyan-500/50"
+                />
+                <Label htmlFor="is_recurring_edit" className="text-slate-300">Recorrente</Label>
+              </div>
 
-  <div className="space-y-2">
-    <Label htmlFor="observations">Observações</Label>
-    <Input
-      id="observations"
-      name="observations"
-      value={formData.observations}
-      onChange={handleInputChange}
-      placeholder="Observações do planejamento"
-    />
-  </div>
+              {formData.is_recurring && (
+                <div className="space-y-2">
+                  <Label htmlFor="recurrence_period_edit" className="text-slate-300">Período da Recorrência (meses)</Label>
+                  <Input
+                    id="recurrence_period_edit"
+                    name="recurrence_period"
+                    type="number"
+                    value={formData.recurrence_period}
+                    onChange={handleInputChange}
+                    placeholder="Ex: 3"
+                    required={formData.is_recurring}
+                    className="glass-panel border-white/10"
+                  />
+                </div>
+              )}
 
-  <div className="flex justify-end space-x-2">
-    <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
-      Cancelar
-    </Button>
-    <Button type="submit">
-      Salvar Alterações
-    </Button>
-  </div>
-</form>
+              <div className="space-y-2">
+                <Label htmlFor="observations_edit" className="text-slate-300">Observações</Label>
+                <Input
+                  id="observations_edit"
+                  name="observations"
+                  value={formData.observations}
+                  onChange={handleInputChange}
+                  placeholder="Observações do planejamento"
+                  className="glass-panel border-white/10"
+                />
+              </div>
 
-            </DialogContent>
-          </Dialog>
-        </div>
-      
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                  Salvar Alterações
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
+
 };
 
 export default Planning;

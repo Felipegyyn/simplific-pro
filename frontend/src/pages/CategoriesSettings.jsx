@@ -184,30 +184,32 @@ const CategoriesSettings = () => {
   const filteredCategories = categories.filter(c => c.type === activeTab);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* Cabeçalho */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Categorias</h1>
-          <p className="text-muted-foreground mt-1">Gerencie como você classifica suas finanças.</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Categorias
+          </h1>
+          <p className="text-slate-400 mt-1">Gerencie como você classifica suas finanças.</p>
         </div>
-        <button 
+        <Button 
           onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-all shadow-md font-medium"
+          className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20"
         >
-          <Plus size={20} /> Nova Categoria
-        </button>
+          <Plus size={20} className="mr-2" /> Nova Categoria
+        </Button>
       </div>
 
       {/* Abas */}
-      <div className="flex p-1 bg-muted/50 rounded-xl w-full md:w-fit">
+      <div className="flex p-1 glass-panel border-white/5 w-full md:w-fit">
         <button
           onClick={() => setActiveTab('entrada')}
           className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === 'entrada' 
-              ? 'bg-background text-green-600 shadow-sm' 
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-white/10 text-emerald-400 shadow-sm' 
+              : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <ArrowUpCircle size={16} /> Entradas
@@ -216,8 +218,8 @@ const CategoriesSettings = () => {
           onClick={() => setActiveTab('saida')}
           className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === 'saida' 
-              ? 'bg-background text-red-600 shadow-sm' 
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-white/10 text-red-400 shadow-sm' 
+              : 'text-slate-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <ArrowDownCircle size={16} /> Saídas
@@ -227,52 +229,55 @@ const CategoriesSettings = () => {
       {/* Lista de Categorias */}
       {loading && categories.length === 0 ? (
         <div className="flex justify-center p-12">
-           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCategories.map((cat) => (
             <div 
               key={cat.id} 
-              className="group flex items-center justify-between p-4 bg-card border border-border/50 rounded-xl hover:shadow-md transition-all duration-200 hover:border-border"
+              className="glass-card group flex items-center justify-between p-5 border-white/10 relative overflow-hidden"
             >
-              <div className="flex items-center gap-3">
-                {/* Bolinha da cor */}
+              <div className="absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 blur-2xl opacity-10" style={{ backgroundColor: cat.color }}></div>
+              
+              <div className="flex items-center gap-4 relative z-10">
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm"
-                  style={{ backgroundColor: cat.color }}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg border border-white/10 transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${cat.color}33`, color: cat.color, borderColor: `${cat.color}55` }}
                 >
-                  <Tag size={18} />
+                  <Tag size={20} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">{cat.name}</h3>
-                  <p className="text-xs text-muted-foreground capitalize">{cat.type}</p>
+                  <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors">{cat.name}</h3>
+                  <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">{cat.type}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
                   onClick={() => handleOpenModal(cat)}
-                  className="p-2 text-muted-foreground hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  title="Editar"
+                  className="h-8 w-8 text-cyan-400 hover:bg-cyan-500/10"
                 >
-                  <Edit2 size={18} />
-                </button>
-                <button 
+                  <Edit2 size={16} />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
                   onClick={() => handleDelete(cat.id)}
-                  className="p-2 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Excluir"
+                  className="h-8 w-8 text-red-400 hover:bg-red-500/10"
                 >
-                  <Trash2 size={18} />
-                </button>
+                  <Trash2 size={16} />
+                </Button>
               </div>
             </div>
           ))}
 
           {filteredCategories.length === 0 && (
-            <div className="col-span-full py-12 text-center text-muted-foreground bg-muted/20 rounded-xl border border-dashed">
-              <p>Nenhuma categoria de {activeTab} encontrada.</p>
-              <button onClick={() => handleOpenModal()} className="text-primary hover:underline mt-2 text-sm">
+            <div className="col-span-full py-16 text-center glass-panel border-white/5 border-dashed">
+              <p className="text-slate-500 italic">Nenhuma categoria de {activeTab} encontrada.</p>
+              <button onClick={() => handleOpenModal()} className="text-cyan-400 hover:underline mt-4 text-sm font-medium">
                 Criar a primeira
               </button>
             </div>
@@ -280,41 +285,41 @@ const CategoriesSettings = () => {
         </div>
       )}
 
-      {/* MODAL (Dialog) */}
+      {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-background rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-border">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="glass-panel rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-white/10 animate-in zoom-in-95 duration-300">
             
-            <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-bold">
+            <div className="flex items-center justify-between p-6 border-b border-white/5">
+              <h2 className="text-xl font-bold text-white">
                 {editingCategory ? 'Editar Categoria' : 'Nova Categoria'}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground">
-                <X size={20} />
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="p-8 space-y-8">
               {error && (
-                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2">
-                  <AlertCircle size={16} /> {error}
+                <div className="p-4 bg-red-500/10 text-red-400 text-sm rounded-xl border border-red-500/20 flex items-center gap-3">
+                  <AlertCircle size={20} /> {error}
                 </div>
               )}
 
-              {/* Tipo (Apenas criação) */}
+              {/* Tipo */}
               {!editingCategory && (
-                <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                <div className="flex gap-2 p-1 glass-panel border-white/5">
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'entrada'})}
-                    className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${formData.type === 'entrada' ? 'bg-white shadow-sm text-green-600' : 'text-muted-foreground'}`}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'entrada' ? 'bg-white/10 text-emerald-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                   >
                     Entrada
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'saida'})}
-                    className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${formData.type === 'saida' ? 'bg-white shadow-sm text-red-600' : 'text-muted-foreground'}`}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'saida' ? 'bg-white/10 text-red-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                   >
                     Saída
                   </button>
@@ -322,95 +327,95 @@ const CategoriesSettings = () => {
               )}
 
               {/* Nome com Emoji Picker */}
-              <div className="space-y-2 relative">
-                <label className="text-sm font-medium">Nome e Ícone da Categoria</label>
-                <div className="flex gap-2">
-                  {/* Botão de abrir os Emojis */}
+              <div className="space-y-3 relative">
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Nome e Ícone</label>
+                <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="flex items-center justify-center w-12 h-[42px] border rounded-lg bg-muted/30 hover:bg-muted transition-colors text-xl shrink-0"
-                    title="Escolher Ícone"
+                    className="flex items-center justify-center w-14 h-14 glass-panel border-white/10 hover:bg-white/5 transition-all text-2xl shrink-0 shadow-lg active:scale-95"
                   >
                     {selectedEmoji}
                   </button>
                   
-                  {/* Input do Nome */}
                   <input
                     type="text"
                     required
                     placeholder="Ex: Alimentação, Salário..."
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none bg-background h-[42px]"
+                    className="flex-1 px-4 py-3 glass-panel border-white/10 focus:border-cyan-500/50 focus:ring-0 outline-none bg-white/2 text-white h-14"
                   />
                 </div>
 
-                {/* O Teclado de Emojis "Flutuante" */}
                 {showEmojiPicker && (
-                  <div className="absolute top-16 left-0 z-50 shadow-2xl rounded-lg overflow-hidden border border-border">
+                  <div className="absolute top-20 left-0 z-50 shadow-2xl rounded-2xl overflow-hidden border border-white/10 animate-in slide-in-from-top-4 duration-300">
                     <EmojiPicker 
                       onEmojiClick={(emojiObject) => {
                         setSelectedEmoji(emojiObject.emoji);
                         setShowEmojiPicker(false);
                       }}
                       autoFocusSearch={false}
-                      theme="auto" // Respeita o dark/light mode do sistema
+                      theme="dark"
                       searchPlaceHolder="Buscar ícone..."
-                      width={300}
+                      width={320}
                       height={400}
                     />
                   </div>
                 )}
               </div>
 
-              {/* Cor Picker Customizado */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium flex justify-between">
-                  Cor de Identificação
-                  <span className="text-xs text-muted-foreground">{formData.color}</span>
-                </label>
+              {/* Cor Picker */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Cor de Identificação</label>
+                    <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">{formData.color}</span>
+                </div>
                 
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-6 gap-3">
                   {presetColors.map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setFormData({...formData, color})}
-                      className={`w-8 h-8 rounded-full transition-transform hover:scale-110 border-2 ${formData.color === color ? 'border-primary ring-2 ring-offset-2 ring-primary/30' : 'border-transparent'}`}
+                      className={`w-10 h-10 rounded-xl transition-all hover:scale-110 shadow-lg border-2 ${formData.color === color ? 'border-white scale-110 ring-4 ring-white/10' : 'border-transparent'}`}
                       style={{ backgroundColor: color }}
                     />
                   ))}
                   
-                  {/* Input Color Nativo (Escondido mas acessível) */}
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-dashed border-gray-300 hover:border-primary cursor-pointer flex items-center justify-center">
+                  <div className="relative w-10 h-10 rounded-xl overflow-hidden glass-panel border-white/10 hover:border-cyan-500/50 cursor-pointer flex items-center justify-center transition-all">
                     <input 
                       type="color" 
                       value={formData.color}
                       onChange={(e) => setFormData({...formData, color: e.target.value})}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
-                    <Plus size={14} className="text-gray-400" />
+                    <Plus size={16} className="text-slate-400" />
                   </div>
                 </div>
               </div>
 
-              {/* Botões de Ação */}
-              <div className="flex gap-3 pt-2">
-                <button
+              {/* Botões */}
+              <div className="flex gap-4 pt-4">
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-2 border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
+                  className="flex-1 h-12 text-slate-400 hover:text-white hover:bg-white/5"
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 h-12 bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20"
                 >
-                  {loading ? 'Salvando...' : <><Check size={16} /> Salvar</>}
-                </button>
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    <><Check size={20} className="mr-2" /> Salvar</>
+                  )}
+                </Button>
               </div>
 
             </form>

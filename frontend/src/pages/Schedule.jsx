@@ -351,894 +351,726 @@ const Schedule = ({ user, onLogout }) => {
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 dark:text-gray-100 p-4 sm:p-0">
-      {/* Header */}
-        <header className="bg-white dark:bg-slate-900 dark:border-slate-700 shadow-sm border-b">
-                
-                  <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => navigate('/dashboard')}
-                        className="mr-4"
-                      >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Voltar
-                      </Button>
-                      <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                        Bem-vindo, {user.name}
-                      </span>
-                      <Button variant="outline" size="sm" onClick={onLogout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Sair
-                      </Button>
-                    </div>
-                  </div>
-                
-              </header>
-
-      {/* Main Content */}
-        <div className="py-6">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold dark:text-slate-200">Agenda Financeira</h2>
-            <p className="text-gray-600 dark:text-gray-400 dark:text-gray-400">Organize seus compromissos e lembretes financeiros</p>
-          </div>
-
-
-          {/* Card de Resumo Agrupado */}
-          <Card className="mb-8 border-orange-500 border-2">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Próximos Eventos */}
-                <div className="flex items-center">
-                  <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full">
-                    <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Próximos Eventos</p>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{eventosProximos.length}</p>
-                  </div>
-                </div>
-
-                {/* Hoje */}
-                <div className="flex items-center">
-                  <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-full">
-                    <Clock className="h-6 w-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Hoje</p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{eventosHoje.length}</p>
-                  </div>
-                </div>
-
-                {/* Pagamentos Pendentes */}
-                <div className="flex items-center">
-                  <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full">
-                    <DollarSign className="h-6 w-6 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Pagamentos Pendentes</p>
-                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                      R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Atrasados */}
-                <div className="flex items-center">
-                  <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full">
-                    <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-slate-400">Atrasados</p>
-                    <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{eventosAtrasados.length}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Tabs defaultValue="calendario" className="space-y-6">
-<div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
-  <TabsList className="grid w-full xl:w-auto grid-cols-5">
-    <TabsTrigger value="calendario">Calendário</TabsTrigger>
-    <TabsTrigger value="proximos">Próximos</TabsTrigger>
-    <TabsTrigger value="hoje">Hoje</TabsTrigger>
-    <TabsTrigger value="concluidos">Concluídos</TabsTrigger>
-    <TabsTrigger value="atrasados">Atrasados</TabsTrigger>
-  </TabsList>
-  
-  {/* GRUPO DE BOTÕES ALINHADOS NA DIREITA - botão do google comentado até resolver a verificação */}
-  <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
-    <Button 
-        variant="outline" 
-        onClick={handleGoogleConnect} 
-        disabled={isSyncing}
-        className="border-green-600 text-green-700 hover:bg-green-50 dark:border-green-500 dark:text-green-400"
-    >
-        <Globe className="h-4 w-4 mr-2" />
-        Google
-    </Button>
-
-    <Button 
-        variant="outline" 
-        onClick={handleAppleSync}
-        className="border-green-600 text-green-700 hover:bg-green-50 dark:border-green-500 dark:text-green-400"
-    >
-        <Smartphone className="h-4 w-4 mr-2" />
-        Apple
-    </Button>
-
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700 text-white">
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Evento
-        </Button>
-      </DialogTrigger>
-                  <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader><DialogTitle>Novo Evento da Agenda</DialogTitle></DialogHeader>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-  <div>
-    <Label htmlFor="title">Título do Evento *</Label>
-    <Input
-      id="title"
-      value={formData.title}
-      onChange={(e) => handleInputChange('title', e.target.value)}
-      placeholder="Ex: Pagamento Cartão, Reunião..."
-      required
-    />
-  </div>
-  
-  <div>
-    <Label htmlFor="description">Descrição</Label>
-    <Textarea
-      id="description"
-      value={formData.description}
-      onChange={(e) => handleInputChange('description', e.target.value)}
-      placeholder="Descreva o evento..."
-      rows={3}
-    />
-  </div>
-
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <Label htmlFor="event_date">Data *</Label>
-      <Input
-        id="event_date"
-        type="date"
-        value={formData.event_date}
-        onChange={(e) => handleInputChange('event_date', e.target.value)}
-        required
-      />
-    </div>
-    <div>
-      <Label htmlFor="event_time">Horário</Label>
-      <Input
-        id="event_time"
-        type="time"
-        value={formData.event_time}
-        onChange={(e) => handleInputChange('event_time', e.target.value)}
-      />
-    </div>
-  </div>
-  
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <Label htmlFor="type">Tipo *</Label>
-      <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="pagamento">Pagamento</SelectItem>
-          <SelectItem value="recebimento">Recebimento</SelectItem>
-          <SelectItem value="vencimento">Vencimento</SelectItem>
-          <SelectItem value="reuniao">Reunião</SelectItem>
-          <SelectItem value="tarefa">Tarefa</SelectItem>
-          <SelectItem value="lembrete">Lembrete</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    <div>
-      <Label htmlFor="priority">Prioridade</Label>
-      <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="alta">Alta</SelectItem>
-          <SelectItem value="média">Média</SelectItem>
-          <SelectItem value="baixa">Baixa</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  </div>
-
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <Label htmlFor="amount">Valor (R$)</Label>
-      <Input
-        id="amount"
-        type="number"
-        step="0.01"
-        value={formData.amount}
-        onChange={(e) => handleInputChange('amount', e.target.value)}
-        placeholder="Opcional"
-      />
-    </div>
-    <div>
-      <Label htmlFor="category">Categoria</Label>
-      <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Selecione..." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-          <SelectItem value="Moradia">Moradia</SelectItem>
-          <SelectItem value="Investimentos">Investimentos</SelectItem>
-          <SelectItem value="Consultoria">Consultoria</SelectItem>
-          <SelectItem value="Planejamento">Planejamento</SelectItem>
-          <SelectItem value="Saúde">Saúde</SelectItem>
-          <SelectItem value="Educação">Educação</SelectItem>
-          <SelectItem value="Outros">Outros</SelectItem>
-        </SelectContent>
-        
-      </Select>
-    </div>
-  </div>
-
-    {/* ▼▼▼ BLOCO DE RECORRÊNCIA ADICIONADO AQUI ▼▼▼ */}
-  <div className="grid grid-cols-2 gap-4">
-    <div>
-      <Label htmlFor="is_recurring">Evento Recorrente?</Label>
-      <Select value={formData.is_recurring} onValueChange={(value) => handleInputChange('is_recurring', value)}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="nao">Não</SelectItem>
-          <SelectItem value="sim">Sim (Mensal)</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-    
-    {formData.is_recurring === 'sim' && (
-      <div>
-        <Label htmlFor="recurrence_count">Duração (Meses)</Label>
-        <Input
-          id="recurrence_count"
-          type="number"
-          min="2"
-          max="120"
-          value={formData.recurrence_count}
-          onChange={(e) => handleInputChange('recurrence_count', e.target.value)}
-          placeholder="Ex: 2"
-          required
-        />
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            Agenda Financeira
+          </h1>
+          <p className="text-slate-400 mt-1">Organize seus compromissos e lembretes financeiros.</p>
+        </div>
       </div>
-    )}
-  </div>
-  {/* ▲▲▲ FIM DO BLOCO DE RECORRÊNCIA ▲▲▲ */}
 
-  <div className="flex justify-end space-x-2 pt-4">
-    <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-      Cancelar
-    </Button>
-    <Button type="submit">
-      Criar Evento
-    </Button>
-  </div>
-</form>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      {/* ... seu código do formulário ... */}
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
+      {/* Card de Resumo Agrupado */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/20">
+              <Calendar className="h-5 w-5 text-blue-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Próximos Eventos</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{eventosProximos.length}</h3>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
+              <Clock className="h-5 w-5 text-emerald-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Hoje</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{eventosHoje.length}</h3>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-red-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/20">
+              <DollarSign className="h-5 w-5 text-red-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Pagamentos Pendentes</p>
+          <h3 className="text-2xl font-bold text-white mt-1">
+            R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </h3>
+        </div>
+
+        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/20">
+              <AlertTriangle className="h-5 w-5 text-yellow-400" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Atrasados</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{eventosAtrasados.length}</h3>
+        </div>
+      </div>
+      
+      <Tabs defaultValue="calendario" className="space-y-6">
+        <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+          <TabsList className="grid w-full xl:w-auto grid-cols-5 glass-panel p-1 border-white/5">
+            <TabsTrigger value="calendario" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Calendário</TabsTrigger>
+            <TabsTrigger value="proximos" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Próximos</TabsTrigger>
+            <TabsTrigger value="hoje" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Hoje</TabsTrigger>
+            <TabsTrigger value="concluidos" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Concluídos</TabsTrigger>
+            <TabsTrigger value="atrasados" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Atrasados</TabsTrigger>
+          </TabsList>
+          
+          <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
+            <Button 
+                variant="outline" 
+                onClick={handleGoogleConnect} 
+                disabled={isSyncing}
+                className="glass-panel border-white/10 hover:bg-white/5 text-slate-300"
+            >
+                <Globe className="h-4 w-4 mr-2 text-cyan-400" />
+                Google
+            </Button>
+
+            <Button 
+                variant="outline" 
+                onClick={handleAppleSync}
+                className="glass-panel border-white/10 hover:bg-white/5 text-slate-300"
+            >
+                <Smartphone className="h-4 w-4 mr-2 text-cyan-400" />
+                Apple
+            </Button>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Evento
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+                <DialogHeader><DialogTitle>Novo Evento da Agenda</DialogTitle></DialogHeader>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="title" className="text-slate-300">Título do Evento *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      placeholder="Ex: Pagamento Cartão, Reunião..."
+                      className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="description" className="text-slate-300">Descrição</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      placeholder="Descreva o evento..."
+                      className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="event_date" className="text-slate-300">Data *</Label>
+                      <Input
+                        id="event_date"
+                        type="date"
+                        value={formData.event_date}
+                        onChange={(e) => handleInputChange('event_date', e.target.value)}
+                        className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="event_time" className="text-slate-300">Horário</Label>
+                      <Input
+                        id="event_time"
+                        type="time"
+                        value={formData.event_time}
+                        onChange={(e) => handleInputChange('event_time', e.target.value)}
+                        className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                      <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
+                        <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="pagamento">Pagamento</SelectItem>
+                          <SelectItem value="recebimento">Recebimento</SelectItem>
+                          <SelectItem value="vencimento">Vencimento</SelectItem>
+                          <SelectItem value="reuniao">Reunião</SelectItem>
+                          <SelectItem value="tarefa">Tarefa</SelectItem>
+                          <SelectItem value="lembrete">Lembrete</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="priority" className="text-slate-300">Prioridade</Label>
+                      <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
+                        <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="alta">Alta</SelectItem>
+                          <SelectItem value="média">Média</SelectItem>
+                          <SelectItem value="baixa">Baixa</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="amount" className="text-slate-300">Valor (R$)</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        step="0.01"
+                        value={formData.amount}
+                        onChange={(e) => handleInputChange('amount', e.target.value)}
+                        placeholder="Opcional"
+                        className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="category" className="text-slate-300">Categoria</Label>
+                      <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                        <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                          <SelectItem value="Moradia">Moradia</SelectItem>
+                          <SelectItem value="Investimentos">Investimentos</SelectItem>
+                          <SelectItem value="Consultoria">Consultoria</SelectItem>
+                          <SelectItem value="Planejamento">Planejamento</SelectItem>
+                          <SelectItem value="Saúde">Saúde</SelectItem>
+                          <SelectItem value="Educação">Educação</SelectItem>
+                          <SelectItem value="Outros">Outros</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="is_recurring" className="text-slate-300">Evento Recorrente?</Label>
+                      <Select value={formData.is_recurring} onValueChange={(value) => handleInputChange('is_recurring', value)}>
+                        <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="glass-panel border-white/10">
+                          <SelectItem value="nao">Não</SelectItem>
+                          <SelectItem value="sim">Sim (Mensal)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {formData.is_recurring === 'sim' && (
+                      <div>
+                        <Label htmlFor="recurrence_count" className="text-slate-300">Duração (Meses)</Label>
+                        <Input
+                          id="recurrence_count"
+                          type="number"
+                          min="2"
+                          max="120"
+                          value={formData.recurrence_count}
+                          onChange={(e) => handleInputChange('recurrence_count', e.target.value)}
+                          placeholder="Ex: 2"
+                          className="bg-white/5 border-white/10 focus:border-cyan-500/50"
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" className="border-white/10 hover:bg-white/5" onClick={() => setIsModalOpen(false)}>
+                      Cancelar
+                    </Button>
+                    <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                      Criar Evento
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* ── CALENDÁRIO MENSAL ─────────────────────────────────────────── */}
+        <TabsContent value="calendario">
+          <div className="glass-panel p-4 sm:p-6 border-white/5">
+            {/* Navegação do mês */}
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => navegarMes(-1)}
+                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <h3 className="text-lg font-bold text-white">
+                {mesesPtBR[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+              </h3>
+              <button
+                onClick={() => navegarMes(1)}
+                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
 
-            {/* ── CALENDÁRIO MENSAL ─────────────────────────────────────────── */}
-            <TabsContent value="calendario">
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  {/* Navegação do mês */}
-                  <div className="flex items-center justify-between mb-6">
-                    <button
-                      onClick={() => navegarMes(-1)}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    </button>
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100">
-                      {mesesPtBR[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-                    </h3>
-                    <button
-                      onClick={() => navegarMes(1)}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                    </button>
-                  </div>
+            {/* Cabeçalho dos dias da semana */}
+            <div className="grid grid-cols-7 mb-2">
+              {diasSemana.map(dia => (
+                <div
+                  key={dia}
+                  className="text-center text-xs font-semibold text-slate-500 py-2"
+                >
+                  {dia}
+                </div>
+              ))}
+            </div>
 
-                  {/* Cabeçalho dos dias da semana */}
-                  <div className="grid grid-cols-7 mb-2">
-                    {diasSemana.map(dia => (
-                      <div
-                        key={dia}
-                        className="text-center text-xs font-semibold text-gray-500 dark:text-slate-400 py-2"
-                      >
-                        {dia}
-                      </div>
-                    ))}
-                  </div>
+            {/* Grid dos dias */}
+            <div className="grid grid-cols-7 gap-px bg-white/5 border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+              {getCalendarDays(currentMonth).map((day, idx) => {
+                const key = toDateKey(day);
+                const isToday = key === hoje;
+                const isSelected = selectedDay && toDateKey(selectedDay) === key;
+                const eventosNoDia = key ? (eventosPorData[key] || []) : [];
 
-                  {/* Grid dos dias */}
-                  <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-slate-700 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                    {getCalendarDays(currentMonth).map((day, idx) => {
-                      const key = toDateKey(day);
-                      const isToday = key === hoje;
-                      const isSelected = selectedDay && toDateKey(selectedDay) === key;
-                      const eventosNoDia = key ? (eventosPorData[key] || []) : [];
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => day && setSelectedDay(isSelected ? null : day)}
+                    className={[
+                      'bg-slate-900/40 min-h-[80px] p-1.5 flex flex-col cursor-pointer backdrop-blur-sm',
+                      'hover:bg-white/5 transition-colors',
+                      isSelected ? 'ring-2 ring-inset ring-cyan-500/50 bg-cyan-500/5' : '',
+                      !day ? 'bg-black/20 cursor-default pointer-events-none' : '',
+                    ].join(' ')}
+                  >
+                    {day && (
+                      <>
+                        {/* Número do dia */}
+                        <span className={[
+                          'text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full mb-1 self-end',
+                          isToday
+                            ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/40'
+                            : 'text-slate-300',
+                        ].join(' ')}>
+                          {day.getDate()}
+                        </span>
 
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => day && setSelectedDay(isSelected ? null : day)}
-                          className={[
-                            'bg-white dark:bg-slate-800 min-h-[80px] p-1.5 flex flex-col cursor-pointer',
-                            'hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors',
-                            isSelected ? 'ring-2 ring-inset ring-blue-500' : '',
-                            !day ? 'bg-gray-50 dark:bg-slate-900 cursor-default pointer-events-none' : '',
-                          ].join(' ')}
-                        >
-                          {day && (
-                            <>
-                              {/* Número do dia */}
-                              <span className={[
-                                'text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full mb-1 self-end',
-                                isToday
-                                  ? 'bg-green-600 text-white font-bold'
-                                  : 'text-gray-700 dark:text-slate-200',
-                              ].join(' ')}>
-                                {day.getDate()}
-                              </span>
-
-                              {/* Pills dos eventos */}
-                              <div className="flex flex-col gap-0.5 overflow-hidden">
-                                {eventosNoDia.slice(0, 3).map(evento => (
-                                  <span
-                                    key={evento.id}
-                                    onClick={(e) => { e.stopPropagation(); setSelectedCalendarEvent(evento); }}
-                                    className={[
-                                      'text-[10px] leading-tight px-1 py-0.5 rounded text-white truncate cursor-pointer',
-                                      'hover:opacity-80 hover:scale-[1.02] transition-all',
-                                      evento.is_completed
-                                        ? 'bg-gray-400 line-through'
-                                        : (tipoCorCalendario[evento.type] || 'bg-gray-500'),
-                                    ].join(' ')}
-                                    title={evento.title}
-                                  >
-                                    {evento.title}
-                                  </span>
-                                ))}
-                                {eventosNoDia.length > 3 && (
-                                  <span className="text-[10px] text-gray-500 dark:text-slate-400 pl-1">
-                                    +{eventosNoDia.length - 3} mais
-                                  </span>
-                                )}
-                              </div>
-                            </>
+                        {/* Pills dos eventos */}
+                        <div className="flex flex-col gap-0.5 overflow-hidden">
+                          {eventosNoDia.slice(0, 3).map(evento => (
+                            <span
+                              key={evento.id}
+                              onClick={(e) => { e.stopPropagation(); setSelectedCalendarEvent(evento); }}
+                              className={[
+                                'text-[10px] leading-tight px-1.5 py-0.5 rounded text-white truncate cursor-pointer shadow-sm',
+                                'hover:opacity-80 hover:scale-[1.02] transition-all',
+                                evento.is_completed
+                                  ? 'bg-slate-700/50 text-slate-500 line-through'
+                                  : (tipoCorCalendario[evento.type] || 'bg-slate-500'),
+                              ].join(' ')}
+                              title={evento.title}
+                            >
+                              {evento.title}
+                            </span>
+                          ))}
+                          {eventosNoDia.length > 3 && (
+                            <span className="text-[10px] text-slate-500 pl-1 mt-0.5">
+                              +{eventosNoDia.length - 3} mais
+                            </span>
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Legenda de tipos */}
-                  <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
-                    {Object.entries({ pagamento: 'Pagamento', recebimento: 'Recebimento', reuniao: 'Reunião', vencimento: 'Vencimento', tarefa: 'Tarefa' }).map(([tipo, label]) => (
-                      <div key={tipo} className="flex items-center gap-1.5">
-                        <span className={`w-3 h-3 rounded-full ${tipoCorCalendario[tipo]}`} />
-                        <span className="text-xs text-gray-500 dark:text-slate-400">{label}</span>
-                      </div>
-                    ))}
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-3 h-3 rounded-full bg-gray-400" />
-                      <span className="text-xs text-gray-500 dark:text-slate-400">Concluído</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Painel de detalhe do dia selecionado */}
-              {selectedDay && (
-                <Card className="mt-4 border-blue-200 dark:border-blue-800">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      {String(selectedDay.getDate()).padStart(2,'0')}/{String(selectedDay.getMonth()+1).padStart(2,'0')}/{selectedDay.getFullYear()}
-                      <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 ml-1">
-                        {(eventosPorData[toDateKey(selectedDay)] || []).length} evento(s)
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {(eventosPorData[toDateKey(selectedDay)] || []).length === 0 ? (
-                      <p className="text-sm text-gray-500 dark:text-slate-400 text-center py-4">
-                        Nenhum evento neste dia.
-                      </p>
-                    ) : (
-                      (eventosPorData[toDateKey(selectedDay)] || []).map(evento => (
-                        <div
-                          key={evento.id}
-                          className="flex items-start justify-between p-3 rounded-lg bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap mb-1">
-                              {getStatusIcon(evento.is_completed)}
-                              <span className={`font-medium text-sm dark:text-slate-100 ${evento.is_completed ? 'line-through text-gray-400' : ''}`}>
-                                {evento.title}
-                              </span>
-                              {getTipoBadge(evento.type)}
-                              {getPrioridadeBadge(evento.priority)}
-                            </div>
-                            {evento.description && (
-                              <p className="text-xs text-gray-500 dark:text-slate-400 mb-1">{evento.description}</p>
-                            )}
-                            <div className="flex flex-wrap gap-3 text-xs text-gray-500 dark:text-slate-400">
-                              {evento.time && <span><Clock className="h-3 w-3 inline mr-1" />{evento.time}</span>}
-                              {evento.category && <span>{evento.category}</span>}
-                              {evento.value && (
-                                <span className={`font-bold ${evento.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                                  R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex gap-1 ml-3 shrink-0">
-                            {!evento.is_completed && (
-                              <Button variant="outline" size="sm" onClick={() => marcarConcluido(evento.id)}>
-                                <CheckCircle className="h-3.5 w-3.5" />
-                              </Button>
-                            )}
-                            <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(evento)}>
-                              <Edit className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => excluirEvento(evento.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
+                      </>
                     )}
-                  </CardContent>
-                </Card>
-              )}
-            </TabsContent>
-            {/* ── FIM CALENDÁRIO MENSAL ─────────────────────────────────────── */}
+                  </div>
+                );
+              })}
+            </div>
 
-            {/* Próximos Eventos */}
-            <TabsContent value="proximos" className="space-y-4">
-              {eventosProximos.map((evento) => (
-                <Card key={evento.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          {/* ▼▼▼ CORREÇÃO 2: USAR 'evento.is_completed' ▼▼▼ */}
+            {/* Legenda de tipos */}
+            <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t border-white/5">
+              {Object.entries({ pagamento: 'Pagamento', recebimento: 'Recebimento', reuniao: 'Reunião', vencimento: 'Vencimento', tarefa: 'Tarefa' }).map(([tipo, label]) => (
+                <div key={tipo} className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full shadow-sm ${tipoCorCalendario[tipo]}`} />
+                  <span className="text-xs text-slate-400">{label}</span>
+                </div>
+              ))}
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-700 shadow-sm" />
+                <span className="text-xs text-slate-400">Concluído</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Painel de detalhe do dia selecionado */}
+          {selectedDay && (
+            <div className="glass-panel p-6 border-white/5 mt-4 animate-in slide-in-from-top duration-300">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-500/10 rounded-lg">
+                    <Calendar className="h-5 w-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">
+                      {String(selectedDay.getDate()).padStart(2,'0')}/{String(selectedDay.getMonth()+1).padStart(2,'0')}/{selectedDay.getFullYear()}
+                    </h3>
+                    <p className="text-xs text-slate-400">{(eventosPorData[toDateKey(selectedDay)] || []).length} evento(s) programado(s)</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {(eventosPorData[toDateKey(selectedDay)] || []).length === 0 ? (
+                  <div className="text-center py-8 bg-white/2 rounded-xl border border-dashed border-white/10">
+                    <p className="text-sm text-slate-500 italic">
+                      Nenhum evento neste dia.
+                    </p>
+                  </div>
+                ) : (
+                  (eventosPorData[toDateKey(selectedDay)] || []).map(evento => (
+                    <div
+                      key={evento.id}
+                      className="group flex items-start justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-300"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
                           {getStatusIcon(evento.is_completed)}
-                          <h3 className="text-lg font-semibold dark:text-slate-100">{evento.title}</h3>
+                          <span className={cn("font-medium text-sm text-white", evento.is_completed && "line-through text-slate-500")}>
+                            {evento.title}
+                          </span>
                           {getTipoBadge(evento.type)}
                           {getPrioridadeBadge(evento.priority)}
                         </div>
-                        <p className="text-gray-600 dark:text-slate-400 mb-3">{evento.description}</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium text-gray-600 dark:text-slate-400">Data</p>
-                            {/* ▼▼▼ CORREÇÃO 2: USAR 'evento.date' ▼▼▼ */}
-                            <p>{formatarData(evento.date)}</p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-600 dark:text-slate-400">Horário</p>
-                            {/* ▼▼▼ CORREÇÃO 2: USAR 'evento.time' ▼▼▼ */}
-                            <p>{evento.time}</p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-600 dark:text-slate-400">Categoria</p>
-                            <p>{evento.category}</p>
-                          </div>
-                          {/* ▼▼▼ CORREÇÃO 2: USAR 'evento.value' ▼▼▼ */}
+                        {evento.description && (
+                          <p className="text-xs text-slate-400 mb-3 line-clamp-2">{evento.description}</p>
+                        )}
+                        <div className="flex flex-wrap gap-4 text-[10px] text-slate-500 font-medium uppercase tracking-wider">
+                          {evento.time && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{evento.time}</span>}
+                          {evento.category && <span className="flex items-center gap-1"><Tag className="h-3 w-3" />{evento.category}</span>}
                           {evento.value && (
-                            <div>
-                              <p className="font-medium text-gray-600 dark:text-slate-400">Valor</p>
-                              <p className={`font-bold dark:text-slate-200 ${evento.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                                R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
+                            <span className={cn("font-bold text-xs", evento.type === 'recebimento' ? 'text-emerald-400' : 'text-red-400')}>
+                              R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
                           )}
                         </div>
                       </div>
-   <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-  <Button 
-    variant="outline" 
-    size="sm"
-    onClick={() => marcarConcluido(evento.id)}
-  >
-    <CheckCircle className="h-4 w-4 mr-1" />
-    Concluir
-  </Button>
-  {/* ▼▼▼ ADICIONE O ONCLICK AQUI ▼▼▼ */}
-  <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(evento)}>
-    <Edit className="h-4 w-4" />
-  </Button>
-  <Button 
-    variant="outline" 
-    size="sm"
-    onClick={() => excluirEvento(evento.id)}
-  >
-    <Trash2 className="h-4 w-4" />
-  </Button>
-</div>
+                      <div className="flex gap-1 ml-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!evento.is_completed && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400 hover:bg-emerald-500/10" onClick={() => marcarConcluido(evento.id)}>
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-500/10" onClick={() => abrirModalEdicao(evento)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:bg-red-500/10" onClick={() => excluirEvento(evento.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </TabsContent>
+        {/* ── FIM CALENDÁRIO MENSAL ─────────────────────────────────────── */}
+
+        {/* Listas de Eventos (Próximos, Hoje, etc) */}
+        {['proximos', 'hoje', 'concluidos', 'atrasados'].map((tab) => {
+          const tabEventos = {
+            proximos: eventosProximos,
+            hoje: eventosHoje,
+            concluidos: eventosConcluidos,
+            atrasados: eventosAtrasados
+          }[tab];
+
+          const tabConfig = {
+            proximos: { icon: Calendar, label: 'Próximos', empty: 'Nenhum evento próximo', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+            hoje: { icon: Clock, label: 'Hoje', empty: 'Nenhum evento para hoje', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+            concluidos: { icon: CheckCircle, label: 'Concluídos', empty: 'Nenhum evento concluído', color: 'text-slate-400', bg: 'bg-slate-500/10' },
+            atrasados: { icon: AlertTriangle, label: 'Atrasados', empty: 'Nenhum evento atrasado! 🎉', color: 'text-red-400', bg: 'bg-red-500/10' }
+          }[tab];
+
+          return (
+            <TabsContent key={tab} value={tab} className="space-y-4">
+              {tabEventos.map((evento) => (
+                <div key={evento.id} className="glass-card p-6 border-white/10 group relative overflow-hidden">
+                  <div className={cn("absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-3xl opacity-20 transition-all duration-500 group-hover:opacity-40", tabConfig.bg.replace('/10', '/30'))}></div>
+                  
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4 relative z-10">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        {getStatusIcon(evento.is_completed)}
+                        <h3 className={cn("text-lg font-bold text-white", evento.is_completed && "line-through text-slate-500")}>
+                          {evento.title}
+                        </h3>
+                        {getTipoBadge(evento.type)}
+                        {getPrioridadeBadge(evento.priority)}
+                        {tab === 'hoje' && <Badge className="bg-emerald-500 text-white border-none shadow-lg shadow-emerald-900/40">Hoje</Badge>}
+                        {tab === 'atrasados' && <Badge className="bg-red-500 text-white border-none shadow-lg shadow-red-900/40">Atrasado</Badge>}
+                      </div>
+                      
+                      {evento.description && (
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2 max-w-2xl">{evento.description}</p>
+                      )}
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Data</p>
+                          <p className={cn("text-sm font-semibold text-slate-200", tab === 'atrasados' && "text-red-400")}>{formatarData(evento.date)}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Horário</p>
+                          <p className="text-sm font-semibold text-slate-200">{evento.time || '—'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categoria</p>
+                          <p className="text-sm font-semibold text-slate-200">{evento.category || '—'}</p>
+                        </div>
+                        {evento.value && (
+                          <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Valor</p>
+                            <p className={cn("text-sm font-bold", evento.type === 'recebimento' ? 'text-emerald-400' : 'text-red-400')}>
+                              R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex md:flex-col gap-2 shrink-0">
+                      {!evento.is_completed && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="glass-panel border-white/10 hover:bg-emerald-500/10 text-emerald-400"
+                          onClick={() => marcarConcluido(evento.id)}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Concluir
+                        </Button>
+                      )}
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-cyan-500/10 text-cyan-400 flex-1" onClick={() => abrirModalEdicao(evento)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="glass-panel border-white/10 hover:bg-red-500/10 text-red-400 flex-1"
+                          onClick={() => excluirEvento(evento.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
-              {eventosProximos.length === 0 && (
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-500">Nenhum evento próximo</p>
+              
+              {tabEventos.length === 0 && (
+                <div className="glass-panel py-16 text-center border-white/5 border-dashed">
+                  <tabConfig.icon className="h-12 w-12 text-slate-700 mx-auto mb-4 opacity-20" />
+                  <p className="text-slate-500 italic">{tabConfig.empty}</p>
                 </div>
               )}
             </TabsContent>
+          );
+        })}
+      </Tabs>
 
-            {/* Eventos de Hoje */}
-<TabsContent value="hoje" className="space-y-4">
-  {eventosHoje.map((evento) => (
-    <Card key={evento.id} className="border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-900">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              {getStatusIcon(evento.is_completed)}
-              <h3 className="text-lg font-semibold dark:text-slate-100">{evento.title}</h3>
-              {getTipoBadge(evento.type)}
-              <Badge className="bg-blue-100 text-blue-800">Hoje</Badge>
+      {/* MODAL DE EDIÇÃO */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Editar Evento da Agenda</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdateEvent} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-title" className="text-slate-300">Título do Evento *</Label>
+              <Input id="edit-title" value={editFormData.title} onChange={(e) => handleEditInputChange('title', e.target.value)} className="bg-white/5 border-white/10" required />
             </div>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">{evento.description}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <Label htmlFor="edit-description" className="text-slate-300">Descrição</Label>
+              <Textarea id="edit-description" value={editFormData.description} onChange={(e) => handleEditInputChange('description', e.target.value)} className="bg-white/5 border-white/10" rows={3} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Horário</p>
-                <p className="font-bold dark:text-slate-200">{evento.time}</p>
+                <Label htmlFor="edit-event_date" className="text-slate-300">Data *</Label>
+                <Input id="edit-event_date" type="date" value={editFormData.event_date} onChange={(e) => handleEditInputChange('event_date', e.target.value)} className="bg-white/5 border-white/10" required />
               </div>
               <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Categoria</p>
-                <p>{evento.category}</p>
+                <Label htmlFor="edit-event_time" className="text-slate-300">Horário</Label>
+                <Input id="edit-event_time" type="time" value={editFormData.event_time} onChange={(e) => handleEditInputChange('event_time', e.target.value)} className="bg-white/5 border-white/10" />
               </div>
-              {evento.value && (
-                <div>
-                  <p className="font-medium text-gray-600 dark:text-slate-400">Valor</p>
-                  <p className={`font-bold dark:text-slate-200 ${evento.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                    R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-type" className="text-slate-300">Tipo *</Label>
+                <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
+                  <SelectTrigger className="bg-white/5 border-white/10"><SelectValue /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="pagamento">Pagamento</SelectItem>
+                    <SelectItem value="recebimento">Recebimento</SelectItem>
+                    <SelectItem value="vencimento">Vencimento</SelectItem>
+                    <SelectItem value="reuniao">Reunião</SelectItem>
+                    <SelectItem value="tarefa">Tarefa</SelectItem>
+                    <SelectItem value="lembrete">Lembrete</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="edit-priority" className="text-slate-300">Prioridade</Label>
+                <Select value={editFormData.priority} onValueChange={(value) => handleEditInputChange('priority', value)}>
+                  <SelectTrigger className="bg-white/5 border-white/10"><SelectValue /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="alta">Alta</SelectItem>
+                    <SelectItem value="média">Média</SelectItem>
+                    <SelectItem value="baixa">Baixa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-amount" className="text-slate-300">Valor (R$)</Label>
+                <Input id="edit-amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => handleEditInputChange('amount', e.target.value)} className="bg-white/5 border-white/10" />
+              </div>
+              <div>
+                <Label htmlFor="edit-category" className="text-slate-300">Categoria</Label>
+                <Select value={editFormData.category} onValueChange={(value) => handleEditInputChange('category', value)}>
+                  <SelectTrigger className="bg-white/5 border-white/10"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10">
+                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                    <SelectItem value="Moradia">Moradia</SelectItem>
+                    <SelectItem value="Investimentos">Investimentos</SelectItem>
+                    <SelectItem value="Consultoria">Consultoria</SelectItem>
+                    <SelectItem value="Planejamento">Planejamento</SelectItem>
+                    <SelectItem value="Saúde">Saúde</SelectItem>
+                    <SelectItem value="Educação">Educação</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button type="button" variant="outline" className="border-white/10 hover:bg-white/5" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
+              <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL DE DETALHE DO EVENTO (CALENDÁRIO) */}
+      <Dialog open={!!selectedCalendarEvent} onOpenChange={(open) => { if (!open) setSelectedCalendarEvent(null); }}>
+        <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[460px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 flex-wrap">
+              {selectedCalendarEvent && getTipoBadge(selectedCalendarEvent.type)}
+              <span className="text-base font-bold text-white">
+                {selectedCalendarEvent?.title}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedCalendarEvent && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                {getStatusIcon(selectedCalendarEvent.is_completed)}
+                <span className="text-sm font-medium text-slate-300">
+                  {selectedCalendarEvent.is_completed ? 'Concluído' : 'Pendente'}
+                </span>
+                {getPrioridadeBadge(selectedCalendarEvent.priority)}
+              </div>
+
+              {selectedCalendarEvent.description && (
+                <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                  <p className="text-sm text-slate-400 italic">
+                    {selectedCalendarEvent.description}
                   </p>
                 </div>
               )}
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-            <Button variant="outline" size="sm" onClick={() => marcarConcluido(evento.id)}>
-              <CheckCircle className="h-4 w-4 mr-1" />Concluir
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(evento)}><Edit className="h-4 w-4" /></Button>
-            <Button variant="outline" size="sm" onClick={() => excluirEvento(evento.id)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  ))}
-  {eventosHoje.length === 0 && (
-    <div className="text-center py-8">
-      <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-      <p className="text-gray-500 dark:text-gray-500">Nenhum evento para hoje</p>
-    </div>
-  )}
-</TabsContent>
 
-            {/* Eventos Concluídos */}
-<TabsContent value="concluidos" className="space-y-4">
-  {eventosConcluidos.map((evento) => (
-    <Card key={evento.id} className="border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-900">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <h3 className="text-lg font-semibold line-through text-gray-500 dark:text-gray-500">{evento.title}</h3>
-              {getTipoBadge(evento.type)}
-              <Badge className="bg-green-100 text-green-800">Concluído</Badge>
-            </div>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">{evento.description}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Data</p>
-                <p>{formatarData(evento.date)}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Horário</p>
-                <p>{evento.time}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Categoria</p>
-                <p>{evento.category}</p>
-              </div>
-              {evento.value && (
-                <div>
-                  <p className="font-medium text-gray-600 dark:text-slate-400">Valor</p>
-                  <p className={`font-bold dark:text-slate-200 ${evento.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                    R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Data</p>
+                  <p className="font-semibold text-white">{formatarData(selectedCalendarEvent.date)}</p>
                 </div>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-             <Button variant="outline" size="sm" onClick={() => excluirEvento(evento.id)}>
-                <Trash2 className="h-4 w-4" />
-             </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  ))}
-  {eventosConcluidos.length === 0 && (
-    <div className="text-center py-8">
-      <p className="text-gray-500 dark:text-gray-500">Nenhum evento concluído</p>
-    </div>
-  )}
-</TabsContent>
-
-            {/* Eventos Atrasados */}
-<TabsContent value="atrasados" className="space-y-4">
-  {eventosAtrasados.map((evento) => (
-    <Card key={evento.id} className="border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-900">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <h3 className="text-lg font-semibold dark:text-slate-100">{evento.title}</h3>
-              {getTipoBadge(evento.type)}
-              <Badge className="bg-red-100 text-red-800">Atrasado</Badge>
-            </div>
-            <p className="text-gray-600 dark:text-slate-400 mb-3">{evento.description}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Data</p>
-                <p className="text-red-600 font-medium">{formatarData(evento.date)}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Horário</p>
-                <p>{evento.time}</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-600 dark:text-slate-400">Categoria</p>
-                <p>{evento.category}</p>
-              </div>
-              {evento.value && (
-                <div>
-                  <p className="font-medium text-gray-600 dark:text-slate-400">Valor</p>
-                  <p className={`font-bold dark:text-slate-200 ${evento.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                    R$ {evento.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Horário</p>
+                  <p className="font-semibold text-white">{selectedCalendarEvent.time || '—'}</p>
                 </div>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-            <Button variant="outline" size="sm" onClick={() => marcarConcluido(evento.id)}>
-              <CheckCircle className="h-4 w-4 mr-1" />Concluir
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => abrirModalEdicao(evento)}><Edit className="h-4 w-4" /></Button>
-            <Button variant="outline" size="sm" onClick={() => excluirEvento(evento.id)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  ))}
-  {eventosAtrasados.length === 0 && (
-    <div className="text-center py-8">
-      <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-4" />
-      <p className="text-gray-500 dark:text-gray-500">Nenhum evento atrasado! 🎉</p>
-    </div>
-  )}
-</TabsContent>
-          </Tabs>
-          {/* ▼▼▼ ADICIONE O NOVO MODAL DE EDIÇÃO AQUI ▼▼▼ */}
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Editar Evento da Agenda</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleUpdateEvent} className="space-y-4">
-                {/* O formulário é praticamente idêntico ao de criação, mas usa 'editFormData' */}
-                <div>
-                  <Label htmlFor="edit-title">Título do Evento *</Label>
-                  <Input id="edit-title" value={editFormData.title} onChange={(e) => handleEditInputChange('title', e.target.value)} required />
-                </div>
-                <div>
-                  <Label htmlFor="edit-description">Descrição</Label>
-                  <Textarea id="edit-description" value={editFormData.description} onChange={(e) => handleEditInputChange('description', e.target.value)} rows={3} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-event_date">Data *</Label>
-                    <Input id="edit-event_date" type="date" value={editFormData.event_date} onChange={(e) => handleEditInputChange('event_date', e.target.value)} required />
+                {selectedCalendarEvent.category && (
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Categoria</p>
+                    <p className="font-semibold text-white">{selectedCalendarEvent.category}</p>
                   </div>
-                  <div>
-                    <Label htmlFor="edit-event_time">Horário</Label>
-                    <Input id="edit-event_time" type="time" value={editFormData.event_time} onChange={(e) => handleEditInputChange('event_time', e.target.value)} />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-type">Tipo *</Label>
-                    <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pagamento">Pagamento</SelectItem>
-                        <SelectItem value="recebimento">Recebimento</SelectItem>
-                        <SelectItem value="vencimento">Vencimento</SelectItem>
-                        <SelectItem value="reuniao">Reunião</SelectItem>
-                        <SelectItem value="tarefa">Tarefa</SelectItem>
-                        <SelectItem value="lembrete">Lembrete</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-priority">Prioridade</Label>
-                    <Select value={editFormData.priority} onValueChange={(value) => handleEditInputChange('priority', value)}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="alta">Alta</SelectItem>
-                        <SelectItem value="média">Média</SelectItem>
-                        <SelectItem value="baixa">Baixa</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-amount">Valor (R$)</Label>
-                    <Input id="edit-amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => handleEditInputChange('amount', e.target.value)} />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-category">Categoria</Label>
-                    <Select value={editFormData.category} onValueChange={(value) => handleEditInputChange('category', value)}>
-                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                        <SelectItem value="Moradia">Moradia</SelectItem>
-                        <SelectItem value="Investimentos">Investimentos</SelectItem>
-                        <SelectItem value="Consultoria">Consultoria</SelectItem>
-                        <SelectItem value="Planejamento">Planejamento</SelectItem>
-                        <SelectItem value="Saúde">Saúde</SelectItem>
-                        <SelectItem value="Educação">Educação</SelectItem>
-                        <SelectItem value="Outros">Outros</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>Cancelar</Button>
-                  <Button type="submit">Salvar Alterações</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-          {/* ▲▲▲ FIM DO NOVO MODAL DE EDIÇÃO ▲▲▲ */}
-
-          {/* ── MODAL DE DETALHE DO EVENTO (CALENDÁRIO) ─────────────────── */}
-          <Dialog open={!!selectedCalendarEvent} onOpenChange={(open) => { if (!open) setSelectedCalendarEvent(null); }}>
-            <DialogContent className="sm:max-w-[460px]">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 flex-wrap">
-                  {selectedCalendarEvent && getTipoBadge(selectedCalendarEvent.type)}
-                  <span className="text-base font-bold dark:text-slate-100">
-                    {selectedCalendarEvent?.title}
-                  </span>
-                </DialogTitle>
-              </DialogHeader>
-
-              {selectedCalendarEvent && (
-                <div className="space-y-4">
-                  {/* Status + Prioridade */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {getStatusIcon(selectedCalendarEvent.is_completed)}
-                    <span className="text-sm text-gray-600 dark:text-slate-400">
-                      {selectedCalendarEvent.is_completed ? 'Concluído' : 'Pendente'}
-                    </span>
-                    {getPrioridadeBadge(selectedCalendarEvent.priority)}
-                  </div>
-
-                  {/* Descrição */}
-                  {selectedCalendarEvent.description && (
-                    <p className="text-sm text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
-                      {selectedCalendarEvent.description}
+                )}
+                {selectedCalendarEvent.value && (
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Valor</p>
+                    <p className={cn("font-bold text-base", selectedCalendarEvent.type === 'recebimento' ? 'text-emerald-400' : 'text-red-400')}>
+                      R$ {selectedCalendarEvent.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
-                  )}
-
-                  {/* Grid de informações */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
-                      <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Data</p>
-                      <p className="font-semibold dark:text-slate-200">{formatarData(selectedCalendarEvent.date)}</p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
-                      <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Horário</p>
-                      <p className="font-semibold dark:text-slate-200">{selectedCalendarEvent.time || '—'}</p>
-                    </div>
-                    {selectedCalendarEvent.category && (
-                      <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
-                        <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Categoria</p>
-                        <p className="font-semibold dark:text-slate-200">{selectedCalendarEvent.category}</p>
-                      </div>
-                    )}
-                    {selectedCalendarEvent.value && (
-                      <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
-                        <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mb-1">Valor</p>
-                        <p className={`font-bold text-base ${selectedCalendarEvent.type === 'recebimento' ? 'text-green-600' : 'text-red-600'}`}>
-                          R$ {selectedCalendarEvent.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                    )}
                   </div>
+                )}
+              </div>
 
-                  {/* Ações */}
-                  <div className="flex justify-end gap-2 pt-2 border-t border-gray-100 dark:border-slate-700">
-                    {!selectedCalendarEvent.is_completed && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => { marcarConcluido(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
-                        className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-400 dark:border-green-700"
-                      >
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Concluir
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { abrirModalEdicao(selectedCalendarEvent); setSelectedCalendarEvent(null); }}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { excluirEvento(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
-                      className="text-red-600 border-red-300 hover:bg-red-50 dark:text-red-400 dark:border-red-700"
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Excluir
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-          {/* ── FIM MODAL DE DETALHE DO EVENTO ───────────────────────────── */}
-        </div>
+              <div className="flex justify-end gap-2 pt-4 border-t border-white/5">
+                {!selectedCalendarEvent.is_completed && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => { marcarConcluido(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
+                    className="glass-panel border-white/10 hover:bg-emerald-500/10 text-emerald-400"
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Concluir
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="glass-panel border-white/10 hover:bg-cyan-500/10 text-cyan-400"
+                  onClick={() => { abrirModalEdicao(selectedCalendarEvent); setSelectedCalendarEvent(null); }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { excluirEvento(selectedCalendarEvent.id); setSelectedCalendarEvent(null); }}
+                  className="glass-panel border-white/10 hover:bg-red-500/10 text-red-400"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Excluir
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

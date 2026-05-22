@@ -91,22 +91,22 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
 
   return (
     <div className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen border-r transition-all duration-300 ease-in-out md:relative",
-        "bg-slate-900 text-slate-100 border-slate-800", // Tema Escuro Corporativo
+        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen transition-all duration-300 ease-in-out md:relative",
+        "glass-panel rounded-none border-y-0 border-l-0 border-white/5", 
         isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         isDesktopOpen ? "md:w-64" : "md:w-20"
       )}
     >
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
-        className="absolute -right-3 top-9 bg-slate-800 border border-slate-700 rounded-full p-1.5 z-10 text-slate-400 hover:text-white shadow-sm transition-colors hidden md:block"
+        className="absolute -right-3 top-9 bg-slate-900 border border-white/10 rounded-full p-1.5 z-10 text-slate-400 hover:text-white shadow-xl transition-colors hidden md:block"
       >
         {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>
 
       {/* HEADER EMPRESA */}
       <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
-        <div className="bg-cyan-500/20 p-2 rounded-lg shrink-0">
+        <div className="bg-cyan-500/10 p-2 rounded-lg shrink-0 border border-cyan-500/20">
              <Building2 className="h-6 w-6 text-cyan-400" />
         </div>
         {isDesktopOpen && (
@@ -118,7 +118,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       </div>
 
       {/* NAVEGAÇÃO */}
-      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 pb-4">
+      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-none pb-4">
         {menuStructure.map((group) => {
           const isOpen = openMenus[group.title];
           const isChildActive = group.items.some(item => location.pathname === item.path);
@@ -128,9 +128,9 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
               <button
                 onClick={() => toggleMenu(group.title)}
                 className={cn(
-                  "w-full flex items-center p-3 rounded-xl transition-all duration-200 group select-none hover:bg-slate-800",
+                  "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen ? "bg-slate-800 text-white" : "text-slate-400"
+                  (!isOpen && isChildActive) || isOpen ? "bg-white/5 text-white font-medium shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "", group.color)} />
@@ -143,7 +143,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
               </button>
 
               {isDesktopOpen && isOpen && (
-                <div className="space-y-1 ml-4 border-l border-slate-700 pl-2 animate-in slide-in-from-top-2 duration-200">
+                <div className="space-y-1 ml-4 border-l border-white/5 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => (
                       <NavLink
                         key={item.name}
@@ -151,7 +151,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                         onClick={handleLinkClick}
                         className={({ isActive }) => cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            isActive ? "bg-cyan-500/10 text-cyan-400 font-medium" : "text-slate-400 hover:text-white hover:bg-slate-800"
+                            isActive ? "active-gradient text-cyan-400 font-medium" : "text-slate-400 hover:text-white hover:bg-white/5"
                           )
                         }
                       >
@@ -167,13 +167,13 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       </nav>
 
       {/* FOOTER - VOLTAR PARA PESSOAL */}
-      <div className="p-4 border-t border-slate-800 bg-slate-900/50 mt-auto space-y-2">
+      <div className="p-4 border-t border-white/5 bg-white/2 mt-auto space-y-2">
         
         {/* Botão de Voltar ao Contexto Pessoal */}
         <button 
           onClick={() => navigate('/dashboard')}
           className={cn(
-            "flex items-center w-full p-3 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors shadow-sm",
+            "flex items-center w-full p-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg hover:shadow-emerald-900/20 active:scale-95",
             !isDesktopOpen && "justify-center"
           )}
           title="Voltar para Pessoa Física"
@@ -185,7 +185,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         <button 
           onClick={() => { navigate('/login'); onLogout(); }}
           className={cn(
-            "flex items-center w-full p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors",
+            "flex items-center w-full p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/5 transition-colors",
             !isDesktopOpen && "justify-center"
           )}
           title="Sair"
