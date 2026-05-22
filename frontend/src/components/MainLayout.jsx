@@ -63,13 +63,13 @@ const MainLayout = ({ user, onLogout }) => {
       {/* Conteúdo Principal */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Header Mobile - Glassmorphism */}
-        <header className="md:hidden sticky top-0 z-30 bg-background/60 backdrop-blur-md border-b border-white/5">
+        <header className="md:hidden sticky top-0 z-30 bg-background/60 backdrop-blur-md border-b border-slate-200 dark:border-white/5">
           <div className="flex items-center justify-between h-16 px-4">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="hover:bg-white/5"
+              className="hover:bg-slate-100 dark:hover:bg-white/5"
             >
               <Menu className="h-6 w-6" />
             </Button>
@@ -99,7 +99,7 @@ const MainLayout = ({ user, onLogout }) => {
           <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-xl group-hover:bg-cyan-500/40 transition-all duration-500 animate-pulse"></div>
           
           {/* Container do Círculo */}
-          <div className="relative w-16 h-16 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 group-active:scale-95 overflow-hidden">
+          <div className="relative w-16 h-16 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 group-active:scale-95 overflow-hidden">
             <img 
                 src="/favicon.ico" 
                 alt="IA" 
@@ -109,9 +109,9 @@ const MainLayout = ({ user, onLogout }) => {
           </div>
 
           {/* Tooltip moderno que aparece no hover */}
-          <div className="absolute right-20 bg-slate-900/90 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none shadow-2xl">
+          <div className="absolute right-20 bg-white dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-slate-900 dark:text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none shadow-2xl">
               Falar com Simplific IA
-              <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-l-[6px] border-l-slate-900/90 border-y-[6px] border-y-transparent"></div>
+              <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-l-[6px] border-l-white dark:border-l-slate-900/90 border-y-[6px] border-y-transparent"></div>
           </div>
         </button>
       </div>
