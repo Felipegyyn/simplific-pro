@@ -16,6 +16,7 @@ import {
   Search, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from "@/lib/utils";
 import logo from '../assets/LOGO.png';
 
 const CreditCards = ({ user, onLogout }) => {

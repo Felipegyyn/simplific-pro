@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
 import { useNavigate } from 'react-router-dom';
+import { cn } from "@/lib/utils";
 import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
 import InvestmentDetailModal from './InvestmentDetailModal';

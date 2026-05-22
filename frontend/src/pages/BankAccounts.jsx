@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea'; // <--- IMPORT NOVO
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Landmark, Plus, Trash2, Wallet, Filter, Edit } from 'lucide-react'; // <--- IMPORT Edit
+import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 
 const BANCOS_BRASIL = [

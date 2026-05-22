@@ -16,6 +16,7 @@ import {
   FileText, RefreshCw, Wallet // <--- Wallet ADICIONADO
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
 

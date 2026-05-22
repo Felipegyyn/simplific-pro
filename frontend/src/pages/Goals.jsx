@@ -14,6 +14,7 @@ import {
   Calendar, CheckCircle, Clock, LogOut, ArrowLeft, Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
 

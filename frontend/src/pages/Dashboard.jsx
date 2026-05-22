@@ -21,6 +21,7 @@ import {
   AlertTriangle, CheckCircle, Clock, Activity, Bell, BellRing, FileText,BookOpen, Image, Download
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
+import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import notificationService from '../services/notifications';
 import NotificationCenter from '@/components/NotificationCenter';

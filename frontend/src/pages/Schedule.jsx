@@ -15,6 +15,7 @@ import {
   ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLocation
+import { cn } from "@/lib/utils";
 import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
 

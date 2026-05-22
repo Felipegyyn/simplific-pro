@@ -111,8 +111,8 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         </div>
         {isDesktopOpen && (
             <div className="overflow-hidden">
-                <span className="block text-sm font-bold text-white whitespace-nowrap truncate">Minha Empresa</span>
-                <span className="text-xs text-slate-400">Simplific PJ</span>
+                <span className="block text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap truncate">Minha Empresa</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Simplific PJ</span>
             </div>
         )}
       </div>
@@ -130,7 +130,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 className={cn(
                   "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen ? "bg-white/5 text-white font-medium shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-white"
+                  (!isOpen && isChildActive) || isOpen ? "bg-cyan-500/10 text-cyan-600 dark:text-white font-medium shadow-sm" : "text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-cyan-600 dark:hover:text-white"
                 )}
               >
                 <group.icon className={cn("h-5 w-5 shrink-0 transition-colors", isDesktopOpen ? "mr-3" : "", group.color)} />
@@ -151,7 +151,7 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                         onClick={handleLinkClick}
                         className={({ isActive }) => cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            isActive ? "active-gradient text-cyan-400 font-medium" : "text-slate-400 hover:text-white hover:bg-white/5"
+                            isActive ? "active-gradient text-cyan-600 dark:text-cyan-400 font-medium bg-cyan-500/5" : "text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-cyan-600 dark:hover:text-white"
                           )
                         }
                       >
@@ -185,13 +185,13 @@ const SidebarBusiness = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         <button 
           onClick={() => { navigate('/login'); onLogout(); }}
           className={cn(
-            "flex items-center w-full p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/5 transition-colors",
+            "flex items-center w-full p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-400/5 transition-colors",
             !isDesktopOpen && "justify-center"
           )}
           title="Sair"
         >
           <LogOut className="h-5 w-5 shrink-0" />
-          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Sair</span>}
+          {isDesktopOpen && <span className="ml-3 text-sm font-medium truncate">Sair</span>}
         </button>
       </div>
     </div>

@@ -291,12 +291,12 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             className="hidden"
             accept="image/png, image/jpeg"
         />
-        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-white/5 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
+        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
           <div className="relative shrink-0">
             {user?.profile_image_url ? (
-                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-md border border-white/10" />
+                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-md border border-slate-200 dark:border-white/10" />
             ) : (
-                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center font-bold text-cyan-400 border border-cyan-500/20">
+                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
                     {user?.name?.charAt(0).toUpperCase()}
                 </div>
             )}
@@ -308,8 +308,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
           </div>
           {isDesktopOpen && (
             <div className="flex-1 overflow-hidden">
-              <p className="font-medium text-sm truncate text-white">{user?.name}</p>
-              <p className="text-xs text-slate-400 truncate">Editar perfil</p>
+              <p className="font-medium text-sm truncate text-slate-900 dark:text-white">{user?.name}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Editar perfil</p>
             </div>
           )}
         </div>
