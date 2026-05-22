@@ -134,6 +134,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               </span>
             ))}
           </div>
+        </div>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/* SEÇÃO 1 — GESTÃO FINANCEIRA DIÁRIA                                */}
