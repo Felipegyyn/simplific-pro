@@ -1473,12 +1473,10 @@ useEffect(() => {
               </div>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
-    </div>
-  );
-
-};
+    );
+  };
 
 export default Planning;
-

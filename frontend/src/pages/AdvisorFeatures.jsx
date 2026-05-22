@@ -103,11 +103,9 @@ const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
 
 // ── Componente principal ────────────────────────────────────────────────────
 const AdvisorFeatures = ({ user, onLogout }) => {
+const AdvisorFeatures = ({ user, onLogout }) => {
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
-
-        {/* ── HERO ─────────────────────────────────────────────────────────── */}
-        <div className="text-center mb-20 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
           
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-cyan-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 backdrop-blur-sm">
@@ -749,8 +747,6 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               ))}
             </div>
           </div>
-        </div>
-
     </div>
   );
 };

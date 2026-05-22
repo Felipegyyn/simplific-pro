@@ -1156,12 +1156,10 @@ const carregarFaturas = async (listaDeCartoes) => {
               </div>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
-    </div>
-  );
-
-};
+    );
+  };
 
 export default CreditCards;
-
