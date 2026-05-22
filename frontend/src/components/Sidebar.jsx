@@ -71,7 +71,6 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       icon: Bot,
       color: 'text-indigo-500',
       items: [
-        { name: 'Simplific IA', path: '/simplific-ia', icon: Bot },
         { 
             name: 'Whatsapp Assessor', 
             path: 'https://wa.me/551151991373', 

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit2, Trash2, X, Check, Tag, AlertCircle, ArrowUpCircle, ArrowDownCircle, Smile
 } from 'lucide-react';
-import EmojiPicker from 'emoji-picker-react'; // <-- ADICIONADO
+import { Button } from '@/components/ui/button';
+import EmojiPicker from 'emoji-picker-react';
 
 const CategoriesSettings = () => {
   const [categories, setCategories] = useState([]);

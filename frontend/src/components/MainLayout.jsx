@@ -86,6 +86,32 @@ const MainLayout = ({ user, onLogout }) => {
         <main className="flex-1 overflow-y-auto scroll-smooth p-4 md:p-6 lg:p-8">
           <Outlet /> 
         </main>
+
+        {/* Botão Flutuante Simplific IA */}
+        <button
+          onClick={() => navigate('/simplific-ia')}
+          className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"
+          title="Falar com Simplific IA"
+        >
+          {/* Efeito de brilho/halo em volta do ícone */}
+          <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-xl group-hover:bg-cyan-500/40 transition-all duration-500 animate-pulse"></div>
+          
+          {/* Container do Círculo */}
+          <div className="relative w-16 h-16 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 group-active:scale-95 overflow-hidden">
+            <img 
+                src="/favicon.ico" 
+                alt="IA" 
+                className="w-10 h-10 object-contain brightness-110"
+                onError={(e) => { e.target.src = logo }} 
+            />
+          </div>
+
+          {/* Tooltip moderno que aparece no hover */}
+          <div className="absolute right-20 bg-slate-900/90 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none shadow-2xl">
+              Falar com Simplific IA
+              <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-l-[6px] border-l-slate-900/90 border-y-[6px] border-y-transparent"></div>
+          </div>
+        </button>
       </div>
     </div>
   );

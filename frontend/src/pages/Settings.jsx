@@ -100,222 +100,264 @@ const Settings = ({ user, onLogout }) => {
   };
   
   return (
-    <div className="bg-gray-50/50 dark:bg-slate-900 min-h-screen pb-20">
+    <div className="space-y-8 animate-in fade-in duration-700">
       
-      <PageHeader user={user} onLogout={onLogout} />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
+      {/* Header da Página */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10">
+        <div>
+          <h1 className="text-3xl font-black bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent tracking-tighter">
+            Configurações
+          </h1>
+          <p className="text-slate-400 text-sm mt-1">Gerencie seus dados pessoais, preferências e assinatura.</p>
+        </div>
         
-        {/* Header da Página */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Minha Conta</h1>
-            <p className="text-gray-500 text-sm mt-1">Gerencie seus dados pessoais e assinatura.</p>
-          </div>
-          
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
              {feedback && (
-                <span className={`text-sm font-medium animate-in fade-in slide-in-from-right-5 ${feedback.includes('Erro') ? 'text-red-600' : 'text-green-600 flex items-center gap-1'}`}>
-                  {!feedback.includes('Erro') && <CheckCircle2 size={16} />}
+                <span className={cn("text-xs font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-5 px-3 py-1.5 rounded-lg border", 
+                  feedback.includes('Erro') ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 flex items-center gap-2')}>
+                  {!feedback.includes('Erro') && <CheckCircle2 size={14} />}
                   {feedback}
                 </span>
              )}
-             <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white shadow-sm">
+             <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold shadow-lg shadow-cyan-900/20 px-6">
                 <Save className="w-4 h-4 mr-2" />
                 {isSaving ? 'Salvando...' : 'Salvar Alterações'}
              </Button>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        
+        {/* COLUNA ESQUERDA (2/3): DADOS */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-cyan-500/10 transition-all duration-700"></div>
+            
+            <div className="flex items-center gap-4 mb-8">
+                <div className="p-2.5 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                    <User size={20} className="text-cyan-400" />
+                </div>
+                <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Perfil do Titular</h3>
+                    <p className="text-xs text-slate-500">Seus dados principais de acesso.</p>
+                </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Nome Completo</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="bg-white/5 border-white/10 focus:border-cyan-500/50 h-11" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="whatsapp" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">WhatsApp Principal</Label>
+                <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+55..." className="bg-white/5 border-white/10 focus:border-cyan-500/50 h-11" />
+              </div>
+            </div>
           </div>
+
+          <div className="glass-panel p-8 border-white/5 bg-gradient-to-br from-blue-500/5 to-transparent relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full -mr-24 -mt-24 blur-3xl group-hover:bg-blue-500/10 transition-all duration-700"></div>
+            
+            <div className="flex items-center gap-4 mb-8">
+                <div className="p-2.5 bg-blue-500/10 rounded-xl border border-blue-500/20 shadow-inner">
+                    <Users size={20} className="text-blue-400" />
+                </div>
+                <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Conta Compartilhada</h3>
+                    <p className="text-xs text-blue-400/60 uppercase font-bold tracking-tighter">Adicione um sócio ou cônjuge ao Simplific.</p>
+                </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-2">
+                <Label htmlFor="sec_name" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Segundo Nome</Label>
+                <Input 
+                  id="sec_name" 
+                  value={secondaryName} 
+                  onChange={(e) => setSecondaryName(e.target.value)} 
+                  placeholder="Ex: Maria"
+                  className="bg-white/5 border-white/10 focus:border-blue-500/50 h-11"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sec_whatsapp" className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">WhatsApp Adicional</Label>
+                <Input 
+                  id="sec_whatsapp" 
+                  value={secondaryWhatsapp} 
+                  onChange={(e) => setSecondaryWhatsapp(e.target.value)} 
+                  placeholder="+55..." 
+                  className="bg-white/5 border-white/10 focus:border-blue-500/50 h-11"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-panel border-white/5 overflow-hidden shadow-2xl relative">
+             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+            
+            <div className="p-8 border-b border-white/5 bg-white/2">
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+                    <CreditCard size={20} className="text-slate-400" />
+                  </div>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-white">Plano e Assinatura</h3>
+                </div>
+            </div>
+
+            <div className="p-8 relative z-10">
+              {loadingSub ? (
+                <div className="h-32 flex flex-col items-center justify-center gap-4">
+                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sincronizando assinatura...</p>
+                </div>
+              ) : subscription?.status === 'ativo' ? (
+                <div className="space-y-8">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 glass-card p-6 border-white/10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+                    <div className="relative z-10">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Plano Ativo</p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-2xl font-black text-white tracking-tighter uppercase">
+                          Simplific PRO <span className="text-emerald-400">/ {subscription.plan_type}</span>
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-400 mt-3 uppercase tracking-wider">
+                        Vencimento: <span className="text-slate-200">{new Date(subscription.valid_until).toLocaleDateString('pt-BR')}</span>
+                      </p>
+                    </div>
+                    
+                    <div className="relative z-10">
+                       <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-white/5 text-[10px] font-black uppercase tracking-widest h-10 px-6">
+                          <Mail size={14} className="mr-2 text-cyan-400"/> Faturas via E-mail
+                       </Button>
+                    </div>
+                  </div>
+
+                  {subscription.gateway === 'mercadopago' ? (
+                    <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6 flex gap-5">
+                        <div className="p-3 bg-amber-500/10 rounded-xl h-fit border border-amber-500/10">
+                           <AlertTriangle className="text-amber-400" size={24} />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest mb-2">Migração de Sistema</h4>
+                          <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                            Estamos atualizando nosso ecossistema de pagamentos. Você receberá um convite exclusivo por e-mail para migrar para a nova infraestrutura. 
+                            <span className="block mt-2 text-emerald-400">Seu acesso continua 100% garantido.</span>
+                          </p>
+                        </div>
+                    </div>
+                  ) : subscription.is_subscription ? (
+                    <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-center gap-6">
+                      <div className="flex gap-4">
+                        <div className="p-3 bg-rose-500/10 rounded-xl h-fit border border-rose-500/10">
+                            <AlertTriangle className="text-rose-400" size={24} />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-black text-white uppercase tracking-widest mb-1">Renovação Automática</h4>
+                            <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-md">
+                                O cancelamento encerra as cobranças futuras, mas você mantém todos os benefícios do Simplific Pro até o final do ciclo contratado.
+                            </p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={handleCancelSubscription} className="text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-500/10 h-10 px-6 shrink-0 border border-rose-500/20">
+                        Cancelar Renovação
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6 flex items-center gap-5">
+                       <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/10">
+                          <CheckCircle2 className="text-emerald-400" size={24} />
+                       </div>
+                       <div>
+                          <h4 className="text-sm font-black text-white uppercase tracking-widest mb-1">Plano Anual Liquidado</h4>
+                          <p className="text-xs text-slate-400 font-medium leading-relaxed">
+                             Sua assinatura anual foi processada. Acesso vitalício por este ciclo garantido até <span className="text-white font-bold">{new Date(subscription.valid_until).toLocaleDateString('pt-BR')}</span>.
+                          </p>
+                       </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-12 flex flex-col items-center">
+                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/5 shadow-2xl">
+                      <CreditCard size={32} className="text-slate-600" />
+                  </div>
+                  <p className="text-slate-400 font-bold mb-8 uppercase tracking-widest text-xs italic">Nenhuma assinatura ativa encontrada.</p>
+                  <Button onClick={() => navigate('/planos')} className="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-black uppercase tracking-widest px-10 h-12 shadow-xl shadow-emerald-900/20 animate-pulse">
+                    Assinar Agora
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* COLUNA DIREITA (1/3): PREFS */}
+        <div className="space-y-8">
           
-          {/* COLUNA ESQUERDA (2/3): DADOS */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
             
-            <Card className="border-gray-200 dark:border-slate-800 shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-2 bg-green-100 rounded-lg text-green-700"><User size={20} /></div>
-                  <CardTitle className="text-lg">Perfil do Titular</CardTitle>
-                </div>
-                <CardDescription>Seus dados principais de acesso.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome Completo</Label>
-                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="bg-gray-50/50" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="whatsapp">WhatsApp Principal</Label>
-                  <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+55..." className="bg-gray-50/50" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-blue-100 bg-blue-50/30 dark:bg-blue-900/5 dark:border-blue-900/50 shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="p-2 bg-blue-100 rounded-lg text-blue-700 dark:bg-blue-900 dark:text-blue-300"><Users size={20} /></div>
-                  <CardTitle className="text-lg text-blue-900 dark:text-blue-100">Conta Compartilhada</CardTitle>
-                </div>
-                <CardDescription className="text-blue-700/80 dark:text-blue-300/70">
-                  Adicione um sócio ou cônjuge para interagir com o Simplific.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sec_name" className="text-blue-900 dark:text-blue-200">Segundo Nome</Label>
-                  <Input 
-                    id="sec_name" 
-                    value={secondaryName} 
-                    onChange={(e) => setSecondaryName(e.target.value)} 
-                    placeholder="Ex: Maria"
-                    className="bg-white dark:bg-slate-950 border-blue-200 dark:border-blue-800"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sec_whatsapp" className="text-blue-900 dark:text-blue-200">WhatsApp Adicional</Label>
-                  <Input 
-                    id="sec_whatsapp" 
-                    value={secondaryWhatsapp} 
-                    onChange={(e) => setSecondaryWhatsapp(e.target.value)} 
-                    placeholder="+55..." 
-                    className="bg-white dark:bg-slate-950 border-blue-200 dark:border-blue-800"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* SEÇÃO ASSINATURA (DESCOMENTADA E CORRIGIDA) */}
-            <Card className="border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <CardHeader className="pb-4 border-b bg-gray-50/50 dark:bg-slate-900/50">
-                <div className="flex items-center gap-2">
-                  <CreditCard size={20} className="text-gray-500" />
-                  <CardTitle className="text-lg">Plano e Assinatura</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                {loadingSub ? (
-                  <div className="h-20 flex items-center justify-center text-gray-400">Carregando informações...</div>
-                ) : subscription?.status === 'ativo' ? (
-                  <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-950 p-4 rounded-xl border border-gray-200 dark:border-slate-800">
-                      <div>
-                        <p className="text-sm text-gray-500 font-medium">Plano Atual</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
-                          <span className="text-xl font-bold text-gray-900 dark:text-white">
-                            Simplific PRO - {subscription.plan_type}
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Próximo vencimento/validade: {new Date(subscription.valid_until).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                      
-                      <div className="text-right">
-                         <div className="flex flex-col items-end gap-2">
-                            <Button variant="outline" size="sm" className="text-xs h-8">
-                               <Mail size={12} className="mr-2"/> Faturas via E-mail
-                            </Button>
-                         </div>
-                      </div>
-                    </div>
-
-                    {/* LÓGICA DE STATUS DA ASSINATURA (NOVA) */}
-                    {subscription.gateway === 'mercadopago' ? (
-                      // CASO 1: CLIENTE LEGADO (MERCADO PAGO)
-                      <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-lg p-4">
-                        <div className="flex gap-3">
-                          <div className="p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-full h-fit">
-                             <AlertTriangle className="text-yellow-600 dark:text-yellow-400" size={20} />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-300 mb-1">
-                              Atualização de Sistema
-                            </h4>
-                            <p className="text-sm text-yellow-700 dark:text-yellow-400 leading-relaxed">
-                              Mudamos o formato da sua assinatura para melhorar a experiência. 
-                              Você receberá um e-mail em breve com os próximos passos para migrar para o novo sistema.
-                              Seu acesso continua normal.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ) : subscription.is_subscription ? (
-                      // CASO 2: ASAAS MENSAL (Cancelável)
-                      <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div className="flex gap-3">
-                          <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={20} />
-                          <div className="text-sm text-red-800 dark:text-red-300">
-                            <strong>Zona de Perigo:</strong> Cancelar a renovação encerrará cobranças futuras, mas você mantém o acesso até o fim do período atual.
-                          </div>
-                        </div>
-                        <Button variant="destructive" size="sm" onClick={handleCancelSubscription} className="shrink-0">
-                          Cancelar Renovação
-                        </Button>
-                      </div>
-                    ) : (
-                      // CASO 3: ASAAS ANUAL (Pago/Parcelado)
-                      <div className="bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 rounded-lg p-4 flex items-center gap-3">
-                         <CheckCircle2 className="text-green-600 shrink-0" size={20} />
-                         <div className="text-sm text-green-800 dark:text-green-300">
-                            <strong>Plano Anual Ativo:</strong> Seu plano anual está pago/parcelado. Você tem acesso garantido até {new Date(subscription.valid_until).toLocaleDateString('pt-BR')} sem novas cobranças.
-                         </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">Você não possui uma assinatura ativa.</p>
-                    <Button onClick={() => navigate('/planos')} className="bg-gradient-to-r from-green-600 to-emerald-600 text-white">
-                      Assinar Agora
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
+            <div className="flex items-center gap-3 mb-8">
+                <Palette size={18} className="text-purple-400" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-white">Visual e Interface</h3>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-white/2 rounded-xl border border-white/5 hover:bg-white/5 transition-all">
+                <Label htmlFor="dark-mode" className="text-sm font-bold text-slate-300 cursor-pointer">Dark Mode (V2.0)</Label>
+                <Switch id="dark-mode" checked={theme === 'dark'} onCheckedChange={toggleTheme} className="data-[state=checked]:bg-cyan-500" />
+            </div>
           </div>
 
-          {/* COLUNA DIREITA (1/3): PREFS */}
-          <div className="space-y-6">
-            <Card className="border-gray-200 dark:border-slate-800 shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Palette size={18} className="text-purple-600" />
-                  <CardTitle className="text-base">Aparência</CardTitle>
+          <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+            
+            <div className="flex items-center gap-3 mb-6">
+                <Bot size={18} className="text-indigo-400" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-white">Configuração da IA</h3>
+            </div>
+            
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6 px-1">Formato de Resposta</p>
+            
+            <RadioGroup value={responseFormat} onValueChange={handlePreferenceChange} className="space-y-4">
+              <div 
+                className={cn("flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden", 
+                  responseFormat === 'text' 
+                    ? "bg-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/20" 
+                    : "bg-white/2 border-white/5 hover:bg-white/5")}
+                onClick={() => handlePreferenceChange('text')}
+              >
+                {responseFormat === 'text' && <div className="absolute left-0 inset-y-0 w-1 bg-indigo-500"></div>}
+                <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="r_text" className="cursor-pointer font-bold text-slate-200">Texto</Label>
+                    <span className="text-[10px] text-slate-500 font-medium">Processamento instantâneo</span>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-950 rounded-lg border">
-                  <Label htmlFor="dark-mode" className="cursor-pointer">Modo Escuro</Label>
-                  <Switch id="dark-mode" checked={theme === 'dark'} onCheckedChange={toggleTheme} />
-                </div>
-              </CardContent>
-            </Card>
+                <RadioGroupItem value="text" id="r_text" className="border-white/20 data-[state=checked]:border-indigo-500 data-[state=checked]:text-indigo-500" />
+              </div>
 
-            <Card className="border-gray-200 dark:border-slate-800 shadow-sm">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Bot size={18} className="text-indigo-600" />
-                  <CardTitle className="text-base">Assistente Simplific</CardTitle>
+              <div 
+                className={cn("flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all duration-300 relative overflow-hidden", 
+                  responseFormat === 'audio' 
+                    ? "bg-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/20" 
+                    : "bg-white/2 border-white/5 hover:bg-white/5")}
+                onClick={() => handlePreferenceChange('audio')}
+              >
+                {responseFormat === 'audio' && <div className="absolute left-0 inset-y-0 w-1 bg-indigo-500"></div>}
+                <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="r_audio" className="cursor-pointer font-bold text-slate-200">Áudio Voz</Label>
+                    <span className="text-[10px] text-slate-500 font-medium">Interação mais natural</span>
                 </div>
-                <CardDescription className="text-xs">Como o bot deve responder?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup value={responseFormat} onValueChange={handlePreferenceChange} className="space-y-3">
-                  <div className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${responseFormat === 'text' ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800' : 'hover:bg-gray-50 dark:hover:bg-slate-800'}`}>
-                    <Label htmlFor="r_text" className="cursor-pointer flex-1 font-normal">Texto (Mais rápido)</Label>
-                    <RadioGroupItem value="text" id="r_text" />
-                  </div>
-                  <div className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${responseFormat === 'audio' ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800' : 'hover:bg-gray-50 dark:hover:bg-slate-800'}`}>
-                    <Label htmlFor="r_audio" className="cursor-pointer flex-1 font-normal">Áudio (Mais natural)</Label>
-                    <RadioGroupItem value="audio" id="r_audio" />
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
+                <RadioGroupItem value="audio" id="r_audio" className="border-white/20 data-[state=checked]:border-indigo-500 data-[state=checked]:text-indigo-500" />
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="p-6 text-center opacity-40">
+             <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Simplific Pro Cloud © 2026</p>
+             <p className="text-[8px] font-medium text-slate-600 mt-2 tracking-widest uppercase">Versão de Sistema 2.0.4-beta</p>
           </div>
         </div>
       </div>

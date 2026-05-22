@@ -9,63 +9,73 @@ import {
 
 // ── Componente de preview de chat WhatsApp ──────────────────────────────────
 const ChatBubble = ({ text, isBot = false }) => (
-  <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-1`}>
-    <div className={`max-w-[85%] px-3 py-1.5 rounded-xl text-xs leading-relaxed ${
+  <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-2`}>
+    <div className={cn(
+      "max-w-[85%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-lg backdrop-blur-md",
       isBot
-        ? 'bg-white text-slate-700 rounded-tl-none shadow-sm'
-        : 'bg-emerald-500 text-white rounded-tr-none'
-    }`}>
+        ? 'bg-slate-800/80 text-slate-200 rounded-tl-none border border-white/5'
+        : 'bg-emerald-600/90 text-white rounded-tr-none border border-emerald-500/20'
+    )}>
       {text}
     </div>
   </div>
 );
 
 const ChatPreview = ({ messages }) => (
-  <div className="bg-[#e5ddd5] rounded-xl p-3 mt-4">
-    <div className="flex items-center gap-2 bg-emerald-700 rounded-t-lg -mx-3 -mt-3 px-3 py-2 mb-3">
-      <div className="w-7 h-7 rounded-full bg-emerald-400 flex items-center justify-center">
-        <Sparkles size={12} className="text-white" />
+  <div className="glass-panel p-4 mt-6 border-white/5 bg-slate-900/40 relative overflow-hidden">
+    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-cyan-500"></div>
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+        <Sparkles size={14} className="text-emerald-400" />
       </div>
-      <span className="text-white text-xs font-semibold">Simplific Pro</span>
+      <div>
+        <span className="text-white text-[10px] font-black uppercase tracking-widest block">Simplific Pro</span>
+        <span className="text-[10px] text-emerald-400 font-bold">Online agora</span>
+      </div>
     </div>
-    {messages.map((msg, i) => (
-      <ChatBubble key={i} text={msg.text} isBot={msg.isBot} />
-    ))}
+    <div className="space-y-1">
+      {messages.map((msg, i) => (
+        <ChatBubble key={i} text={msg.text} isBot={msg.isBot} />
+      ))}
+    </div>
   </div>
 );
 
 // ── Card de funcionalidade ──────────────────────────────────────────────────
 const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, preview }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-border hover:shadow-md transition-all hover:-translate-y-1 flex flex-col h-full overflow-hidden">
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex items-start justify-between mb-3">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${color}`}>
-            <Icon size={24} className="text-white" />
+    <div className="glass-card group flex flex-col h-full overflow-hidden border-white/5 hover:border-white/10 transition-all duration-500">
+      <div className="p-6 flex flex-col flex-grow relative">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/2 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-white/5 transition-all"></div>
+        
+        <div className="flex items-start justify-between mb-6">
+          <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg border border-white/10", color.replace('bg-', 'bg-opacity-20 text-'))}>
+            <Icon size={24} className={color.replace('bg-', 'text-').replace('-500', '-400').replace('-600', '-400')} />
           </div>
           {badge && (
-            <span className="text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wide">
+            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] font-black uppercase tracking-widest px-2 py-0.5">
               {badge}
-            </span>
+            </Badge>
           )}
         </div>
-        <h3 className="text-lg font-bold text-foreground mb-1">{title}</h3>
-        <p className="text-muted-foreground text-sm mb-4 flex-grow leading-relaxed">{description}</p>
+
+        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">{title}</h3>
+        <p className="text-slate-400 text-sm mb-6 flex-grow leading-relaxed">{description}</p>
 
         {preview && <ChatPreview messages={preview} />}
 
-        <div className="mt-4">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground mb-3">
-            <MessageCircle size={12} className="text-emerald-500" />
-            Exemplos de comandos
+        <div className="mt-8 pt-6 border-t border-white/5">
+          <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
+            <MessageCircle size={12} className="text-cyan-400" />
+            Comandos de exemplo
           </div>
-          <div className="bg-muted/50 rounded-xl p-3 border border-border/50 space-y-2">
+          <div className="space-y-3">
             {commands.map((cmd, idx) => (
-              <div key={idx} className="flex gap-2 items-start">
-                <div className="bg-emerald-100 dark:bg-emerald-900/30 p-1 rounded-full mt-0.5 shrink-0">
-                  <MessageCircle size={10} className="text-emerald-700 dark:text-emerald-400" />
+              <div key={idx} className="flex gap-3 items-start group/cmd">
+                <div className="bg-white/5 p-1 rounded-lg mt-0.5 shrink-0 border border-white/5 group-hover/cmd:border-cyan-500/30 transition-colors">
+                  <Zap size={10} className="text-cyan-400" />
                 </div>
-                <p className="text-xs text-foreground font-medium italic">"{cmd}"</p>
+                <p className="text-xs text-slate-300 font-medium italic leading-relaxed group-hover/cmd:text-white transition-colors">"{cmd}"</p>
               </div>
             ))}
           </div>
@@ -77,13 +87,13 @@ const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, p
 
 // ── Separador de seção ──────────────────────────────────────────────────────
 const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
-  <div className="flex items-center gap-4 mb-7">
-    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${color} shrink-0`}>
-      <Icon size={20} className="text-white" />
+  <div className="flex items-center gap-5 mb-10 group">
+    <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl border border-white/10 transition-transform group-hover:scale-110", color.replace('bg-', 'bg-opacity-20 '))}>
+      <Icon size={24} className={color.replace('bg-', 'text-').replace('-500', '-400').replace('-600', '-400')} />
     </div>
     <div>
-      <h2 className="text-2xl font-bold text-foreground leading-tight">{title}</h2>
-      {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
+      <h2 className="text-2xl font-black text-white tracking-tight leading-tight">{title}</h2>
+      {subtitle && <p className="text-sm font-medium text-slate-500 mt-1 uppercase tracking-wider">{subtitle}</p>}
     </div>
   </div>
 );
@@ -91,33 +101,36 @@ const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
 // ── Componente principal ────────────────────────────────────────────────────
 const AdvisorFeatures = ({ user, onLogout }) => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col font-sans">
-      <PageHeader user={user} onLogout={onLogout} />
-
-      <div className="flex-grow container mx-auto px-4 py-8 max-w-7xl">
+    <div className="space-y-12 animate-in fade-in duration-700">
 
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
-        <div className="text-center mb-14 mt-4">
-          <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 px-4 py-1.5 rounded-full text-sm font-bold mb-6">
-            <Sparkles size={16} /> Inteligência Artificial Simplific
+        <div className="text-center mb-20 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+          
+          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-cyan-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 backdrop-blur-sm">
+            <Sparkles size={14} className="animate-pulse" /> Inteligência Artificial Simplific
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4 tracking-tight">
-            Tudo que o Simplific faz por você <span className="text-emerald-600 dark:text-emerald-400">no WhatsApp</span>
+          
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter leading-[1.1]">
+            Potencialize sua gestão <br/>
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">pelo WhatsApp</span>
           </h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Mais que um bot. Um parceiro financeiro completo, analista de mercado, secretária executiva e muito mais.
-            Basta falar ou enviar áudio — e o Simplific cuida do resto.
+          
+          <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
+            Um parceiro financeiro autônomo, analista de mercado e assistente executivo.
+            Basta falar ou enviar uma foto — a IA cuida de toda a burocracia para você.
           </p>
-          <div className="flex flex-wrap justify-center gap-3 mt-6">
+
+          <div className="flex flex-wrap justify-center gap-3 mt-10">
             {[
               { icon: Mic, label: 'Aceita Áudios' },
-              { icon: Receipt, label: 'Lê Imagens e Comprovantes' },
+              { icon: Receipt, label: 'Lê Comprovantes' },
               { icon: Brain, label: 'Memória Permanente' },
-              { icon: Globe, label: 'Pesquisa na Internet' },
-              { icon: Shield, label: 'Dados 100% Seguros' },
+              { icon: Globe, label: 'Pesquisa Web' },
+              { icon: Shield, label: '100% Seguro' },
             ].map(({ icon: I, label }) => (
-              <span key={label} className="flex items-center gap-2 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full border border-border shadow-sm">
-                <I size={14} className="text-emerald-500" /> {label}
+              <span key={label} className="flex items-center gap-2 glass-panel border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-300 px-5 py-2.5 rounded-xl shadow-xl hover:border-cyan-500/30 transition-all cursor-default group">
+                <I size={14} className="text-cyan-400 group-hover:scale-110 transition-transform" /> {label}
               </span>
             ))}
           </div>
