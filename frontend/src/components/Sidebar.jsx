@@ -205,9 +205,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 className={cn(
                   "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
                   !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen 
-                    ? "bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-bold shadow-sm" 
-                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                  (!isOpen && isChildActive) || isOpen ? "bg-white/5 text-white font-medium shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <group.icon 
@@ -231,14 +229,14 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                 )}
 
                 {!isDesktopOpen && (
-                  <span className="absolute left-14 glass-panel px-3 py-1.5 rounded-lg text-xs shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border-slate-200 dark:border-white/10">
+                  <span className="absolute left-14 glass-panel px-3 py-1.5 rounded-lg text-xs shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border-white/10">
                     {group.title}
                   </span>
                 )}
               </button>
 
               {isDesktopOpen && isOpen && (
-                <div className="space-y-1 ml-4 border-l border-slate-200 dark:border-white/5 pl-2 animate-in slide-in-from-top-2 duration-200">
+                <div className="space-y-1 ml-4 border-l border-white/5 pl-2 animate-in slide-in-from-top-2 duration-200">
                   {group.items.map((item) => {
                     if (item.isExternal) {
                       return (
@@ -249,7 +247,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           rel="noopener noreferrer"
                           className={cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            "text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-50 dark:hover:bg-white/5"
+                            "text-slate-400 hover:text-cyan-400 hover:bg-white/5"
                           )}
                         >
                           <item.icon className="h-4 w-4 mr-3 opacity-70" />
@@ -267,8 +265,8 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           cn(
                             "flex items-center p-2 rounded-lg transition-colors text-sm",
                             isActive 
-                              ? "active-gradient text-cyan-600 dark:text-cyan-400 font-bold bg-slate-100 dark:bg-transparent" 
-                              : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
+                              ? "active-gradient text-cyan-400 font-medium" 
+                              : "text-slate-400 hover:text-white hover:bg-white/5"
                           )
                         }
                       >
