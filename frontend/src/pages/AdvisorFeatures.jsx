@@ -1,11 +1,14 @@
 import React from 'react';
 import PageHeader from '@/components/PageHeader';
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import {
   Wallet, TrendingUp, MessageCircle, CreditCard, Sparkles, Mic, BarChart3, Video,
   UserPlus, FileText, Target, Brain, Search, Receipt, Building2, Calculator,
   Trophy, Users, Package, Link2, Bell, Globe, PieChart, Award, ArrowUpDown,
-  Shield, Calendar, Zap, LineChart, FileUp, Star, DollarSign, Smartphone
+  Shield, Calendar, Zap, LineChart, FileUp, Star, DollarSign, Smartphone, Bot
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // ── Componente de preview de chat WhatsApp ──────────────────────────────────
 const ChatBubble = ({ text, isBot = false }) => (
@@ -338,7 +341,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               description="Para ações e FIIs, o Simplific calcula a Taxa de Crescimento Anual Composta (CAGR) histórica do ativo e projeta seu crescimento para os próximos 24 meses com base no desempenho real."
               badge="IA"
               commands={[
-                'Qual a projeção de crescimento do meu MXRF11?',
+                'Qual a projecção de crescimento do meu MXRF11?',
                 'Como deve se sair minha carteira nos próximos 2 anos?',
                 'Me mostra a evolução histórica da carteira em 2024',
               ]}
@@ -566,7 +569,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               icon={Bell}
               color="bg-orange-400"
               title="Notificações e Lembretes"
-              description="Configure alertas automáticos: vencimento de faturas, datas de pagamento, aniversários de metas, eventos da agenda e alertas de orçamento ultrapassado — tudo direto no WhatsApp."
+              description="Configure alertas automáticos: vencimento de faturas, das de pagamento, aniversários de metas, eventos da agenda e alertas de orçamento ultrapassado — tudo direto no WhatsApp."
               commands={[
                 'Me lembre de cancelar a Netflix na sexta-feira',
                 'Avisa quando minha fatura do Nubank vencer',
@@ -748,7 +751,6 @@ const AdvisorFeatures = ({ user, onLogout }) => {
           </div>
         </div>
 
-      </div>
     </div>
   );
 };

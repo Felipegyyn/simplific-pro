@@ -21,6 +21,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
+import { cn } from "@/lib/utils";
 
 const Reports = ({ user, onLogout }) => {
   const navigate = useNavigate();

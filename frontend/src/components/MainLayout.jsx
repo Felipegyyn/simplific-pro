@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom'; // <--- 1. Importei useLocation
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'; // <--- 1. Importei useLocation e useNavigate
 import Sidebar from './Sidebar';
 import SidebarBusiness from './SidebarBusiness'; // <--- 2. Importei o novo Sidebar
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '../assets/LOGO.png';
+import { cn } from "@/lib/utils";
 
 const MainLayout = ({ user, onLogout }) => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // 3. Detectar qual contexto estamos

@@ -1045,10 +1045,10 @@ const Transactions = ({ user, onLogout }) => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-    </div>
-  );
-
-};
+        </div>
+        </div>
+        </div>
+        );
+        };
 
 export default Transactions;

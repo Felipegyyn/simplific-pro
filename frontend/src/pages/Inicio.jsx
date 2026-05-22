@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import PageHeader from '../components/PageHeader'; // <--- ADICIONE ESTA LINHA
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, ArrowDownCircle, ArrowUpCircle, Wallet, Clock, CheckCircle, Landmark, CreditCard, Edit, Trash2, Calendar, Target, DollarSign  } from 'lucide-react';
 import apiService from '../services/api';
 import eventService from '../services/eventService';
+import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const Inicio = ({ user }) => {

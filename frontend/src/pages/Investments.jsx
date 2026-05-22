@@ -917,10 +917,9 @@ const handleCalculate = async (e) => {
         />
       </div>
     </div>
-  );
-
-};
-            
+    </div>
+    );
+    };            
             
 
 export default Investments;
