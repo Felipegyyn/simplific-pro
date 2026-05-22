@@ -299,6 +299,7 @@ const Settings = ({ user, onLogout }) => {
         {/* COLUNA DIREITA (1/3): PREFS */}
         <div className="space-y-8">
           
+          {/* 
           <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
             
@@ -312,6 +313,7 @@ const Settings = ({ user, onLogout }) => {
                 <Switch id="dark-mode" checked={theme === 'dark'} onCheckedChange={toggleTheme} className="data-[state=checked]:bg-cyan-500" />
             </div>
           </div>
+          */}
 
           <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
