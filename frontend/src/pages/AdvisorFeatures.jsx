@@ -745,6 +745,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               ))}
             </div>
           </div>
+        </div>
     </div>
   );
 };
