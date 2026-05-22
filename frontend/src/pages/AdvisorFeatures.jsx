@@ -103,7 +103,6 @@ const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
 
 // ── Componente principal ────────────────────────────────────────────────────
 const AdvisorFeatures = ({ user, onLogout }) => {
-const AdvisorFeatures = ({ user, onLogout }) => {
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
@@ -135,7 +134,6 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               </span>
             ))}
           </div>
-        </div>
 
         {/* ══════════════════════════════════════════════════════════════════ */}
         {/* SEÇÃO 1 — GESTÃO FINANCEIRA DIÁRIA                                */}
