@@ -6,10 +6,12 @@ import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils";
+import ChatWidget from './ChatWidget';
 
 const MainLayout = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   
   // 3. Detectar qual contexto estamos
   const location = useLocation();
