@@ -76,7 +76,7 @@ const Contacts = () => {
   );
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-6 max-w-[100%] mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">

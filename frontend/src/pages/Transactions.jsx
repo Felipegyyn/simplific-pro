@@ -516,7 +516,7 @@ const Transactions = ({ user, onLogout }) => {
   return (
     <div className="min-h-screen bg-transparent text-slate-200">
       <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Button 
@@ -539,7 +539,7 @@ const Transactions = ({ user, onLogout }) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
             Lançamentos Financeiros
