@@ -89,9 +89,12 @@ const MainLayout = ({ user, onLogout }) => {
           <Outlet /> 
         </main>
 
+        {/* Componente de Mini Chat */}
+        <ChatWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+
         {/* Botão Flutuante Simplific IA */}
         <button
-          onClick={() => navigate('/simplific-ia')}
+          onClick={() => setIsChatOpen(!isChatOpen)}
           className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"
           title="Falar com Simplific IA"
         >
@@ -103,7 +106,7 @@ const MainLayout = ({ user, onLogout }) => {
             <img 
                 src="/favicon.ico" 
                 alt="IA" 
-                className="w-10 h-10 object-contain brightness-110"
+                className="w-full h-full object-cover rounded-full brightness-110"
                 onError={(e) => { e.target.src = logo }} 
             />
           </div>
