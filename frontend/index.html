@@ -9,6 +9,14 @@
     <title>Simplific Pro | Assuma o Controle da Sua Vida</title>
 
     <script>
+      // Força o modo dark imediatamente para evitar flash branco
+      document.documentElement.classList.add('dark');
+      if (localStorage.getItem('theme') !== 'dark') {
+        localStorage.setItem('theme', 'dark');
+      }
+    </script>
+
+    <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
