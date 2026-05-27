@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Calendar, Clock, CheckCircle, AlertTriangle, Plus, Edit, Trash2,
   DollarSign, Bell, LogOut, ArrowLeft, Filter, Globe, Smartphone,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, ListTodo, StickyNote, Tag
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLocation
 import { cn } from "@/lib/utils";
@@ -25,6 +25,12 @@ const Schedule = ({ user, onLogout }) => {
   const location = useLocation(); // Hook para ler a URL
   const [isSyncing, setIsSyncing] = useState(false); // Estado de loading do botão
 
+  // Estados para o Bloco de Notas / Gestor de Tarefas
+  const [localTasks, setLocalTasks] = useState([]);
+  const [newTaskText, setNewTaskText] = useState('');
+  const [newTaskDate, setNewTaskDate] = useState('');
+  const [isTaskLoading, setIsTaskLoading] = useState(false);
+
   // Estados puramente de UI para o calendário visual
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
@@ -33,6 +39,85 @@ const Schedule = ({ user, onLogout }) => {
   // Estados para eventos e modal
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // --- Lógica do Bloco de Notas (LocalStorage) ---
+  useEffect(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`simplific_tasks_${user.id}`);
+      if (saved) setLocalTasks(JSON.parse(saved));
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`simplific_tasks_${user.id}`, JSON.stringify(localTasks));
+    }
+  }, [localTasks, user?.id]);
+
+  const handleQuickAddTask = async (e) => {
+    e.preventDefault();
+    if (!newTaskText.trim()) return;
+
+    if (newTaskDate) {
+      try {
+        setIsTaskLoading(true);
+        await apiService.post('/api/schedule', {
+          title: newTaskText,
+          event_date: newTaskDate,
+          type: 'tarefa',
+          priority: 'média',
+          description: 'Tarefa criada via Bloco de Notas'
+        });
+        await loadEventos();
+        setNewTaskText('');
+        setNewTaskDate('');
+      } catch (error) {
+        console.error("Erro ao sincronizar tarefa:", error);
+      } finally {
+        setIsTaskLoading(false);
+      }
+    } else {
+      const newTask = {
+        id: Date.now(),
+        text: newTaskText,
+        completed: false,
+        created_at: new Date().toISOString()
+      };
+      setLocalTasks([newTask, ...localTasks]);
+      setNewTaskText('');
+    }
+  };
+
+  const toggleLocalTask = (id) => {
+    setLocalTasks(localTasks.map(t => 
+      t.id === id ? { ...t, completed: !t.completed } : t
+    ));
+  };
+
+  const deleteLocalTask = (id) => {
+    setLocalTasks(localTasks.filter(t => t.id !== id));
+  };
+
+  const promoteToAgenda = async (task) => {
+    const date = prompt("Para qual data deseja agendar? (AAAA-MM-DD)", new Date().toISOString().split('T')[0]);
+    if (date) {
+      try {
+        setIsTaskLoading(true);
+        await apiService.post('/api/schedule', {
+          title: task.text,
+          event_date: date,
+          type: 'tarefa',
+          priority: 'média'
+        });
+        deleteLocalTask(task.id);
+        await loadEventos();
+      } catch (error) {
+        alert("Erro ao agendar tarefa.");
+      } finally {
+        setIsTaskLoading(false);
+      }
+    }
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -411,7 +496,12 @@ const Schedule = ({ user, onLogout }) => {
         </div>
       </div>
       
-      <Tabs defaultValue="calendario" className="space-y-6">
+      {/* Estrutura Principal: Agenda + Bloco de Notas Lateral */}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        
+        {/* COLUNA ESQUERDA: Agenda Financeira Principal (3/4) */}
+        <div className="xl:col-span-3 space-y-6">
+          <Tabs defaultValue="calendario" className="space-y-6">
         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
           <TabsList className="grid w-full xl:w-auto grid-cols-5 glass-panel p-1 border-white/5">
             <TabsTrigger value="calendario" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Calendário</TabsTrigger>
@@ -899,6 +989,100 @@ const Schedule = ({ user, onLogout }) => {
           );
         })}
       </Tabs>
+        </div>
+
+        {/* COLUNA DIREITA: Bloco de Notas / Gestor de Tarefas (1/4) */}
+        <div className="xl:col-span-1 space-y-4">
+          <Card className="glass-panel border-white/10 bg-slate-900/40 backdrop-blur-md sticky top-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-bold flex items-center gap-2 text-white">
+                <ListTodo className="h-5 w-5 text-cyan-400" />
+                Bloco de Notas
+              </CardTitle>
+              <p className="text-xs text-slate-400">Anote tarefas rápidas ou rascunhos.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Input Rápido */}
+              <form onSubmit={handleQuickAddTask} className="space-y-2">
+                <div className="relative">
+                  <Input
+                    placeholder="Nova tarefa..."
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    className="bg-white/5 border-white/10 pr-10 focus:ring-cyan-500/50"
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={isTaskLoading || !newTaskText.trim()}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    value={newTaskDate}
+                    onChange={(e) => setNewTaskDate(e.target.value)}
+                    className="bg-white/5 border-white/10 text-xs h-8"
+                  />
+                  <span className="text-[10px] text-slate-500 italic">Opcional</span>
+                </div>
+              </form>
+
+              {/* Lista de Tarefas */}
+              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                {localTasks.length === 0 && (
+                  <div className="text-center py-8 opacity-40">
+                    <StickyNote className="h-8 w-8 mx-auto mb-2" />
+                    <p className="text-xs">Nenhuma anotação local.</p>
+                  </div>
+                )}
+                
+                {localTasks.map(task => (
+                  <div 
+                    key={task.id} 
+                    className="group flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-all"
+                  >
+                    <button 
+                      onClick={() => toggleLocalTask(task.id)}
+                      className={cn(
+                        "mt-0.5 rounded-full border border-white/20 p-0.5 transition-colors",
+                        task.completed ? "bg-cyan-500 border-cyan-500" : "hover:border-cyan-500/50"
+                      )}
+                    >
+                      <CheckCircle className={cn("h-3 w-3", task.completed ? "text-white" : "text-transparent")} />
+                    </button>
+                    
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-sm text-slate-200 leading-tight break-words",
+                        task.completed && "line-through opacity-40"
+                      )}>
+                        {task.text}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => promoteToAgenda(task)}
+                          className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1"
+                        >
+                          <Calendar className="h-3 w-3" /> Agendar
+                        </button>
+                        <button 
+                          onClick={() => deleteLocalTask(task.id)}
+                          className="text-[10px] text-red-400 hover:underline"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* MODAL DE EDIÇÃO */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
