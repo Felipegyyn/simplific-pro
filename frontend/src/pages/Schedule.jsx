@@ -98,6 +98,30 @@ const Schedule = ({ user, onLogout }) => {
     setLocalTasks(localTasks.filter(t => t.id !== id));
   };
 
+  // --- Função para unificar tarefas locais e da agenda ---
+  const getUnifiedTasks = () => {
+    // 1. Pegamos as tarefas locais (sem data)
+    const local = localTasks.map(t => ({ ...t, source: 'local' }));
+    
+    // 2. Pegamos as tarefas da agenda (da API) que são do tipo 'tarefa'
+    const fromAgenda = eventos
+      .filter(e => e.type === 'tarefa')
+      .map(e => ({
+        id: e.id,
+        text: e.title,
+        completed: e.is_completed,
+        date: e.date,
+        source: 'api',
+        priority: e.priority
+      }));
+
+    // Retorna tudo unificado, priorizando as não concluídas no topo
+    return [...local, ...fromAgenda].sort((a, b) => {
+      if (a.completed === b.completed) return 0;
+      return a.completed ? 1 : -1;
+    });
+  };
+
   const promoteToAgenda = async (task) => {
     const date = prompt("Para qual data deseja agendar? (AAAA-MM-DD)", new Date().toISOString().split('T')[0]);
     if (date) {
@@ -1030,51 +1054,81 @@ const Schedule = ({ user, onLogout }) => {
                 </div>
               </form>
 
-              {/* Lista de Tarefas */}
-              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
-                {localTasks.length === 0 && (
+              {/* Lista de Tarefas Unificada (Local + Agenda) */}
+              <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
+                {getUnifiedTasks().length === 0 && (
                   <div className="text-center py-8 opacity-40">
                     <StickyNote className="h-8 w-8 mx-auto mb-2" />
-                    <p className="text-xs">Nenhuma anotação local.</p>
+                    <p className="text-xs">Nenhuma nota ou tarefa.</p>
                   </div>
                 )}
                 
-                {localTasks.map(task => (
+                {getUnifiedTasks().map(task => (
                   <div 
-                    key={task.id} 
-                    className="group flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-all"
+                    key={`${task.source}-${task.id}`} 
+                    className={cn(
+                      "group relative flex flex-col p-3 rounded-lg transition-all border-l-4 shadow-sm",
+                      task.source === 'api' 
+                        ? "bg-cyan-500/5 border-cyan-500/50 hover:bg-cyan-500/10" 
+                        : "bg-yellow-500/5 border-yellow-500/50 hover:bg-yellow-500/10",
+                      task.completed && "opacity-50 grayscale-[0.5]"
+                    )}
                   >
-                    <button 
-                      onClick={() => toggleLocalTask(task.id)}
-                      className={cn(
-                        "mt-0.5 rounded-full border border-white/20 p-0.5 transition-colors",
-                        task.completed ? "bg-cyan-500 border-cyan-500" : "hover:border-cyan-500/50"
-                      )}
-                    >
-                      <CheckCircle className={cn("h-3 w-3", task.completed ? "text-white" : "text-transparent")} />
-                    </button>
-                    
-                    <div className="flex-1 min-w-0">
-                      <p className={cn(
-                        "text-sm text-slate-200 leading-tight break-words",
-                        task.completed && "line-through opacity-40"
-                      )}>
-                        {task.text}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-start gap-2">
+                      <button 
+                        onClick={() => task.source === 'local' ? toggleLocalTask(task.id) : marcarConcluido(task.id)}
+                        className={cn(
+                          "mt-0.5 rounded-full border border-white/20 p-0.5 transition-colors shrink-0",
+                          task.completed ? "bg-emerald-500 border-emerald-500" : "hover:border-emerald-500/50"
+                        )}
+                      >
+                        <CheckCircle className={cn("h-3 w-3", task.completed ? "text-white" : "text-transparent")} />
+                      </button>
+                      
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          "text-sm font-medium text-slate-100 leading-tight break-words",
+                          task.completed && "line-through text-slate-400"
+                        )}>
+                          {task.text}
+                        </p>
+                        
+                        {/* Tags de Contexto */}
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          <span className={cn(
+                            "text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-tighter",
+                            task.source === 'api' ? "bg-cyan-500/20 text-cyan-400" : "bg-yellow-500/20 text-yellow-400"
+                          )}>
+                            {task.source === 'api' ? 'Agenda' : 'Nota'}
+                          </span>
+                          
+                          {task.date && (
+                            <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                              <Calendar className="h-2.5 w-2.5" />
+                              {formatarData(task.date)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ações Rápidas (Hover) */}
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {task.source === 'local' && (
                         <button 
                           onClick={() => promoteToAgenda(task)}
-                          className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1"
+                          title="Transformar em Compromisso"
+                          className="p-1 text-slate-400 hover:text-cyan-400"
                         >
-                          <Calendar className="h-3 w-3" /> Agendar
+                          <Calendar className="h-3.5 w-3.5" />
                         </button>
-                        <button 
-                          onClick={() => deleteLocalTask(task.id)}
-                          className="text-[10px] text-red-400 hover:underline"
-                        >
-                          Excluir
-                        </button>
-                      </div>
+                      )}
+                      <button 
+                        onClick={() => task.source === 'local' ? deleteLocalTask(task.id) : excluirEvento(task.id)}
+                        className="p-1 text-slate-400 hover:text-red-400"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 ))}
