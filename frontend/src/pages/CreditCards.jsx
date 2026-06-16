@@ -806,7 +806,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                         {expandedCardId === cartao.id ? 'Ocultar Histórico' : 'Ver Histórico de Faturas'}
                       </Button>
 
-                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
 
                     {expandedCardId === cartao.id && (
