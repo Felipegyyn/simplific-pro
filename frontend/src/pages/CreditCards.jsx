@@ -763,7 +763,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                             <p className="text-xs text-slate-500 uppercase tracking-widest">{cartao.bandeira} • {cartao.numero}</p>
                           </div>
                         </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                           <Button variant="ghost" size="icon" onClick={() => abrirModalGasto(cartao)} className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10"><Plus className="h-4 w-4" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => abrirModalEdicao(cartao)} className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/5"><Edit className="h-4 w-4" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => excluirCartao(cartao.id)} className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10"><Trash2 className="h-4 w-4" /></Button>
@@ -927,7 +927,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                             </Badge>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                               <Button 
                                 variant="ghost" 
                                 size="sm"
@@ -1105,7 +1105,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                         <div className="flex items-center gap-4">
                           <p className="text-sm font-bold text-rose-400">R$ {Number(transacao.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                           {selectedFatura.status === 'aberta' && (
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => excluirTransacao(transacao.id)}>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-rose-400 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity" onClick={() => excluirTransacao(transacao.id)}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           )}
