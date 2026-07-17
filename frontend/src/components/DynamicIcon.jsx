@@ -8,7 +8,8 @@ const DynamicIcon = ({ name, ...props }) => {
 
   if (!LucideIcon) {
     // Retorna um ícone padrão caso o nome seja inválido
-    return <icons.HelpCircle {...props} />;
+    const DefaultIcon = icons.CircleHelp || icons.HelpCircle;
+    return DefaultIcon ? <DefaultIcon {...props} /> : null;
   }
 
   return <LucideIcon {...props} />;

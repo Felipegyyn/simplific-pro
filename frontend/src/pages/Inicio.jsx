@@ -859,6 +859,203 @@ const Inicio = ({ user }) => {
 
           </div>
         </div>
+
+        {/* MODAL DE AGENDAMENTO RÁPIDO (PRÓXIMOS EVENTOS) */}
+        <Dialog open={isEventoModalOpen} onOpenChange={setIsEventoModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-white font-black">Agendar Novo Evento</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEventoSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Título do Evento</Label>
+                <Input
+                  value={eventoFormData.title}
+                  onChange={(e) => setEventoFormData({ ...eventoFormData, title: e.target.value })}
+                  placeholder="Ex: Pagamento Aluguel"
+                  className="bg-white/5 border-white/10 text-white"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Data</Label>
+                  <Input
+                    type="date"
+                    value={eventoFormData.event_date}
+                    onChange={(e) => setEventoFormData({ ...eventoFormData, event_date: e.target.value })}
+                    className="bg-white/5 border-white/10 text-white"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Tipo</Label>
+                  <Select
+                    value={eventoFormData.type}
+                    onValueChange={(val) => setEventoFormData({ ...eventoFormData, type: val })}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10 text-slate-200">
+                      <SelectItem value="pagamento">Pagamento / Despesa</SelectItem>
+                      <SelectItem value="recebimento">Recebimento / Receita</SelectItem>
+                      <SelectItem value="compromisso">Compromisso</SelectItem>
+                      <SelectItem value="lembrete">Lembrete</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Descrição / Observação</Label>
+                <Input
+                  value={eventoFormData.description}
+                  onChange={(e) => setEventoFormData({ ...eventoFormData, description: e.target.value })}
+                  placeholder="Detalhes opcionais..."
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+              <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold h-10 shadow-lg shadow-pink-900/20">
+                Confirmar Agendamento
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL DE INJETAR CAPITAL NA META */}
+        <Dialog open={isAddValorMetaModalOpen} onOpenChange={setIsAddValorMetaModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-white font-black">Injetar Capital em Meta</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddValorMetaSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Selecione a Meta</Label>
+                <Select
+                  value={selectedMetaAdd}
+                  onValueChange={(val) => setSelectedMetaAdd(val)}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Selecione uma meta ativa..." /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10 text-slate-200">
+                    {metasAtivas.length === 0 ? (
+                      <SelectItem value="none" disabled>Nenhuma meta ativa disponível</SelectItem>
+                    ) : (
+                      metasAtivas.map(m => (
+                        <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Valor a Adicionar (R$)</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  value={valorAdicionarMeta}
+                  onChange={(e) => setValorAdicionarMeta(e.target.value)}
+                  placeholder="0,00"
+                  className="bg-white/5 border-white/10 text-white"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold h-10 shadow-lg shadow-purple-900/20">
+                Confirmar Injeção de Capital
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL DE LANÇAMENTO NO CARTÃO DE CRÉDITO */}
+        <Dialog open={isGastoModalOpen} onOpenChange={setIsGastoModalOpen}>
+          <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-white font-black">Gasto no Cartão: {selectedCartao?.name}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleGastoSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Descrição</Label>
+                <Input
+                  value={gastoFormData.description}
+                  onChange={(e) => setGastoFormData({ ...gastoFormData, description: e.target.value })}
+                  placeholder="Ex: Assinatura, Restaurante..."
+                  className="bg-white/5 border-white/10 text-white"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Valor (R$)</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={gastoFormData.amount}
+                    onChange={(e) => setGastoFormData({ ...gastoFormData, amount: e.target.value })}
+                    placeholder="0,00"
+                    className="bg-white/5 border-white/10 text-white"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Data</Label>
+                  <Input
+                    type="date"
+                    value={gastoFormData.date}
+                    onChange={(e) => setGastoFormData({ ...gastoFormData, date: e.target.value })}
+                    className="bg-white/5 border-white/10 text-white"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Categoria de Saída</Label>
+                <Select
+                  value={gastoFormData.category}
+                  onValueChange={(val) => setGastoFormData({ ...gastoFormData, category: val })}
+                >
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Selecione uma categoria..." /></SelectTrigger>
+                  <SelectContent className="glass-panel border-white/10 text-slate-200 max-h-[200px]">
+                    {categorias.filter(c => c.type === 'saida').map((cat, idx) => (
+                      <SelectItem key={idx} value={cat.name}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Pagamento</Label>
+                  <Select
+                    value={gastoFormData.payment_method}
+                    onValueChange={(val) => setGastoFormData({ ...gastoFormData, payment_method: val })}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
+                    <SelectContent className="glass-panel border-white/10 text-slate-200">
+                      <SelectItem value="a_vista">À Vista</SelectItem>
+                      <SelectItem value="parcelado">Parcelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {gastoFormData.payment_method === 'parcelado' && (
+                  <div className="space-y-2">
+                    <Label className="text-slate-400 text-[10px] uppercase font-black ml-1">Parcelas</Label>
+                    <Input
+                      type="number"
+                      min="2"
+                      max="48"
+                      value={gastoFormData.installments}
+                      onChange={(e) => setGastoFormData({ ...gastoFormData, installments: parseInt(e.target.value) || 1 })}
+                      className="bg-white/5 border-white/10 text-white"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
+              <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold h-10 shadow-lg shadow-cyan-900/20">
+                Lançar no Cartão
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
