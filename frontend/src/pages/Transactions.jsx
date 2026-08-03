@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
+import styles from './Transactions.module.css';
 
 const Transactions = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -514,8 +515,8 @@ const Transactions = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-200">
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+    <div className={styles.pageContainer}>
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -523,15 +524,14 @@ const Transactions = ({ user, onLogout }) => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')} 
-                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-400 hidden sm:block">Bem-vindo, {user.name}</span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
+              <span className="text-sm text-slate-500 hidden sm:block">Bem-vindo, {user.name}</span>
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" /> Sair
               </Button>
             </div>
@@ -540,67 +540,73 @@ const Transactions = ({ user, onLogout }) => {
       </header>
 
       <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            Lançamentos Financeiros
-          </h2>
-          <p className="text-slate-400">Gerencie suas receitas e despesas com precisão tecnológica</p>
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.pageTitle}>
+              Lançamentos Financeiros
+            </h2>
+            <p className={styles.pageSubtitle}>Gerencie suas receitas e despesas com precisão tecnológica</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp className="h-12 w-12 text-emerald-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Total Receitas</p>
-            <p className="text-2xl font-bold text-white">R$ {totalReceitas.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }} />
-            </div>
-          </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingDown className="h-12 w-12 text-rose-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Total Despesas</p>
-            <p className="text-2xl font-bold text-white">R$ {totalDespesas.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-rose-500 rounded-full" style={{ width: '100%' }} />
+        <div className={styles.summaryGrid}>
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Total Receitas</p>
+              <p className={styles.summaryValue}>R$ {totalReceitas.toLocaleString()}</p>
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <DollarSign className="h-12 w-12 text-cyan-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Saldo Líquido</p>
-            <p className={`text-2xl font-bold ${saldoLiquido >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              R$ {saldoLiquido.toLocaleString()}
-            </p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${saldoLiquido >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: '100%' }} />
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
+                  <TrendingDown className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Total Despesas</p>
+              <p className={styles.summaryValue}>R$ {totalDespesas.toLocaleString()}</p>
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Clock className="h-12 w-12 text-amber-400" />
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
+                  <DollarSign className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Saldo Líquido</p>
+              <p className={cn(styles.summaryValue, saldoLiquido >= 0 ? styles.textSuccess : styles.textDanger)}>
+                R$ {saldoLiquido.toLocaleString()}
+              </p>
             </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Pendentes</p>
-            <p className="text-2xl font-bold text-white">{totalPendentes}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-amber-500 rounded-full" style={{ width: '100%' }} />
+          </div>
+
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
+                  <Clock className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Pendentes</p>
+              <p className={styles.summaryValue}>{totalPendentes}</p>
             </div>
           </div>
         </div>
 
         <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
-          <TabsList className="grid w-full sm:w-auto grid-cols-4 glass-panel p-1 border-white/5">
-              <TabsTrigger value="todas" className="data-[state=active]:active-gradient">Todas</TabsTrigger>
-              <TabsTrigger value="receita" className="data-[state=active]:active-gradient">Receitas</TabsTrigger>
-              <TabsTrigger value="despesa" className="data-[state=active]:active-gradient">Despesas</TabsTrigger>
-              <TabsTrigger value="pendentes" className="data-[state=active]:active-gradient">Pendentes</TabsTrigger>
+          <TabsList className={styles.tabsList + " mb-6"}>
+              <TabsTrigger value="todas" className={styles.tabsTrigger}>Todas</TabsTrigger>
+              <TabsTrigger value="receita" className={styles.tabsTrigger}>Receitas</TabsTrigger>
+              <TabsTrigger value="despesa" className={styles.tabsTrigger}>Despesas</TabsTrigger>
+              <TabsTrigger value="pendentes" className={styles.tabsTrigger}>Pendentes</TabsTrigger>
           </TabsList>
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
@@ -835,80 +841,92 @@ const Transactions = ({ user, onLogout }) => {
 
           <TabsContent value={filtroAtivo} className="space-y-6">
             {(() => {
-              const LancamentoRow = ({ transacao, showTipo }) => (
-                <div className={`${getRowBorderClass(transacao)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
-                  <div className="flex-1 z-10">
+              const LancamentoRow = ({ transacao, showTipo }) => {
+                let borderStyle = '';
+                if (transacao.status === 'pendente') {
+                  borderStyle = styles.transactionRowWarning;
+                } else if (transacao.type === 'income') {
+                  borderStyle = styles.transactionRowSuccess;
+                } else {
+                  borderStyle = styles.transactionRowDanger;
+                }
+
+                return (
+                <div className={`${styles.transactionRow} ${borderStyle} group`}>
+                  <div className="flex-1 z-10 w-full">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-sm text-white">{transacao.description}</h3>
+                      <h3 className="font-semibold text-sm text-slate-800 dark:text-white">{transacao.description}</h3>
                       {showTipo && (
-                        <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.type === 'income' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                        <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.type === 'income' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400'}`}>
                           {transacao.type === 'income' ? 'Receita' : 'Despesa'}
                         </Badge>
                       )}
-                      <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.status === 'confirmada' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                      <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${transacao.status === 'confirmada' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
                         {transacao.status === 'confirmada' ? 'Confirmada' : 'Pendente'}
                       </Badge>
                     </div>
                     <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] text-slate-500">
-                      <span><span className="font-medium text-slate-400">Categoria:</span> {transacao.category || 'Sem categoria'}</span>
-                      <span><span className="font-medium text-slate-400">Conta:</span> {transacao.account_label || '---'}</span>
-                      <span><span className="font-medium text-slate-400">Data:</span> {formatDateForDisplay(transacao.transaction_date)}</span>
+                      <span><span className="font-medium text-slate-600 dark:text-slate-400">Categoria:</span> {transacao.category || 'Sem categoria'}</span>
+                      <span><span className="font-medium text-slate-600 dark:text-slate-400">Conta:</span> {transacao.account_label || '---'}</span>
+                      <span><span className="font-medium text-slate-600 dark:text-slate-400">Data:</span> {formatDateForDisplay(transacao.transaction_date)}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 mt-4 sm:mt-0 sm:ml-4 w-full sm:w-auto justify-between sm:justify-end z-10">
-                    <span className={`text-lg font-bold whitespace-nowrap ${transacao.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <span className={`text-lg font-bold whitespace-nowrap ${transacao.type === 'income' ? styles.textSuccess : styles.textDanger}`}>
                       R$ {(transacao.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-1 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                       {transacao.status === 'pendente' && (
-                        <Button variant="ghost" size="sm" onClick={() => confirmarTransacao(transacao.id)} className="h-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 px-2">
+                        <Button variant="ghost" size="sm" onClick={() => confirmarTransacao(transacao.id)} className="h-8 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-500/10 px-2">
                           <CheckCircle className="h-4 w-4 mr-1" />
-                          Confirmar
+                          <span className="hidden sm:inline">Confirmar</span>
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(transacao)} className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/5">
+                      <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(transacao)} className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5">
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => excluirTransacao(transacao)} className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10">
+                      <Button variant="ghost" size="sm" onClick={() => excluirTransacao(transacao)} className="h-8 w-8 p-0 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 dark:text-rose-400 dark:hover:text-rose-300">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                  {/* Subtle background glow on hover */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${transacao.type === 'income' ? 'from-emerald-500/0 to-emerald-500/5' : 'from-rose-500/0 to-rose-500/5'} opacity-0 group-hover:opacity-100 transition-opacity`} />
                 </div>
-              );
+              )};
 
               const receitasFiltradas = transacoesFiltradas.filter(t => t?.type === 'income');
               const despesasFiltradas = transacoesFiltradas.filter(t => t?.type === 'expense');
 
               if (filtroAtivo === 'todas') {
                 return (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className={styles.mainGrid}>
                     {/* ── CARD RECEITAS ── */}
-                    <div className="glass-panel p-6 border-white/5 h-fit">
-                      <div className="flex items-center gap-2 text-emerald-400 mb-6">
-                        <TrendingUp className="h-5 w-5" />
-                        <h4 className="font-semibold uppercase tracking-wider text-sm">Receitas</h4>
+                    <div className={styles.premiumCard + " h-fit"}>
+                      <div className={styles.cardHeader}>
+                        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                          <TrendingUp className="h-5 w-5" />
+                          <h4 className="font-semibold uppercase tracking-wider text-sm">Receitas</h4>
+                        </div>
                       </div>
-                      <div className="space-y-3">
+                      <div className={styles.cardContent + " pt-0 space-y-3"}>
                         {receitasFiltradas.length > 0
                           ? receitasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
-                          : <p className="text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma receita encontrada</p>
+                          : <div className={styles.emptyState}>Nenhuma receita encontrada</div>
                         }
                       </div>
                     </div>
 
                     {/* ── CARD DESPESAS ── */}
-                    <div className="glass-panel p-6 border-white/5 h-fit">
-                      <div className="flex items-center gap-2 text-rose-400 mb-6">
-                        <TrendingDown className="h-5 w-5" />
-                        <h4 className="font-semibold uppercase tracking-wider text-sm">Despesas</h4>
+                    <div className={styles.premiumCard + " h-fit"}>
+                      <div className={styles.cardHeader}>
+                        <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+                          <TrendingDown className="h-5 w-5" />
+                          <h4 className="font-semibold uppercase tracking-wider text-sm">Despesas</h4>
+                        </div>
                       </div>
-                      <div className="space-y-3">
+                      <div className={styles.cardContent + " pt-0 space-y-3"}>
                         {despesasFiltradas.length > 0
                           ? despesasFiltradas.map(t => <LancamentoRow key={t.id} transacao={t} showTipo={false} />)
-                          : <p className="text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma despesa encontrada</p>
+                          : <div className={styles.emptyState}>Nenhuma despesa encontrada</div>
                         }
                       </div>
                     </div>
@@ -921,31 +939,33 @@ const Transactions = ({ user, onLogout }) => {
                            : 'Lançamentos Pendentes';
 
               return (
-                <div className="glass-panel p-6 border-white/5">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <h4 className="font-semibold uppercase tracking-wider text-sm text-white">{titulo}</h4>
+                <div className={styles.premiumCard}>
+                  <div className={styles.cardHeader + " flex-col sm:flex-row items-start sm:items-center"}>
+                    <h4 className="font-semibold uppercase tracking-wider text-sm text-slate-800 dark:text-white">{titulo}</h4>
                     {filtroAtivo === 'pendentes' && (
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 mt-2 sm:mt-0">
                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-center min-w-[120px]">
-                          <p className="text-[10px] uppercase font-bold text-emerald-500/70 mb-0.5">Receitas</p>
-                          <p className="text-sm font-bold text-emerald-400">
+                          <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-500/70 mb-0.5">Receitas</p>
+                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                             R$ {receitasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                         <div className="px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-center min-w-[120px]">
-                          <p className="text-[10px] uppercase font-bold text-rose-500/70 mb-0.5">Despesas</p>
-                          <p className="text-sm font-bold text-rose-400">
+                          <p className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-500/70 mb-0.5">Despesas</p>
+                          <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
                             R$ {despesasPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {transacoesFiltradas.length > 0
-                      ? transacoesFiltradas.map(t => t && <LancamentoRow key={t.id} transacao={t} showTipo={filtroAtivo === 'pendentes'} />)
-                      : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhum lançamento encontrado</p>
-                    }
+                  <div className={styles.cardContent + " pt-0"}>
+                    <div className="grid grid-cols-1 gap-3">
+                      {transacoesFiltradas.length > 0
+                        ? transacoesFiltradas.map(t => t && <LancamentoRow key={t.id} transacao={t} showTipo={filtroAtivo === 'pendentes'} />)
+                        : <div className={styles.emptyState + " col-span-1"}>Nenhum lançamento encontrado</div>
+                      }
+                    </div>
                   </div>
                 </div>
               );

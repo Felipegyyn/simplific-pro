@@ -17,6 +17,7 @@
   color: var(--text-main);
   background: linear-gradient(to right, var(--text-main), var(--text-muted));
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 
