@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import notificationService from '../services/notifications';
 import NotificationCenter from '@/components/NotificationCenter';
+import styles from './Dashboard.module.css';
 
 const Dashboard = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -449,31 +450,31 @@ const tutorials = [
   }
 
   return (
-    <div className="space-y-6">
+    <div className={styles.pageContainer}>
       <WhatsNewModal />
       
       {/* Page Header Area */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className={styles.header}>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+          <h1 className={styles.pageTitle}>
             Olá, {user?.name?.split(' ')[0]}
           </h1>
-          <p className="text-slate-400 mt-1">Bem-vindo de volta ao seu centro de controle.</p>
+          <p className={styles.pageSubtitle}>Bem-vindo de volta ao seu centro de controle.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className={styles.actionPanel}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-white/5">
-                <BookOpen className="h-4 w-4 mr-2 text-cyan-400" />
-                Tutoriais
-              </Button>
+              <button className={styles.iconBtn}>
+                <BookOpen className="h-4 w-4 mr-2" style={{ color: '#06b6d4' }} />
+                <span className="text-sm font-semibold">Tutoriais</span>
+              </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="glass-panel border-white/10 text-slate-200">
+            <DropdownMenuContent>
               <DropdownMenuLabel>Guia Rápido</DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-white/5" />
+              <DropdownMenuSeparator />
               {tutorials.map((tutorial) => (
-                <DropdownMenuItem key={tutorial.name} className="hover:bg-white/5 cursor-pointer">
+                <DropdownMenuItem key={tutorial.name} className="cursor-pointer">
                   <a href={tutorial.url} target="_blank" rel="noopener noreferrer" className="w-full">
                     {tutorial.name}
                   </a>
@@ -484,18 +485,16 @@ const tutorials = [
 
           <Dialog open={isNotificationCenterOpen} onOpenChange={setIsNotificationCenterOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="glass-panel border-white/10 hover:bg-white/5 relative">
-                {unreadCount > 0 ? <BellRing className="h-4 w-4 text-cyan-400" /> : <Bell className="h-4 w-4" />}
+              <button className={styles.iconBtn}>
+                {unreadCount > 0 ? <BellRing className="h-4 w-4" style={{ color: '#06b6d4' }} /> : <Bell className="h-4 w-4" />}
                 {unreadCount > 0 && (
-                  <Badge 
-                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-[10px] p-0 bg-cyan-500 text-white border-none shadow-lg shadow-cyan-900/40"
-                  >
+                  <span className={styles.notificationBadge}>
                     {unreadCount > 9 ? '9+' : unreadCount}
-                  </Badge>
+                  </span>
                 )}
-              </Button>
+              </button>
             </DialogTrigger>
-            <DialogContent className="glass-panel border-white/10 text-slate-200 max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Central de Notificações</DialogTitle>
               </DialogHeader>
@@ -509,229 +508,250 @@ const tutorials = [
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center mb-6">
-        <div className="flex items-center gap-2 glass-panel p-1 pr-3 border-white/5">
-          <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-            <SelectTrigger className="w-32 border-none bg-transparent focus:ring-0">
-              <SelectValue placeholder="Mês" />
-            </SelectTrigger>
-            <SelectContent className="glass-panel border-white/10">
-              <SelectItem value="1">Janeiro</SelectItem>
-              <SelectItem value="2">Fevereiro</SelectItem>
-              <SelectItem value="3">Março</SelectItem>
-              <SelectItem value="4">Abril</SelectItem>
-              <SelectItem value="5">Maio</SelectItem>
-              <SelectItem value="6">Junho</SelectItem>
-              <SelectItem value="7">Julho</SelectItem>
-              <SelectItem value="8">Agosto</SelectItem>
-              <SelectItem value="9">Setembro</SelectItem>
-              <SelectItem value="10">Outubro</SelectItem>
-              <SelectItem value="11">Novembro</SelectItem>
-              <SelectItem value="12">Dezembro</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-            <SelectTrigger className="w-24 border-none bg-transparent focus:ring-0">
-              <SelectValue placeholder="Ano" />
-            </SelectTrigger>
-            <SelectContent className="glass-panel border-white/10">
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2025">2025</SelectItem>
-              <SelectItem value="2026">2026</SelectItem>
-              <SelectItem value="2027">2027</SelectItem>
-              <SelectItem value="2028">2028</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className={styles.filterPanel}>
+        <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+          <SelectTrigger className="w-32 border-none bg-transparent focus:ring-0 font-semibold shadow-none">
+            <SelectValue placeholder="Mês" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Janeiro</SelectItem>
+            <SelectItem value="2">Fevereiro</SelectItem>
+            <SelectItem value="3">Março</SelectItem>
+            <SelectItem value="4">Abril</SelectItem>
+            <SelectItem value="5">Maio</SelectItem>
+            <SelectItem value="6">Junho</SelectItem>
+            <SelectItem value="7">Julho</SelectItem>
+            <SelectItem value="8">Agosto</SelectItem>
+            <SelectItem value="9">Setembro</SelectItem>
+            <SelectItem value="10">Outubro</SelectItem>
+            <SelectItem value="11">Novembro</SelectItem>
+            <SelectItem value="12">Dezembro</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className={styles.filterDivider}></div>
+        <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+          <SelectTrigger className="w-24 border-none bg-transparent focus:ring-0 font-semibold shadow-none">
+            <SelectValue placeholder="Ano" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="2023">2023</SelectItem>
+            <SelectItem value="2024">2024</SelectItem>
+            <SelectItem value="2025">2025</SelectItem>
+            <SelectItem value="2026">2026</SelectItem>
+            <SelectItem value="2027">2027</SelectItem>
+            <SelectItem value="2028">2028</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Grid de Cards Principais */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
-              <TrendingUp className="h-5 w-5 text-emerald-400" />
+      <div className={styles.summaryGrid}>
+        <div className={styles.premiumCard}>
+          <div className={`${styles.cardTopAccent} ${styles.accentGreen}`}></div>
+          <div className={styles.cardHeaderPlain}>
+            <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
+              <TrendingUp className="h-5 w-5" />
             </div>
-            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/10">
-              +{receitaPercentual.toFixed(1)}%
+            <span className={`${styles.summaryDiff} ${receitaPercentual >= 0 ? styles.diffPositive : styles.diffNegative}`}>
+              {receitaPercentual >= 0 ? '+' : ''}{receitaPercentual.toFixed(1)}%
             </span>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Receitas</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(totalReceitas)}</h3>
+          <div className={styles.cardContent}>
+            <p className={styles.summaryLabel}>Total Receitas</p>
+            <h3 className={styles.summaryValue}>{formatCurrency(totalReceitas)}</h3>
+          </div>
         </div>
 
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-red-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/20">
-              <TrendingDown className="h-5 w-5 text-red-400" />
+        <div className={styles.premiumCard}>
+          <div className={`${styles.cardTopAccent} ${styles.accentRed}`}></div>
+          <div className={styles.cardHeaderPlain}>
+            <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
+              <TrendingDown className="h-5 w-5" />
             </div>
-            <span className="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded-full border border-red-500/10">
+            <span className={`${styles.summaryDiff} ${despesaPercentual > 0 ? styles.diffNegative : styles.diffPositive}`}>
               {despesaPercentual > 0 ? '+' : ''}{despesaPercentual.toFixed(1)}%
             </span>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Despesas</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(totalDespesas)}</h3>
-        </div>
-
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/20">
-              <Wallet className="h-5 w-5 text-blue-400" />
-            </div>
-          </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Saldo Líquido</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(saldoLiquido)}</h3>
-          <div className="mt-4 flex items-center gap-1">
-            <statusSaldo.Icon className={cn("h-3 w-3", saldoLiquido >= 0 ? "text-emerald-400" : "text-orange-400")} />
-            <span className={cn("text-[10px] font-medium", saldoLiquido >= 0 ? "text-emerald-400" : "text-orange-400")}>{statusSaldo.text}</span>
+          <div className={styles.cardContent}>
+            <p className={styles.summaryLabel}>Total Despesas</p>
+            <h3 className={styles.summaryValue}>{formatCurrency(totalDespesas)}</h3>
           </div>
         </div>
 
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-purple-500/20 rounded-lg border border-purple-500/20">
-              <Building2 className="h-5 w-5 text-purple-400" />
+        <div className={styles.premiumCard}>
+          <div className={`${styles.cardTopAccent} ${styles.accentBlue}`}></div>
+          <div className={styles.cardHeaderPlain}>
+            <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
+              <Wallet className="h-5 w-5" />
             </div>
-            <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full border", 
-              dashboardData.summary.investmentsProfitability >= 0 
-                ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/10" 
-                : "text-red-400 bg-red-500/10 border-red-500/10"
-            )}>
-              {dashboardData.summary.investmentsProfitability.toFixed(2)}%
+          </div>
+          <div className={styles.cardContent}>
+            <p className={styles.summaryLabel}>Saldo Líquido</p>
+            <h3 className={styles.summaryValue}>{formatCurrency(saldoLiquido)}</h3>
+            <div className="mt-2 flex items-center gap-2">
+              <statusSaldo.Icon className="h-4 w-4" style={{ color: saldoLiquido >= 0 ? '#10b981' : '#f59e0b' }} />
+              <span className="text-xs font-bold" style={{ color: saldoLiquido >= 0 ? '#10b981' : '#f59e0b' }}>{statusSaldo.text}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.premiumCard}>
+          <div className={`${styles.cardTopAccent} ${styles.accentPurple}`}></div>
+          <div className={styles.cardHeaderPlain}>
+            <div className={styles.iconBox + ' ' + styles.iconBoxPurple}>
+              <Building2 className="h-5 w-5" />
+            </div>
+            <span className={`${styles.summaryDiff} ${dashboardData.summary.investmentsProfitability >= 0 ? styles.diffPositive : styles.diffNegative}`}>
+              {dashboardData.summary.investmentsProfitability >= 0 ? '+' : ''}{dashboardData.summary.investmentsProfitability.toFixed(2)}%
             </span>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Investimentos</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</h3>
+          <div className={styles.cardContent}>
+            <p className={styles.summaryLabel}>Investimentos</p>
+            <h3 className={styles.summaryValue}>{formatCurrency(dashboardData.summary.investmentsCurrentValue)}</h3>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="glass-panel p-6 border-white/5">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-cyan-400" />
-                    Status Operacional
-                </h3>
+      <div className={styles.mainGrid}>
+        <div className={styles.premiumCard + ' ' + styles.colSpan1}>
+            <div className={styles.cardHeader}>
+                <div className={styles.cardTitleArea}>
+                    <Activity className="h-4 w-4" style={{ color: '#06b6d4' }} />
+                    <h3 className={styles.cardTitle}>Status Operacional</h3>
+                </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                    <p className="text-slate-400 text-xs">Metas Ativas</p>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className="text-xl font-bold text-white">{dashboardData.summary.metasAtivas}</span>
-                        <Target className="h-4 w-4 text-orange-400" />
-                    </div>
-                </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                    <p className="text-slate-400 text-xs">Próximos Eventos</p>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className="text-xl font-bold text-white">{dashboardData.summary.proximosEventos}</span>
-                        <Calendar className="h-4 w-4 text-pink-400" />
-                    </div>
-                </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                    <p className="text-slate-400 text-xs">Limite Cartões</p>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className="text-xl font-bold text-white">{formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}</span>
-                        <CreditCard className="h-4 w-4 text-purple-400" />
-                    </div>
-                </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                    <p className="text-slate-400 text-xs">Score Financeiro</p>
-                    <div className="flex items-center justify-between mt-1">
-                        <span className={cn("text-xl font-bold", dashboardData.overallStatus.color.replace('text-', 'text-'))}>{dashboardData.overallStatus.text}</span>
-                        <dashboardData.overallStatus.Icon className={cn("h-4 w-4", dashboardData.overallStatus.color.replace('text-', 'text-'))} />
-                    </div>
-                </div>
+            <div className={styles.cardContent}>
+              <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Metas Ativas</p>
+                      <div className="flex items-center justify-between">
+                          <span className="text-xl font-bold text-slate-800 dark:text-white">{dashboardData.summary.metasAtivas}</span>
+                          <Target className="h-4 w-4 text-orange-400" />
+                      </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Próximos Eventos</p>
+                      <div className="flex items-center justify-between">
+                          <span className="text-xl font-bold text-slate-800 dark:text-white">{dashboardData.summary.proximosEventos}</span>
+                          <Calendar className="h-4 w-4 text-pink-400" />
+                      </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Limite Cartões</p>
+                      <div className="flex items-center justify-between">
+                          <span className="text-xl font-bold text-slate-800 dark:text-white">{formatCurrency(dashboardData.summary.limiteDisponivelCartoes)}</span>
+                          <CreditCard className="h-4 w-4 text-purple-400" />
+                      </div>
+                  </div>
+                  <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5">
+                      <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-2">Score Financeiro</p>
+                      <div className="flex items-center justify-between">
+                          <span className={cn("text-lg font-bold", dashboardData.overallStatus.color.replace('text-', 'text-'))}>{dashboardData.overallStatus.text}</span>
+                          <dashboardData.overallStatus.Icon className={cn("h-4 w-4", dashboardData.overallStatus.color.replace('text-', 'text-'))} />
+                      </div>
+                  </div>
+              </div>
             </div>
         </div>
 
-        <div className="glass-panel p-6 border-white/5">
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <TrendingDown className="h-5 w-5 text-red-400" />
-                Maiores Gastos
-            </h3>
-            <div className="space-y-4">
+        <div className={styles.premiumCard + ' ' + styles.colSpan2}>
+            <div className={styles.cardHeader}>
+                <div className={styles.cardTitleArea}>
+                    <TrendingDown className="h-4 w-4 text-red-500" />
+                    <h3 className={styles.cardTitle}>Maiores Gastos</h3>
+                </div>
+            </div>
+            <div className={styles.cardContentNoPad}>
               {dashboardData.chartData.top5Expenses.map((gasto, index) => (
-                <div key={index}>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-300">{gasto.name}</span>
-                    <span className="font-bold text-white">{formatCurrency(gasto.value)}</span>
+                <div key={index} className={styles.listItem}>
+                  <div className={styles.itemMain}>
+                    <div>
+                      <p className={styles.itemLabel}>{gasto.name}</p>
+                    </div>
                   </div>
-                  <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div 
-                        className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500" 
-                        style={{ width: `${gasto.percent}%` }}
-                    ></div>
+                  <div className="flex flex-col items-end gap-2 w-1/3">
+                    <span className={styles.itemValue}>{formatCurrency(gasto.value)}</span>
+                    <div className="relative h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div 
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-red-400 to-orange-400 rounded-full transition-all duration-500" 
+                          style={{ width: `${gasto.percent}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               ))}
+              {dashboardData.chartData.top5Expenses.length === 0 && (
+                <div className={styles.emptyState}>
+                  <p className={styles.emptyText}>Sem gastos no período</p>
+                </div>
+              )}
             </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass-panel p-6 border-white/5">
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-emerald-400" />
-                Evolução Financeira
-            </h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dashboardData.chartData.evolution}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="rgba(255,255,255,0.4)" 
+      <div className={styles.mainGrid} style={{ gridTemplateColumns: 'repeat(1, 1fr)' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className={styles.premiumCard}>
+            <div className={styles.cardHeader}>
+                <div className={styles.cardTitleArea}>
+                    <TrendingUp className="h-4 w-4 text-emerald-500" />
+                    <h3 className={styles.cardTitle}>Evolução Financeira</h3>
+                </div>
+            </div>
+            <div className={styles.cardContent}>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={dashboardData.chartData.evolution}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.1)" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="#94a3b8" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                   <YAxis 
+                    stroke="#94a3b8" 
                     fontSize={10} 
                     tickLine={false} 
                     axisLine={false} 
+                    tickFormatter={(value) => `R$${value}`}
                   />
-                 <YAxis 
-                  stroke="rgba(255,255,255,0.4)" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false} 
-                  tickFormatter={(value) => `R$${value}`}
-                />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                    itemStyle={{ fontSize: '12px' }}
-                    formatter={(value) => [formatCurrency(value), '']} 
-                  />
-                  <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: '#ef4444' }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '12px', color: 'var(--text-main)' }}
+                      itemStyle={{ fontSize: '12px' }}
+                      formatter={(value) => [formatCurrency(value), '']} 
+                    />
+                    <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: '#ef4444' }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
           
-          <div className="glass-panel p-6 border-white/5">
-            <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <PieChartIcon className="h-5 w-5 text-purple-400" />
-                    Planejado vs. Realizado
-                </h3>
+          <div className={styles.premiumCard}>
+            <div className={styles.cardHeader}>
+                <div className={styles.cardTitleArea}>
+                    <PieChartIcon className="h-4 w-4 text-purple-500" />
+                    <h3 className={styles.cardTitle}>Planejado vs. Realizado</h3>
+                </div>
                 <div className="flex items-center gap-2">
                   <Select value={pvrTypeFilter} onValueChange={setPvrTypeFilter}>
-                    <SelectTrigger className="w-28 h-8 text-[10px] glass-panel border-white/10">
+                    <SelectTrigger className="w-28 h-8 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 border-none shadow-none">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="glass-panel border-white/10">
+                    <SelectContent>
                       <SelectItem value="saida">Despesas</SelectItem>
                       <SelectItem value="entrada">Receitas</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={pvrCategoryFilter} onValueChange={setPvrCategoryFilter}>
-                    <SelectTrigger className="w-36 h-8 text-[10px] glass-panel border-white/10">
+                    <SelectTrigger className="w-32 h-8 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 border-none shadow-none">
                       <SelectValue placeholder="Categoria..." />
                     </SelectTrigger>
-                    <SelectContent className="glass-panel border-white/10 max-h-[250px]">
+                    <SelectContent className="max-h-[250px]">
                       <SelectItem value="all">Todas</SelectItem> 
                       {categories
                         .filter(cat => cat.type === pvrTypeFilter)
@@ -742,45 +762,48 @@ const tutorials = [
                   </Select>
                 </div>
             </div>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={pvrData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="rgba(255,255,255,0.4)" 
-                    fontSize={10} 
-                    tickLine={false} 
-                    axisLine={false} 
-                  />
-                  <YAxis 
-                    stroke="rgba(255,255,255,0.4)" 
-                    fontSize={10} 
-                    tickLine={false} 
-                    axisLine={false} 
-                  />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}
-                    formatter={(value) => [formatCurrency(value), '']} 
-                  />
-                  <Legend iconType="circle" />
-                  <Bar dataKey="planejado" fill="rgba(167, 139, 250, 0.4)" name="Planejado" radius={[4, 4, 0, 0]} />
-                  <Line type="monotone" dataKey="realizado" stroke="#10b981" strokeWidth={3} name="Realizado" dot={{ r: 4, fill: '#10b981' }} />
-                </ComposedChart>
-              </ResponsiveContainer>
+            <div className={styles.cardContent}>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={pvrData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.1)" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="#94a3b8" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <YAxis 
+                      stroke="#94a3b8" 
+                      fontSize={10} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '12px', color: 'var(--text-main)' }}
+                      formatter={(value) => [formatCurrency(value), '']} 
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Bar dataKey="planejado" fill="rgba(167, 139, 250, 0.4)" name="Planejado" radius={[4, 4, 0, 0]} />
+                    <Line type="monotone" dataKey="realizado" stroke="#10b981" strokeWidth={3} name="Realizado" dot={{ r: 4, fill: '#10b981' }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
+        </div>
       </div>
 
       <Dialog open={isReportModalOpen} onOpenChange={setIsReportModalOpen}>
-        <DialogContent className="glass-panel border-white/10 text-slate-200 max-w-3xl">
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Seu Resumo Visual</DialogTitle>
           </DialogHeader>
           <div className="mt-4">
             {generatedImageUrl ? (
               <>
-                <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full border border-white/10" />
+                <img src={generatedImageUrl} alt="Resumo financeiro visual" className="rounded-lg w-full border border-slate-200 dark:border-white/10" />
                 <Button asChild className="mt-4 w-full bg-cyan-600 hover:bg-cyan-700">
                   <a href={generatedImageUrl} download={`resumo_simplific_${selectedYear}_${selectedMonth}.png`}>
                     <Download className="h-4 w-4 mr-2" />
