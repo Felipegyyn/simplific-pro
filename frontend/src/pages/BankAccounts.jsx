@@ -291,7 +291,6 @@ const BankAccounts = ({ user, onLogout }) => {
       </div>
 
       <div className="mb-8">
-      <div className="mb-8">
         <div className={styles.premiumCard + " p-8 relative overflow-hidden group border-none bg-gradient-to-br from-cyan-600/10 to-blue-600/10 dark:from-cyan-900/20 dark:to-blue-900/20"}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-600/10 dark:bg-cyan-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-cyan-600/20 dark:group-hover:bg-cyan-500/20 transition-all duration-700"></div>
           <div className="flex items-center justify-between relative z-10">

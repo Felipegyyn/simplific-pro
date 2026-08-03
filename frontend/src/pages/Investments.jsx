@@ -879,7 +879,6 @@ const handleCalculate = async (e) => {
           onUpdate={loadInvestimentos}
         />
       </div>
-    </div>
   );
 };
 
