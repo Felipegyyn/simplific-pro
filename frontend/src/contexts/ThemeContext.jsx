@@ -5,21 +5,28 @@ const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
-  // Forçamos 'dark' independentemente do que estiver no localStorage
-  const [theme] = useState('dark');
+  const [theme, setTheme] = useState(() => {
+    // Tenta ler do localStorage primeiro
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme;
+    }
+    // Caso não exista, retorna 'dark' como padrão inicial
+    return 'dark';
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    // Garantimos que apenas a classe 'dark' esteja presente no HTML
-    root.classList.remove('light');
-    root.classList.add('dark');
-    // Forçamos o salvamento como 'dark' para evitar inconsistências
-    localStorage.setItem('theme', 'dark');
-  }, []);
+    // Remove qualquer classe de tema antiga
+    root.classList.remove('light', 'dark');
+    // Adiciona a classe correspondente ao tema atual
+    root.classList.add(theme);
+    // Salva no localStorage
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
-    // Modo light temporariamente desativado para correções visuais
-    console.log("Modo light temporariamente desativado.");
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
   };
 
   return (

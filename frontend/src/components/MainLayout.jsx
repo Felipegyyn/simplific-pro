@@ -1,37 +1,31 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'; // <--- 1. Importei useLocation e useNavigate
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import SidebarBusiness from './SidebarBusiness'; // <--- 2. Importei o novo Sidebar
+import SidebarBusiness from './SidebarBusiness';
 import { Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import logo from '../assets/LOGO.png';
-import { cn } from "@/lib/utils";
 import ChatWidget from './ChatWidget';
+
+// Importação do CSS Modular
+import styles from './MainLayout.module.css';
 
 const MainLayout = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   
-  // 3. Detectar qual contexto estamos
   const location = useLocation();
   const isBusinessRoute = location.pathname.startsWith('/business');
 
   return (
-    <div className="flex h-screen bg-background text-foreground bg-mesh bg-fixed overflow-hidden">
+    <div className={styles.layoutContainer}>
       
-      {/* Sidebar Container com Glassmorphism */}
-      <div className="hidden md:block">
+      {/* Sidebar Desktop */}
+      <div className={styles.sidebarDesktop}>
         {isBusinessRoute ? (
-          <SidebarBusiness 
-            user={user} 
-            onLogout={onLogout} 
-          />
+          <SidebarBusiness user={user} onLogout={onLogout} />
         ) : (
-          <Sidebar 
-            user={user} 
-            onLogout={onLogout} 
-          />
+          <Sidebar user={user} onLogout={onLogout} />
         )}
       </div>
 
@@ -39,10 +33,10 @@ const MainLayout = ({ user, onLogout }) => {
       {isMobileMenuOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden" 
+            className={styles.mobileOverlay}
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
-          <div className="fixed inset-y-0 left-0 z-50 md:hidden animate-in slide-in-from-left duration-300">
+          <div className={styles.sidebarMobile}>
             {isBusinessRoute ? (
               <SidebarBusiness 
                 user={user} 
@@ -63,31 +57,29 @@ const MainLayout = ({ user, onLogout }) => {
       )}
 
       {/* Conteúdo Principal */}
-      <div className="flex-1 flex flex-col min-w-0 relative">
-        {/* Header Mobile - Glassmorphism */}
-        <header className="md:hidden sticky top-0 z-30 bg-background/60 backdrop-blur-md border-b border-white/5">
-          <div className="flex items-center justify-between h-16 px-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="hover:bg-white/5"
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
-            
-            <div className="flex items-center gap-2">
-                <img src={logo} alt="Simplific Pro" className="h-7 w-auto" />
-                <h1 className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    {isBusinessRoute ? 'Simplific Empresas' : 'Simplific Pro'}
-                </h1>
-            </div>
-            
-            <div className="w-10"></div> 
+      <div className={styles.mainContentWrapper}>
+        
+        {/* Header Mobile */}
+        <header className={styles.mobileHeader}>
+          <button 
+            className={styles.menuButton}
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Abrir Menu"
+          >
+            <Menu size={24} />
+          </button>
+          
+          <div className={styles.logoContainer}>
+            <img src={logo} alt="Simplific Pro" className={styles.logoIcon} />
+            <h1 className={styles.logoText}>
+                {isBusinessRoute ? 'Simplific Empresas' : 'Simplific Pro'}
+            </h1>
           </div>
+          
+          <div style={{ width: '24px' }}></div> 
         </header>
 
-        <main className="flex-1 overflow-y-auto scroll-smooth p-4 md:p-6 lg:p-8">
+        <main className={styles.mainArea}>
           <Outlet /> 
         </main>
 
@@ -97,26 +89,23 @@ const MainLayout = ({ user, onLogout }) => {
         {/* Botão Flutuante Simplific IA */}
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
-          className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"
+          className={styles.floatingButton}
           title="Falar com Simplific IA"
         >
-          {/* Efeito de brilho/halo em volta do ícone */}
-          <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-xl group-hover:bg-cyan-500/40 transition-all duration-500 animate-pulse"></div>
+          <div className={styles.floatingGlow}></div>
           
-          {/* Container do Círculo */}
-          <div className="relative w-16 h-16 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-110 group-active:scale-95 overflow-hidden">
+          <div className={styles.floatingCircle}>
             <img 
                 src="/favicon.ico" 
                 alt="IA" 
-                className="w-full h-full object-cover rounded-full brightness-110"
+                className={styles.floatingAvatar}
                 onError={(e) => { e.target.src = logo }} 
             />
           </div>
 
-          {/* Tooltip moderno que aparece no hover */}
-          <div className="absolute right-20 bg-slate-900/90 backdrop-blur-md border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300 pointer-events-none shadow-2xl">
+          <div className={styles.floatingTooltip}>
               Falar com Simplific IA
-              <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 border-l-[6px] border-l-slate-900/90 border-y-[6px] border-y-transparent"></div>
+              <div className={styles.tooltipArrow}></div>
           </div>
         </button>
       </div>
