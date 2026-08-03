@@ -558,8 +558,6 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
-
-          </div>
         </div>
 
         {/* 2. PENDÊNCIAS */}
@@ -1045,7 +1043,8 @@ const Inicio = ({ user }) => {
           </DialogContent>
         </Dialog>
       </div>
-    );
+    </div>
+  );
 };
 
 export default Inicio;
