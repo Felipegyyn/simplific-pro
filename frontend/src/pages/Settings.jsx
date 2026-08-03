@@ -299,21 +299,19 @@ const Settings = ({ user, onLogout }) => {
         {/* COLUNA DIREITA (1/3): PREFS */}
         <div className="space-y-8">
           
-          {/* 
           <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
             
             <div className="flex items-center gap-3 mb-8">
                 <Palette size={18} className="text-purple-400" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-white">Visual e Interface</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-white">Visual e Interface</h3>
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-white/2 rounded-xl border border-white/5 hover:bg-white/5 transition-all">
-                <Label htmlFor="dark-mode" className="text-sm font-bold text-slate-300 cursor-pointer">Dark Mode (V2.0)</Label>
+            <div className="flex items-center justify-between p-4 bg-slate-100 dark:bg-white/2 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-slate-200 dark:hover:bg-white/5 transition-all">
+                <Label htmlFor="dark-mode" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Dark Mode (V2.0)</Label>
                 <Switch id="dark-mode" checked={theme === 'dark'} onCheckedChange={toggleTheme} className="data-[state=checked]:bg-cyan-500" />
             </div>
           </div>
-          */}
 
           <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full -mr-12 -mt-12 blur-2xl"></div>
