@@ -581,7 +581,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name" className="text-slate-300">Nome do Cartão *</Label>
+                          <Label htmlFor="name" className="text-slate-600 dark:text-slate-300">Nome do Cartão *</Label>
                           <Input
                             id="name"
                             value={formData.name}
@@ -592,7 +592,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="brand" className="text-slate-300">Bandeira *</Label>
+                          <Label htmlFor="brand" className="text-slate-600 dark:text-slate-300">Bandeira *</Label>
                           <Select value={formData.brand} onValueChange={(value) => handleInputChange('brand', value)}>
                             <SelectTrigger className="glass-panel border-white/10">
                               <SelectValue placeholder="Selecione..." />
@@ -609,7 +609,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="card_number" className="text-slate-300">Número (Final 4 dígitos) *</Label>
+                          <Label htmlFor="card_number" className="text-slate-600 dark:text-slate-300">Número (Final 4 dígitos) *</Label>
                           <Input
                             id="card_number"
                             value={formData.card_number}
@@ -621,7 +621,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="limit_amount" className="text-slate-300">Limite (R$) *</Label>
+                          <Label htmlFor="limit_amount" className="text-slate-600 dark:text-slate-300">Limite (R$) *</Label>
                           <Input
                             id="limit_amount"
                             type="number"
@@ -636,7 +636,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="due_date" className="text-slate-300">Dia do Vencimento</Label>
+                        <Label htmlFor="due_date" className="text-slate-600 dark:text-slate-300">Dia do Vencimento</Label>
                         <Select value={formData.due_date} onValueChange={(value) => handleInputChange('due_date', value)}>
                           <SelectTrigger className="glass-panel border-white/10">
                             <SelectValue placeholder="Selecione o dia..." />
@@ -652,7 +652,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       </div>
 
                       <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">
                           Cancelar
                         </Button>
                         <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
@@ -674,7 +674,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                 <form onSubmit={handleUpdateCard} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-name" className="text-slate-300">Nome do Cartão *</Label>
+                      <Label htmlFor="edit-name" className="text-slate-600 dark:text-slate-300">Nome do Cartão *</Label>
                       <Input
                         id="edit-name"
                         value={editingCard?.nome || ''}
@@ -685,7 +685,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-brand" className="text-slate-300">Bandeira *</Label>
+                      <Label htmlFor="edit-brand" className="text-slate-600 dark:text-slate-300">Bandeira *</Label>
                       <Select value={editingCard?.bandeira || ''} onValueChange={(value) => handleEditInputChange('bandeira', value)}>
                         <SelectTrigger className="glass-panel border-white/10">
                           <SelectValue placeholder="Selecione..." />
@@ -702,7 +702,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-card_number" className="text-slate-300">Número do Cartão *</Label>
+                      <Label htmlFor="edit-card_number" className="text-slate-600 dark:text-slate-300">Número do Cartão *</Label>
                       <Input
                         id="edit-card_number"
                         value={editingCard?.numero || ''}
@@ -715,7 +715,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-limit_amount" className="text-slate-300">Limite (R$) *</Label>
+                      <Label htmlFor="edit-limit_amount" className="text-slate-600 dark:text-slate-300">Limite (R$) *</Label>
                       <Input
                         id="edit-limit_amount"
                         type="number"
@@ -730,7 +730,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="edit-due_date" className="text-slate-300">Dia do Vencimento</Label>
+                    <Label htmlFor="edit-due_date" className="text-slate-600 dark:text-slate-300">Dia do Vencimento</Label>
                     <Select value={editingCard?.due_day?.toString() || ''} onValueChange={(value) => handleEditInputChange('due_day', value)}>
                       <SelectTrigger className="glass-panel border-white/10">
                         <SelectValue placeholder="Selecione o dia..." />
@@ -746,7 +746,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                   </div>
 
                   <div className="flex justify-end space-x-2 pt-4">
-                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">
+                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">
                       Cancelar
                     </Button>
                     <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
@@ -795,7 +795,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                           <div className="text-right">
                             <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Dia Vencimento</p>
                             <p className="text-lg font-bold text-slate-800 dark:text-white flex items-center justify-end">
-                              <Calendar className="h-4 w-4 mr-2 text-slate-400" />
+                              <Calendar className="h-4 w-4 mr-2 text-slate-500 dark:text-slate-400" />
                               {cartao.due_day}
                             </p>
                           </div>
@@ -847,7 +847,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                                     {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
                                   </Badge>
                                 </div>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400" onClick={() => visualizarFatura(fatura)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400" onClick={() => visualizarFatura(fatura)}>
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -1012,23 +1012,23 @@ const carregarFaturas = async (listaDeCartoes) => {
               }
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="gasto-description" className="text-slate-300">Descrição *</Label>
+                <Label htmlFor="gasto-description" className="text-slate-600 dark:text-slate-300">Descrição *</Label>
                 <Input id="gasto-description" value={gastoFormData.description} onChange={(e) => setGastoFormData(prev => ({...prev, description: e.target.value}))} placeholder="Ex: Restaurante..." required className="glass-panel border-white/10" />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="gasto-amount" className="text-slate-300">Valor *</Label>
+                  <Label htmlFor="gasto-amount" className="text-slate-600 dark:text-slate-300">Valor *</Label>
                   <Input id="gasto-amount" type="number" step="0.01" value={gastoFormData.amount} onChange={(e) => setGastoFormData(prev => ({...prev, amount: e.target.value}))} placeholder="0,00" required className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="gasto-date" className="text-slate-300">Data</Label>
+                  <Label htmlFor="gasto-date" className="text-slate-600 dark:text-slate-300">Data</Label>
                   <Input id="gasto-date" type="date" value={gastoFormData.date} onChange={(e) => setGastoFormData(prev => ({...prev, date: e.target.value}))} className="glass-panel border-white/10" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="gasto-category" className="text-slate-300">Categoria *</Label>
+                <Label htmlFor="gasto-category" className="text-slate-600 dark:text-slate-300">Categoria *</Label>
                 <Select value={gastoFormData.category} onValueChange={(value) => setGastoFormData(prev => ({...prev, category: value}))}>
                   <SelectTrigger className="glass-panel border-white/10">
                     <SelectValue placeholder="Selecione..." />
@@ -1048,7 +1048,7 @@ const carregarFaturas = async (listaDeCartoes) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="payment_method" className="text-slate-300">Forma Pagamento</Label>
+                  <Label htmlFor="payment_method" className="text-slate-600 dark:text-slate-300">Forma Pagamento</Label>
                   <Select value={gastoFormData.payment_method} onValueChange={(value) => setGastoFormData(prev => ({...prev, payment_method: value, installments: 1}))}>
                     <SelectTrigger className="glass-panel border-white/10">
                       <SelectValue />
@@ -1061,14 +1061,14 @@ const carregarFaturas = async (listaDeCartoes) => {
                 </div>
                 {gastoFormData.payment_method === 'parcelado' && (
                   <div className="space-y-2">
-                    <Label htmlFor="installments" className="text-slate-300">Parcelas</Label>
+                    <Label htmlFor="installments" className="text-slate-600 dark:text-slate-300">Parcelas</Label>
                     <Input id="installments" type="number" min="2" max="24" value={gastoFormData.installments} onChange={(e) => setGastoFormData(prev => ({...prev, installments: parseInt(e.target.value) || 1}))} className="glass-panel border-white/10" />
                   </div>
                 )}
               </div>
 
               <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsGastoModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsGastoModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                 <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Lançar Gasto</Button>
               </div>
             </form>
@@ -1103,7 +1103,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 border-b border-white/5 pb-2">Transações</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 border-b border-white/5 pb-2">Transações</h4>
                   <div className="space-y-2">
                     {selectedFatura.transacoes.map((transacao, index) => (
                       <div key={index} className="glass-panel p-3 flex justify-between items-center border-white/5 group hover:bg-white/5">
@@ -1112,7 +1112,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                           <div className="flex items-center gap-3">
                             <span className="text-[10px] text-slate-500">{formatDateForDisplay(transacao.date)}</span>
                             {transacao.installments > 1 && (
-                              <Badge className="bg-white/5 text-slate-400 border-none text-[8px] px-1.5 py-0">
+                              <Badge className="bg-white/5 text-slate-500 dark:text-slate-400 border-none text-[8px] px-1.5 py-0">
                                 Parcela {transacao.current_installment}/{transacao.installments}
                               </Badge>
                             )}
@@ -1132,7 +1132,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                 </div>
 
                 <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                  <Button variant="ghost" onClick={() => setIsFaturaModalOpen(false)} className="text-slate-400">Fechar</Button>
+                  <Button variant="ghost" onClick={() => setIsFaturaModalOpen(false)} className="text-slate-500 dark:text-slate-400">Fechar</Button>
                   {selectedFatura.status === 'aberta' && (
                     <Button onClick={() => { pagarFatura(selectedFatura); setIsFaturaModalOpen(false); }} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                       <DollarSign className="h-4 w-4 mr-2" /> Confirmar Pagamento
@@ -1153,11 +1153,11 @@ const carregarFaturas = async (listaDeCartoes) => {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="data_inicio" className="text-slate-300 text-xs">Início</Label>
+                  <Label htmlFor="data_inicio" className="text-slate-600 dark:text-slate-300 text-xs">Início</Label>
                   <Input id="data_inicio" type="date" value={dataInicioFiltro} onChange={(e) => setDataInicioFiltro(e.target.value)} className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="data_fim" className="text-slate-300 text-xs">Fim</Label>
+                  <Label htmlFor="data_fim" className="text-slate-600 dark:text-slate-300 text-xs">Fim</Label>
                   <Input id="data_fim" type="date" value={dataFimFiltro} onChange={(e) => setDataFimFiltro(e.target.value)} className="glass-panel border-white/10" />
                 </div>
               </div>
@@ -1166,7 +1166,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                   Limpar
                 </Button>
                 <div className="flex gap-2">
-                  <Button variant="ghost" onClick={() => setIsPeriodoModalOpen(false)} className="text-slate-400 h-9">Cancelar</Button>
+                  <Button variant="ghost" onClick={() => setIsPeriodoModalOpen(false)} className="text-slate-500 dark:text-slate-400 h-9">Cancelar</Button>
                   <Button onClick={() => setIsPeriodoModalOpen(false)} className="bg-cyan-600 hover:bg-cyan-700 text-white h-9 px-4">Aplicar</Button>
                 </div>
               </div>

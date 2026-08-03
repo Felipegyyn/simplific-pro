@@ -106,7 +106,7 @@ const Contacts = () => {
         <p className="text-center text-slate-500 dark:text-slate-400 py-10">Carregando contatos...</p>
       ) : filteredContacts.length === 0 ? (
         <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-white/10">
-          <Users className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-3" />
+          <Users className="mx-auto h-12 w-12 text-slate-600 dark:text-slate-300 dark:text-slate-600 mb-3" />
           <p className="text-slate-500 dark:text-slate-400">Nenhum contato encontrado.</p>
           {searchTerm && <button onClick={() => setSearchTerm('')} className="text-cyan-600 dark:text-cyan-400 hover:underline mt-2">Limpar busca</button>}
         </div>
@@ -126,8 +126,8 @@ const Contacts = () => {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => handleOpenModal(contact)} className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"><Edit2 size={16} /></button>
-                    <button onClick={() => handleDelete(contact.id)} className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"><Trash2 size={16} /></button>
+                    <button onClick={() => handleOpenModal(contact)} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"><Edit2 size={16} /></button>
+                    <button onClick={() => handleDelete(contact.id)} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"><Trash2 size={16} /></button>
                   </div>
                 </div>
                 
@@ -138,7 +138,7 @@ const Contacts = () => {
                       <span>{contact.whatsapp}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-slate-400 italic">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 italic">
                       <Phone size={14} /> Sem telefone
                     </div>
                   )}
@@ -149,7 +149,7 @@ const Contacts = () => {
                       <span className="truncate">{contact.email}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-slate-400 italic">
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 italic">
                       <Mail size={14} /> Sem email
                     </div>
                   )}

@@ -145,7 +145,7 @@ const PageHeaderBusiness = ({ user, onLogout }) => {
           {/* Usuário Admin */}
           <div className="text-right hidden md:block">
              <span className="block text-sm font-bold text-slate-700 dark:text-slate-200">{user?.name?.split(' ')[0]}</span>
-             <span className="block text-xs text-slate-400">Administrador</span>
+             <span className="block text-xs text-slate-500 dark:text-slate-400">Administrador</span>
           </div>
 
           {/* Botão Sair */}

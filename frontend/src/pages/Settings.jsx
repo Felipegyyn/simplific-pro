@@ -199,7 +199,7 @@ const Settings = ({ user, onLogout }) => {
             <div className="p-8 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/2">
                 <div className="flex items-center gap-4">
                   <div className="p-2.5 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center">
-                    <CreditCard size={20} className="text-slate-400" />
+                    <CreditCard size={20} className="text-slate-500 dark:text-slate-400" />
                   </div>
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-white">Plano e Assinatura</h3>
                 </div>
@@ -282,7 +282,7 @@ const Settings = ({ user, onLogout }) => {
               ) : (
                 <div className="text-center py-12 flex flex-col items-center">
                   <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-6 border border-slate-200 dark:border-white/5 shadow-2xl">
-                      <CreditCard size={32} className="text-slate-400 dark:text-slate-600" />
+                      <CreditCard size={32} className="text-slate-500 dark:text-slate-400 dark:text-slate-600" />
                   </div>
                   <p className="text-slate-500 dark:text-slate-400 font-bold mb-8 uppercase tracking-widest text-xs italic">Nenhuma assinatura ativa encontrada.</p>
                   <Button onClick={() => navigate('/planos')} className="bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-black uppercase tracking-widest px-10 h-12 shadow-xl shadow-emerald-900/20 animate-pulse">

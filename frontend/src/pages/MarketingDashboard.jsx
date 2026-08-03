@@ -215,7 +215,7 @@ const MarketingDashboard = () => {
         {/* GRÁFICO 2: Investimento */}
         <div className={`${styles.premiumCard} p-6`}>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <BarChart3 size={20} className="text-slate-400" /> Investimento por Campanha
+                <BarChart3 size={20} className="text-slate-500 dark:text-slate-400" /> Investimento por Campanha
             </h3>
             <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -265,13 +265,13 @@ const MarketingDashboard = () => {
                     <div className="flex flex-col items-center gap-1">
                         {camp.purchases > 0 && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-emerald-500/20"><ShoppingCart size={12} /> {camp.purchases} Vendas</span>}
                         {camp.leads > 0 && <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400 text-xs font-bold border border-cyan-100 dark:border-cyan-500/20"><Users size={12} /> {camp.leads} Leads</span>}
-                        {camp.purchases === 0 && camp.leads === 0 && <span className="text-slate-400 dark:text-slate-500 text-xs">{camp.clicks} Cliques</span>}
+                        {camp.purchases === 0 && camp.leads === 0 && <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-xs">{camp.clicks} Cliques</span>}
                     </div>
                   </td>
                   <td className="p-4 text-right font-bold text-slate-900 dark:text-slate-200">R$ {camp.total_spend ? camp.total_spend.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td>
                   <td className="p-4">
                     <div className="relative">
-                      <span className="absolute left-3 top-2 text-slate-400 text-sm">R$</span>
+                      <span className="absolute left-3 top-2 text-slate-500 dark:text-slate-400 text-sm">R$</span>
                       <input 
                         type="number" className="w-full pl-8 pr-3 py-1.5 border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-900 rounded-md focus:ring-2 focus:ring-cyan-500 outline-none transition-all text-sm text-slate-900 dark:text-white"
                         defaultValue={camp.daily_budget}

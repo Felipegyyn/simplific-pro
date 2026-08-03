@@ -219,13 +219,13 @@ const BankAccounts = ({ user, onLogout }) => {
               <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[425px]">
               <DialogHeader>
                   <DialogTitle>{editingId ? 'Editar Conta' : 'Nova Conta Bancária'}</DialogTitle>
-                  <DialogDescription className="text-slate-400">
+                  <DialogDescription className="text-slate-500 dark:text-slate-400">
                       {editingId ? 'Atualize os dados da sua conta.' : 'Preencha os dados da sua conta para controle de saldo.'}
                   </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-6 py-6">
                   <div className="space-y-2">
-                  <Label htmlFor="banco" className="text-slate-300">Instituição Financeira</Label>
+                  <Label htmlFor="banco" className="text-slate-600 dark:text-slate-300">Instituição Financeira</Label>
                   <Select 
                       value={formData.banco} 
                       onValueChange={(val) => handleInputChange('banco', val)}
@@ -241,17 +241,17 @@ const BankAccounts = ({ user, onLogout }) => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                      <Label htmlFor="agencia" className="text-slate-300">Agência</Label>
+                      <Label htmlFor="agencia" className="text-slate-600 dark:text-slate-300">Agência</Label>
                       <Input id="agencia" placeholder="0000" value={formData.agencia} onChange={(e) => handleInputChange('agencia', e.target.value)} className="bg-white/5 border-white/10 focus:border-cyan-500/50" />
                   </div>
                   <div className="space-y-2">
-                      <Label htmlFor="conta" className="text-slate-300">Conta Corrente</Label>
+                      <Label htmlFor="conta" className="text-slate-600 dark:text-slate-300">Conta Corrente</Label>
                       <Input id="conta" placeholder="12345-6" value={formData.conta} onChange={(e) => handleInputChange('conta', e.target.value)} className="bg-white/5 border-white/10 focus:border-cyan-500/50" required />
                   </div>
                   </div>
                   
                   <div className="space-y-2">
-                  <Label htmlFor="saldo" className="text-slate-300">Saldo Inicial (R$)</Label>
+                  <Label htmlFor="saldo" className="text-slate-600 dark:text-slate-300">Saldo Inicial (R$)</Label>
                   <Input 
                       id="saldo" 
                       type="number" 
@@ -268,7 +268,7 @@ const BankAccounts = ({ user, onLogout }) => {
                   </div>
 
                   <div className="space-y-2">
-                      <Label htmlFor="observacoes" className="text-slate-300">Observações (Opcional)</Label>
+                      <Label htmlFor="observacoes" className="text-slate-600 dark:text-slate-300">Observações (Opcional)</Label>
                       <Textarea 
                           id="observacoes" 
                           placeholder="Ex: Conta usada apenas para investimentos..." 
@@ -279,7 +279,7 @@ const BankAccounts = ({ user, onLogout }) => {
                   </div>
 
                   <div className="pt-4 flex justify-end gap-3">
-                  <Button type="button" variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                  <Button type="button" variant="ghost" className="text-slate-500 dark:text-slate-400 hover:text-white hover:bg-white/5" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
                   <Button type="submit" disabled={loading} className="bg-cyan-600 hover:bg-cyan-700 text-white min-w-[120px]">
                     {loading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : (editingId ? 'Atualizar' : 'Salvar Conta')}
                   </Button>
@@ -311,7 +311,7 @@ const BankAccounts = ({ user, onLogout }) => {
           <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600 dark:border-cyan-400"></div></div>
       ) : filteredAccounts.length === 0 ? (
         <div className="py-20 text-center bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-dashed border-slate-300 dark:border-white/10">
-          <Landmark className="h-16 w-16 text-slate-300 dark:text-slate-700 mx-auto mb-6 dark:opacity-20" />
+          <Landmark className="h-16 w-16 text-slate-600 dark:text-slate-300 dark:text-slate-700 mx-auto mb-6 dark:opacity-20" />
           <p className="text-slate-500 italic mb-6">
               {contas.length === 0 ? "Nenhuma conta bancária cadastrada." : "Nenhuma conta encontrada com o filtro atual."}
           </p>

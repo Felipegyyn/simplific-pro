@@ -296,7 +296,7 @@ const CategoriesSettings = () => {
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">
                 {editingCategory ? 'Editar Categoria' : 'Nova Categoria'}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
                 <X size={24} />
               </button>
             </div>
@@ -314,14 +314,14 @@ const CategoriesSettings = () => {
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'entrada'})}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'entrada' ? 'bg-white dark:bg-white/10 text-emerald-600 dark:text-emerald-400 shadow-sm dark:shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'entrada' ? 'bg-white dark:bg-white/10 text-emerald-600 dark:text-emerald-400 shadow-sm dark:shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-600 dark:text-slate-300'}`}
                   >
                     Entrada
                   </button>
                   <button
                     type="button"
                     onClick={() => setFormData({...formData, type: 'saida'})}
-                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'saida' ? 'bg-white dark:bg-white/10 text-red-600 dark:text-red-400 shadow-sm dark:shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'}`}
+                    className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${formData.type === 'saida' ? 'bg-white dark:bg-white/10 text-red-600 dark:text-red-400 shadow-sm dark:shadow-lg' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-600 dark:text-slate-300'}`}
                   >
                     Saída
                   </button>
@@ -371,7 +371,7 @@ const CategoriesSettings = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Cor de Identificação</label>
-                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/5">{formData.color}</span>
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full border border-slate-200 dark:border-white/5">{formData.color}</span>
                 </div>
                 
                 <div className="grid grid-cols-6 gap-3">
@@ -392,7 +392,7 @@ const CategoriesSettings = () => {
                       onChange={(e) => setFormData({...formData, color: e.target.value})}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
-                    <Plus size={16} className="text-slate-400" />
+                    <Plus size={16} className="text-slate-500 dark:text-slate-400" />
                   </div>
                 </div>
               </div>

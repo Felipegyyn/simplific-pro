@@ -267,7 +267,7 @@ const BusinessPayables = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-green-500 shadow-sm">
                 <CardContent className="p-4 flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Total Pago</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Total Pago</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">
                             R$ {totalPaid.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                         </p>
@@ -280,7 +280,7 @@ const BusinessPayables = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-amber-500 shadow-sm">
                 <CardContent className="p-4 flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase">Total A Pagar</p>
+                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Total A Pagar</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">
                             R$ {totalToPay.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                         </p>
@@ -297,7 +297,7 @@ const BusinessPayables = ({ user, onLogout }) => {
             <CardContent className="p-3">
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
                         <Input 
                             placeholder="Buscar por ID, fornecedor ou categoria..." 
                             className="pl-10" 
@@ -348,7 +348,7 @@ const BusinessPayables = ({ user, onLogout }) => {
                             <div className="md:col-span-4 space-y-1 relative">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">#{pay.id}</span>
-                                    <span className="text-xs font-bold text-slate-400 uppercase truncate max-w-[150px]">{pay.company_name}</span>
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase truncate max-w-[150px]">{pay.company_name}</span>
                                     <Select value={pay.status} onValueChange={(val) => handleStatusChange(pay, val)}>
                                         <SelectTrigger className={`h-6 text-[10px] uppercase font-bold border-0 px-2 rounded-full w-auto gap-1 ${pay.status === 'pago' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-amber-100 text-amber-700 hover:bg-amber-200'}`}><SelectValue /></SelectTrigger>
                                         <SelectContent><SelectItem value="a_pagar">A Pagar</SelectItem><SelectItem value="pago">Pago</SelectItem></SelectContent>
@@ -356,27 +356,27 @@ const BusinessPayables = ({ user, onLogout }) => {
                                 </div>
                                 <h3 className={`font-bold text-lg ${pay.status === 'pago' ? 'text-slate-500' : 'text-slate-800'} dark:text-slate-100 leading-tight`}>{pay.stakeholder_name}</h3>
                                 <p className="text-sm text-slate-500">{pay.category_name} {pay.subcategory_name && `/ ${pay.subcategory_name}`}</p>
-                                <div className="flex gap-2 text-xs text-slate-400 mt-1">
+                                <div className="flex gap-2 text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     {pay.doc_type !== 'outros' && <span className="flex items-center gap-1"><FileText size={10}/> {pay.doc_number || 'S/N'}</span>}
                                 </div>
                             </div>
 
                             {/* COLUNA 2 */}
                             <div className="md:col-span-3">
-                                <p className="text-xs text-slate-400">Valor</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Valor</p>
                                 <p className={`text-xl font-bold ${pay.status === 'pago' ? 'text-green-600' : 'text-slate-700'}`}>R$ {pay.value?.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                                <div className="mt-2 flex items-center gap-2 text-sm"><Calendar size={14} className="text-slate-400"/><span>Venc: {new Date(pay.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</span></div>
+                                <div className="mt-2 flex items-center gap-2 text-sm"><Calendar size={14} className="text-slate-500 dark:text-slate-400"/><span>Venc: {new Date(pay.due_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'})}</span></div>
                             </div>
 
                             {/* COLUNA 3 */}
                             <div className="md:col-span-5 flex gap-3">
                                 <div className="flex-1 grid grid-cols-2 gap-3 bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-100 dark:border-slate-800">
                                     <div className="space-y-1">
-                                        <Label className="text-[10px] uppercase text-slate-400">Prorrogação</Label>
+                                        <Label className="text-[10px] uppercase text-slate-500 dark:text-slate-400">Prorrogação</Label>
                                         <Input type="date" className="h-8 text-xs bg-slate-50" value={pay.extension_date} disabled={pay.status === 'pago'} onChange={(e) => handleQuickUpdate(pay.id, 'extension_date', e.target.value)}/>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-[10px] uppercase text-slate-400">Banco/Conta</Label>
+                                        <Label className="text-[10px] uppercase text-slate-500 dark:text-slate-400">Banco/Conta</Label>
                                         {!pay.bank_name ? (
                                             <Select disabled={pay.status === 'pago'} onValueChange={(val) => handleQuickUpdate(pay.id, 'bank_name', val)}>
                                                 <SelectTrigger className="h-8 text-xs bg-slate-50"><SelectValue placeholder="Selecione..."/></SelectTrigger>
@@ -391,8 +391,8 @@ const BusinessPayables = ({ user, onLogout }) => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-1 justify-center">
-                                    <Button variant="ghost" size="icon" disabled={pay.status === 'pago'} className="h-8 w-8 text-slate-400 hover:text-cyan-600 hover:bg-slate-100 disabled:opacity-20" onClick={() => handleEditFull(pay)}><Edit size={16}/></Button>
-                                    <Button variant="ghost" size="icon" disabled={pay.status === 'pago'} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-20" onClick={() => handleDelete(pay.id, pay.status)}><Trash2 size={16}/></Button>
+                                    <Button variant="ghost" size="icon" disabled={pay.status === 'pago'} className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-cyan-600 hover:bg-slate-100 disabled:opacity-20" onClick={() => handleEditFull(pay)}><Edit size={16}/></Button>
+                                    <Button variant="ghost" size="icon" disabled={pay.status === 'pago'} className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-20" onClick={() => handleDelete(pay.id, pay.status)}><Trash2 size={16}/></Button>
                                 </div>
                             </div>
                         </CardContent>
@@ -448,7 +448,7 @@ const BusinessPayables = ({ user, onLogout }) => {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="px-3 py-2 text-xs text-slate-400">Nenhum fornecedor encontrado.</div>
+                                    <div className="px-3 py-2 text-xs text-slate-500 dark:text-slate-400">Nenhum fornecedor encontrado.</div>
                                 )}
                             </div>
                         )}

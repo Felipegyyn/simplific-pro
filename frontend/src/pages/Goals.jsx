@@ -376,38 +376,38 @@ const handleSubmit = (e) => {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-slate-300">Nome da Meta *</Label>
+                    <Label htmlFor="name" className="text-slate-600 dark:text-slate-300">Nome da Meta *</Label>
                     <Input id="name" value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} placeholder="Ex: Reserva de Emergência" required className="glass-panel border-white/10" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-slate-300">Descrição</Label>
+                    <Label htmlFor="description" className="text-slate-600 dark:text-slate-300">Descrição</Label>
                     <Textarea id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Descreva sua meta..." rows={3} className="glass-panel border-white/10 resize-none" />
                   </div>
                 
                   <div className="space-y-2">
-                    <Label htmlFor="image_url" className="text-slate-300">URL da Imagem (Opcional)</Label>
+                    <Label htmlFor="image_url" className="text-slate-600 dark:text-slate-300">URL da Imagem (Opcional)</Label>
                     <Input id="image_url" value={formData.image_url} onChange={(e) => handleInputChange('image_url', e.target.value)} placeholder="Link de uma imagem..." className="glass-panel border-white/10" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="target_amount" className="text-slate-300">Valor Meta (R$) *</Label>
+                      <Label htmlFor="target_amount" className="text-slate-600 dark:text-slate-300">Valor Meta (R$) *</Label>
                       <Input id="target_amount" type="number" step="0.01" value={formData.target_amount} onChange={(e) => handleInputChange('target_amount', e.target.value)} placeholder="0,00" required className="glass-panel border-white/10" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="current_amount" className="text-slate-300">Valor Atual (R$)</Label>
+                      <Label htmlFor="current_amount" className="text-slate-600 dark:text-slate-300">Valor Atual (R$)</Label>
                       <Input id="current_amount" type="number" step="0.01" value={formData.current_amount} onChange={(e) => handleInputChange('current_amount', e.target.value)} placeholder="0,00" className="glass-panel border-white/10" />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="target_date" className="text-slate-300">Data Meta *</Label>
+                      <Label htmlFor="target_date" className="text-slate-600 dark:text-slate-300">Data Meta *</Label>
                       <Input id="target_date" type="date" value={formData.target_date} onChange={(e) => handleInputChange('target_date', e.target.value)} required className="glass-panel border-white/10" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="priority" className="text-slate-300">Prioridade</Label>
+                      <Label htmlFor="priority" className="text-slate-600 dark:text-slate-300">Prioridade</Label>
                       <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
                         <SelectTrigger className="glass-panel border-white/10">
                           <SelectValue />
@@ -422,7 +422,7 @@ const handleSubmit = (e) => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="category" className="text-slate-300">Categoria *</Label>
+                    <Label htmlFor="category" className="text-slate-600 dark:text-slate-300">Categoria *</Label>
                     <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                       <SelectTrigger className="glass-panel border-white/10">
                         <SelectValue placeholder="Selecione..." />
@@ -441,7 +441,7 @@ const handleSubmit = (e) => {
                   </div>
 
                   <div className="flex justify-end space-x-2 pt-4">
-                    <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                    <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                     <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Criar Meta</Button>
                   </div>
                 </form>
@@ -593,7 +593,7 @@ const handleSubmit = (e) => {
           {/* Metas Arquivadas */}
           <TabsContent value="arquivadas" className="space-y-6">
             <div className={styles.emptyState + " flex-col border border-dashed rounded-xl"}>
-              <Target className="h-12 w-12 text-slate-400 mb-4" />
+              <Target className="h-12 w-12 text-slate-500 dark:text-slate-400 mb-4" />
               <p className="font-medium text-slate-600 dark:text-slate-400">Nenhuma meta arquivada</p>
               <p className="text-xs text-slate-500 mt-1">Metas canceladas ou pausadas aparecerão aqui</p>
             </div>
@@ -623,33 +623,33 @@ const handleSubmit = (e) => {
               editarMeta(selectedMeta.id, payload);
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit_name" className="text-slate-300">Nome da Meta *</Label>
+                <Label htmlFor="edit_name" className="text-slate-600 dark:text-slate-300">Nome da Meta *</Label>
                 <Input id="edit_name" value={editFormData.name} onChange={(e) => setEditFormData(prev => ({...prev, name: e.target.value}))} required className="glass-panel border-white/10" />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="edit_description" className="text-slate-300">Descrição</Label>
+                <Label htmlFor="edit_description" className="text-slate-600 dark:text-slate-300">Descrição</Label>
                 <Textarea id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} rows={3} className="glass-panel border-white/10 resize-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit_target_amount" className="text-slate-300">Valor Meta (R$) *</Label>
+                  <Label htmlFor="edit_target_amount" className="text-slate-600 dark:text-slate-300">Valor Meta (R$) *</Label>
                   <Input id="edit_target_amount" type="number" step="0.01" value={editFormData.target_amount} onChange={(e) => setEditFormData(prev => ({...prev, target_amount: e.target.value}))} required className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_current_amount" className="text-slate-300">Valor Atual (R$)</Label>
+                  <Label htmlFor="edit_current_amount" className="text-slate-600 dark:text-slate-300">Valor Atual (R$)</Label>
                   <Input id="edit_current_amount" type="number" step="0.01" value={editFormData.current_amount} onChange={(e) => setEditFormData(prev => ({...prev, current_amount: e.target.value}))} className="glass-panel border-white/10" />
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit_target_date" className="text-slate-300">Data Meta *</Label>
+                  <Label htmlFor="edit_target_date" className="text-slate-600 dark:text-slate-300">Data Meta *</Label>
                   <Input id="edit_target_date" type="date" value={editFormData.target_date} onChange={(e) => setEditFormData(prev => ({...prev, target_date: e.target.value}))} required className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_priority" className="text-slate-300">Prioridade</Label>
+                  <Label htmlFor="edit_priority" className="text-slate-600 dark:text-slate-300">Prioridade</Label>
                   <Select value={editFormData.priority} onValueChange={(value) => setEditFormData(prev => ({...prev, priority: value}))}>
                     <SelectTrigger className="glass-panel border-white/10">
                       <SelectValue />
@@ -664,7 +664,7 @@ const handleSubmit = (e) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit_category" className="text-slate-300">Categoria *</Label>
+                <Label htmlFor="edit_category" className="text-slate-600 dark:text-slate-300">Categoria *</Label>
                 <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>
                   <SelectTrigger className="glass-panel border-white/10">
                     <SelectValue placeholder="Selecione..." />
@@ -683,7 +683,7 @@ const handleSubmit = (e) => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                 <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
               </div>
             </form>

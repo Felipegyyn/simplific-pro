@@ -558,8 +558,6 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
-
-          </div>
         </div>
 
         {/* 2. PENDÊNCIAS */}
@@ -625,7 +623,6 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
-          </div>
         </div>
 
         {/* 3. VISÃO POR INSTITUIÇÃO */}
@@ -683,8 +680,6 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
-
-          </div>
         </div>
 
         {/* 4. CARTÕES DE CRÉDITO */}
@@ -703,8 +698,8 @@ const Inicio = ({ user }) => {
             <div className={styles.carouselContainer}>
               {loading ? (
                 <div className="flex gap-4 w-full">
-                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
-                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
+                    <Skeleton className="h-44 w-72 bg-slate-200 dark:bg-white/5 border-slate-300 dark:border-white/5" />
+                    <Skeleton className="h-44 w-72 bg-slate-200 dark:bg-white/5 border-slate-300 dark:border-white/5" />
                 </div>
               ) : cartoes.length === 0 ? (
                 <div className={styles.emptyState}>
@@ -759,7 +754,6 @@ const Inicio = ({ user }) => {
                   );
                 })
               )}
-            </div>
             </div>
           </div>
         </div>

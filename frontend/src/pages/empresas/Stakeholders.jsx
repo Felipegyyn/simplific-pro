@@ -145,7 +145,7 @@ const Stakeholders = ({ user, onLogout }) => {
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
           <CardContent className="p-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
               <Input 
                 placeholder="Buscar por nome ou documento..." 
                 className="pl-10 bg-slate-50 dark:bg-slate-950 border-slate-200"
@@ -246,14 +246,14 @@ const Stakeholders = ({ user, onLogout }) => {
                  onClick={() => handleInputChange('type', 'pj')}
                  className={`cursor-pointer border rounded-xl p-4 flex items-center gap-3 transition-all ${formData.type === 'pj' ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20 ring-1 ring-cyan-500' : 'hover:bg-slate-50'}`}
                >
-                 <Building2 className={formData.type === 'pj' ? 'text-cyan-600' : 'text-slate-400'} />
+                 <Building2 className={formData.type === 'pj' ? 'text-cyan-600' : 'text-slate-500 dark:text-slate-400'} />
                  <span className="font-medium">Pessoa Jurídica</span>
                </div>
                <div 
                  onClick={() => handleInputChange('type', 'pf')}
                  className={`cursor-pointer border rounded-xl p-4 flex items-center gap-3 transition-all ${formData.type === 'pf' ? 'border-green-500 bg-green-50 dark:bg-green-900/20 ring-1 ring-green-500' : 'hover:bg-slate-50'}`}
                >
-                 <User className={formData.type === 'pf' ? 'text-green-600' : 'text-slate-400'} />
+                 <User className={formData.type === 'pf' ? 'text-green-600' : 'text-slate-500 dark:text-slate-400'} />
                  <span className="font-medium">Pessoa Física</span>
                </div>
             </div>

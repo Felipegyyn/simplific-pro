@@ -27,7 +27,7 @@ const MoversList = ({ title, data, isPositive }) => (
             <span className={cn("text-xs font-black", isPositive ? "text-emerald-400" : "text-red-400")}>
               {item.change_percent > 0 ? '+' : ''}{item.change_percent.toFixed(2)}%
             </span>
-            <span className="text-xs font-medium text-slate-300">R$ {item.price.toFixed(2)}</span>
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-300">R$ {item.price.toFixed(2)}</span>
           </div>
         </div>
       ))}
@@ -148,9 +148,9 @@ const HomeBroker = () => {
                       </span>
                     </div>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-4 flex items-center gap-3">
-                      <span>Abertura: <span className="text-slate-300 font-mono">{mainChartData.open_price?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></span>
+                      <span>Abertura: <span className="text-slate-600 dark:text-slate-300 font-mono">{mainChartData.open_price?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></span>
                       <span className="w-1 h-1 rounded-full bg-slate-700"></span>
-                      <span>Anterior: <span className="text-slate-300 font-mono">{mainChartData.previous_close?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></span>
+                      <span>Anterior: <span className="text-slate-600 dark:text-slate-300 font-mono">{mainChartData.previous_close?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></span>
                     </p>
                   </div>
                 )}
@@ -224,7 +224,7 @@ const HomeBroker = () => {
             <div className="relative z-10">
               <Zap className="h-6 w-6 text-cyan-400 mb-4" />
               <h4 className="text-sm font-bold text-white mb-2 tracking-tight">Análise em tempo real</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Sua carteira é sincronizada com dados oficiais da B3 e mercados internacionais 24 horas por dia.
               </p>
             </div>

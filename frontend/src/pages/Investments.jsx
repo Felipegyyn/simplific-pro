@@ -480,12 +480,12 @@ const handleCalculate = async (e) => {
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-slate-300">Nome do Investimento *</Label>
+                      <Label htmlFor="name" className="text-slate-600 dark:text-slate-300">Nome do Investimento *</Label>
                       <Input id="name" value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} placeholder="Ex: Tesouro Selic, ITSA4..." required className="glass-panel border-white/10" />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                      <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                       <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
                         <SelectTrigger className="glass-panel border-white/10">
                           <SelectValue placeholder="Selecione o tipo" />
@@ -502,34 +502,34 @@ const handleCalculate = async (e) => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="initial_value" className="text-slate-300">Valor Investido (R$) *</Label>
+                        <Label htmlFor="initial_value" className="text-slate-600 dark:text-slate-300">Valor Investido (R$) *</Label>
                         <Input id="initial_value" type="number" step="0.01" value={formData.initial_value} onChange={(e) => handleInputChange('initial_value', e.target.value)} placeholder="0,00" required className="glass-panel border-white/10" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="current_value" className="text-slate-300">Valor Atual (R$)</Label>
+                        <Label htmlFor="current_value" className="text-slate-600 dark:text-slate-300">Valor Atual (R$)</Label>
                         <Input id="current_value" type="number" step="0.01" value={formData.current_value} onChange={(e) => handleInputChange('current_value', e.target.value)} placeholder="Opcional" className="glass-panel border-white/10" />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="purchase_date" className="text-slate-300">Data da Compra *</Label>
+                        <Label htmlFor="purchase_date" className="text-slate-600 dark:text-slate-300">Data da Compra *</Label>
                         <Input id="purchase_date" type="date" value={formData.purchase_date} onChange={(e) => handleInputChange('purchase_date', e.target.value)} required className="glass-panel border-white/10" />
                       </div>
                       {['Ações', 'FII'].includes(formData.type) ? (
                         <div className="space-y-2">
-                          <Label htmlFor="ticker" className="text-slate-300">Ticker *</Label>
+                          <Label htmlFor="ticker" className="text-slate-600 dark:text-slate-300">Ticker *</Label>
                           <Input id="ticker" value={formData.ticker} onChange={(e) => handleInputChange('ticker', e.target.value.toUpperCase())} placeholder="Ex: ITSA4" required className="glass-panel border-white/10" />
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          <Label htmlFor="expected_monthly_yield" className="text-slate-300">Rentabilidade (% a.m.)</Label>
+                          <Label htmlFor="expected_monthly_yield" className="text-slate-600 dark:text-slate-300">Rentabilidade (% a.m.)</Label>
                           <Input id="expected_monthly_yield" type="number" step="0.01" value={formData.expected_monthly_yield} onChange={(e) => handleInputChange('expected_monthly_yield', e.target.value)} placeholder="Ex: 1.2" className="glass-panel border-white/10" />
                         </div>
                       )}
                     </div>
                     <div className="flex justify-end space-x-2 pt-4">
-                      <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                      <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                       <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Adicionar</Button>
                     </div>
                   </form>
@@ -544,11 +544,11 @@ const handleCalculate = async (e) => {
                 </DialogHeader>
                 <form onSubmit={handleUpdateInvestment} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="edit-name" className="text-slate-300">Nome do Investimento *</Label>
+                    <Label htmlFor="edit-name" className="text-slate-600 dark:text-slate-300">Nome do Investimento *</Label>
                     <Input id="edit-name" value={editFormData.name} onChange={(e) => handleEditInputChange('name', e.target.value)} required className="glass-panel border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="edit-type" className="text-slate-300">Tipo *</Label>
+                    <Label htmlFor="edit-type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                     <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
                       <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
                       <SelectContent className="glass-panel border-white/10">
@@ -562,33 +562,33 @@ const handleCalculate = async (e) => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-initial_value" className="text-slate-300">Valor Investido (R$)</Label>
+                      <Label htmlFor="edit-initial_value" className="text-slate-600 dark:text-slate-300">Valor Investido (R$)</Label>
                       <Input id="edit-initial_value" type="number" step="0.01" value={editFormData.initial_value} onChange={(e) => handleEditInputChange('initial_value', e.target.value)} className="glass-panel border-white/10" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-current_value" className="text-slate-300">Valor Atual (R$)</Label>
+                      <Label htmlFor="edit-current_value" className="text-slate-600 dark:text-slate-300">Valor Atual (R$)</Label>
                       <Input id="edit-current_value" type="number" step="0.01" value={editFormData.current_value} onChange={(e) => handleEditInputChange('current_value', e.target.value)} className="glass-panel border-white/10" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-purchase_date" className="text-slate-300">Data da Compra *</Label>
+                      <Label htmlFor="edit-purchase_date" className="text-slate-600 dark:text-slate-300">Data da Compra *</Label>
                       <Input id="edit-purchase_date" type="date" value={editFormData.purchase_date} onChange={(e) => handleEditInputChange('purchase_date', e.target.value)} required className="glass-panel border-white/10" />
                     </div>
                     {['Ações', 'FII'].includes(editFormData.type) ? (
                       <div className="space-y-2">
-                        <Label htmlFor="edit-ticker" className="text-slate-300">Ticker *</Label>
+                        <Label htmlFor="edit-ticker" className="text-slate-600 dark:text-slate-300">Ticker *</Label>
                         <Input id="edit-ticker" value={editFormData.ticker} onChange={(e) => handleEditInputChange('ticker', e.target.value.toUpperCase())} placeholder="Ex: ITSA4" required className="glass-panel border-white/10" />
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <Label htmlFor="edit-expected_monthly_yield" className="text-slate-300">Rentabilidade (% a.m.)</Label>
+                        <Label htmlFor="edit-expected_monthly_yield" className="text-slate-600 dark:text-slate-300">Rentabilidade (% a.m.)</Label>
                         <Input id="edit-expected_monthly_yield" type="number" step="0.01" value={editFormData.expected_monthly_yield} onChange={(e) => handleEditInputChange('expected_monthly_yield', e.target.value)} className="glass-panel border-white/10" />
                       </div>
                     )}
                   </div>
                   <div className="flex justify-end space-x-2 pt-4">
-                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                    <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                     <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
                   </div>
                 </form>
@@ -769,14 +769,14 @@ const handleCalculate = async (e) => {
                   </div>
                   
                   <div className="space-y-4">
-                    <h5 className="text-[10px] uppercase font-bold text-slate-400 tracking-widest border-b border-white/5 pb-2">Distribuição por Valor</h5>
+                    <h5 className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-widest border-b border-white/5 pb-2">Distribuição por Valor</h5>
                     <div className="space-y-3">
                       {summaryData.distribution.length > 0 ? (
                         summaryData.distribution.map((item, index) => (
                           <div key={index} className="flex justify-between items-center group">
                             <div className="flex items-center">
                               <div className="w-2 h-2 rounded-full mr-3 group-hover:scale-150 transition-transform" style={{ backgroundColor: item.color }} />
-                              <span className="text-sm text-slate-300">{item.name}</span>
+                              <span className="text-sm text-slate-600 dark:text-slate-300">{item.name}</span>
                             </div>
                             <span className="text-sm font-bold text-white">R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
@@ -799,24 +799,24 @@ const handleCalculate = async (e) => {
                 </div>
                 <h4 className="text-lg font-bold text-white">Simulador de Independência Financeira</h4>
               </div>
-              <p className="text-sm text-slate-400 mb-8 italic">Projete o futuro do seu patrimônio com base em aportes e rentabilidade esperada.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 italic">Projete o futuro do seu patrimônio com base em aportes e rentabilidade esperada.</p>
               
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <form onSubmit={handleCalculate} className="space-y-4 glass-card p-6 border-white/5 bg-white/5">
                   <div className="space-y-2">
-                    <Label htmlFor="initialAmount" className="text-slate-300 text-xs">Aporte Inicial (R$)</Label>
+                    <Label htmlFor="initialAmount" className="text-slate-600 dark:text-slate-300 text-xs">Aporte Inicial (R$)</Label>
                     <Input id="initialAmount" name="initialAmount" type="number" step="0.01" value={calculatorForm.initialAmount} onChange={handleCalculatorChange} placeholder="0,00" className="glass-panel border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="monthlyContribution" className="text-slate-300 text-xs">Aporte Mensal (R$)</Label>
+                    <Label htmlFor="monthlyContribution" className="text-slate-600 dark:text-slate-300 text-xs">Aporte Mensal (R$)</Label>
                     <Input id="monthlyContribution" name="monthlyContribution" type="number" step="0.01" value={calculatorForm.monthlyContribution} onChange={handleCalculatorChange} placeholder="0,00" className="glass-panel border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="annualRate" className="text-slate-300 text-xs">Rentabilidade Anual (%)</Label>
+                    <Label htmlFor="annualRate" className="text-slate-600 dark:text-slate-300 text-xs">Rentabilidade Anual (%)</Label>
                     <Input id="annualRate" name="annualRate" type="number" step="0.01" value={calculatorForm.annualRate} onChange={handleCalculatorChange} placeholder="8.5" className="glass-panel border-white/10" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="periodYears" className="text-slate-300 text-xs">Período (anos)</Label>
+                    <Label htmlFor="periodYears" className="text-slate-600 dark:text-slate-300 text-xs">Período (anos)</Label>
                     <Input id="periodYears" name="periodYears" type="number" value={calculatorForm.periodYears} onChange={handleCalculatorChange} placeholder="10" className="glass-panel border-white/10" />
                   </div>
                   <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white mt-4" disabled={isCalculating}>

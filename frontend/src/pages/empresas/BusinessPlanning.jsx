@@ -196,11 +196,11 @@ const BusinessPlanning = ({ user, onLogout }) => {
                                     {line.category_name}
                                 </span>
                             ))}
-                            {plan.lines.length > 3 && <span className="text-[10px] text-slate-400 px-1">+{plan.lines.length - 3}</span>}
+                            {plan.lines.length > 3 && <span className="text-[10px] text-slate-500 dark:text-slate-400 px-1">+{plan.lines.length - 3}</span>}
                         </div>
 
                         <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
-                            <span className="text-xs text-slate-400">Total Previsto</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">Total Previsto</span>
                             <span className="font-bold text-xl text-cyan-700">
                                 R$ {plan.total_value?.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
                             </span>
@@ -230,12 +230,12 @@ const BusinessPlanning = ({ user, onLogout }) => {
                             <div className="flex items-center gap-2">
                                 {expandedLines[line.id] ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}
                                 <span className="font-medium text-sm">
-                                    {line.category_name} {line.subcategory_name && <span className="text-slate-400 font-normal">/ {line.subcategory_name}</span>}
+                                    {line.category_name} {line.subcategory_name && <span className="text-slate-500 dark:text-slate-400 font-normal">/ {line.subcategory_name}</span>}
                                 </span>
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className="font-bold text-sm">R$ {line.total_value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-500" onClick={(e) => { e.stopPropagation(); handleDeleteLine(line.id); }}>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-500 dark:text-slate-400 hover:text-red-500" onClick={(e) => { e.stopPropagation(); handleDeleteLine(line.id); }}>
                                     <Trash2 size={12}/>
                                 </Button>
                             </div>
@@ -246,7 +246,7 @@ const BusinessPlanning = ({ user, onLogout }) => {
                             <div className="p-3 bg-white dark:bg-slate-950 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                                 {line.items.map(item => (
                                     <div key={item.id} className="border rounded p-2 flex flex-col items-center justify-center text-center">
-                                        <span className="text-[10px] text-slate-400 uppercase font-bold mb-1">{item.month.split('-')[1]}/{item.month.split('-')[0].slice(2)}</span>
+                                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold mb-1">{item.month.split('-')[1]}/{item.month.split('-')[0].slice(2)}</span>
                                         
                                         {editingItem?.id === item.id ? (
                                             <Input 
@@ -274,7 +274,7 @@ const BusinessPlanning = ({ user, onLogout }) => {
                 ))}
                 
                 {selectedPlanning?.lines.length === 0 && (
-                    <div className="text-center py-8 text-slate-400">Nenhuma categoria neste orçamento.</div>
+                    <div className="text-center py-8 text-slate-500 dark:text-slate-400">Nenhuma categoria neste orçamento.</div>
                 )}
             </div>
             

@@ -62,7 +62,7 @@ const Maintenance = () => {
 
         {/* Cronômetro */}
         <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-6 mb-6 border border-slate-200 dark:border-slate-800">
-            <p className="text-xs uppercase font-bold text-slate-400 mb-2 flex items-center justify-center gap-2">
+            <p className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-2 flex items-center justify-center gap-2">
                 <Clock size={14} /> Tempo estimado de retorno
             </p>
             <div className="text-4xl font-mono font-bold text-cyan-600 dark:text-cyan-400">
@@ -79,7 +79,7 @@ const Maintenance = () => {
       </div>
       
       {/* Footer */}
-      <p className="mt-8 text-slate-400 text-sm">
+      <p className="mt-8 text-slate-500 dark:text-slate-400 text-sm">
         Agradecemos a paciência. Voltaremos em breve! 🚀
       </p>
     </div>

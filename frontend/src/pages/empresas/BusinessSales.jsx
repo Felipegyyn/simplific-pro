@@ -145,7 +145,7 @@ const BusinessSales = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-cyan-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Vendas no Período</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Vendas no Período</p>
                         <p className="text-3xl font-bold text-slate-700 dark:text-white">{totalSalesCount}</p>
                     </div>
                     <ShoppingBag className="text-cyan-500 opacity-20" size={40} />
@@ -154,7 +154,7 @@ const BusinessSales = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-green-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Volume Total</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Volume Total</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">R$ {totalSalesValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
                     <div className="bg-green-100 p-2 rounded-full text-green-600 font-bold text-xs">R$</div>
@@ -167,7 +167,7 @@ const BusinessSales = ({ user, onLogout }) => {
             <CardContent className="p-3">
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
                         <Input 
                             placeholder="Buscar vendas por cliente..." 
                             className="pl-10" 
@@ -219,7 +219,7 @@ const BusinessSales = ({ user, onLogout }) => {
                             <div className="flex items-center gap-6">
                                 <div className="text-right">
                                     <p className="text-lg font-bold text-slate-700">R$ {sale.total_value.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                                    <p className="text-xs text-slate-400 flex items-center justify-end gap-1">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-end gap-1">
                                         <Calendar size={12}/> {new Date(sale.date).toLocaleDateString('pt-BR')}
                                     </p>
                                 </div>
@@ -228,7 +228,7 @@ const BusinessSales = ({ user, onLogout }) => {
                                 {sale.can_modify ? (
                                     <Button 
                                         variant="ghost" size="icon" 
-                                        className="text-slate-400 hover:text-red-600 hover:bg-red-50"
+                                        className="text-slate-500 dark:text-slate-400 hover:text-red-600 hover:bg-red-50"
                                         onClick={() => handleDelete(sale)}
                                         title="Excluir Venda (Estornar)"
                                     >
@@ -237,7 +237,7 @@ const BusinessSales = ({ user, onLogout }) => {
                                 ) : (
                                     <Button 
                                         variant="ghost" size="icon" 
-                                        className="text-slate-300 cursor-not-allowed"
+                                        className="text-slate-600 dark:text-slate-300 cursor-not-allowed"
                                         title="Venda possui recebimentos (bloqueado)"
                                     >
                                         <Ban size={18} />
@@ -249,7 +249,7 @@ const BusinessSales = ({ user, onLogout }) => {
                 ))}
                 
                 {filteredHistory.length === 0 && (
-                    <div className="text-center py-10 text-slate-400">Nenhuma venda encontrada neste período.</div>
+                    <div className="text-center py-10 text-slate-500 dark:text-slate-400">Nenhuma venda encontrada neste período.</div>
                 )}
             </div>
         )}

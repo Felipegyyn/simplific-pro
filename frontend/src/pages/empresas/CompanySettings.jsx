@@ -171,25 +171,25 @@ const CompanySettings = ({ user, onLogout }) => {
                     
                     {company.cnae && (
                     <div className="flex items-center gap-2">
-                        <Briefcase size={14} className="text-slate-400 shrink-0" />
+                        <Briefcase size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
                         <span className="truncate">CNAE: {company.cnae}</span>
                     </div>
                     )}
                     
                     {company.representante && (
                     <div className="flex items-center gap-2">
-                        <User size={14} className="text-slate-400 shrink-0" />
+                        <User size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
                         <span className="truncate">Rep: {company.representante}</span>
                     </div>
                     )}
 
                     <div className="flex items-center gap-2">
-                    <Phone size={14} className="text-slate-400 shrink-0" />
+                    <Phone size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
                     <span>{company.telefone}</span>
                     </div>
 
                     <div className="flex items-start gap-2">
-                    <MapPin size={14} className="text-slate-400 mt-0.5 shrink-0" />
+                    <MapPin size={14} className="text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" />
                     <span className="line-clamp-2">{company.endereco}, {company.numero}</span>
                     </div>
 
@@ -208,7 +208,7 @@ const CompanySettings = ({ user, onLogout }) => {
 
             {/* Empty State */}
             {companies.length === 0 && (
-                <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300">
+                <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300">
                 <Building2 size={48} className="mx-auto mb-4 opacity-20" />
                 <p>Nenhuma empresa cadastrada ainda.</p>
                 </div>

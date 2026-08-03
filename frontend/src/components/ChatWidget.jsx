@@ -61,7 +61,7 @@ const ChatWidget = ({ isOpen, onClose }) => {
             </div>
             <CardTitle className="text-sm font-black uppercase tracking-widest text-white">Simplific IA</CardTitle>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-white/5 text-slate-400 hover:text-white">
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 hover:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-white">
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>

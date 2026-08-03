@@ -149,7 +149,7 @@ const BusinessCategories = ({ user, onLogout }) => {
         <Card className="border-slate-200 dark:border-slate-800 shadow-sm">
           <CardContent className="p-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
               <Input placeholder="Buscar categoria..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
           </CardContent>
@@ -176,7 +176,7 @@ const BusinessCategories = ({ user, onLogout }) => {
                         {cat.parent_id ? (
                             <>
                                 <div className="w-6"></div> {/* Espaço vazio para indentar */}
-                                <CornerDownRight size={16} className="text-slate-400" />
+                                <CornerDownRight size={16} className="text-slate-500 dark:text-slate-400" />
                             </>
                         ) : (
                             <Tags size={16} className="text-cyan-600" />

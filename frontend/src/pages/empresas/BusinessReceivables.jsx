@@ -135,7 +135,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-green-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Total Recebido</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Total Recebido</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">R$ {totalReceived.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
                     <CheckCircle2 className="text-green-500 opacity-20" size={32}/>
@@ -144,7 +144,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
             <Card className="bg-white dark:bg-slate-950 border-l-4 border-l-amber-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">A Receber (Atualizado)</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">A Receber (Atualizado)</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">R$ {totalToReceive.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
                     <Wallet className="text-amber-500 opacity-20" size={32}/>
@@ -157,7 +157,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
             <CardContent className="p-3">
                 <div className="flex flex-col md:flex-row gap-3">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500 dark:text-slate-400" />
                         <Input 
                             placeholder="Buscar cliente, NF..." 
                             className="pl-10" 
@@ -200,7 +200,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
                     {isLoading ? (
                         <TableRow><TableCell colSpan={7} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2 text-cyan-600"/> Carregando...</TableCell></TableRow>
                     ) : filteredList.length === 0 ? (
-                        <TableRow><TableCell colSpan={7} className="h-24 text-center text-slate-400">Nenhum registro encontrado.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={7} className="h-24 text-center text-slate-500 dark:text-slate-400">Nenhum registro encontrado.</TableCell></TableRow>
                     ) : (
                         filteredList.map((item) => {
                             const calc = calculateUpdatedValues(item);
@@ -222,7 +222,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
                                             <span className="font-bold text-slate-600 dark:text-slate-300">
                                                 {item.installment_number}/{item.total_installments}
                                             </span>
-                                            <span className="text-[10px] text-slate-400">#{item.sale_id}</span>
+                                            <span className="text-[10px] text-slate-500 dark:text-slate-400">#{item.sale_id}</span>
                                         </div>
                                     </TableCell>
 
@@ -231,7 +231,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
                                         <div className="flex flex-col">
                                             <span className="font-bold text-slate-800 dark:text-slate-200">{item.client_name}</span>
                                             <div className="flex gap-2">
-                                                <span className="text-xs text-slate-400 uppercase">{item.company_name}</span>
+                                                <span className="text-xs text-slate-500 dark:text-slate-400 uppercase">{item.company_name}</span>
                                                 {item.doc_nf && <span className="text-xs bg-slate-100 px-1 rounded border">NF: {item.doc_nf}</span>}
                                             </div>
                                         </div>
@@ -285,7 +285,7 @@ const BusinessReceivables = ({ user, onLogout }) => {
 
                                     {/* Ações */}
                                     <TableCell>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-600" onClick={() => handleOpenMaintenance(item)} title="Manutenção">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-cyan-600" onClick={() => handleOpenMaintenance(item)} title="Manutenção">
                                             <Settings size={16} />
                                         </Button>
                                     </TableCell>

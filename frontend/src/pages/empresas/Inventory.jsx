@@ -175,7 +175,7 @@ const Inventory = ({ user, onLogout }) => {
             <Card className="border-l-4 border-l-cyan-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Itens Cadastrados</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Itens Cadastrados</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">{totalItems}</p>
                     </div>
                     <Package className="text-cyan-500 opacity-20" size={32} />
@@ -184,7 +184,7 @@ const Inventory = ({ user, onLogout }) => {
             <Card className="border-l-4 border-l-green-500 shadow-sm">
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Valor em Estoque (Custo)</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Valor em Estoque (Custo)</p>
                         <p className="text-2xl font-bold text-slate-700 dark:text-white">R$ {totalStockValue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                     </div>
                     <DollarSign className="text-green-500 opacity-20" size={32} />
@@ -193,17 +193,17 @@ const Inventory = ({ user, onLogout }) => {
             <Card className={`border-l-4 shadow-sm ${lowStockItems > 0 ? 'border-l-red-500 bg-red-50 dark:bg-red-900/10' : 'border-l-slate-300'}`}>
                 <CardContent className="p-4 flex justify-between items-center">
                     <div>
-                        <p className="text-xs text-slate-400 font-bold uppercase">Alerta de Reposição</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Alerta de Reposição</p>
                         <p className={`text-2xl font-bold ${lowStockItems > 0 ? 'text-red-600' : 'text-slate-700'}`}>{lowStockItems} itens</p>
                     </div>
-                    <AlertTriangle className={`${lowStockItems > 0 ? 'text-red-500' : 'text-slate-300'} opacity-20`} size={32} />
+                    <AlertTriangle className={`${lowStockItems > 0 ? 'text-red-500' : 'text-slate-600 dark:text-slate-300'} opacity-20`} size={32} />
                 </CardContent>
             </Card>
         </div>
 
         {/* BARRA DE BUSCA */}
         <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-500 dark:text-slate-400" />
             <Input 
                 placeholder="Buscar por Nome, SKU ou Categoria..." 
                 className="pl-10 bg-white" 
@@ -228,14 +228,14 @@ const Inventory = ({ user, onLogout }) => {
                     {isLoading ? (
                         <TableRow><TableCell colSpan={5} className="h-24 text-center"><Loader2 className="animate-spin inline mr-2 text-cyan-600"/> Carregando...</TableCell></TableRow>
                     ) : filteredProducts.length === 0 ? (
-                        <TableRow><TableCell colSpan={5} className="h-24 text-center text-slate-400">Nenhum produto encontrado.</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={5} className="h-24 text-center text-slate-500 dark:text-slate-400">Nenhum produto encontrado.</TableCell></TableRow>
                     ) : (
                         filteredProducts.map((prod) => (
                             <TableRow key={prod.id}>
                                 <TableCell>
                                     <div className="flex flex-col">
                                         <span className="font-bold text-slate-700 dark:text-slate-200">{prod.name}</span>
-                                        <span className="text-xs text-slate-400 flex items-center gap-1">
+                                        <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                                             <Barcode size={10} /> {prod.sku}
                                         </span>
                                     </div>
@@ -248,7 +248,7 @@ const Inventory = ({ user, onLogout }) => {
                                 <TableCell className="text-center">
                                     <div className="flex flex-col items-center">
                                         <span className={`font-bold text-lg ${prod.current_stock <= prod.min_stock ? 'text-red-600' : 'text-cyan-700'}`}>
-                                            {prod.current_stock} <span className="text-xs text-slate-400 font-normal">{prod.unit}</span>
+                                            {prod.current_stock} <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">{prod.unit}</span>
                                         </span>
                                         {prod.current_stock <= prod.min_stock && (
                                             <span className="text-[10px] text-red-500 flex items-center gap-1 bg-red-50 px-1 rounded">
@@ -272,10 +272,10 @@ const Inventory = ({ user, onLogout }) => {
                                             <History size={14} /> Ajustar
                                         </Button>
                                         
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-600" onClick={() => handleOpenProductModal(prod)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-cyan-600" onClick={() => handleOpenProductModal(prod)}>
                                             <Edit size={16}/>
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600" onClick={() => handleDeleteProduct(prod.id)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-red-600" onClick={() => handleDeleteProduct(prod.id)}>
                                             <Trash2 size={16}/>
                                         </Button>
                                     </div>

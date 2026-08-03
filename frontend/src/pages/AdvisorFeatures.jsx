@@ -701,7 +701,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-5">Apenas fale naturalmente 🗣️</h2>
-            <p className="text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
+            <p className="text-slate-600 dark:text-slate-300 text-lg mb-10 max-w-2xl mx-auto">
               Esqueça os bots de "Digite 1 para X". O Simplific entende o seu jeito de falar, gírias,
               áudios enormes e atende múltiplos pedidos de uma só vez.
             </p>
@@ -739,7 +739,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               ].map(({ icon: I, label }) => (
                 <div key={label} className="flex items-center gap-2 bg-slate-800/50 px-3 py-2.5 rounded-xl border border-slate-700/50">
                   <I size={15} className="text-emerald-400 shrink-0" />
-                  <span className="text-xs font-medium text-slate-300">{label}</span>
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{label}</span>
                 </div>
               ))}
             </div>

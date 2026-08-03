@@ -628,7 +628,7 @@ const Transactions = ({ user, onLogout }) => {
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto items-center">
               <Popover>
                   <PopoverTrigger asChild>
-                      <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-300 h-9">
+                      <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300 h-9">
                           <Wallet className="h-4 w-4 mr-2" />
                           Contas
                           {selectedContas.length > 0 && (
@@ -640,7 +640,7 @@ const Transactions = ({ user, onLogout }) => {
                   </PopoverTrigger>
                   <PopoverContent className="w-56 glass-panel border-white/10 text-slate-200 p-3" align="end">
                       <div className="space-y-2">
-                          <h4 className="font-medium text-xs text-slate-400 mb-2 uppercase tracking-wider">Filtrar por Conta:</h4>
+                          <h4 className="font-medium text-xs text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Filtrar por Conta:</h4>
                           {contas.length === 0 ? (
                               <p className="text-xs text-slate-500 italic">Nenhuma conta cadastrada.</p>
                           ) : (
@@ -652,7 +652,7 @@ const Transactions = ({ user, onLogout }) => {
                                           onCheckedChange={() => {}}
                                           className="border-white/20 data-[state=checked]:bg-cyan-500"
                                       />
-                                      <label className="text-sm text-slate-300 cursor-pointer flex-1">
+                                      <label className="text-sm text-slate-600 dark:text-slate-300 cursor-pointer flex-1">
                                           {conta.bank_name}
                                       </label>
                                   </div>
@@ -697,13 +697,13 @@ const Transactions = ({ user, onLogout }) => {
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="description" className="text-slate-300">Descrição *</Label>
+                        <Label htmlFor="description" className="text-slate-600 dark:text-slate-300">Descrição *</Label>
                         <Input id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Supermercado, Salário..." required className="glass-panel border-white/10" />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                          <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                           <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
                             <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
                             <SelectContent className="glass-panel border-white/10">
@@ -714,14 +714,14 @@ const Transactions = ({ user, onLogout }) => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="amount" className="text-slate-300">Valor *</Label>
+                          <Label htmlFor="amount" className="text-slate-600 dark:text-slate-300">Valor *</Label>
                           <Input id="amount" type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required className="glass-panel border-white/10" />
                         </div>
                       </div>
 
                       {formData.type === 'credit_card' && (
                         <div className="space-y-2">
-                          <Label htmlFor="credit_card" className="text-slate-300">Selecione o Cartão *</Label>
+                          <Label htmlFor="credit_card" className="text-slate-600 dark:text-slate-300">Selecione o Cartão *</Label>
                           <Select value={formData.credit_card_id} onValueChange={(val) => handleInputChange('credit_card_id', val)}>
                               <SelectTrigger className="glass-panel border-white/10">
                                   <SelectValue placeholder="Selecione um cartão" />
@@ -738,7 +738,7 @@ const Transactions = ({ user, onLogout }) => {
                       )}
 
                       <div className={formData.type === 'credit_card' ? 'opacity-50 pointer-events-none' : 'space-y-2'}>
-                        <Label htmlFor="bank_account" className="text-slate-300">Conta Bancária (Opcional)</Label>
+                        <Label htmlFor="bank_account" className="text-slate-600 dark:text-slate-300">Conta Bancária (Opcional)</Label>
                         <Select 
                           disabled={formData.type === 'credit_card'} 
                           value={formData.type === 'credit_card' ? 'none' : formData.bank_account_id} 
@@ -759,7 +759,7 @@ const Transactions = ({ user, onLogout }) => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="category" className="text-slate-300">Categoria *</Label>
+                        <Label htmlFor="category" className="text-slate-600 dark:text-slate-300">Categoria *</Label>
                         <div className="flex items-center gap-2">
                           <Select key={formData.type + categorias.length} value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                             <SelectTrigger className="glass-panel border-white/10 flex-1"><SelectValue placeholder="Selecione..." /></SelectTrigger>
@@ -792,11 +792,11 @@ const Transactions = ({ user, onLogout }) => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="transaction_date" className="text-slate-300">Data</Label>
+                          <Label htmlFor="transaction_date" className="text-slate-600 dark:text-slate-300">Data</Label>
                           <Input id="transaction_date" type="date" value={formData.transaction_date} onChange={(e) => handleInputChange('transaction_date', e.target.value)} className="glass-panel border-white/10" />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="status" className="text-slate-300">Status</Label>
+                          <Label htmlFor="status" className="text-slate-600 dark:text-slate-300">Status</Label>
                           <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
                             <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
                             <SelectContent className="glass-panel border-white/10">
@@ -808,7 +808,7 @@ const Transactions = ({ user, onLogout }) => {
                       </div>
 
                       <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                         <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Criar Transação</Button>
                       </div>
                     </form>
@@ -818,7 +818,7 @@ const Transactions = ({ user, onLogout }) => {
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  className="w-9 h-9 border-white/10 hover:bg-white/5 text-slate-300" 
+                  className="w-9 h-9 border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300" 
                   onClick={() => fileInputRef.current.click()} 
                   disabled={isUploading} 
                   title="Importar Extrato"
@@ -994,16 +994,16 @@ const Transactions = ({ user, onLogout }) => {
               editarTransacao(selectedTransacao.id, payload);
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit_description" className="text-slate-300">Descrição *</Label>
+                <Label htmlFor="edit_description" className="text-slate-600 dark:text-slate-300">Descrição *</Label>
                 <Input id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} required className="glass-panel border-white/10" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit_amount" className="text-slate-300">Valor *</Label>
+                  <Label htmlFor="edit_amount" className="text-slate-600 dark:text-slate-300">Valor *</Label>
                   <Input id="edit_amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))} required className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_type" className="text-slate-300">Tipo *</Label>
+                  <Label htmlFor="edit_type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                   <Select value={editFormData.type} onValueChange={(value) => setEditFormData(prev => ({...prev, type: value}))}>
                     <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
                     <SelectContent className="glass-panel border-white/10">
@@ -1015,7 +1015,7 @@ const Transactions = ({ user, onLogout }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit_bank_account" className="text-slate-300">Conta Bancária</Label>
+                <Label htmlFor="edit_bank_account" className="text-slate-600 dark:text-slate-300">Conta Bancária</Label>
                 <Select value={editFormData.bank_account_id} onValueChange={(value) => setEditFormData(prev => ({...prev, bank_account_id: value}))}>
                     <SelectTrigger className="glass-panel border-white/10">
                         <SelectValue placeholder="Selecione uma conta" />
@@ -1032,7 +1032,7 @@ const Transactions = ({ user, onLogout }) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit_category" className="text-slate-300">Categoria *</Label>
+                <Label htmlFor="edit_category" className="text-slate-600 dark:text-slate-300">Categoria *</Label>
                 <Select value={editFormData.category} onValueChange={(value) => setEditFormData(prev => ({...prev, category: value}))}>
                   <SelectTrigger className="glass-panel border-white/10"><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent className="glass-panel border-white/10 max-h-[250px]">
@@ -1044,11 +1044,11 @@ const Transactions = ({ user, onLogout }) => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit_transaction_date" className="text-slate-300">Data</Label>
+                  <Label htmlFor="edit_transaction_date" className="text-slate-600 dark:text-slate-300">Data</Label>
                   <Input id="edit_transaction_date" type="date" value={editFormData.transaction_date} onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))} className="glass-panel border-white/10" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit_status" className="text-slate-300">Status</Label>
+                  <Label htmlFor="edit_status" className="text-slate-600 dark:text-slate-300">Status</Label>
                   <Select value={editFormData.status} onValueChange={(value) => setEditFormData(prev => ({...prev, status: value}))}>
                     <SelectTrigger className="glass-panel border-white/10"><SelectValue /></SelectTrigger>
                     <SelectContent className="glass-panel border-white/10">
@@ -1059,7 +1059,7 @@ const Transactions = ({ user, onLogout }) => {
                 </div>
               </div>
               <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
                 <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
               </div>
             </form>

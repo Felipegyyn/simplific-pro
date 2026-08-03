@@ -165,7 +165,7 @@ const BankAccounts = ({ user, onLogout }) => {
                                 </div>
                                 <div>
                                     <CardTitle className="text-lg">{bankName}</CardTitle>
-                                    <p className="text-xs text-slate-400 font-medium">{items.length} conta{items.length > 1 ? 's' : ''} cadastrada{items.length > 1 ? 's' : ''}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{items.length} conta{items.length > 1 ? 's' : ''} cadastrada{items.length > 1 ? 's' : ''}</p>
                                 </div>
                             </div>
                         </CardHeader>
@@ -184,13 +184,13 @@ const BankAccounts = ({ user, onLogout }) => {
                                                     {formatType(acc.account_type)}
                                                 </span>
                                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => handleEdit(acc)} className="text-slate-400 hover:text-cyan-600"><Edit size={14}/></button>
-                                                    <button onClick={() => handleDelete(acc.id)} className="text-slate-400 hover:text-red-600"><Trash2 size={14}/></button>
+                                                    <button onClick={() => handleEdit(acc)} className="text-slate-500 dark:text-slate-400 hover:text-cyan-600"><Edit size={14}/></button>
+                                                    <button onClick={() => handleDelete(acc.id)} className="text-slate-500 dark:text-slate-400 hover:text-red-600"><Trash2 size={14}/></button>
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center gap-2 mb-2">
-                                                <Building2 size={14} className="text-slate-400 shrink-0" />
+                                                <Building2 size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
                                                 <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
                                                     {getCompanyName(acc.company_id)}
                                                 </span>
@@ -202,11 +202,11 @@ const BankAccounts = ({ user, onLogout }) => {
                                                         Ag: {acc.agency || '-'} / CC: {acc.account_number || '-'}
                                                     </span>
                                                 ) : (
-                                                    <span className="italic text-slate-400">Sem dados de agência/conta</span>
+                                                    <span className="italic text-slate-500 dark:text-slate-400">Sem dados de agência/conta</span>
                                                 )}
                                             </div>
                                             
-                                            {acc.notes && <p className="text-xs text-slate-400 mt-2 line-clamp-1 italic">{acc.notes}</p>}
+                                            {acc.notes && <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-1 italic">{acc.notes}</p>}
                                         </div>
                                     </div>
                                 ))}
@@ -216,7 +216,7 @@ const BankAccounts = ({ user, onLogout }) => {
                 ))}
 
                 {accounts.length === 0 && (
-                    <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300">
+                    <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-300">
                         <Landmark size={48} className="mx-auto mb-4 opacity-20" />
                         <p>Nenhuma conta bancária cadastrada.</p>
                     </div>

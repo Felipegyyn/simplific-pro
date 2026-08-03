@@ -812,7 +812,7 @@ const tutorials = [
                 </Button>
               </>
             ) : (
-              <p className="text-center py-8 text-slate-400 italic">Carregando imagem...</p>
+              <p className="text-center py-8 text-slate-500 dark:text-slate-400 italic">Carregando imagem...</p>
             )}
           </div>
         </DialogContent>

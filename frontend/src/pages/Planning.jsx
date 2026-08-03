@@ -707,7 +707,7 @@ useEffect(() => {
             {/* Filtros Visão Geral */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6 glass-panel p-4 border-white/5">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Ano</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Ano</label>
                 <select
                   value={filtroAnoVisaoGeral}
                   onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
@@ -720,7 +720,7 @@ useEffect(() => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1 uppercase tracking-wider">Tipo</label>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Tipo</label>
                 <select
                   value={filtroTipoVisaoGeral}
                   onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
@@ -894,7 +894,7 @@ useEffect(() => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
               <div>
                 <h3 className="text-lg font-semibold text-white">Orçamento por Categoria</h3>
-                <p className="text-sm text-slate-400">Controle seus gastos por categoria mensalmente</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Controle seus gastos por categoria mensalmente</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -910,7 +910,7 @@ useEffect(() => {
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="type" className="text-slate-300">Tipo</Label>
+                        <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo</Label>
                         <Select
                           value={formData.type}
                           onValueChange={(value) => handleSelectChange('type', value)}
@@ -930,7 +930,7 @@ useEffect(() => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="category_id" className="text-slate-300">Categoria</Label>
+                        <Label htmlFor="category_id" className="text-slate-600 dark:text-slate-300">Categoria</Label>
                         <Select
                           value={formData.category_id}
                           onValueChange={(value) => handleSelectChange('category_id', value)}
@@ -954,7 +954,7 @@ useEffect(() => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="form" className="text-slate-300">Forma</Label>
+                          <Label htmlFor="form" className="text-slate-600 dark:text-slate-300">Forma</Label>
                           <Select
                             id="form"
                             name="form"
@@ -972,7 +972,7 @@ useEffect(() => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="value" className="text-slate-300">Valor (R$)</Label>
+                          <Label htmlFor="value" className="text-slate-600 dark:text-slate-300">Valor (R$)</Label>
                           <Input
                             id="value"
                             name="value"
@@ -988,7 +988,7 @@ useEffect(() => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="date" className="text-slate-300">Data</Label>
+                          <Label htmlFor="date" className="text-slate-600 dark:text-slate-300">Data</Label>
                           <Input
                             id="date"
                             name="date"
@@ -1008,13 +1008,13 @@ useEffect(() => {
                             onChange={handleInputChange}
                             className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-600 focus:ring-cyan-500/50"
                           />
-                          <Label htmlFor="is_recurring" className="text-slate-300">Recorrente</Label>
+                          <Label htmlFor="is_recurring" className="text-slate-600 dark:text-slate-300">Recorrente</Label>
                         </div>
                       </div>
 
                       {formData.is_recurring && (
                         <div className="space-y-2">
-                          <Label htmlFor="recurrence_period" className="text-slate-300">Período da Recorrência (meses)</Label>
+                          <Label htmlFor="recurrence_period" className="text-slate-600 dark:text-slate-300">Período da Recorrência (meses)</Label>
                           <Input
                             id="recurrence_period"
                             name="recurrence_period"
@@ -1029,7 +1029,7 @@ useEffect(() => {
                       )}
 
                       <div className="space-y-2">
-                        <Label htmlFor="observations" className="text-slate-300">Observações</Label>
+                        <Label htmlFor="observations" className="text-slate-600 dark:text-slate-300">Observações</Label>
                         <Input
                           id="observations"
                           name="observations"
@@ -1041,7 +1041,7 @@ useEffect(() => {
                       </div>
 
                       <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">
                           Cancelar
                         </Button>
                         <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">
@@ -1054,7 +1054,7 @@ useEffect(() => {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-300">
+                    <Button variant="outline" className="border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300">
                       <Plus className="h-4 w-4 mr-2" />
                       Nova Categoria
                     </Button>
@@ -1065,7 +1065,7 @@ useEffect(() => {
                     </DialogHeader>
                     <form onSubmit={handleCreateCategory} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="category_name" className="text-slate-300">Nome da Categoria</Label>
+                        <Label htmlFor="category_name" className="text-slate-600 dark:text-slate-300">Nome da Categoria</Label>
                         <Input
                           id="category_name"
                           name="category_name"
@@ -1076,7 +1076,7 @@ useEffect(() => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="category_type" className="text-slate-300">Tipo</Label>
+                        <Label htmlFor="category_type" className="text-slate-600 dark:text-slate-300">Tipo</Label>
                         <select
                           id="category_type"
                           name="category_type"
@@ -1105,7 +1105,7 @@ useEffect(() => {
             {/* Filtros Orçamento */}
             <div className="flex flex-wrap gap-4 items-end glass-panel p-4 border-white/5">
               <div>
-                <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Ano</Label>
+                <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ano</Label>
                 <select
                   value={filtroAnoOrcamento}
                   onChange={(e) => setFiltroAnoOrcamento(e.target.value)}
@@ -1117,7 +1117,7 @@ useEffect(() => {
                 </select>
               </div>
               <div>
-                <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Mês</Label>
+                <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Mês</Label>
                 <select
                   value={filtroMesOrcamento}
                   onChange={(e) => setFiltroMesOrcamento(e.target.value)}
@@ -1223,7 +1223,7 @@ useEffect(() => {
               {/* Filtros */}
               <div className="lg:col-span-2 glass-panel p-6 border-white/5 flex flex-wrap gap-4 items-end">
                 <div>
-                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Categoria</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Categoria</Label>
                   <select
                     value={filtroCategoria}
                     onChange={(e) => setFiltroCategoria(e.target.value)}
@@ -1236,7 +1236,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div>
-                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Tipo</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tipo</Label>
                   <select
                     value={filtroTipo}
                     onChange={(e) => setFiltroTipo(e.target.value)}
@@ -1249,7 +1249,7 @@ useEffect(() => {
                   </select>
                 </div>
                 <div>
-                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Início</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Início</Label>
                   <Input
                     type="date"
                     value={filtroInicio}
@@ -1258,7 +1258,7 @@ useEffect(() => {
                   />
                 </div>
                 <div>
-                  <Label className="block mb-1 text-xs font-medium text-slate-400 uppercase tracking-wider">Fim</Label>
+                  <Label className="block mb-1 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fim</Label>
                   <Input
                     type="date"
                     value={filtroFim}
@@ -1271,24 +1271,24 @@ useEffect(() => {
               {/* Minicard de Resumo */}
               <div className="glass-card border-white/10 p-6 flex flex-col justify-center bg-cyan-500/5">
                 <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Resumo Filtrado</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Resumo Filtrado</span>
                   <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-400">Planejado</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Planejado</span>
                     <span className="text-sm font-bold text-cyan-400">
                       {resumoFiltrado.totalPlanejado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-400">Realizado</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Realizado</span>
                     <span className="text-sm font-bold text-rose-400">
                       {resumoFiltrado.totalGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-400">A realizar</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">A realizar</span>
                     <span className="text-sm font-bold text-emerald-400">
                       {resumoFiltrado.disponivel.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </span>
@@ -1413,7 +1413,7 @@ useEffect(() => {
               });
             }} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="type" className="text-slate-300">Tipo</Label>
+                <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo</Label>
                 <select
                   id="type"
                   name="type"
@@ -1430,7 +1430,7 @@ useEffect(() => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category_id" className="text-slate-300">Categoria</Label>
+                <Label htmlFor="category_id" className="text-slate-600 dark:text-slate-300">Categoria</Label>
                 <Select 
                   value={formData.category_id}
                   onValueChange={(value) => handleInputChange({ target: { name: 'category_id', value } })}
@@ -1453,7 +1453,7 @@ useEffect(() => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="value" className="text-slate-300">Valor (R$)</Label>
+                  <Label htmlFor="value" className="text-slate-600 dark:text-slate-300">Valor (R$)</Label>
                   <Input
                     id="value"
                     name="value"
@@ -1466,7 +1466,7 @@ useEffect(() => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="date" className="text-slate-300">Data</Label>
+                  <Label htmlFor="date" className="text-slate-600 dark:text-slate-300">Data</Label>
                   <Input
                     id="date"
                     name="date"
@@ -1488,12 +1488,12 @@ useEffect(() => {
                   onChange={handleInputChange}
                   className="w-4 h-4 rounded border-white/10 bg-white/5 text-cyan-600 focus:ring-cyan-500/50"
                 />
-                <Label htmlFor="is_recurring_edit" className="text-slate-300">Recorrente</Label>
+                <Label htmlFor="is_recurring_edit" className="text-slate-600 dark:text-slate-300">Recorrente</Label>
               </div>
 
               {formData.is_recurring && (
                 <div className="space-y-2">
-                  <Label htmlFor="recurrence_period_edit" className="text-slate-300">Período da Recorrência (meses)</Label>
+                  <Label htmlFor="recurrence_period_edit" className="text-slate-600 dark:text-slate-300">Período da Recorrência (meses)</Label>
                   <Input
                     id="recurrence_period_edit"
                     name="recurrence_period"
@@ -1508,7 +1508,7 @@ useEffect(() => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="observations_edit" className="text-slate-300">Observações</Label>
+                <Label htmlFor="observations_edit" className="text-slate-600 dark:text-slate-300">Observações</Label>
                 <Input
                   id="observations_edit"
                   name="observations"
@@ -1520,7 +1520,7 @@ useEffect(() => {
               </div>
 
               <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-400 hover:text-white">
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">
                   Cancelar
                 </Button>
                 <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">

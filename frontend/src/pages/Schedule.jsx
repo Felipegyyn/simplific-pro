@@ -549,7 +549,7 @@ const Schedule = ({ user, onLogout }) => {
                 variant="outline" 
                 onClick={handleGoogleConnect} 
                 disabled={isSyncing}
-                className="glass-panel border-white/10 hover:bg-white/5 text-slate-300"
+                className="glass-panel border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300"
             >
                 <Globe className="h-4 w-4 mr-2 text-cyan-400" />
                 Google
@@ -558,7 +558,7 @@ const Schedule = ({ user, onLogout }) => {
             <Button 
                 variant="outline" 
                 onClick={handleAppleSync}
-                className="glass-panel border-white/10 hover:bg-white/5 text-slate-300"
+                className="glass-panel border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300"
             >
                 <Smartphone className="h-4 w-4 mr-2 text-cyan-400" />
                 Apple
@@ -576,7 +576,7 @@ const Schedule = ({ user, onLogout }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <Label htmlFor="title" className="text-slate-300">Título do Evento *</Label>
+                    <Label htmlFor="title" className="text-slate-600 dark:text-slate-300">Título do Evento *</Label>
                     <Input
                       id="title"
                       value={formData.title}
@@ -588,7 +588,7 @@ const Schedule = ({ user, onLogout }) => {
                   </div>
                   
                   <div>
-                    <Label htmlFor="description" className="text-slate-300">Descrição</Label>
+                    <Label htmlFor="description" className="text-slate-600 dark:text-slate-300">Descrição</Label>
                     <Textarea
                       id="description"
                       value={formData.description}
@@ -601,7 +601,7 @@ const Schedule = ({ user, onLogout }) => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="event_date" className="text-slate-300">Data *</Label>
+                      <Label htmlFor="event_date" className="text-slate-600 dark:text-slate-300">Data *</Label>
                       <Input
                         id="event_date"
                         type="date"
@@ -612,7 +612,7 @@ const Schedule = ({ user, onLogout }) => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="event_time" className="text-slate-300">Horário</Label>
+                      <Label htmlFor="event_time" className="text-slate-600 dark:text-slate-300">Horário</Label>
                       <Input
                         id="event_time"
                         type="time"
@@ -625,7 +625,7 @@ const Schedule = ({ user, onLogout }) => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="type" className="text-slate-300">Tipo *</Label>
+                      <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                       <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
                         <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
                           <SelectValue />
@@ -641,7 +641,7 @@ const Schedule = ({ user, onLogout }) => {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="priority" className="text-slate-300">Prioridade</Label>
+                      <Label htmlFor="priority" className="text-slate-600 dark:text-slate-300">Prioridade</Label>
                       <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
                         <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
                           <SelectValue />
@@ -657,7 +657,7 @@ const Schedule = ({ user, onLogout }) => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="amount" className="text-slate-300">Valor (R$)</Label>
+                      <Label htmlFor="amount" className="text-slate-600 dark:text-slate-300">Valor (R$)</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -669,7 +669,7 @@ const Schedule = ({ user, onLogout }) => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="category" className="text-slate-300">Categoria</Label>
+                      <Label htmlFor="category" className="text-slate-600 dark:text-slate-300">Categoria</Label>
                       <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                         <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
                           <SelectValue placeholder="Selecione..." />
@@ -690,7 +690,7 @@ const Schedule = ({ user, onLogout }) => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="is_recurring" className="text-slate-300">Evento Recorrente?</Label>
+                      <Label htmlFor="is_recurring" className="text-slate-600 dark:text-slate-300">Evento Recorrente?</Label>
                       <Select value={formData.is_recurring} onValueChange={(value) => handleInputChange('is_recurring', value)}>
                         <SelectTrigger className="bg-white/5 border-white/10 focus:border-cyan-500/50">
                           <SelectValue />
@@ -704,7 +704,7 @@ const Schedule = ({ user, onLogout }) => {
                     
                     {formData.is_recurring === 'sim' && (
                       <div>
-                        <Label htmlFor="recurrence_count" className="text-slate-300">Duração (Meses)</Label>
+                        <Label htmlFor="recurrence_count" className="text-slate-600 dark:text-slate-300">Duração (Meses)</Label>
                         <Input
                           id="recurrence_count"
                           type="number"
@@ -741,7 +741,7 @@ const Schedule = ({ user, onLogout }) => {
             <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => navegarMes(-1)}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-500 dark:text-slate-400 hover:text-white"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -750,7 +750,7 @@ const Schedule = ({ user, onLogout }) => {
               </h3>
               <button
                 onClick={() => navegarMes(1)}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-400 hover:text-white"
+                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-slate-500 dark:text-slate-400 hover:text-white"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -794,7 +794,7 @@ const Schedule = ({ user, onLogout }) => {
                           'text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full mb-1 self-end',
                           isToday
                             ? 'bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-900/40'
-                            : 'text-slate-300',
+                            : 'text-slate-600 dark:text-slate-300',
                         ].join(' ')}>
                           {day.getDate()}
                         </span>
@@ -835,12 +835,12 @@ const Schedule = ({ user, onLogout }) => {
               {Object.entries({ pagamento: 'Pagamento', recebimento: 'Recebimento', reuniao: 'Reunião', vencimento: 'Vencimento', tarefa: 'Tarefa' }).map(([tipo, label]) => (
                 <div key={tipo} className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full shadow-sm ${tipoCorCalendario[tipo]}`} />
-                  <span className="text-xs text-slate-400">{label}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">{label}</span>
                 </div>
               ))}
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-slate-700 shadow-sm" />
-                <span className="text-xs text-slate-400">Concluído</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Concluído</span>
               </div>
             </div>
           </div>
@@ -857,7 +857,7 @@ const Schedule = ({ user, onLogout }) => {
                     <h3 className="text-lg font-bold text-white">
                       {String(selectedDay.getDate()).padStart(2,'0')}/{String(selectedDay.getMonth()+1).padStart(2,'0')}/{selectedDay.getFullYear()}
                     </h3>
-                    <p className="text-xs text-slate-400">{(eventosPorData[toDateKey(selectedDay)] || []).length} evento(s) programado(s)</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{(eventosPorData[toDateKey(selectedDay)] || []).length} evento(s) programado(s)</p>
                   </div>
                 </div>
               </div>
@@ -885,7 +885,7 @@ const Schedule = ({ user, onLogout }) => {
                           {getPrioridadeBadge(evento.priority)}
                         </div>
                         {evento.description && (
-                          <p className="text-xs text-slate-400 mb-3 line-clamp-2">{evento.description}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2">{evento.description}</p>
                         )}
                         <div className="flex flex-wrap gap-4 text-[10px] text-slate-500 font-medium uppercase tracking-wider">
                           {evento.time && <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{evento.time}</span>}
@@ -931,7 +931,7 @@ const Schedule = ({ user, onLogout }) => {
           const tabConfig = {
             proximos: { icon: Calendar, label: 'Próximos', empty: 'Nenhum evento próximo', color: 'text-blue-400', bg: 'bg-blue-500/10' },
             hoje: { icon: Clock, label: 'Hoje', empty: 'Nenhum evento para hoje', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-            concluidos: { icon: CheckCircle, label: 'Concluídos', empty: 'Nenhum evento concluído', color: 'text-slate-400', bg: 'bg-slate-500/10' },
+            concluidos: { icon: CheckCircle, label: 'Concluídos', empty: 'Nenhum evento concluído', color: 'text-slate-500 dark:text-slate-400', bg: 'bg-slate-500/10' },
             atrasados: { icon: AlertTriangle, label: 'Atrasados', empty: 'Nenhum evento atrasado! 🎉', color: 'text-red-400', bg: 'bg-red-500/10' }
           }[tab];
 
@@ -955,7 +955,7 @@ const Schedule = ({ user, onLogout }) => {
                       </div>
                       
                       {evento.description && (
-                        <p className="text-slate-400 text-sm mb-4 line-clamp-2 max-w-2xl">{evento.description}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2 max-w-2xl">{evento.description}</p>
                       )}
                       
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -1032,7 +1032,7 @@ const Schedule = ({ user, onLogout }) => {
                 <ListTodo className="h-5 w-5 text-cyan-400" />
                 Bloco de Notas
               </CardTitle>
-              <p className="text-xs text-slate-400">Anote tarefas rápidas ou rascunhos.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Anote tarefas rápidas ou rascunhos.</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Input Rápido */}
@@ -1097,7 +1097,7 @@ const Schedule = ({ user, onLogout }) => {
                       <div className="flex-1 min-w-0">
                         <p className={cn(
                           "text-sm font-medium text-slate-100 leading-tight break-words",
-                          task.completed && "line-through text-slate-400"
+                          task.completed && "line-through text-slate-500 dark:text-slate-400"
                         )}>
                           {task.text}
                         </p>
@@ -1112,7 +1112,7 @@ const Schedule = ({ user, onLogout }) => {
                           </span>
                           
                           {task.date && (
-                            <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                               <Calendar className="h-2.5 w-2.5" />
                               {formatarData(task.date)}
                             </span>
@@ -1127,14 +1127,14 @@ const Schedule = ({ user, onLogout }) => {
                         <button 
                           onClick={() => promoteToAgenda(task)}
                           title="Transformar em Compromisso"
-                          className="p-1 text-slate-400 hover:text-cyan-400"
+                          className="p-1 text-slate-500 dark:text-slate-400 hover:text-cyan-400"
                         >
                           <Calendar className="h-3.5 w-3.5" />
                         </button>
                       )}
                       <button 
                         onClick={() => task.source === 'local' ? deleteLocalTask(task.id) : excluirEvento(task.id)}
-                        className="p-1 text-slate-400 hover:text-red-400"
+                        className="p-1 text-slate-500 dark:text-slate-400 hover:text-red-400"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -1155,26 +1155,26 @@ const Schedule = ({ user, onLogout }) => {
           </DialogHeader>
           <form onSubmit={handleUpdateEvent} className="space-y-4">
             <div>
-              <Label htmlFor="edit-title" className="text-slate-300">Título do Evento *</Label>
+              <Label htmlFor="edit-title" className="text-slate-600 dark:text-slate-300">Título do Evento *</Label>
               <Input id="edit-title" value={editFormData.title} onChange={(e) => handleEditInputChange('title', e.target.value)} className="bg-white/5 border-white/10" required />
             </div>
             <div>
-              <Label htmlFor="edit-description" className="text-slate-300">Descrição</Label>
+              <Label htmlFor="edit-description" className="text-slate-600 dark:text-slate-300">Descrição</Label>
               <Textarea id="edit-description" value={editFormData.description} onChange={(e) => handleEditInputChange('description', e.target.value)} className="bg-white/5 border-white/10" rows={3} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-event_date" className="text-slate-300">Data *</Label>
+                <Label htmlFor="edit-event_date" className="text-slate-600 dark:text-slate-300">Data *</Label>
                 <Input id="edit-event_date" type="date" value={editFormData.event_date} onChange={(e) => handleEditInputChange('event_date', e.target.value)} className="bg-white/5 border-white/10" required />
               </div>
               <div>
-                <Label htmlFor="edit-event_time" className="text-slate-300">Horário</Label>
+                <Label htmlFor="edit-event_time" className="text-slate-600 dark:text-slate-300">Horário</Label>
                 <Input id="edit-event_time" type="time" value={editFormData.event_time} onChange={(e) => handleEditInputChange('event_time', e.target.value)} className="bg-white/5 border-white/10" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-type" className="text-slate-300">Tipo *</Label>
+                <Label htmlFor="edit-type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                 <Select value={editFormData.type} onValueChange={(value) => handleEditInputChange('type', value)}>
                   <SelectTrigger className="bg-white/5 border-white/10"><SelectValue /></SelectTrigger>
                   <SelectContent className="glass-panel border-white/10">
@@ -1188,7 +1188,7 @@ const Schedule = ({ user, onLogout }) => {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="edit-priority" className="text-slate-300">Prioridade</Label>
+                <Label htmlFor="edit-priority" className="text-slate-600 dark:text-slate-300">Prioridade</Label>
                 <Select value={editFormData.priority} onValueChange={(value) => handleEditInputChange('priority', value)}>
                   <SelectTrigger className="bg-white/5 border-white/10"><SelectValue /></SelectTrigger>
                   <SelectContent className="glass-panel border-white/10">
@@ -1201,11 +1201,11 @@ const Schedule = ({ user, onLogout }) => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="edit-amount" className="text-slate-300">Valor (R$)</Label>
+                <Label htmlFor="edit-amount" className="text-slate-600 dark:text-slate-300">Valor (R$)</Label>
                 <Input id="edit-amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => handleEditInputChange('amount', e.target.value)} className="bg-white/5 border-white/10" />
               </div>
               <div>
-                <Label htmlFor="edit-category" className="text-slate-300">Categoria</Label>
+                <Label htmlFor="edit-category" className="text-slate-600 dark:text-slate-300">Categoria</Label>
                 <Select value={editFormData.category} onValueChange={(value) => handleEditInputChange('category', value)}>
                   <SelectTrigger className="bg-white/5 border-white/10"><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent className="glass-panel border-white/10">
@@ -1245,7 +1245,7 @@ const Schedule = ({ user, onLogout }) => {
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 {getStatusIcon(selectedCalendarEvent.is_completed)}
-                <span className="text-sm font-medium text-slate-300">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                   {selectedCalendarEvent.is_completed ? 'Concluído' : 'Pendente'}
                 </span>
                 {getPrioridadeBadge(selectedCalendarEvent.priority)}
@@ -1253,7 +1253,7 @@ const Schedule = ({ user, onLogout }) => {
 
               {selectedCalendarEvent.description && (
                 <div className="bg-white/5 rounded-xl p-4 border border-white/5">
-                  <p className="text-sm text-slate-400 italic">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 italic">
                     {selectedCalendarEvent.description}
                   </p>
                 </div>
