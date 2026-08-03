@@ -527,7 +527,7 @@ const Inicio = ({ user }) => {
               </button>
             </div>
 
-            <div className={styles.cardContent}>
+            <div className={`${styles.cardContent} ${styles.scrollableList}`}>
               {loading ? (
                 <div className={styles.emptyState}>
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
@@ -577,7 +577,7 @@ const Inicio = ({ user }) => {
                 </Badge>
             </div>
 
-            <div className={styles.cardContent}>
+            <div className={`${styles.cardContent} ${styles.scrollableList}`}>
               {loading ? (
                 <div className={styles.emptyState}>
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-400"></div>
