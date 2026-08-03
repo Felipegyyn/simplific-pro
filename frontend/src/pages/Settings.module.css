@@ -1,0 +1,93 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn var(--transition-slow);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.pageSubtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.premiumCard {
+  background-color: var(--surface-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.premiumCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.iconBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.iconBoxPrimary {
+  background-color: rgba(6, 182, 212, 0.1);
+  color: #0891b2;
+}
+
+.iconBoxSecondary {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.iconBoxTertiary {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #7c3aed;
+}
+
+/* Dark mode overrides for icons */
+:global(.dark) .iconBoxPrimary {
+  background-color: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+}
+:global(.dark) .iconBoxSecondary {
+  background-color: rgba(96, 165, 250, 0.1);
+  color: #60a5fa;
+}
+:global(.dark) .iconBoxTertiary {
+  background-color: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+}
