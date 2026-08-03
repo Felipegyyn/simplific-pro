@@ -76,31 +76,36 @@
   width: 100%;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) { /* TEMPORARY REPLACE MARKER */
   .mainGrid {
     grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: min-content;
+    grid-template-rows: auto auto auto;
   }
   
   .gridLancamentos {
     grid-column: 1 / 2;
     grid-row: 1 / 3;
+    min-height: 0; /* IMPEDE QUE A LISTA CRESÇA O GRID */
   }
   .gridVisao {
     grid-column: 2 / 4;
     grid-row: 1 / 2;
+    min-height: 0;
   }
   .gridCartoes {
     grid-column: 2 / 4;
     grid-row: 2 / 3;
+    min-height: 0;
   }
   .gridPendencias {
     grid-column: 1 / 2;
     grid-row: 3 / 4;
+    min-height: 0;
   }
   .gridBottomRow {
     grid-column: 2 / 4;
     grid-row: 3 / 4;
+    min-height: 0;
   }
 }
 
@@ -197,6 +202,7 @@
 .scrollableList {
   overflow-y: auto;
   min-height: 0;
+  flex: 1; /* PERMITE CRESCER MAS RESPEITA O OVERFLOW */
 }
 .scrollableList::-webkit-scrollbar {
   width: 6px;
