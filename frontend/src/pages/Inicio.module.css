@@ -65,37 +65,42 @@
   gap: 2rem;
 }
 
+.gridLancamentos,
+.gridPendencias,
+.gridVisao,
+.gridCartoes,
+.gridBottomRow {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
 @media (min-width: 1024px) {
   .mainGrid {
     grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: min-content;
   }
-}
-
-.leftCol {
-  grid-column: span 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: hidden;
-}
-
-.rightCol {
-  grid-column: span 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: hidden;
-}
-
-@media (min-width: 1024px) {
-  .rightCol {
-    grid-column: span 2;
+  
+  .gridLancamentos {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+  }
+  .gridVisao {
+    grid-column: 2 / 4;
+    grid-row: 1 / 2;
+  }
+  .gridCartoes {
+    grid-column: 2 / 4;
+    grid-row: 2 / 3;
+  }
+  .gridPendencias {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+  .gridBottomRow {
+    grid-column: 2 / 4;
+    grid-row: 3 / 4;
   }
 }
 
@@ -190,8 +195,8 @@
 }
 
 .scrollableList {
-  max-height: 415px;
   overflow-y: auto;
+  min-height: 0;
 }
 .scrollableList::-webkit-scrollbar {
   width: 6px;

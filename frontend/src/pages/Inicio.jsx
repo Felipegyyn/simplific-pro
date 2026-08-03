@@ -440,11 +440,9 @@ const Inicio = ({ user }) => {
 
       <div className={styles.mainGrid}>
         
-        {/* COLUNA ESQUERDA (LANÇAMENTOS + PENDÊNCIAS) */}
-        <div className={styles.leftCol}>
-          
-          {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <div className={styles.premiumCard} style={{ minHeight: '500px' }}>
+        {/* 1. LANÇAMENTOS */}
+        <div className={styles.gridLancamentos}>
+          <div className={styles.premiumCard} style={{ height: '100%' }}>
             <div className={`${styles.cardTopAccent} ${styles.accentGreen}`}></div>
             
             <div className={styles.cardHeader}>
@@ -561,8 +559,12 @@ const Inicio = ({ user }) => {
             </div>
           </div>
 
-          {/* 2. MINI TELA DE PENDÊNCIAS */}
-          <div className={styles.premiumCard} style={{ minHeight: '300px' }}>
+          </div>
+        </div>
+
+        {/* 2. PENDÊNCIAS */}
+        <div className={styles.gridPendencias}>
+          <div className={styles.premiumCard} style={{ height: '100%', minHeight: '300px' }}>
              <div className={`${styles.cardTopAccent} ${styles.accentOrange}`}></div>
             
             <div className={styles.cardHeader}>
@@ -623,13 +625,12 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
+          </div>
         </div>
 
-        {/* COLUNAS DIREITAS (GRÁFICOS E INDICADORES) */}
-        <div className={styles.rightCol}>
-
-          {/* GRÁFICO DE SALDO POR CONTA */}
-          <div className={styles.premiumCard}>
+        {/* 3. VISÃO POR INSTITUIÇÃO */}
+        <div className={styles.gridVisao}>
+          <div className={styles.premiumCard} style={{ height: '100%' }}>
             <div className={`${styles.cardTopAccent} ${styles.accentCyan}`}></div>
             
             <div className={styles.chartHeader}>
@@ -683,8 +684,12 @@ const Inicio = ({ user }) => {
             </div>
           </div>
 
-          {/* CARROSSEL DE CARTÕES DE CRÉDITO */}
-          <div>
+          </div>
+        </div>
+
+        {/* 4. CARTÕES DE CRÉDITO */}
+        <div className={styles.gridCartoes}>
+          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className={styles.carouselHeader}>
               <div className={styles.cardTitleArea}>
                 <CreditCard size={16} style={{ color: '#a855f7' }} />
@@ -755,9 +760,13 @@ const Inicio = ({ user }) => {
                 })
               )}
             </div>
+            </div>
           </div>
+        </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+        {/* 5. EVENTOS E METAS */}
+        <div className={styles.gridBottomRow}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', height: '100%' }}>
             
             {/* WIDGET AGENDA */}
             <div className={styles.premiumCard}>
