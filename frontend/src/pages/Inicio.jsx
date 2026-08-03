@@ -558,6 +558,8 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
+
+          </div>
         </div>
 
         {/* 2. PENDÊNCIAS */}
@@ -698,8 +700,8 @@ const Inicio = ({ user }) => {
             <div className={styles.carouselContainer}>
               {loading ? (
                 <div className="flex gap-4 w-full">
-                    <Skeleton className="h-44 w-72 bg-slate-200 dark:bg-white/5 border-slate-300 dark:border-white/5" />
-                    <Skeleton className="h-44 w-72 bg-slate-200 dark:bg-white/5 border-slate-300 dark:border-white/5" />
+                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
+                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
                 </div>
               ) : cartoes.length === 0 ? (
                 <div className={styles.emptyState}>
@@ -854,7 +856,7 @@ const Inicio = ({ user }) => {
           </div>
         </div>
 
-        {/* MODAL DE AGENDAMENTO RÁPIDO (PRÓXIMOS EVENTOS) */}
+      {/* MODAL DE AGENDAMENTO RÁPIDO (PRÓXIMOS EVENTOS) */}
         <Dialog open={isEventoModalOpen} onOpenChange={setIsEventoModalOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -1043,8 +1045,7 @@ const Inicio = ({ user }) => {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
-  );
+    );
 };
 
 export default Inicio;
