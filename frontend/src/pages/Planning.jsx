@@ -1143,10 +1143,10 @@ useEffect(() => {
                 <div className={`${styles.transactionRow} ${statusClass} group`}>
                   <div className="flex-1 min-w-0 z-10 w-full">
                     <h3 className="font-semibold text-sm text-slate-800 dark:text-white mb-2">{orc.categoria}</h3>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
-                      <span className="text-cyan-600 dark:text-cyan-400 font-medium">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-rose-600 dark:text-rose-400 font-medium">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mb-3">
+                      <span className="text-cyan-600 dark:text-cyan-400 font-semibold">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-semibold">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="flex-1 bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
@@ -1323,10 +1323,10 @@ useEffect(() => {
                         {new Date(plan.start_date).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
-                      <span className="text-cyan-600 dark:text-cyan-400 font-medium">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-rose-600 dark:text-rose-400 font-medium">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm mb-3">
+                      <span className="text-cyan-600 dark:text-cyan-400 font-semibold">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-semibold">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     {plan.observations && (
                       <p className="text-[10px] text-slate-500 italic mb-3 line-clamp-1">"{plan.observations}"</p>

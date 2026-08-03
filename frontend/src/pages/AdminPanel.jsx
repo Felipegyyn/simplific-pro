@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import apiService from '../services/api'; // Certifique-se que o apiService está correto
 import logo from '../assets/LOGO.png';
+import styles from './AdminPanel.module.css';
 
 const AdminPanel = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -179,95 +180,90 @@ const AdminPanel = ({ user, onLogout }) => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <header className="bg-white dark:bg-slate-800 dark:border-slate-700 shadow-sm border-b">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mr-4">
-              <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-            </Button>
-            <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3" />
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">Bem-vindo, {user.name}</span>
-            <Button variant="outline" size="sm" onClick={onLogout}>
-              <LogOut className="h-4 w-4 mr-2" /> Sair
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="p-4 sm:p-6">
-        {/* ▼▼▼ ADICIONE O TÍTULO E OS CARDS AQUI ▼▼▼ */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Visão Geral</h2>
-        <p className="text-gray-600 dark:text-gray-300">Estatísticas principais do sistema</p>
+    <div className={styles.pageContainer + " p-4 sm:p-6"}>
+      {/* Cabeçalho */}
+      <div className={styles.header}>
+        <div>
+          <h2 className={styles.pageTitle}>Visão Geral</h2>
+          <p className={styles.pageSubtitle}>Estatísticas principais do sistema</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mr-4 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+            <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
+          </Button>
+          <span className="text-sm text-slate-500 dark:text-slate-400">Bem-vindo, {user.name}</span>
+          <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
+            <LogOut className="h-4 w-4 mr-2" /> Sair
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent}>
             <div className="flex items-center">
-              <div className="flex-shrink-0"><Users className="h-8 w-8 text-blue-600" /></div>
+              <div className="flex-shrink-0"><Users className="h-8 w-8 text-cyan-600 dark:text-cyan-400" /></div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Usuários</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalUsuarios}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Total de Usuários</p>
+                <p className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">{totalUsuarios}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
+          </div>
+        </div>
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent}>
             <div className="flex items-center">
-              <div className="flex-shrink-0"><UserCheck className="h-8 w-8 text-green-600" /></div>
+              <div className="flex-shrink-0"><UserCheck className="h-8 w-8 text-emerald-600 dark:text-emerald-400" /></div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Usuários Ativos</p>
-                <p className="text-2xl font-bold text-green-600">{usuariosAtivos}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Usuários Ativos</p>
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{usuariosAtivos}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
+          </div>
+        </div>
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent}>
             <div className="flex items-center">
-              <div className="flex-shrink-0"><Activity className="h-8 w-8 text-purple-600" /></div>
+              <div className="flex-shrink-0"><Activity className="h-8 w-8 text-purple-600 dark:text-purple-400" /></div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Logins Hoje</p>
-                <p className="text-2xl font-bold text-purple-600">{loginsHoje}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Logins Hoje</p>
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{loginsHoje}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
+          </div>
+        </div>
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent}>
             <div className="flex items-center">
-              <div className="flex-shrink-0"><Calendar className="h-8 w-8 text-orange-600" /></div>
+              <div className="flex-shrink-0"><Calendar className="h-8 w-8 text-orange-600 dark:text-orange-400" /></div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Novos no Mês</p>
-                <p className="text-2xl font-bold text-orange-600">{novosUsuariosMes}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Novos no Mês</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{novosUsuariosMes}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
-        <Tabs defaultValue="usuarios" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="usuarios">Gestão de Usuários</TabsTrigger>
-            <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
-          </TabsList>
 
-          <TabsContent value="usuarios" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Usuários do Sistema</h3>
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <main className="flex-1">
+        <Tabs defaultValue="usuarios" className="space-y-6">
+          <TabsList className="bg-white dark:bg-slate-900/50 border-b border-slate-200 dark:border-white/10 p-0 h-auto rounded-none w-full justify-start overflow-x-auto">
+            <TabsTrigger value="usuarios" className="px-4 py-3 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:text-cyan-600 dark:data-[state=active]:text-cyan-400">Gerenciar Usuários</TabsTrigger>
+            <TabsTrigger value="configuracoes" className="px-4 py-3 rounded-none border-b-2 border-transparent data-[state=active]:border-cyan-500 data-[state=active]:text-cyan-600 dark:data-[state=active]:text-cyan-400">Configurações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="usuarios" className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold dark:text-slate-100">Usuários do Sistema</h3>
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">
                     <Plus className="h-4 w-4 mr-2" /> Novo Usuário
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                   <DialogHeader>
-                    <DialogTitle>Criar Novo Usuário</DialogTitle>
+                    <DialogTitle className="text-slate-800 dark:text-white">Criar Novo Usuário</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 py-4">
                     <div className="space-y-2">
@@ -285,8 +281,8 @@ const AdminPanel = ({ user, onLogout }) => {
                     <div className="space-y-2">
                       <Label htmlFor="profile">Perfil</Label>
                       <Select value={novoUsuario.profile} onValueChange={handleSelectChange}>
-                        <SelectTrigger><SelectValue placeholder="Selecione o perfil" /></SelectTrigger>
-                        <SelectContent>
+                        <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10"><SelectValue placeholder="Selecione o perfil" /></SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                           <SelectItem value="admin">Administrador</SelectItem>
                           <SelectItem value="usuario">Usuário</SelectItem>
                         </SelectContent>
@@ -298,7 +294,7 @@ const AdminPanel = ({ user, onLogout }) => {
                     </div>
                   </div>
                   <div className="flex justify-end mt-4">
-                    <Button onClick={criarUsuario}>Salvar Usuário</Button>
+                    <Button onClick={criarUsuario} className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">Salvar Usuário</Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -306,66 +302,64 @@ const AdminPanel = ({ user, onLogout }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {loading ? <p>Carregando usuários...</p> : usuarios.map((u) => (
-                <Card key={u.id}>
-                  <CardContent className="p-6">
+                <div key={u.id} className={styles.premiumCard}>
+                  <div className={styles.cardContent}>
                     <div className="flex flex-col sm:flex-row justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold dark:text-gray-100">{u.name}</h3>
+                          <h3 className="text-lg font-semibold text-slate-800 dark:text-gray-100">{u.name}</h3>
                           {getPerfilBadge(u.profile)}
                           {getStatusBadge(u.status)}
-                        </div>
-                         <p className="text-gray-600 dark:text-gray-400 mb-3">{u.email}</p>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="font-medium text-gray-600">Último Login</p>
-                            <p>{formatarData(u.last_login)}</p>
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-600">Data Criação</p>
-                            <p>{formatarData(u.created_at)}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2 self-start sm:self-center mt-4 sm:mt-0 sm:ml-4">
-                        {/* Botão inteligente para Ativar ou Inativar */}
+                        </div>
+                         <p className="text-slate-600 dark:text-slate-400 mb-3">{u.email}</p>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="font-medium text-slate-500">Último Login</p>
+                            <p className="text-slate-700 dark:text-slate-300">{formatarData(u.last_login)}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-500">Data Criação</p>
+                            <p className="text-slate-700 dark:text-slate-300">{formatarData(u.created_at)}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2 self-start sm:self-center mt-4 sm:mt-0 sm:ml-4">
+                        {/* Botão inteligente para Ativar ou Inativar */}
                         {u.id !== user.id && ( // Impede que o admin se auto-inactive
                           u.status === 'ativo' ? (
-                            <Button variant="outline" size="sm" title="Inativar Usuário" onClick={() => toggleUserStatus(u)}>
+                            <Button variant="outline" size="sm" title="Inativar Usuário" onClick={() => toggleUserStatus(u)} className="border-slate-200 dark:border-white/10 hover:bg-red-50 dark:hover:bg-red-900/20">
                               <UserX className="h-4 w-4 text-red-500" />
                           </Button>
                           ) : (
-                            <Button variant="outline" size="sm" title="Ativar Usuário" onClick={() => toggleUserStatus(u)}>
+                            <Button variant="outline" size="sm" title="Ativar Usuário" onClick={() => toggleUserStatus(u)} className="border-slate-200 dark:border-white/10 hover:bg-green-50 dark:hover:bg-green-900/20">
                           <UserCheck className="h-4 w-4 text-green-500" />
                           </Button>
                           )
                         )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-         
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          
             {/* Configurações do Sistema */}
             <TabsContent value="configuracoes" className="space-y-6">
               <h3 className="text-lg font-semibold dark:text-slate-100">Configurações do Sistema</h3>
 
               <div className="grid gap-6">
                 {/* Informações Gerais */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Settings className="h-5 w-5 mr-2" />
-                      Informações Gerais
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                <div className={styles.premiumCard}>
+                  <div className={styles.cardContent}>
+                    <h4 className="flex items-center text-lg font-bold text-slate-800 dark:text-white mb-4">
+                      <Settings className="h-5 w-5 mr-2 text-cyan-600 dark:text-cyan-400" />
+                      Geral
+                    </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="nome_sistema">Nome do Sistema</Label>
-                        <Input id="nome_sistema" value={configuracoes.nome_sistema} readOnly />
+                        <Label htmlFor="nome_sistema" className="text-slate-600 dark:text-slate-400">Nome do Sistema</Label>
+                        <Input id="nome_sistema" value={configuracoes.nome_sistema} readOnly className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10" />
                       </div>
                       <div>
                         <Label htmlFor="versao">Versão</Label>
@@ -380,50 +374,50 @@ const AdminPanel = ({ user, onLogout }) => {
                         <Input id="sessao_timeout" type="number" value={configuracoes.sessao_timeout} />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Segurança */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Shield className="h-5 w-5 mr-2" />
+                <div className={styles.premiumCard}>
+                  <div className={styles.cardContent}>
+                    <h4 className="flex items-center text-lg font-bold text-slate-800 dark:text-white mb-4">
+                      <Shield className="h-5 w-5 mr-2 text-red-500" />
                       Segurança
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    </h4>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium dark:text-slate-200">Modo Manutenção</p>
-                          <p className="text-sm text-gray-600">Bloqueia acesso de usuários não-admin</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-200">Modo Manutenção</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Bloqueia acesso de usuários não-admin</p>
                         </div>
                         <Button 
                           variant={configuracoes.manutencao ? "destructive" : "outline"}
                           onClick={alterarModoManutencao}
+                          className={!configuracoes.manutencao ? "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5" : ""}
                         >
                           {configuracoes.manutencao ? "Desativar" : "Ativar"}
                         </Button>
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium dark:text-slate-200">Backup Automático</p>
-                          <p className="text-sm text-gray-600">Backup diário dos dados</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-200">Backup Automático</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Backup diário dos dados</p>
                         </div>
                         <Button 
                           variant={configuracoes.backup_automatico ? "default" : "outline"}
                           onClick={alterarBackupAutomatico}
+                          className={configuracoes.backup_automatico ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"}
                         >
                           {configuracoes.backup_automatico ? "Ativo" : "Inativo"}
                         </Button>
                       </div>
                       <div>
-                        <Label htmlFor="log_nivel">Nível de Log</Label>
+                        <Label htmlFor="log_nivel" className="text-slate-600 dark:text-slate-400">Nível de Log</Label>
                         <Select value={configuracoes.log_nivel}>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-800 dark:text-white mt-1">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                             <SelectItem value="debug">Debug</SelectItem>
                             <SelectItem value="info">Info</SelectItem>
                             <SelectItem value="warning">Warning</SelectItem>
@@ -432,70 +426,66 @@ const AdminPanel = ({ user, onLogout }) => {
                         </Select>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Notificações */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Bell className="h-5 w-5 mr-2" />
+                <div className={styles.premiumCard}>
+                  <div className={styles.cardContent}>
+                    <h4 className="flex items-center text-lg font-bold text-slate-800 dark:text-white mb-4">
+                      <Bell className="h-5 w-5 mr-2 text-yellow-500" />
                       Notificações
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    </h4>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium dark:text-slate-200">Notificações por Email</p>
-                          <p className="text-sm text-gray-600">Enviar alertas importantes por email</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-200">Notificações por Email</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Enviar alertas importantes por email</p>
                         </div>
-                        <Button variant={configuracoes.notificacoes_email ? "default" : "outline"}>
+                        <Button variant={configuracoes.notificacoes_email ? "default" : "outline"} className={configuracoes.notificacoes_email ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"}>
                           {configuracoes.notificacoes_email ? "Ativo" : "Inativo"}
                         </Button>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Banco de Dados */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Database className="h-5 w-5 mr-2" />
+                <div className={styles.premiumCard}>
+                  <div className={styles.cardContent}>
+                    <h4 className="flex items-center text-lg font-bold text-slate-800 dark:text-white mb-4">
+                      <Database className="h-5 w-5 mr-2 text-indigo-500" />
                       Banco de Dados
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="text-center p-4 bg-green-50 rounded-lg dark:bg-green-900/50">
-                        <p className="text-sm text-gray-600">Status</p>
-                        <p className="text-lg font-bold text-green-600">Conectado</p>
+                      <div className="text-center p-4 bg-emerald-50 rounded-xl dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-500/20">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Status</p>
+                        <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">Conectado</p>
                       </div>
-                     <div className="text-center p-4 bg-blue-50 rounded-lg dark:bg-blue-900/50">
-                        <p className="text-sm text-gray-600">Tamanho</p>
-                        <p className="text-lg font-bold text-blue-600">2.4 MB</p>
+                     <div className="text-center p-4 bg-blue-50 rounded-xl dark:bg-blue-900/20 border border-blue-100 dark:border-blue-500/20">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Tamanho</p>
+                        <p className="text-lg font-bold text-blue-600 dark:text-blue-400">2.4 MB</p>
                       </div>
-                      <div className="text-center p-4 bg-purple-50 rounded-lg dark:bg-purple-900/50">
-                        <p className="text-sm text-gray-600">Último Backup</p>
-                        <p className="text-lg font-bold text-purple-600">Hoje</p>
+                      <div className="text-center p-4 bg-purple-50 rounded-xl dark:bg-purple-900/20 border border-purple-100 dark:border-purple-500/20">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Último Backup</p>
+                        <p className="text-lg font-bold text-purple-600 dark:text-purple-400">Hoje</p>
                       </div>
                     </div>
-                    <div className="flex space-x-2 mt-4">
-                      <Button variant="outline">
+                    <div className="flex space-x-2 mt-6">
+                      <Button variant="outline" className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5">
                         <Database className="h-4 w-4 mr-2" />
                         Fazer Backup
                       </Button>
-                      <Button variant="outline">
+                      <Button variant="outline" className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5">
                         <Activity className="h-4 w-4 mr-2" />
                         Ver Logs
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
-                <div className="flex justify-end">
-                  <Button onClick={salvarConfiguracoes}>Salvar Configurações</Button>
+                <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-white/10 mt-6">
+                  <Button onClick={salvarConfiguracoes} className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">Salvar Configurações</Button>
                 </div>
               </div>
             </TabsContent>

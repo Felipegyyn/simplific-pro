@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import apiService from '../services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Lock } from 'lucide-react';
+import { Lock, Trophy } from 'lucide-react';
 import DynamicIcon from '../components/DynamicIcon'; // Importa nosso novo componente
+import styles from './Achievements.module.css';
 
 const Achievements = () => {
   const [achievements, setAchievements] = useState([]);
@@ -64,43 +65,46 @@ const Achievements = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-slate-50">Sala de Troféus</h1>
-        <p className="mt-2 text-lg text-gray-600 dark:text-slate-400">
-          Acompanhe seu progresso e as conquistas que você desbloqueou em sua jornada financeira!
-        </p>
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle + " flex items-center gap-2"}>
+             <Trophy className="text-yellow-500" /> Sala de Troféus
+          </h1>
+          <p className={styles.pageSubtitle}>
+            Acompanhe seu progresso e as conquistas que você desbloqueou em sua jornada financeira!
+          </p>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {achievements.map((ach) => (
-          <Card 
+          <div 
             key={ach.id} 
-            className={`transition-all duration-300 ${ach.unlocked ? 'border-green-500/50 dark:border-green-400/50 shadow-lg' : 'opacity-60 grayscale'}`}
+            className={`${styles.premiumCard} ${ach.unlocked ? 'border-emerald-500/50 dark:border-emerald-400/50' : 'opacity-60 grayscale'}`}
           >
-            <CardHeader className="items-center text-center">
-              <div className={`relative h-16 w-16 flex items-center justify-center rounded-full mb-4 ${ach.unlocked ? 'bg-green-100 dark:bg-green-900/50' : 'bg-gray-200 dark:bg-slate-700'}`}>
+            <div className={`${styles.cardContent} flex flex-col items-center text-center p-6`}>
+              <div className={`relative h-16 w-16 flex items-center justify-center rounded-full mb-4 ${ach.unlocked ? 'bg-emerald-100 dark:bg-emerald-900/50' : 'bg-slate-200 dark:bg-slate-800'}`}>
                 <DynamicIcon 
                   name={ach.icon} 
-                  className={`h-8 w-8 ${ach.unlocked ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-slate-400'}`} 
+                  className={`h-8 w-8 ${ach.unlocked ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`} 
                 />
                 {!ach.unlocked && (
-                  <Lock className="absolute -bottom-1 -right-1 h-5 w-5 p-1 bg-white dark:bg-slate-800 rounded-full text-gray-500 dark:text-slate-400" />
+                  <Lock className="absolute -bottom-1 -right-1 h-5 w-5 p-1 bg-white dark:bg-slate-900 rounded-full text-slate-500 dark:text-slate-400" />
                 )}
               </div>
-              <CardTitle className={`text-lg ${ach.unlocked ? 'text-gray-900 dark:text-slate-50' : 'text-gray-600 dark:text-slate-400'}`}>
+              <h3 className={`text-lg font-bold mb-2 ${ach.unlocked ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
                 {ach.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-sm text-gray-600 dark:text-slate-400 mb-3">{ach.description}</p>
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{ach.description}</p>
+              
               {ach.unlocked && (
-                <Badge variant="secondary" className="text-green-700 dark:text-green-300">
+                <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
                   Desbloqueado em {formatDate(ach.unlocked_at)}
                 </Badge>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
     </div>

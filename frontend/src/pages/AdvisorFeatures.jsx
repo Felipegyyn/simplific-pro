@@ -9,14 +9,15 @@ import {
   Shield, Calendar, Zap, LineChart, FileUp, Star, DollarSign, Smartphone, Bot
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import styles from './AdvisorFeatures.module.css';
 
 // ── Componente de preview de chat WhatsApp ──────────────────────────────────
 const ChatBubble = ({ text, isBot = false }) => (
   <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-2`}>
-    <div className={cn(
-      "max-w-[85%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-lg backdrop-blur-md",
+      <div className={cn(
+      "max-w-[85%] px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-sm",
       isBot
-        ? 'bg-slate-800/80 text-slate-200 rounded-tl-none border border-white/5'
+        ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 rounded-tl-none border border-slate-200 dark:border-white/5'
         : 'bg-emerald-600/90 text-white rounded-tr-none border border-emerald-500/20'
     )}>
       {text}
@@ -25,15 +26,15 @@ const ChatBubble = ({ text, isBot = false }) => (
 );
 
 const ChatPreview = ({ messages }) => (
-  <div className="glass-panel p-4 mt-6 border-white/5 bg-slate-900/40 relative overflow-hidden">
+  <div className={styles.chatPreviewPanel}>
     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-cyan-500"></div>
     <div className="flex items-center gap-3 mb-4">
       <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-        <Sparkles size={14} className="text-emerald-400" />
+        <Sparkles size={14} className="text-emerald-500 dark:text-emerald-400" />
       </div>
       <div>
-        <span className="text-white text-[10px] font-black uppercase tracking-widest block">Simplific Pro</span>
-        <span className="text-[10px] text-emerald-400 font-bold">Online agora</span>
+        <span className="text-slate-800 dark:text-white text-[10px] font-black uppercase tracking-widest block">Simplific Pro</span>
+        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Online agora</span>
       </div>
     </div>
     <div className="space-y-1">
@@ -47,38 +48,36 @@ const ChatPreview = ({ messages }) => (
 // ── Card de funcionalidade ──────────────────────────────────────────────────
 const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, preview }) => {
   return (
-    <div className="glass-card group flex flex-col h-full overflow-hidden border-white/5 hover:border-white/10 transition-all duration-500">
+    <div className={`${styles.premiumCard} group flex flex-col h-full overflow-hidden`}>
       <div className="p-6 flex flex-col flex-grow relative">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-white/2 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-white/5 transition-all"></div>
-        
         <div className="flex items-start justify-between mb-6">
-          <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg border border-white/10", color.replace('bg-', 'bg-opacity-20 text-'))}>
+          <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-slate-200 dark:border-white/10", color.replace('bg-', 'bg-opacity-20 text-'))}>
             <Icon size={24} className={color.replace('bg-', 'text-').replace('-500', '-400').replace('-600', '-400')} />
           </div>
           {badge && (
-            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] font-black uppercase tracking-widest px-2 py-0.5">
+            <Badge className="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20 text-[9px] font-black uppercase tracking-widest px-2 py-0.5">
               {badge}
             </Badge>
           )}
         </div>
 
-        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">{title}</h3>
-        <p className="text-slate-400 text-sm mb-6 flex-grow leading-relaxed">{description}</p>
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">{title}</h3>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 flex-grow leading-relaxed">{description}</p>
 
         {preview && <ChatPreview messages={preview} />}
 
-        <div className="mt-8 pt-6 border-t border-white/5">
+        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/5">
           <div className="flex items-center gap-2 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
-            <MessageCircle size={12} className="text-cyan-400" />
+            <MessageCircle size={12} className="text-cyan-600 dark:text-cyan-400" />
             Comandos de exemplo
           </div>
           <div className="space-y-3">
             {commands.map((cmd, idx) => (
               <div key={idx} className="flex gap-3 items-start group/cmd">
-                <div className="bg-white/5 p-1 rounded-lg mt-0.5 shrink-0 border border-white/5 group-hover/cmd:border-cyan-500/30 transition-colors">
-                  <Zap size={10} className="text-cyan-400" />
+                <div className="bg-slate-100 dark:bg-white/5 p-1 rounded-lg mt-0.5 shrink-0 border border-slate-200 dark:border-white/5 group-hover/cmd:border-cyan-500/30 transition-colors">
+                  <Zap size={10} className="text-cyan-600 dark:text-cyan-400" />
                 </div>
-                <p className="text-xs text-slate-300 font-medium italic leading-relaxed group-hover/cmd:text-white transition-colors">"{cmd}"</p>
+                <p className="text-xs text-slate-600 dark:text-slate-300 font-medium italic leading-relaxed group-hover/cmd:text-slate-800 dark:group-hover/cmd:text-white transition-colors">"{cmd}"</p>
               </div>
             ))}
           </div>
@@ -91,11 +90,11 @@ const FeatureCard = ({ icon: Icon, title, description, commands, color, badge, p
 // ── Separador de seção ──────────────────────────────────────────────────────
 const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-5 mb-10 group">
-    <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl border border-white/10 transition-transform group-hover:scale-110", color.replace('bg-', 'bg-opacity-20 '))}>
+    <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-slate-200 dark:border-white/10 transition-transform group-hover:scale-110", color.replace('bg-', 'bg-opacity-20 '))}>
       <Icon size={24} className={color.replace('bg-', 'text-').replace('-500', '-400').replace('-600', '-400')} />
     </div>
     <div>
-      <h2 className="text-2xl font-black text-white tracking-tight leading-tight">{title}</h2>
+      <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">{title}</h2>
       {subtitle && <p className="text-sm font-medium text-slate-500 mt-1 uppercase tracking-wider">{subtitle}</p>}
     </div>
   </div>
@@ -104,19 +103,19 @@ const SectionHeader = ({ color, icon: Icon, title, subtitle }) => (
 // ── Componente principal ────────────────────────────────────────────────────
 const AdvisorFeatures = ({ user, onLogout }) => {
   return (
-    <div className="space-y-12 animate-in fade-in duration-700">
+    <div className={styles.pageContainer}>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
           
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-cyan-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-cyan-600 dark:text-cyan-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-8">
             <Sparkles size={14} className="animate-pulse" /> Inteligência Artificial Simplific
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter leading-[1.1]">
+          <h1 className="text-4xl md:text-6xl font-black text-slate-800 dark:text-white mb-6 tracking-tighter leading-[1.1]">
             Potencialize sua gestão <br/>
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">pelo WhatsApp</span>
+            <span className="bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-600 bg-clip-text text-transparent">pelo WhatsApp</span>
           </h1>
           
-          <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
+          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium">
             Um parceiro financeiro autônomo, analista de mercado e assistente executivo.
             Basta falar ou enviar uma foto — a IA cuida de toda a burocracia para você.
           </p>
@@ -129,8 +128,8 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               { icon: Globe, label: 'Pesquisa Web' },
               { icon: Shield, label: '100% Seguro' },
             ].map(({ icon: I, label }) => (
-              <span key={label} className="flex items-center gap-2 glass-panel border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-300 px-5 py-2.5 rounded-xl shadow-xl hover:border-cyan-500/30 transition-all cursor-default group">
-                <I size={14} className="text-cyan-400 group-hover:scale-110 transition-transform" /> {label}
+              <span key={label} className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 px-5 py-2.5 rounded-xl hover:border-cyan-500/30 transition-all cursor-default group">
+                <I size={14} className="text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" /> {label}
               </span>
             ))}
           </div>

@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
+import styles from './Investments.module.css';
 import InvestmentDetailModal from './InvestmentDetailModal';
 import HomeBroker from '@/components/HomeBroker';
 import StockTicker from '@/components/StockTicker';
@@ -396,94 +397,57 @@ const handleCalculate = async (e) => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-200">
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-400 hidden sm:block">
-                Bem-vindo, {user.name}
-              </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className={styles.pageContainer}>
       <StockTicker />
       
-      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            Carteira de Investimentos
-          </h2>
-          <p className="text-slate-400">Acompanhe seus investimentos e rentabilidade com precisão tecnológica</p>
+      <div className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Carteira de Investimentos</h1>
+          <p className={styles.pageSubtitle}>Acompanhe seus investimentos e rentabilidade com precisão tecnológica.</p>
+        </div>
+      </div>
+
+      <div className={styles.summaryGrid}>
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryHeader}>
+            <p className={styles.summaryLabel}>Total Investido</p>
+            <div className={`${styles.iconBox} ${styles.iconBoxPrimary}`}>
+              <DollarSign className="h-5 w-5" />
+            </div>
+          </div>
+          <p className={styles.summaryValue}>R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <DollarSign className="h-12 w-12 text-cyan-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Total Investido</p>
-            <p className="text-2xl font-bold text-white">R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryHeader}>
+            <p className={styles.summaryLabel}>Valor Atual</p>
+            <div className={`${styles.iconBox} ${styles.iconBoxSuccess}`}>
+              <TrendingUp className="h-5 w-5" />
             </div>
           </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp className="h-12 w-12 text-emerald-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Valor Atual</p>
-            <p className="text-2xl font-bold text-white">R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }} />
-            </div>
-          </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              {lucroTotal >= 0 ? <TrendingUp className="h-12 w-12 text-emerald-400" /> : <TrendingDown className="h-12 w-12 text-rose-400" />}
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Lucro/Prejuízo</p>
-            <p className={`text-2xl font-bold ${lucroTotal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full ${lucroTotal >= 0 ? 'bg-emerald-500' : 'bg-rose-500'}`} style={{ width: '100%' }} />
-            </div>
-          </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <BarChart3 className="h-12 w-12 text-purple-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Rentabilidade</p>
-            <p className={`text-2xl font-bold ${rentabilidadeTotal >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {(rentabilidadeTotal ?? 0).toFixed(2)}%
-            </p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
-            </div>
-          </div>
+          <p className={styles.summaryValue}>R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         </div>
+
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryHeader}>
+            <p className={styles.summaryLabel}>Lucro/Prejuízo</p>
+            <div className={`${styles.iconBox} ${lucroTotal >= 0 ? styles.iconBoxSuccess : styles.iconBoxDanger}`}>
+              {lucroTotal >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+            </div>
+          </div>
+          <p className={styles.summaryValue}>R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+        </div>
+
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryHeader}>
+            <p className={styles.summaryLabel}>Rentabilidade</p>
+            <div className={`${styles.iconBox} ${rentabilidadeTotal >= 0 ? styles.iconBoxSuccess : styles.iconBoxDanger}`}>
+              <BarChart3 className="h-5 w-5" />
+            </div>
+          </div>
+          <p className={styles.summaryValue}>{(rentabilidadeTotal ?? 0).toFixed(2)}%</p>
+        </div>
+      </div>
 
         <Tabs defaultValue="carteira" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 glass-panel p-1 border-white/5">
@@ -633,23 +597,23 @@ const handleCalculate = async (e) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {investimentosCalculados.map((inv) => (
-                <div key={inv.id} className="glass-card p-6 border-white/10 hover:bg-white/5 transition-all group relative overflow-hidden">
-                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6 z-10 relative">
+                <div key={inv.id} className={styles.premiumCard}>
+                  <div className={styles.cardContent + " group relative overflow-hidden flex flex-col sm:flex-row justify-between items-start gap-4 z-10"}>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
-                        <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">{inv.name}</h3>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">{inv.name}</h3>
                         <Badge className={`border-none text-[10px] uppercase font-bold px-1.5 py-0 ${inv.type === 'Renda Fixa' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
                           {inv.type}
                         </Badge>
                       </div>
                       <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[11px] uppercase tracking-wider">
                         <div>
-                          <p className="text-slate-500 mb-1">Valor Investido</p>
-                          <p className="font-bold text-slate-200">R$ {(inv.initial_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          <p className="text-slate-500 mb-1 font-bold">Valor Investido</p>
+                          <p className="font-bold text-slate-700 dark:text-slate-200">R$ {(inv.initial_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                         </div>
                         <div>
-                          <p className="text-slate-500 mb-1">Valor Atual</p>
-                          <p className="font-bold text-emerald-400">R$ {(inv.dynamic_current_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          <p className="text-slate-500 mb-1 font-bold">Valor Atual</p>
+                          <p className="font-bold text-emerald-600 dark:text-emerald-400">R$ {(inv.dynamic_current_value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 mb-1">Rentabilidade</p>
@@ -658,18 +622,17 @@ const handleCalculate = async (e) => {
                           </p>
                         </div>
                         <div>
-                          <p className="text-slate-500 mb-1">Data Compra</p>
-                          <p className="font-bold text-slate-200">{formatLocalDate(inv.purchase_date)}</p>
+                          <p className="text-slate-500 mb-1 font-bold">Data Compra</p>
+                          <p className="font-bold text-slate-700 dark:text-slate-200">{formatLocalDate(inv.purchase_date)}</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10" onClick={() => abrirModalDetalhes(inv.id)}><Eye className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white" onClick={() => abrirModalEdicao(inv)}><Edit className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10" onClick={() => excluirInvestimento(inv.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity mt-4 sm:mt-0">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10" onClick={() => abrirModalDetalhes(inv.id)}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white" onClick={() => abrirModalEdicao(inv)}><Edit className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-500/10" onClick={() => excluirInvestimento(inv.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </div>
               ))}
             </div>

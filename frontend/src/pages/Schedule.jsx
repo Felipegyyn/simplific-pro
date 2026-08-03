@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from 'react-router-dom'; // Adicionado useLo
 import { cn } from "@/lib/utils";
 import  apiService  from '../services/api';
 import logo from '../assets/LOGO.png';
+import styles from './Schedule.module.css';
 
 const Schedule = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -461,62 +462,70 @@ const Schedule = ({ user, onLogout }) => {
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div className={styles.pageContainer}>
+      <div className={styles.header}>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+          <h1 className={styles.pageTitle}>
             Agenda Financeira
           </h1>
-          <p className="text-slate-400 mt-1">Organize seus compromissos e lembretes financeiros.</p>
+          <p className={styles.pageSubtitle}>Organize seus compromissos e lembretes financeiros.</p>
         </div>
       </div>
 
       {/* Card de Resumo Agrupado */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent + " relative"}>
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/20">
-              <Calendar className="h-5 w-5 text-blue-400" />
+              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Próximos Eventos</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{eventosProximos.length}</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Próximos Eventos</p>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosProximos.length}</h3>
+          </div>
         </div>
 
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent + " relative"}>
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
-              <Clock className="h-5 w-5 text-emerald-400" />
+              <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Hoje</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{eventosHoje.length}</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Hoje</p>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosHoje.length}</h3>
+          </div>
         </div>
 
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent + " relative"}>
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-red-500/20 transition-all"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/20">
-              <DollarSign className="h-5 w-5 text-red-400" />
+              <DollarSign className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Pagamentos Pendentes</p>
-          <h3 className="text-2xl font-bold text-white mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Pagamentos Pendentes</p>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
             R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </h3>
+          </div>
         </div>
 
-        <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
+        <div className={styles.premiumCard}>
+          <div className={styles.cardContent + " relative"}>
           <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/20">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" />
+              <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             </div>
           </div>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Atrasados</p>
-          <h3 className="text-2xl font-bold text-white mt-1">{eventosAtrasados.length}</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Atrasados</p>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosAtrasados.length}</h3>
+          </div>
         </div>
       </div>
       

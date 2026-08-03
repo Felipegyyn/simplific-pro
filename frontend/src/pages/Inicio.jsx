@@ -444,7 +444,7 @@ const Inicio = ({ user }) => {
         <div className={styles.leftCol}>
           
           {/* 1. MINI TELA DE LANÇAMENTOS */}
-          <div className={styles.premiumCard} style={{ height: '650px' }}>
+          <div className={styles.premiumCard} style={{ minHeight: '500px' }}>
             <div className={`${styles.cardTopAccent} ${styles.accentGreen}`}></div>
             
             <div className={styles.cardHeader}>

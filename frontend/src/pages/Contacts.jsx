@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, User, Phone, Mail, Edit2, Trash2, Search, Users } from 'lucide-react';
+import styles from './Contacts.module.css';
 
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
@@ -76,13 +77,13 @@ const Contacts = () => {
   );
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-[100%] mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className={styles.pageContainer}>
+      <div className={styles.header}>
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="text-green-600" /> Meus Contatos
+          <h1 className={styles.pageTitle + " flex items-center gap-2"}>
+            <Users className="text-cyan-600 dark:text-cyan-400" /> Meus Contatos
           </h1>
-          <p className="text-gray-500 text-sm">Gerencie as pessoas com quem você agenda reuniões.</p>
+          <p className={styles.pageSubtitle}>Gerencie as pessoas com quem você agenda reuniões.</p>
         </div>
         <Button onClick={() => handleOpenModal()} className="bg-green-600 hover:bg-green-700 text-white">
           <Plus className="mr-2 h-4 w-4" /> Novo Contato
@@ -102,42 +103,42 @@ const Contacts = () => {
 
       {/* Lista de Contatos */}
       {loading ? (
-        <p className="text-center text-gray-500 py-10">Carregando contatos...</p>
+        <p className="text-center text-slate-500 dark:text-slate-400 py-10">Carregando contatos...</p>
       ) : filteredContacts.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-          <Users className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-          <p className="text-gray-500">Nenhum contato encontrado.</p>
-          {searchTerm && <button onClick={() => setSearchTerm('')} className="text-green-600 hover:underline mt-2">Limpar busca</button>}
+        <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-white/10">
+          <Users className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600 mb-3" />
+          <p className="text-slate-500 dark:text-slate-400">Nenhum contato encontrado.</p>
+          {searchTerm && <button onClick={() => setSearchTerm('')} className="text-cyan-600 dark:text-cyan-400 hover:underline mt-2">Limpar busca</button>}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredContacts.map((contact) => (
-            <Card key={contact.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-5">
+            <div key={contact.id} className={styles.premiumCard}>
+              <div className={styles.cardContent}>
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg">
+                    <div className="h-10 w-10 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-700 dark:text-cyan-400 font-bold text-lg">
                       {contact.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 line-clamp-1">{contact.name}</h3>
-                      <p className="text-xs text-gray-500">Adicionado recentemente</p>
+                      <h3 className="font-bold text-slate-800 dark:text-white line-clamp-1">{contact.name}</h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Adicionado recentemente</p>
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => handleOpenModal(contact)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"><Edit2 size={16} /></button>
-                    <button onClick={() => handleDelete(contact.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"><Trash2 size={16} /></button>
+                    <button onClick={() => handleOpenModal(contact)} className="p-1.5 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"><Edit2 size={16} /></button>
+                    <button onClick={() => handleDelete(contact.id)} className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"><Trash2 size={16} /></button>
                   </div>
                 </div>
                 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
                   {contact.whatsapp ? (
                     <div className="flex items-center gap-2">
-                      <Phone size={14} className="text-green-500" />
+                      <Phone size={14} className="text-cyan-600 dark:text-cyan-400" />
                       <span>{contact.whatsapp}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-gray-400 italic">
+                    <div className="flex items-center gap-2 text-slate-400 italic">
                       <Phone size={14} /> Sem telefone
                     </div>
                   )}
@@ -148,22 +149,22 @@ const Contacts = () => {
                       <span className="truncate">{contact.email}</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-gray-400 italic">
-                      <Mail size={14} /> Sem e-mail
+                    <div className="flex items-center gap-2 text-slate-400 italic">
+                      <Mail size={14} /> Sem email
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Modal de Criação/Edição */}
+      {/* Modal de Adicionar/Editar Contato */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
           <DialogHeader>
-            <DialogTitle>{editingContact ? 'Editar Contato' : 'Novo Contato'}</DialogTitle>
+            <DialogTitle className="text-slate-800 dark:text-white">{editingContact ? 'Editar Contato' : 'Novo Contato'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="space-y-2">

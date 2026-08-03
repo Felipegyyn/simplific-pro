@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Landmark, Plus, Trash2, Wallet, Filter, Edit } from 'lucide-react'; // <--- IMPORT Edit
 import { cn } from "@/lib/utils";
 import apiService from '../services/api';
+import styles from './BankAccounts.module.css';
 
 const BANCOS_BRASIL = [
   { code: '260', name: 'Nubank' },
@@ -154,30 +155,30 @@ const BankAccounts = ({ user, onLogout }) => {
   const saldoTotal = filteredAccounts.reduce((acc, conta) => acc + (Number(conta.balance) || 0), 0);
 
   return (
-    <div className="space-y-6">
+    <div className={styles.pageContainer}>
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className={styles.header}>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent flex items-center gap-3">
+          <h1 className={styles.pageTitle + " flex items-center gap-3"}>
             Contas Bancárias
           </h1>
-          <p className="text-slate-400 mt-1">Gerencie seus saldos e contas correntes.</p>
+          <p className={styles.pageSubtitle}>Gerencie seus saldos e contas correntes.</p>
         </div>
 
         <div className="flex items-center gap-3">
           <Popover>
               <PopoverTrigger asChild>
-                  <Button variant="outline" className="glass-panel border-white/10 hover:bg-white/5 text-slate-300">
-                      <Filter className="h-4 w-4 mr-2 text-cyan-400" />
+                  <Button variant="outline" className="glass-panel border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-600 dark:text-slate-300">
+                      <Filter className="h-4 w-4 mr-2 text-cyan-600 dark:text-cyan-400" />
                       Filtrar Bancos
                       {selectedBanks.length > 0 && (
-                          <Badge className="ml-2 bg-cyan-500 text-white border-none h-5 w-5 flex items-center justify-center p-0 text-[10px]">
+                          <Badge className="ml-2 bg-cyan-600 dark:bg-cyan-500 text-white border-none h-5 w-5 flex items-center justify-center p-0 text-[10px]">
                               {selectedBanks.length}
                           </Badge>
                       )}
                   </Button>
               </PopoverTrigger>
-              <PopoverContent className="glass-panel border-white/10 text-slate-200 w-56 p-4 shadow-2xl" align="end">
+              <PopoverContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 w-56 p-4 shadow-2xl" align="end">
                   <div className="space-y-3">
                       <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Instituições</h4>
                       {availableBanks.length === 0 ? (
@@ -190,9 +191,9 @@ const BankAccounts = ({ user, onLogout }) => {
                                         id={`filter-${bank}`} 
                                         checked={selectedBanks.includes(bank)}
                                         onCheckedChange={() => toggleBankFilter(bank)}
-                                        className="border-white/20 data-[state=checked]:bg-cyan-500"
+                                        className="border-slate-300 dark:border-white/20 data-[state=checked]:bg-cyan-600 dark:data-[state=checked]:bg-cyan-500"
                                     />
-                                    <label htmlFor={`filter-${bank}`} className="text-sm text-slate-400 group-hover:text-white transition-colors cursor-pointer">
+                                    <label htmlFor={`filter-${bank}`} className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors cursor-pointer">
                                         {bank}
                                     </label>
                                 </div>
@@ -200,7 +201,7 @@ const BankAccounts = ({ user, onLogout }) => {
                           </div>
                       )}
                       {selectedBanks.length > 0 && (
-                          <Button variant="ghost" size="sm" className="w-full mt-2 text-[10px] uppercase font-bold text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 h-8" onClick={() => setSelectedBanks([])}>
+                          <Button variant="ghost" size="sm" className="w-full mt-2 text-[10px] uppercase font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 h-8" onClick={() => setSelectedBanks([])}>
                               Limpar Filtros
                           </Button>
                       )}
@@ -290,50 +291,50 @@ const BankAccounts = ({ user, onLogout }) => {
       </div>
 
       <div className="mb-8">
-        <div className="glass-panel p-8 border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-cyan-500/20 transition-all duration-700"></div>
+      <div className="mb-8">
+        <div className={styles.premiumCard + " p-8 relative overflow-hidden group border-none bg-gradient-to-br from-cyan-600/10 to-blue-600/10 dark:from-cyan-900/20 dark:to-blue-900/20"}>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-600/10 dark:bg-cyan-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-cyan-600/20 dark:group-hover:bg-cyan-500/20 transition-all duration-700"></div>
           <div className="flex items-center justify-between relative z-10">
             <div>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Saldo Geral {selectedBanks.length > 0 ? '(Filtrado)' : ''}</p>
-              <h2 className="text-5xl font-black text-white tracking-tighter">
+              <p className="text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Saldo Geral {selectedBanks.length > 0 ? '(Filtrado)' : ''}</p>
+              <h2 className="text-5xl font-black text-slate-800 dark:text-white tracking-tighter">
                 {saldoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </h2>
             </div>
-            <div className="h-16 w-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 shadow-2xl">
-              <Wallet className="h-8 w-8 text-cyan-400" />
+            <div className="h-16 w-16 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-2xl">
+              <Wallet className="h-8 w-8 text-cyan-600 dark:text-cyan-400" />
             </div>
           </div>
         </div>
       </div>
 
       {loading && !isModalOpen && contas.length === 0 ? (
-          <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-400"></div></div>
+          <div className="flex justify-center p-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-600 dark:border-cyan-400"></div></div>
       ) : filteredAccounts.length === 0 ? (
-        <div className="py-20 text-center glass-panel border-white/5 border-dashed">
-          <Landmark className="h-16 w-16 text-slate-700 mx-auto mb-6 opacity-20" />
+        <div className="py-20 text-center bg-slate-50 dark:bg-slate-900/40 rounded-xl border border-dashed border-slate-300 dark:border-white/10">
+          <Landmark className="h-16 w-16 text-slate-300 dark:text-slate-700 mx-auto mb-6 dark:opacity-20" />
           <p className="text-slate-500 italic mb-6">
               {contas.length === 0 ? "Nenhuma conta bancária cadastrada." : "Nenhuma conta encontrada com o filtro atual."}
           </p>
           {contas.length === 0 && (
-              <Button variant="outline" className="glass-panel border-white/10 hover:bg-white/5 text-cyan-400 font-bold" onClick={handleOpenModal}>Cadastrar a primeira</Button>
+              <Button variant="outline" className="border-slate-300 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5 text-cyan-600 dark:text-cyan-400 font-bold" onClick={handleOpenModal}>Cadastrar a primeira</Button>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAccounts.map((conta) => (
-            <div key={conta.id} className="glass-card group flex flex-col justify-between p-6 border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/2 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/5 transition-all"></div>
+            <div key={conta.id} className={`${styles.premiumCard} group flex flex-col justify-between p-6 relative overflow-hidden`}>
               
               <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
-                    <div className="p-2.5 bg-white/5 rounded-xl border border-white/5 shadow-inner">
-                         <Landmark className="h-6 w-6 text-cyan-400" />
+                    <div className="p-2.5 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner">
+                         <Landmark className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-y-1 group-hover:translate-y-0">
+                    <div className="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all transform md:translate-y-1 group-hover:translate-y-0">
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-cyan-400 hover:bg-cyan-500/10"
+                            className="h-8 w-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-500/10"
                             onClick={() => handleEdit(conta)}
                         >
                           <Edit className="h-4 w-4" />
@@ -341,7 +342,7 @@ const BankAccounts = ({ user, onLogout }) => {
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-red-400 hover:bg-red-500/10"
+                            className="h-8 w-8 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
                             onClick={() => handleDelete(conta.id)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -349,28 +350,28 @@ const BankAccounts = ({ user, onLogout }) => {
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                       {conta.bank_name}
                   </h3>
 
                   <div className="space-y-2 mb-8">
                     <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                         <span>Agência</span>
-                        <span className="text-slate-300">{conta.agency || '---'}</span>
+                        <span className="text-slate-700 dark:text-slate-300">{conta.agency || '---'}</span>
                     </div>
                     <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                         <span>Conta</span>
-                        <span className="text-slate-300">{conta.account_number}</span>
+                        <span className="text-slate-700 dark:text-slate-300">{conta.account_number}</span>
                     </div>
                     {conta.observations && (
-                        <div className="pt-4 border-t border-white/5">
+                        <div className="pt-4 border-t border-slate-200 dark:border-white/5">
                             <p className="text-[10px] italic text-slate-500 leading-relaxed">"{conta.observations}"</p>
                         </div>
                     )}
                   </div>
               </div>
 
-              <div className="relative z-10 pt-4 border-t border-white/5">
+              <div className="relative z-10 pt-4 border-t border-slate-200 dark:border-white/5">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Saldo Atual</p>
                 <p className={cn("text-2xl font-black tracking-tight", conta.balance >= 0 ? 'text-emerald-400' : 'text-red-400')}>
                   {Number(conta.balance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
