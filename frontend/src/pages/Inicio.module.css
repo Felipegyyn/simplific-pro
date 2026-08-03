@@ -190,7 +190,7 @@
 }
 
 .scrollableList {
-  max-height: 480px;
+  max-height: 415px;
   overflow-y: auto;
 }
 .scrollableList::-webkit-scrollbar {
