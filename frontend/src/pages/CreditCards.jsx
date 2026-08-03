@@ -18,6 +18,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import logo from '../assets/LOGO.png';
+import styles from './CreditCards.module.css';
 
 const CreditCards = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -451,9 +452,9 @@ const carregarFaturas = async (listaDeCartoes) => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-200">
+    <div className={styles.pageContainer}>
       {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -461,18 +462,17 @@ const carregarFaturas = async (listaDeCartoes) => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-400 hidden sm:block">
+              <span className="text-sm text-slate-500 hidden sm:block">
                 Bem-vindo, {user.name}
               </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
@@ -483,53 +483,67 @@ const carregarFaturas = async (listaDeCartoes) => {
 
       {/* Main Content */}
       <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            Cartões de Crédito
-          </h2>
-          <p className="text-slate-400">Gerencie seus cartões e faturas com precisão tecnológica</p>
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.pageTitle}>
+              Cartões de Crédito
+            </h2>
+            <p className={styles.pageSubtitle}>Gerencie seus cartões e faturas com precisão tecnológica</p>
+          </div>
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <CreditCard className="h-12 w-12 text-cyan-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Limite Total</p>
-            <p className="text-2xl font-bold text-white">R$ {limiteTotal.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-            </div>
-          </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <DollarSign className="h-12 w-12 text-rose-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Limite Usado</p>
-            <p className="text-2xl font-bold text-white">R$ {usadoTotal.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-rose-500 rounded-full" style={{ width: `${(usadoTotal / limiteTotal) * 100}%` }} />
+        <div className={styles.summaryGrid}>
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
+                  <CreditCard className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Limite Total</p>
+              <p className={styles.summaryValue}>R$ {limiteTotal.toLocaleString()}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+              </div>
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp className="h-12 w-12 text-emerald-400" />
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
+                  <DollarSign className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Limite Usado</p>
+              <p className={styles.summaryValue}>R$ {usadoTotal.toLocaleString()}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-rose-500 rounded-full" style={{ width: `${limiteTotal > 0 ? (usadoTotal / limiteTotal) * 100 : 0}%` }} />
+              </div>
             </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Limite Disponível</p>
-            <p className="text-2xl font-bold text-white">R$ {disponivelTotal.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(disponivelTotal / limiteTotal) * 100}%` }} />
+          </div>
+
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Limite Disponível</p>
+              <p className={styles.summaryValue}>R$ {disponivelTotal.toLocaleString()}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${limiteTotal > 0 ? (disponivelTotal / limiteTotal) * 100 : 0}%` }} />
+              </div>
             </div>
           </div>
         </div>
 
         <Tabs defaultValue="cartoes" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 glass-panel p-1 border-white/5">
-            <TabsTrigger value="cartoes" className="data-[state=active]:active-gradient">Meus Cartões</TabsTrigger>
-            <TabsTrigger value="faturas" className="data-[state=active]:active-gradient">Faturas</TabsTrigger>
+          <TabsList className={styles.tabsList}>
+            <TabsTrigger value="cartoes" className={styles.tabsTrigger}>Meus Cartões</TabsTrigger>
+            <TabsTrigger value="faturas" className={styles.tabsTrigger}>Faturas</TabsTrigger>
           </TabsList>
 
           {/* Meus Cartões */}
@@ -745,68 +759,70 @@ const carregarFaturas = async (listaDeCartoes) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCartoes.length === 0 ? (
-                <div className="col-span-2 py-12 glass-card border-dashed flex flex-col items-center justify-center text-slate-500">
-                  <CreditCard className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhum cartão encontrado.</p>
+                <div className={styles.emptyState + " col-span-2"}>
+                  <div className="flex flex-col items-center">
+                    <CreditCard className="h-12 w-12 mb-4 opacity-20" />
+                    <p>Nenhum cartão encontrado.</p>
+                  </div>
                 </div>
               ) : (
                 filteredCartoes.map((cartao) => (
                   <div key={cartao.id} className="flex flex-col">
-                    <div className="glass-card p-6 border-white/10 hover:bg-white/5 transition-all group relative overflow-hidden">
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="flex items-center">
-                          <div className="bg-cyan-500/20 p-3 rounded-xl mr-4 group-hover:scale-110 transition-transform">
-                            <CreditCard className="h-6 w-6 text-cyan-400" />
+                    <div className={styles.creditCard + " group"}>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="flex items-center">
+                            <div className="bg-cyan-500/20 p-3 rounded-xl mr-4 group-hover:scale-110 transition-transform">
+                              <CreditCard className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">{cartao.nome}</h3>
+                              <p className="text-xs text-slate-500 uppercase tracking-widest">{cartao.bandeira} • {cartao.numero}</p>
+                            </div>
                           </div>
+                          <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" onClick={() => abrirModalGasto(cartao)} className="h-8 w-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"><Plus className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" onClick={() => abrirModalEdicao(cartao)} className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"><Edit className="h-4 w-4" /></Button>
+                            <Button variant="ghost" size="icon" onClick={() => excluirCartao(cartao.id)} className="h-8 w-8 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-500/10"><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-6">
                           <div>
-                            <h3 className="font-bold text-white group-hover:text-cyan-400 transition-colors">{cartao.nome}</h3>
-                            <p className="text-xs text-slate-500 uppercase tracking-widest">{cartao.bandeira} • {cartao.numero}</p>
+                            <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Limite Disponível</p>
+                            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">R$ {cartao.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Dia Vencimento</p>
+                            <p className="text-lg font-bold text-slate-800 dark:text-white flex items-center justify-end">
+                              <Calendar className="h-4 w-4 mr-2 text-slate-400" />
+                              {cartao.due_day}
+                            </p>
                           </div>
                         </div>
-                        <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" onClick={() => abrirModalGasto(cartao)} className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10"><Plus className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => abrirModalEdicao(cartao)} className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/5"><Edit className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => excluirCartao(cartao.id)} className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10"><Trash2 className="h-4 w-4" /></Button>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center text-[10px] uppercase tracking-tighter">
+                            <span className="text-slate-500">Utilização do Limite</span>
+                            <span className={getUtilizacaoColor((cartao.usado / cartao.limite) * 100)}>
+                              {((cartao.usado / cartao.limite) * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor((cartao.usado / cartao.limite) * 100)}`} style={{ width: `${(cartao.usado / cartao.limite) * 100}%` }} />
+                          </div>
                         </div>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="w-full mt-6 text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 h-8 border border-slate-200 dark:border-white/5"
+                          onClick={() => setExpandedCardId(expandedCardId === cartao.id ? null : cartao.id)}
+                        >
+                          {expandedCardId === cartao.id ? <ChevronUp className="h-4 w-4 mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
+                          {expandedCardId === cartao.id ? 'Ocultar Histórico' : 'Ver Histórico de Faturas'}
+                        </Button>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Limite Disponível</p>
-                          <p className="text-lg font-bold text-emerald-400">R$ {cartao.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter mb-1">Dia Vencimento</p>
-                          <p className="text-lg font-bold text-white flex items-center justify-end">
-                            <Calendar className="h-4 w-4 mr-2 text-slate-400" />
-                            {cartao.due_day}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center text-[10px] uppercase tracking-tighter">
-                          <span className="text-slate-500">Utilização do Limite</span>
-                          <span className={getUtilizacaoColor((cartao.usado / cartao.limite) * 100)}>
-                            {((cartao.usado / cartao.limite) * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor((cartao.usado / cartao.limite) * 100)}`} style={{ width: `${(cartao.usado / cartao.limite) * 100}%` }} />
-                        </div>
-                      </div>
-
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full mt-6 text-xs text-slate-400 hover:text-white hover:bg-white/5 h-8 border border-white/5"
-                        onClick={() => setExpandedCardId(expandedCardId === cartao.id ? null : cartao.id)}
-                      >
-                        {expandedCardId === cartao.id ? <ChevronUp className="h-4 w-4 mr-2" /> : <ChevronDown className="h-4 w-4 mr-2" />}
-                        {expandedCardId === cartao.id ? 'Ocultar Histórico' : 'Ver Histórico de Faturas'}
-                      </Button>
-
-                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
 
                     {expandedCardId === cartao.id && (
@@ -817,21 +833,21 @@ const carregarFaturas = async (listaDeCartoes) => {
                           </div>
                         ) : (
                           getFaturasDoCartao(cartao.id).map((fatura) => (
-                            <div key={fatura.id} className="glass-panel p-4 flex justify-between items-center border-white/5 hover:bg-white/5 transition-all">
+                            <div key={fatura.id} className="glass-panel p-4 flex justify-between items-center border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                               <div>
-                                <p className="text-xs font-bold text-white">
+                                <p className="text-xs font-bold text-slate-800 dark:text-white">
                                   {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase tracking-tighter">Vence em: {formatDateForDisplay(fatura.data_vencimento)}</p>
                               </div>
                               <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                  <p className="text-sm font-bold text-rose-400">R$ {fatura.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                                  <Badge className={`border-none text-[8px] uppercase font-bold px-1 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                                  <p className="text-sm font-bold text-rose-500 dark:text-rose-400">R$ {fatura.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                                  <Badge className={`border-none text-[8px] uppercase font-bold px-1 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
                                     {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
                                   </Badge>
                                 </div>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-400" onClick={() => visualizarFatura(fatura)}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400" onClick={() => visualizarFatura(fatura)}>
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -849,7 +865,7 @@ const carregarFaturas = async (listaDeCartoes) => {
           {/* Faturas */}
           <TabsContent value="faturas" className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
-              <h3 className="text-lg font-semibold text-white">Controle de Faturas</h3>
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white">Controle de Faturas</h3>
               
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <Select value={selectedCardFilter} onValueChange={setSelectedCardFilter}>
@@ -877,7 +893,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                   </SelectContent>
                 </Select>
 
-                <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)} className="border-white/10 hover:bg-white/5 text-slate-300 h-9">
+                <Button variant="outline" onClick={() => setIsPeriodoModalOpen(true)} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 h-9">
                   <Calendar className="h-4 w-4 mr-2" />
                   Período
                 </Button>
@@ -887,7 +903,7 @@ const carregarFaturas = async (listaDeCartoes) => {
             <div className="glass-panel border-white/5 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="text-[10px] text-slate-500 uppercase tracking-widest bg-white/5 border-b border-white/5">
+                  <thead className="text-[10px] text-slate-500 uppercase tracking-widest bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5">
                     <tr>
                       <th className="px-6 py-4">Cartão</th>
                       <th className="px-6 py-4">Referência</th>
@@ -897,7 +913,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                       <th className="px-6 py-4 text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {faturas.filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter).length === 0 ? (
                       <tr>
                         <td colSpan="6" className="px-6 py-12 text-center text-slate-500 italic">
@@ -908,21 +924,21 @@ const carregarFaturas = async (listaDeCartoes) => {
                       faturas
                         .filter(f => selectedCardFilter === 'all' || f.cartao_id.toString() === selectedCardFilter)
                         .map((fatura) => (
-                        <tr key={fatura.id} className="hover:bg-white/5 transition-colors group">
-                          <td className="px-6 py-4 font-bold text-white">
+                        <tr key={fatura.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+                          <td className="px-6 py-4 font-bold text-slate-800 dark:text-white">
                             {fatura.cartao_nome}
                           </td>
-                          <td className="px-6 py-4 text-slate-400 capitalize">
+                          <td className="px-6 py-4 text-slate-600 dark:text-slate-400 capitalize">
                             {new Date(fatura.mes_ref).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
                           </td>
-                          <td className="px-6 py-4 text-purple-400 font-medium">
+                          <td className="px-6 py-4 text-purple-600 dark:text-purple-400 font-medium">
                             {formatDateForDisplay(fatura.data_vencimento)}
                           </td>
-                          <td className="px-6 py-4 font-bold text-rose-400">
+                          <td className="px-6 py-4 font-bold text-rose-500 dark:text-rose-400">
                             R$ {(Number(fatura.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <Badge className={`border-none text-[8px] uppercase font-bold px-1.5 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                            <Badge className={`border-none text-[8px] uppercase font-bold px-1.5 py-0 ${fatura.status === 'aberta' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
                               {fatura.status === 'aberta' ? 'Aberta' : 'Paga'}
                             </Badge>
                           </td>
@@ -932,7 +948,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                                 variant="ghost" 
                                 size="sm"
                                 onClick={() => visualizarFatura(fatura)}
-                                className="h-8 text-cyan-400 hover:bg-cyan-400/10"
+                                className="h-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 Detalhes
@@ -950,7 +966,7 @@ const carregarFaturas = async (listaDeCartoes) => {
                               <Button 
                                 variant="ghost" 
                                 size="sm"
-                                className="h-8 text-rose-400 hover:bg-rose-400/10"
+                                className="h-8 text-rose-500 hover:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-400/10"
                                 onClick={() => excluirFatura(fatura)}
                               >
                                 <Trash2 className="h-4 w-4" />

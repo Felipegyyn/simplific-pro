@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
+import styles from './Planning.module.css';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
@@ -650,9 +651,9 @@ useEffect(() => {
   
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-200">
+    <div className={styles.pageContainer}>
       {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -660,18 +661,17 @@ useEffect(() => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-400 hidden sm:block">
+              <span className="text-sm text-slate-500 hidden sm:block">
                 Bem-vindo, {user.name}
               </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
@@ -682,11 +682,13 @@ useEffect(() => {
 
       {/* Main Content */}
       <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            Planejamento Financeiro
-          </h2>
-          <p className="text-slate-400">Gerencie seus planejamentos e orçamentos com precisão tecnológica</p>
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.pageTitle}>
+              Planejamento Financeiro
+            </h2>
+            <p className={styles.pageSubtitle}>Gerencie seus planejamentos e orçamentos com precisão tecnológica</p>
+          </div>
         </div>
 
         <Tabs
@@ -694,10 +696,10 @@ useEffect(() => {
           onValueChange={(v) => setAbaAtiva(v)}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 glass-panel p-1">
-            <TabsTrigger value="visao-geral" className="data-[state=active]:active-gradient">Visão Geral</TabsTrigger>
-            <TabsTrigger value="orcamento" className="data-[state=active]:active-gradient">Orçamento por Categoria</TabsTrigger>
-            <TabsTrigger value="planejamentos" className="data-[state=active]:active-gradient">Planejamentos</TabsTrigger>
+          <TabsList className={styles.tabsList + " mb-6"}>
+            <TabsTrigger value="visao-geral" className={styles.tabsTrigger}>Visão Geral</TabsTrigger>
+            <TabsTrigger value="orcamento" className={styles.tabsTrigger}>Orçamento por Categoria</TabsTrigger>
+            <TabsTrigger value="planejamentos" className={styles.tabsTrigger}>Planejamentos</TabsTrigger>
           </TabsList>
 
           {/* Visão Geral */}
@@ -709,7 +711,7 @@ useEffect(() => {
                 <select
                   value={filtroAnoVisaoGeral}
                   onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
-                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                  className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
                 >
                   {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
                     <option key={ano} value={ano}>{ano}</option>
@@ -722,7 +724,7 @@ useEffect(() => {
                 <select
                   value={filtroTipoVisaoGeral}
                   onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
-                  className="bg-slate-900/50 border border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                  className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
                 >
                   <option value="">Todos</option>
                   <option value="entrada">Entrada</option>
@@ -732,67 +734,86 @@ useEffect(() => {
             </div>
 
             {/* Cards de Resumo */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Target className="h-12 w-12 text-cyan-400" />
-                </div>
-                <p className="text-sm font-medium text-slate-400 mb-1">Total Planejado</p>
-                <p className="text-2xl font-bold text-white">
-                  R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </p>
-                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-                </div>
-              </div>
-
-              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <DollarSign className="h-12 w-12 text-rose-400" />
-                </div>
-                <p className="text-sm font-medium text-slate-400 mb-1">Total Realizado</p>
-                <p className="text-2xl font-bold text-white">
-                  R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </p>
-                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+            <div className={styles.summaryGrid}>
+              <div className={styles.premiumCard}>
+                <div className={styles.cardContent}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
+                      <Target className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className={styles.summaryLabel}>Total Planejado</p>
+                  <p className={styles.summaryValue}>
+                    R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+                  </div>
                 </div>
               </div>
 
-              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <TrendingUp className="h-12 w-12 text-emerald-400" />
-                </div>
-                <p className="text-sm font-medium text-slate-400 mb-1">Total a realizar</p>
-                <p className="text-2xl font-bold text-white">
-                  R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </p>
-                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.max(0, 100 - resumo.progressoMedio)}%` }} />
+              <div className={styles.premiumCard}>
+                <div className={styles.cardContent}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
+                      <DollarSign className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className={styles.summaryLabel}>Total Realizado</p>
+                  <p className={styles.summaryValue}>
+                    R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+                  </div>
                 </div>
               </div>
 
-              <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <BarChart3 className="h-12 w-12 text-purple-400" />
+              <div className={styles.premiumCard}>
+                <div className={styles.cardContent}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
+                      <TrendingUp className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className={styles.summaryLabel}>Total a realizar</p>
+                  <p className={styles.summaryValue}>
+                    R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.max(0, 100 - resumo.progressoMedio)}%` }} />
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-slate-400 mb-1">Progresso Médio</p>
-                <p className="text-2xl font-bold text-white">
-                  {resumo.progressoMedio.toFixed(1)}%
-                </p>
-                <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-purple-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+              </div>
+
+              <div className={styles.premiumCard}>
+                <div className={styles.cardContent}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
+                      <BarChart3 className="h-6 w-6" />
+                    </div>
+                  </div>
+                  <p className={styles.summaryLabel}>Progresso Médio</p>
+                  <p className={styles.summaryValue}>
+                    {resumo.progressoMedio.toFixed(1)}%
+                  </p>
+                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div className={styles.mainGrid + " mt-6"}>
               {/* Gráfico de Rosca - Entradas */}
-              <div className="glass-panel p-6 border-white/5">
-                <h4 className="font-semibold mb-4 text-slate-200 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500" />
-                  Distribuição de Entradas
-                </h4>
+              <div className={styles.premiumCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardTitleArea}>
+                    <div className="w-2 h-2 rounded-full bg-cyan-500" />
+                    <h4 className={styles.cardTitle}>Distribuição de Entradas</h4>
+                  </div>
+                </div>
+                <div className={styles.cardContent + " pt-0"}>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Tooltip 
@@ -818,14 +839,18 @@ useEffect(() => {
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
+                </div>
               </div>
 
               {/* Gráfico de Rosca - Saídas */}
-              <div className="glass-panel p-6 border-white/5">
-                <h4 className="font-semibold mb-4 text-slate-200 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  Distribuição de Saídas
-                </h4>
+              <div className={styles.premiumCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardTitleArea}>
+                    <div className="w-2 h-2 rounded-full bg-rose-500" />
+                    <h4 className={styles.cardTitle}>Distribuição de Saídas</h4>
+                  </div>
+                </div>
+                <div className={styles.cardContent + " pt-0"}>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
@@ -859,6 +884,7 @@ useEffect(() => {
                     />
                   </PieChart>
                 </ResponsiveContainer>
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -1107,17 +1133,23 @@ useEffect(() => {
 
             {/* DRE Orçamento */}
             {(() => {
-              const OrcRow = ({ orc }) => (
-                <div className={`${getOrcBorderClass(orc.progresso)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
-                  <div className="flex-1 min-w-0 z-10">
-                    <h3 className="font-semibold text-sm text-white mb-2">{orc.categoria}</h3>
+              const OrcRow = ({ orc }) => {
+                let statusClass = '';
+                if (orc.progresso > 90) statusClass = styles.transactionRowDanger;
+                else if (orc.progresso > 70) statusClass = styles.transactionRowWarning;
+                else statusClass = styles.transactionRowSuccess;
+
+                return (
+                <div className={`${styles.transactionRow} ${statusClass} group`}>
+                  <div className="flex-1 min-w-0 z-10 w-full">
+                    <h3 className="font-semibold text-sm text-slate-800 dark:text-white mb-2">{orc.categoria}</h3>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
-                      <span className="text-cyan-400 font-medium">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-rose-400 font-medium">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-emerald-400 font-medium">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-cyan-600 dark:text-cyan-400 font-medium">Orçado: R$ {orc.orcado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-medium">Gasto: R$ {orc.gasto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">Disponível: R$ {orc.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div className="flex-1 bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
                         <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor(orc.progresso)}`} style={{ width: `${Math.min(orc.progresso, 100)}%` }} />
                       </div>
                       <span className={`text-xs font-bold w-12 text-right ${orc.progresso > 90 ? 'text-rose-500' : orc.progresso > 70 ? 'text-amber-500' : 'text-emerald-500'}`}>
@@ -1125,49 +1157,55 @@ useEffect(() => {
                       </span>
                     </div>
                   </div>
-                  <div className="mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 sm:opacity-0 group-hover:opacity-100 transition-opacity self-end sm:self-center">
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => handleExcluirOrcamento(orc)}
-                      className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 h-8 w-8 p-0"
+                      className="text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 h-8 w-8 p-0"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  {/* Subtle background glow on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-              );
+              )};
 
               const entradasOrc = orcamentosComTipo.filter(o => o.tipo === 'entrada');
               const saidasOrc = orcamentosComTipo.filter(o => o.tipo === 'saida');
 
               return (
                 <div className="space-y-6">
-                  <div className="glass-panel p-6 border-white/5">
-                    <div className="flex items-center gap-2 text-emerald-400 mb-6">
-                      <TrendingUp className="h-5 w-5" />
-                      <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                  <div className={styles.premiumCard}>
+                    <div className={styles.cardHeader}>
+                      <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                        <TrendingUp className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {entradasOrc.length > 0
-                        ? entradasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
-                        : <p className="col-span-2 text-center text-sm text-slate-500 py-8 glass-card border-dashed">Nenhum orçamento de entrada encontrado</p>
-                      }
+                    <div className={styles.cardContent + " pt-0"}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {entradasOrc.length > 0
+                          ? entradasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                          : <div className={styles.emptyState + " col-span-full"}>Nenhum orçamento de entrada encontrado</div>
+                        }
+                      </div>
                     </div>
                   </div>
 
-                  <div className="glass-panel p-6 border-white/5">
-                    <div className="flex items-center gap-2 text-rose-400 mb-6">
-                      <Target className="h-5 w-5" />
-                      <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                  <div className={styles.premiumCard}>
+                    <div className={styles.cardHeader}>
+                      <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+                        <Target className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {saidasOrc.length > 0
-                        ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
-                        : <p className="col-span-2 text-center text-sm text-slate-500 py-8 glass-card border-dashed">Nenhum orçamento de saída encontrado</p>
-                      }
+                    <div className={styles.cardContent + " pt-0"}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {saidasOrc.length > 0
+                          ? saidasOrc.map((o, i) => <OrcRow key={i} orc={o} />)
+                          : <div className={styles.emptyState + " col-span-full"}>Nenhum orçamento de saída encontrado</div>
+                        }
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1261,13 +1299,23 @@ useEffect(() => {
 
             {/* Lista de Planejamentos */}
             {(() => {
-              const PlanRow = ({ plan }) => (
-                <div className={`${getPlanRowBorderClass(plan)} glass-card p-4 flex flex-col sm:flex-row justify-between items-start hover:bg-white/5 transition-all group relative overflow-hidden`}>
-                  <div className="flex-1 min-w-0 z-10">
+              const PlanRow = ({ plan }) => {
+                let borderStyle = '';
+                if (plan.status !== 'confirmed') {
+                  borderStyle = styles.transactionRowWarning;
+                } else if (plan.type === 'entrada') {
+                  borderStyle = styles.transactionRowSuccess;
+                } else {
+                  borderStyle = styles.transactionRowDanger;
+                }
+
+                return (
+                <div className={`${styles.transactionRow} ${borderStyle} group`}>
+                  <div className="flex-1 min-w-0 z-10 w-full">
                     <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-sm text-white">{plan.category_name}</h3>
+                      <h3 className="font-semibold text-sm text-slate-800 dark:text-white">{plan.category_name}</h3>
                       {plan.status === 'confirmed' && (
-                        <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/20 text-[10px] uppercase font-bold px-1.5 py-0">
+                        <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-none text-[10px] uppercase font-bold px-1.5 py-0">
                           Confirmado
                         </Badge>
                       )}
@@ -1276,64 +1324,72 @@ useEffect(() => {
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] mb-3">
-                      <span className="text-cyan-400 font-medium">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-rose-400 font-medium">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-emerald-400 font-medium">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-cyan-600 dark:text-cyan-400 font-medium">Planejado: R$ {parseFloat(plan.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-medium">Gasto: R$ {parseFloat(plan.spent_amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">Disponível: R$ {(parseFloat(plan.total_amount) - parseFloat(plan.spent_amount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     {plan.observations && (
                       <p className="text-[10px] text-slate-500 italic mb-3 line-clamp-1">"{plan.observations}"</p>
                     )}
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div className="flex-1 bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
                         <div className={`h-full rounded-full transition-all duration-500 ${getProgressColor(plan.progress || 0)}`} style={{ width: `${Math.min(plan.progress || 0, 100)}%` }} />
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
+                      <span className="text-[10px] font-bold text-slate-500 w-12 text-right">{(plan.progress || 0).toFixed(1)}%</span>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-2 mt-4 sm:mt-0 sm:ml-4 shrink-0 z-10 sm:opacity-0 group-hover:opacity-100 transition-opacity self-end sm:self-center">
                     {plan.status !== 'confirmed' && (
-                      <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)} className="h-8 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
+                      <Button variant="outline" size="sm" onClick={() => confirmarPlanejamento(plan.id)} className="h-8 text-xs border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10">
                         Confirmar
                       </Button>
                     )}
-                    <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(plan)} className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/5">
+                    <Button variant="ghost" size="sm" onClick={() => abrirModalEdicao(plan)} className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => excluirPlanejamento(plan.id)} className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10">
+                    <Button variant="ghost" size="sm" onClick={() => excluirPlanejamento(plan.id)} className="h-8 w-8 p-0 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 dark:text-rose-400 dark:hover:text-rose-300">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-              );
+              )};
 
               const entradas = planejamentos.filter(p => p.type === 'entrada');
               const saidas = planejamentos.filter(p => p.type === 'saida');
 
               return (
                 <div className="space-y-8">
-                  <div className="glass-panel p-6 border-white/5">
-                    <div className="flex items-center gap-2 text-emerald-400 mb-6">
-                      <TrendingUp className="h-5 w-5" />
-                      <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                  <div className={styles.premiumCard}>
+                    <div className={styles.cardHeader}>
+                      <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                        <TrendingUp className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Entradas</h4>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {entradas.length > 0
-                        ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
-                        : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma entrada planejada</p>
-                      }
+                    <div className={styles.cardContent + " pt-0"}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {entradas.length > 0
+                          ? entradas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <div className={styles.emptyState + " col-span-full"}>Nenhuma entrada planejada</div>
+                        }
+                      </div>
                     </div>
                   </div>
 
-                  <div className="glass-panel p-6 border-white/5">
-                    <div className="flex items-center gap-2 text-rose-400 mb-6">
-                      <Target className="h-5 w-5" />
-                      <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                  <div className={styles.premiumCard}>
+                    <div className={styles.cardHeader}>
+                      <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+                        <Target className="h-5 w-5" />
+                        <h4 className="font-semibold uppercase tracking-wider text-sm">Saídas</h4>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {saidas.length > 0
-                        ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
-                        : <p className="col-span-2 text-center text-sm text-slate-500 py-12 glass-card border-dashed">Nenhuma saída planejada</p>
-                      }
+                    <div className={styles.cardContent + " pt-0"}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {saidas.length > 0
+                          ? saidas.map(p => <PlanRow key={p.id} plan={p} />)
+                          : <div className={styles.emptyState + " col-span-full"}>Nenhuma saída planejada</div>
+                        }
+                      </div>
                     </div>
                   </div>
                 </div>

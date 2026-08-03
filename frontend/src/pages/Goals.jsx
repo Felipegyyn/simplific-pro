@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import logo from '../assets/LOGO.png';
+import styles from './Goals.module.css';
 
 const Goals = ({ user, onLogout }) => {
   const navigate = useNavigate();
@@ -252,9 +253,9 @@ const handleSubmit = (e) => {
     return `${day}/${month}/${year}`;
   };
   return (
-    <div className="min-h-screen bg-transparent text-slate-200">
+    <div className={styles.pageContainer}>
       {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10">
+      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
@@ -262,18 +263,17 @@ const handleSubmit = (e) => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-400 hover:text-white hover:bg-white/5"
+                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <img src={logo} alt="Simplific Pro" className="h-8 w-auto mr-3 brightness-0 invert" />
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-400 hidden sm:block">
+              <span className="text-sm text-slate-500 hidden sm:block">
                 Bem-vindo, {user.name}
               </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-white/10 hover:bg-white/5 text-slate-300">
+              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sair
               </Button>
@@ -284,66 +284,84 @@ const handleSubmit = (e) => {
 
       {/* Main Content */}
       <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-            Metas Financeiras
-          </h2>
-          <p className="text-slate-400">Defina e acompanhe seus objetivos financeiros com precisão tecnológica</p>
+        <div className={styles.header}>
+          <div>
+            <h2 className={styles.pageTitle}>
+              Metas Financeiras
+            </h2>
+            <p className={styles.pageSubtitle}>Defina e acompanhe seus objetivos financeiros com precisão tecnológica</p>
+          </div>
         </div>
 
         {/* Cards de Resumo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Target className="h-12 w-12 text-cyan-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Total de Metas</p>
-            <p className="text-2xl font-bold text-white">{metasAtivas.length}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-            </div>
-          </div>
-
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <DollarSign className="h-12 w-12 text-purple-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Valor Total</p>
-            <p className="text-2xl font-bold text-white">R$ {valorTotalMetas.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
+        <div className={styles.summaryGrid}>
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
+                  <Target className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Total de Metas</p>
+              <p className={styles.summaryValue}>{metasAtivas.length}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
+              </div>
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp className="h-12 w-12 text-emerald-400" />
-            </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Valor Atual</p>
-            <p className="text-2xl font-bold text-white">R$ {valorAtualTotal.toLocaleString()}</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(valorAtualTotal / valorTotalMetas) * 100}%` }} />
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxPurple}>
+                  <DollarSign className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Valor Total</p>
+              <p className={styles.summaryValue}>R$ {valorTotalMetas.toLocaleString()}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
+              </div>
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Star className="h-12 w-12 text-amber-400" />
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Valor Atual</p>
+              <p className={styles.summaryValue}>R$ {valorAtualTotal.toLocaleString()}</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${valorTotalMetas > 0 ? (valorAtualTotal / valorTotalMetas) * 100 : 0}%` }} />
+              </div>
             </div>
-            <p className="text-sm font-medium text-slate-400 mb-1">Progresso Médio</p>
-            <p className="text-2xl font-bold text-white">{progressoMedio.toFixed(1)}%</p>
-            <div className="mt-2 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-amber-500 rounded-full" style={{ width: `${progressoMedio}%` }} />
+          </div>
+
+          <div className={styles.premiumCard}>
+            <div className={styles.cardContent}>
+              <div className="flex items-center justify-between mb-4">
+                <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
+                  <Star className="h-6 w-6" />
+                </div>
+              </div>
+              <p className={styles.summaryLabel}>Progresso Médio</p>
+              <p className={styles.summaryValue}>{progressoMedio.toFixed(1)}%</p>
+              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-500 rounded-full" style={{ width: `${progressoMedio}%` }} />
+              </div>
             </div>
           </div>
         </div>
 
         <Tabs defaultValue="ativas" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 glass-panel p-2 border-white/5">
-            <TabsList className="grid w-full sm:w-auto grid-cols-3 bg-transparent border-none">
-              <TabsTrigger value="ativas" className="data-[state=active]:active-gradient">Ativas ({metasAtivas.length})</TabsTrigger>
-              <TabsTrigger value="concluidas" className="data-[state=active]:active-gradient">Concluídas ({metasConcluidas.length})</TabsTrigger>
-              <TabsTrigger value="arquivadas" className="data-[state=active]:active-gradient">Arquivadas ({metasArquivadas.length})</TabsTrigger>
+          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 glass-panel p-4 border-white/5">
+            <TabsList className={styles.tabsList}>
+              <TabsTrigger value="ativas" className={styles.tabsTrigger}>Ativas ({metasAtivas.length})</TabsTrigger>
+              <TabsTrigger value="concluidas" className={styles.tabsTrigger}>Concluídas ({metasConcluidas.length})</TabsTrigger>
+              <TabsTrigger value="arquivadas" className={styles.tabsTrigger}>Arquivadas ({metasArquivadas.length})</TabsTrigger>
             </TabsList>
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
@@ -437,7 +455,7 @@ const handleSubmit = (e) => {
               {metasAtivas.map((meta) => {
                 const dias = diasRestantes(meta.target_date);
                 return (
-                  <div key={meta.id} className="glass-card overflow-hidden group relative transition-all hover:scale-[1.01]">
+                  <div key={meta.id} className={styles.goalCard + " group"}>
                     <div className="flex flex-col md:flex-row h-full">
                       {meta.image_url && (
                         <div className="md:w-1/3 flex-shrink-0 relative overflow-hidden">
@@ -447,7 +465,7 @@ const handleSubmit = (e) => {
                             className="w-full h-48 md:h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x400/020617/94a3b8?text=Goal'; }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/0 to-slate-950/20 md:to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/0 to-slate-900/20 md:to-transparent dark:from-slate-950/0 dark:to-slate-950/20" />
                         </div>
                       )}
 
@@ -456,39 +474,39 @@ const handleSubmit = (e) => {
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">{meta.name}</h3>
+                                <h3 className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">{meta.name}</h3>
                                 {getPrioridadeBadge(meta.priority)}
                               </div>
-                              <p className="text-xs text-slate-400 mb-4 line-clamp-2 italic">"{meta.description}"</p>
+                              <p className="text-xs text-slate-500 mb-4 line-clamp-2 italic">"{meta.description}"</p>
                               
                               <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-[11px] uppercase tracking-wider">
                                 <div>
                                   <p className="text-slate-500 mb-1">Categoria</p>
-                                  <p className="font-bold text-slate-200">{meta.category}</p>
+                                  <p className="font-bold text-slate-700 dark:text-slate-200">{meta.category}</p>
                                 </div>
                                 <div>
                                   <p className="text-slate-500 mb-1">Prazo</p>
-                                  <p className={`font-bold ${dias < 30 ? 'text-rose-400' : 'text-slate-200'}`}>
+                                  <p className={`font-bold ${dias < 30 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200'}`}>
                                     {formatLocalDate(meta.target_date)}
                                     {dias >= 0 && <span className="text-[9px] block opacity-70">({dias} dias)</span>}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-slate-500 mb-1">Valor Meta</p>
-                                  <p className="font-bold text-cyan-400">R$ {meta.target_value.toLocaleString()}</p>
+                                  <p className="font-bold text-cyan-600 dark:text-cyan-400">R$ {meta.target_value.toLocaleString()}</p>
                                 </div>
                                 <div>
                                   <p className="text-slate-500 mb-1">Valor Atual</p>
-                                  <p className="font-bold text-emerald-400">R$ {meta.current_value.toLocaleString()}</p>
+                                  <p className="font-bold text-emerald-600 dark:text-emerald-400">R$ {meta.current_value.toLocaleString()}</p>
                                 </div>
                               </div>
                             </div>
                             
-                            <div className="flex flex-col gap-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex flex-col gap-2 ml-4 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                               <Button 
                                 variant="ghost" 
                                 size="icon"
-                                className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10"
+                                className="h-8 w-8 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"
                                 onClick={() => {
                                   const valor = prompt('Quanto deseja adicionar à meta?');
                                   if (valor && !isNaN(valor)) adicionarValor(meta.id, valor);
@@ -496,8 +514,8 @@ const handleSubmit = (e) => {
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white" onClick={() => abrirModalEdicao(meta)}><Edit className="h-4 w-4" /></Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-400 hover:text-rose-300 hover:bg-rose-400/10" onClick={() => excluirMeta(meta.id)}><Trash2 className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5" onClick={() => abrirModalEdicao(meta)}><Edit className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 hover:bg-rose-500/10" onClick={() => excluirMeta(meta.id)}><Trash2 className="h-4 w-4" /></Button>
                             </div>
                           </div>
                         </div>
@@ -505,9 +523,9 @@ const handleSubmit = (e) => {
                         <div className="space-y-3 mt-6">
                           <div className="flex justify-between items-end">
                             <span className="text-[10px] text-slate-500 uppercase tracking-widest">Progresso</span>
-                            <span className="text-sm font-bold text-white">{meta.progress_percentage.toFixed(1)}%</span>
+                            <span className="text-sm font-bold text-slate-800 dark:text-white">{meta.progress_percentage.toFixed(1)}%</span>
                           </div>
-                          <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                          <div className="w-full bg-slate-200 dark:bg-white/5 rounded-full h-1.5 overflow-hidden">
                             <div 
                               className={`h-full rounded-full transition-all duration-1000 ${getProgressColor(meta.progress_percentage)}`}
                               style={{ width: `${Math.min(meta.progress_percentage, 100)}%` }}
@@ -520,8 +538,6 @@ const handleSubmit = (e) => {
                         </div>
                       </div>
                     </div>
-                    {/* Glow effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                   </div>
                 );
               })}
@@ -532,28 +548,28 @@ const handleSubmit = (e) => {
           <TabsContent value="concluidas" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {metasConcluidas.map((meta) => (
-                <div key={meta.id} className="glass-card border-emerald-500/20 bg-emerald-500/5 p-6 group relative overflow-hidden">
+                <div key={meta.id} className={styles.goalCard + " border-emerald-500/20 bg-emerald-500/5 p-6 group"}>
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="bg-emerald-500/20 p-2 rounded-lg">
-                          <CheckCircle className="h-5 w-5 text-emerald-400" />
+                          <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
-                        <h3 className="text-lg font-bold text-white">{meta.name}</h3>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">{meta.name}</h3>
                       </div>
-                      <p className="text-xs text-slate-400 mb-4 line-clamp-1 italic">"{meta.description}"</p>
+                      <p className="text-xs text-slate-500 mb-4 line-clamp-1 italic">"{meta.description}"</p>
                       <div className="grid grid-cols-3 gap-4 text-[10px] uppercase tracking-wider">
                         <div>
                           <p className="text-slate-500 mb-1">Categoria</p>
-                          <p className="font-bold text-slate-200">{meta.category}</p>
+                          <p className="font-bold text-slate-700 dark:text-slate-200">{meta.category}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 mb-1">Concluída</p>
-                          <p className="font-bold text-slate-200">{formatLocalDate(meta.target_date)}</p>
+                          <p className="font-bold text-slate-700 dark:text-slate-200">{formatLocalDate(meta.target_date)}</p>
                         </div>
                         <div>
                           <p className="text-slate-500 mb-1">Total</p>
-                          <p className="font-bold text-emerald-400">R$ {meta.current_value.toLocaleString()}</p>
+                          <p className="font-bold text-emerald-600 dark:text-emerald-400">R$ {meta.current_value.toLocaleString()}</p>
                         </div>
                       </div>
                     </div>
@@ -564,9 +580,11 @@ const handleSubmit = (e) => {
                 </div>
               ))}
               {metasConcluidas.length === 0 && (
-                <div className="col-span-2 py-12 glass-panel border-dashed flex flex-col items-center justify-center text-slate-500">
-                  <CheckCircle className="h-12 w-12 mb-4 opacity-20" />
-                  <p>Nenhuma meta concluída ainda.</p>
+                <div className={styles.emptyState + " col-span-2"}>
+                  <div className="flex flex-col items-center">
+                    <CheckCircle className="h-12 w-12 mb-4 opacity-20" />
+                    <p>Nenhuma meta concluída ainda.</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -574,10 +592,10 @@ const handleSubmit = (e) => {
 
           {/* Metas Arquivadas */}
           <TabsContent value="arquivadas" className="space-y-6">
-            <div className="glass-panel border-dashed py-16 flex flex-col items-center justify-center text-center">
-              <Target className="h-12 w-12 text-slate-700 mb-4" />
-              <p className="text-slate-400 font-medium">Nenhuma meta arquivada</p>
-              <p className="text-xs text-slate-600 mt-1">Metas canceladas ou pausadas aparecerão aqui</p>
+            <div className={styles.emptyState + " flex-col border border-dashed rounded-xl"}>
+              <Target className="h-12 w-12 text-slate-400 mb-4" />
+              <p className="font-medium text-slate-600 dark:text-slate-400">Nenhuma meta arquivada</p>
+              <p className="text-xs text-slate-500 mt-1">Metas canceladas ou pausadas aparecerão aqui</p>
             </div>
           </TabsContent>
         </Tabs>
