@@ -4,41 +4,33 @@ import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
   Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, 
-  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark, Home // <--- 1. ÍCONES ADICIONADOS
+  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark, Home
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
-import { cn } from "@/lib/utils"; 
+import { cn } from "@/lib/utils";
+import styles from './Sidebar.module.css';
 
 const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const [isDesktopOpen, setIsDesktopOpen] = useState(true);
-  
-  // Controle dos menus abertos
- const [openMenus, setOpenMenus] = useState({});
-  
+  const [openMenus, setOpenMenus] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // --- ESTRUTURA DOS DADOS
-
   const menuStructure = [
-    // ▼▼▼ 1. NOVO MENU INÍCIO ▼▼▼
     {
       title: 'Início',
       icon: Home,
-      color: 'text-amber-500', // Escolhi uma cor diferente (âmbar/amarelo) para destacar
+      color: 'var(--primary-accent)',
       items: [
         { name: 'Início', path: '/inicio', icon: Home },
       ]
     },
-    // ▲▲▲ FIM DO NOVO MENU ▲▲▲
-
-  
     {
       title: 'Resumo',
       icon: LayoutDashboard,
-      color: 'text-blue-500',
+      color: '#3b82f6',
       items: [
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Balanço Geral', path: '/reports', icon: FileText },
@@ -48,7 +40,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Lançamentos',
       icon: DollarSign,
-      color: 'text-green-500',
+      color: '#22c55e',
       items: [
         { name: 'Lançamentos', path: '/transactions', icon: DollarSign },
         { name: 'Planejamento', path: '/planning', icon: Target },
@@ -59,17 +51,15 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Investimentos',
       icon: TrendingUp,
-      color: 'text-purple-500',
+      color: '#a855f7',
       items: [
         { name: 'Investimentos', path: '/investments', icon: TrendingUp },
       ]
     },
-
-    // ▲▲▲ FIM DO NOVO GRUPO ▲▲▲
     {
       title: 'Assessor Simplific',
       icon: Bot,
-      color: 'text-indigo-500',
+      color: '#6366f1',
       items: [
         { 
             name: 'Whatsapp Assessor', 
@@ -83,7 +73,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Compromissos',
       icon: Calendar,
-      color: 'text-pink-500',
+      color: '#ec4899',
       items: [
         { name: 'Agenda', path: '/schedule', icon: Calendar },
         { name: 'Contatos', path: '/contacts', icon: Users },
@@ -92,7 +82,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     {
       title: 'Configurações e outros',
       icon: Settings,
-      color: 'text-orange-500',
+      color: '#f97316',
       items: [
         { name: 'Contas Bancárias', path: '/bank-accounts', icon: Landmark },
         { name: 'Categorias', path: '/categories', icon: Tags },
@@ -102,19 +92,16 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         { name: 'Marketing', path: '/admin/marketing', icon: Megaphone, adminOnly: true },
       ]
     },
-
-        // ▼▼▼ 3. NOVO GRUPO: SIMPLIFIC EMPRESAS ▼▼▼
     {
       title: 'Simplific Empresas',
       icon: Building2,
-      color: 'text-cyan-500', // Cor Ciano
+      color: '#06b6d4',
       items: [
         { name: 'Acessar Empresa', path: '/business', icon: Briefcase, adminOnly: true },
       ]
     },
   ];
 
-  // Filtra itens baseados na permissão
   const visibleMenu = menuStructure.map(group => ({
     ...group,
     items: group.items.filter(item => !item.adminOnly || user?.profile === 'admin')
@@ -171,72 +158,68 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   return (
     <div 
       className={cn(
-        "fixed inset-y-0 left-0 z-30 flex flex-col h-screen transition-all duration-300 ease-in-out md:relative",
-        "glass-panel rounded-none border-y-0 border-l-0 border-white/5", 
-        isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
-        isDesktopOpen ? "md:w-64" : "md:w-20"
+        styles.sidebar,
+        isMobileOpen ? styles.sidebarMobile : styles.sidebarMobileHidden,
+        isDesktopOpen ? styles.sidebarDesktopOpen : styles.sidebarDesktopClosed
       )}
     >
       <button 
         onClick={() => setIsDesktopOpen(!isDesktopOpen)} 
-        className="absolute -right-3 top-9 bg-slate-900 border border-white/10 rounded-full p-1.5 z-10 text-slate-400 hover:text-white shadow-xl transition-colors hidden md:block"
+        className={styles.toggleButton}
       >
         {isDesktopOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
       </button>
 
-      <div className={cn("flex items-center gap-3 mb-2 p-6 h-20", !isDesktopOpen && "justify-center px-2")}>
-        <img src={logo} alt="Simplific Pro" className="h-8 w-auto shrink-0 brightness-110" />
+      <div className={cn(styles.logoArea, !isDesktopOpen && styles.logoAreaClosed)}>
+        <img src={logo} alt="Simplific Pro" className={styles.logoImg} />
         {isDesktopOpen && (
-            <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
+            <span className={styles.logoText}>
                 Simplific Pro
             </span>
         )}
       </div>
 
-      <nav className="flex-1 space-y-2 px-3 overflow-y-auto scrollbar-none pb-4">
+      <nav className={styles.navContainer}>
         {visibleMenu.map((group) => {
           const isOpen = openMenus[group.title];
           const isChildActive = group.items.some(item => !item.isExternal && location.pathname === item.path);
 
           return (
-            <div key={group.title} className="space-y-1">
+            <div key={group.title} className={styles.navGroup}>
               <button
                 onClick={() => toggleMenu(group.title)}
                 className={cn(
-                  "w-full flex items-center p-3 rounded-xl transition-all duration-200 group relative select-none",
-                  !isDesktopOpen && "justify-center",
-                  (!isOpen && isChildActive) || isOpen ? "bg-white/5 text-white font-medium shadow-sm" : "text-slate-400 hover:bg-white/5 hover:text-white"
+                  styles.groupButton,
+                  !isDesktopOpen && styles.groupButtonClosed,
+                  ((!isOpen && isChildActive) || isOpen) && styles.groupButtonActive
                 )}
               >
                 <group.icon 
                     className={cn(
-                        "h-5 w-5 shrink-0 transition-colors", 
-                        isDesktopOpen ? "mr-3" : "",
-                        group.color 
+                        styles.groupIcon, 
+                        isDesktopOpen && styles.groupIconOpen
                     )} 
+                    style={{ color: group.color }}
                 />
                 
                 {isDesktopOpen && (
                   <>
-                    <span className="flex-1 text-left text-sm">{group.title}</span>
+                    <span className={styles.groupTitle}>{group.title}</span>
                     <ChevronDown 
-                      className={cn(
-                        "h-4 w-4 transition-transform duration-200 opacity-50", 
-                        isOpen ? "transform rotate-180" : ""
-                      )} 
+                      className={cn(styles.chevron, isOpen && styles.chevronOpen)} 
                     />
                   </>
                 )}
 
                 {!isDesktopOpen && (
-                  <span className="absolute left-14 glass-panel px-3 py-1.5 rounded-lg text-xs shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none whitespace-nowrap border-white/10">
+                  <span className={styles.tooltip}>
                     {group.title}
                   </span>
                 )}
               </button>
 
               {isDesktopOpen && isOpen && (
-                <div className="space-y-1 ml-4 border-l border-white/5 pl-2 animate-in slide-in-from-top-2 duration-200">
+                <div className={styles.subItemsContainer}>
                   {group.items.map((item) => {
                     if (item.isExternal) {
                       return (
@@ -245,12 +228,9 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                           href={item.path}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={cn(
-                            "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            "text-slate-400 hover:text-cyan-400 hover:bg-white/5"
-                          )}
+                          className={styles.navLink}
                         >
-                          <item.icon className="h-4 w-4 mr-3 opacity-70" />
+                          <item.icon className={styles.navLinkIcon} />
                           <span>{item.name}</span>
                         </a>
                       );
@@ -262,15 +242,10 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
                         to={item.path}
                         onClick={handleLinkClick}
                         className={({ isActive }) => 
-                          cn(
-                            "flex items-center p-2 rounded-lg transition-colors text-sm",
-                            isActive 
-                              ? "active-gradient text-cyan-400 font-medium" 
-                              : "text-slate-400 hover:text-white hover:bg-white/5"
-                          )
+                          cn(styles.navLink, isActive && styles.navLinkActive)
                         }
                       >
-                          <item.icon className="h-4 w-4 mr-3 opacity-70" /> 
+                          <item.icon className={styles.navLinkIcon} /> 
                         <span>{item.name}</span>
                       </NavLink>
                     );
@@ -282,7 +257,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/5 bg-white/2 mt-auto">
+      <div className={styles.footer}>
         <input
             type="file"
             ref={fileInputRef}
@@ -290,38 +265,39 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
             className="hidden"
             accept="image/png, image/jpeg"
         />
-        <div className={cn("flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer", !isDesktopOpen && "justify-center")} onClick={() => !isUploading && fileInputRef.current.click()}>
-          <div className="relative shrink-0">
+        <div 
+          className={cn(styles.profileCard, !isDesktopOpen && styles.profileCardClosed)} 
+          onClick={() => !isUploading && fileInputRef.current.click()}
+        >
+          <div className={styles.avatarContainer}>
             {user?.profile_image_url ? (
-                <img src={user.profile_image_url} alt="Foto" className="h-10 w-10 rounded-full object-cover shadow-md border border-slate-200 dark:border-white/10" />
+                <img src={user.profile_image_url} alt="Foto" className={styles.avatarImage} />
             ) : (
-                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                <div className={styles.avatarFallback}>
                     {user?.name?.charAt(0).toUpperCase()}
                 </div>
             )}
             {isUploading && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-cyan-400 border-t-transparent"></div>
-                </div>
+              <div className={styles.uploadIndicator}>
+                <div className={styles.spinner}></div>
+              </div>
             )}
           </div>
+          
           {isDesktopOpen && (
-            <div className="flex-1 overflow-hidden">
-              <p className="font-medium text-sm truncate text-slate-900 dark:text-white">{user?.name}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Editar perfil</p>
+            <div className={styles.profileInfo}>
+              <p className={styles.profileName}>{user?.name || 'Usuário'}</p>
+              <p className={styles.profileRole}>{user?.profile === 'admin' ? 'Administrador' : 'Membro'}</p>
             </div>
           )}
         </div>
-        <button 
+
+        <button
           onClick={handleLogoutClick}
-          className={cn(
-            "flex items-center w-full mt-2 p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-400/5 transition-colors",
-            !isDesktopOpen && "justify-center"
-          )}
-          title="Sair"
+          className={cn(styles.logoutButton, !isDesktopOpen && styles.logoutButtonClosed)}
         >
-          <LogOut className="h-5 w-5 shrink-0" />
-          {isDesktopOpen && <span className="ml-3 text-sm font-medium">Sair</span>}
+          <LogOut className={styles.logoutIcon} />
+          {isDesktopOpen && <span className={styles.logoutText}>Sair</span>}
         </button>
       </div>
     </div>
