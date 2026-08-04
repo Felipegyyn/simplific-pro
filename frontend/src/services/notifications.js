@@ -224,20 +224,21 @@ async checkUpcomingPayments() {
   // Verificar progresso das metas
   async checkGoalProgress() {
     try {
-      // Simular dados - em produção viria da API
-      const goals = [
-        {
-          id: 1,
-          name: 'Reserva de Emergência',
-          target_amount: 30000,
-          current_amount: 30000,
-          progress: 100
-        }
-      ];
+      // Busca as metas reais do banco de dados via API
+      const goals = await apiService.getGoals();
+      if (!goals || !Array.isArray(goals)) return;
+
+      // Recupera do localStorage quais metas já foram notificadas como concluídas
+      const notifiedGoals = JSON.parse(localStorage.getItem('simplific_notified_goals') || '[]');
 
       goals.forEach(goal => {
-        if (goal.progress >= 100) {
+        // Notifica apenas se atingiu 100% e se ainda NÃO foi notificada antes
+        if (goal.progress >= 100 && !notifiedGoals.includes(goal.id)) {
           this.notifyGoalAchieved(goal);
+          
+          // Marca a meta como notificada para evitar spam
+          notifiedGoals.push(goal.id);
+          localStorage.setItem('simplific_notified_goals', JSON.stringify(notifiedGoals));
         }
       });
     } catch (error) {
