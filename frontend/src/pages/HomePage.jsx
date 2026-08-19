@@ -50,26 +50,26 @@ const instagramPosts = [
   {
     id: 1,
     image: '/assets/insta_placeholder1.png', // Substitua pela sua imagem
-    link: 'https://instagram.com/simplifipro.ia',
-    caption: 'SimplificPro Simplificando sua vida financeira com IA. #financas #ia #organizacao',
+    link: 'https://www.instagram.com/reel/DbmQlVxO1np/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+    caption: 'Simplificando sua vida financeira com IA. #financas #ia #organizacao',
   },
   {
     id: 2,
     image: '/assets/insta_placeholder2.png', // Substitua pela sua imagem
-    link: 'https://instagram.com/simplifipro.ia',
-    caption: 'SimplificPro Inteligência artificial a favor do seu bolso. #investimentos #futuro',
+    link: 'https://www.instagram.com/reel/DUReZ1RDUjT/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+    caption: 'Inteligência artificial a favor do seu bolso. #investimentos #futuro',
   },
   {
     id: 3,
     image: '/assets/insta_placeholder3.png', // Substitua pela sua imagem
-    link: 'https://instagram.com/simplifipro.ia',
-    caption: 'SimplificPro Controle total, na palma da sua mão. #app #controlefinanceiro',
+    link: 'https://www.instagram.com/p/DSbExK6jdBO/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+    caption: 'Controle total, na palma da sua mão. #app #controlefinanceiro',
   },
   {
     id: 4,
     image: '/assets/insta_placeholder4.png', // Substitua pela sua imagem
-    link: 'https://instagram.com/simplifipro.ia',
-    caption: 'SimplificPro Planeje hoje para viver melhor amanhã. #planejamento #educacaofinanceira',
+    link: 'https://www.instagram.com/p/DSXyoOdDvlc/?utm_source=ig_web_copy_link&igsi=NTc4MTIwNjQ2YQ==',
+    caption: 'Planeje hoje para viver melhor amanhã. #planejamento #educacaofinanceira',
   }
 ];
 
@@ -450,7 +450,7 @@ const HomePage = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Dicas no Instagram</h2>
             <p className="text-gray-400">
-              Acompanhe nosso conteúdo diário e aprenda a organizar suas finanças. <a href="https://instagram.com/simplifipro.ia" target="_blank" rel="noreferrer" className="text-yellow-500 hover:text-yellow-400 font-medium">@simplifipro.ia</a>
+              Acompanhe nosso conteúdo diário e aprenda a organizar suas finanças. <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="text-yellow-500 hover:text-yellow-400 font-medium">@simplificpro.ia</a>
             </p>
           </div>
 
@@ -465,7 +465,7 @@ const HomePage = () => {
                         <span className="text-white text-[10px] font-bold">SP</span>
                       </div>
                     </div>
-                    <span className="text-white font-bold text-sm tracking-tight">simplifipro.ia</span>
+                    <span className="text-white font-bold text-sm tracking-tight">simplificpro.ia</span>
                     <CheckCircle size={14} className="text-blue-500" fill="currentColor" />
                   </div>
                   <a href={post.link} target="_blank" rel="noreferrer" className="text-yellow-500 font-semibold text-sm hover:text-yellow-400">

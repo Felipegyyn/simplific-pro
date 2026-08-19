@@ -57,13 +57,13 @@ const Privacidade = () => {
                 </ul>
             </div>
 
-            {/* SEÇÃO OBRIGATÓRIA PARA OPEN FINANCE (KLAVI) */}
+            {/* SEÇÃO OBRIGATÓRIA PARA OPEN FINANCE */}
             <div className="border-l-4 border-green-500 pl-4 py-2 my-6 bg-green-50/50 rounded-r-lg">
                 <h2 className="text-lg font-bold text-green-900 flex items-center gap-2">
                     <ShieldCheck size={20}/> 4. Open Finance e Proteção de Dados Bancários
                 </h2>
                 <p className="text-green-800 mt-2">
-                    Para oferecer a funcionalidade de conexão bancária automática, utilizamos a infraestrutura de Open Finance da <strong>Klavi</strong>. Garantimos que:
+                    Para oferecer a funcionalidade de conexão bancária automática, utilizamos a infraestrutura de <strong>provedores oficiais de Open Finance</strong>. Garantimos que:
                 </p>
                 <ul className="list-disc pl-5 text-green-800 mt-1">
                     <li><strong>Não armazenamos</strong> em nossos servidores as suas senhas de acesso ao banco (credenciais).</li>
@@ -79,7 +79,7 @@ const Privacidade = () => {
             <h2 className="text-lg font-bold text-gray-900 mt-4">6. Compartilhamento de Dados</h2>
             <p>Não vendemos seus dados pessoais. Compartilhamos informações apenas com:</p>
             <ul className="list-disc pl-5">
-                <li><strong>Klavi (Open Finance):</strong> Apenas os tokens de acesso necessários para a sincronização segura dos seus extratos bancários, sem acesso às suas senhas.</li>
+                <li><strong>Provedores de Open Finance:</strong> Apenas os tokens de acesso necessários para a sincronização segura dos seus extratos bancários, sem acesso às suas senhas.</li>
                 <li><strong>Mercado Pago:</strong> Apenas os dados necessários para processar o pagamento da assinatura.</li>
                 <li><strong>Twilio/OpenAI:</strong> Para processamento das mensagens do Assessor Inteligente (os dados são anonimizados quando possível).</li>
             </ul>
