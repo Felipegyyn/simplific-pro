@@ -29,6 +29,7 @@ const Checkout = () => {
     : "Plano Mensal - Recorrente";
 
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false); // NOVO: Aceite de termos
   const [formData, setFormData] = useState({
     name: '', email: '', cpfCnpj: '', mobilePhone: '', 
     postalCode: '', addressNumber: '',
@@ -51,6 +52,12 @@ const Checkout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!termsAccepted) {
+      alert("Você precisa concordar com os Termos de Uso e Política de Privacidade para prosseguir.");
+      setLoading(false);
+      return;
+    }
 
     if (!formData.name || !formData.email || !formData.cpfCnpj || !formData.cardNumber || !formData.cardCcv) {
       alert("Por favor, preencha todos os campos obrigatórios.");
@@ -270,11 +277,25 @@ const Checkout = () => {
                     </div>
                  </div>
 
+                 {/* Checkbox de Termos (Obrigatório Klavi/LGPD) */}
+                 <div className="mt-6 bg-gray-900 border border-gray-800 p-4 rounded-xl flex items-start gap-3">
+                    <input 
+                      type="checkbox" 
+                      id="terms" 
+                      className="mt-1 w-5 h-5 accent-green-500 bg-gray-800 border-gray-700 rounded cursor-pointer"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                    />
+                    <label htmlFor="terms" className="text-xs text-gray-400 leading-relaxed cursor-pointer select-none">
+                      Li e concordo com os <a href="#/termos" target="_blank" className="text-green-500 hover:underline font-bold">Termos de Uso</a> e a <a href="#/privacidade" target="_blank" className="text-green-500 hover:underline font-bold">Política de Privacidade</a> do Simplific Pro, autorizando o tratamento dos meus dados para a prestação dos serviços.
+                    </label>
+                 </div>
+
                  <button 
                     type="submit" 
-                    disabled={loading}
-                    className={`w-full py-5 rounded-xl font-bold text-black text-lg mt-6 transition-all flex flex-col items-center justify-center shadow-lg hover:shadow-green-900/20 hover:-translate-y-1
-                      ${loading ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-green-500 hover:bg-green-400'}
+                    disabled={loading || !termsAccepted}
+                    className={`w-full py-5 rounded-xl font-bold text-black text-lg mt-4 transition-all flex flex-col items-center justify-center shadow-lg hover:-translate-y-1
+                      ${(loading || !termsAccepted) ? 'bg-gray-700 cursor-not-allowed text-gray-400 shadow-none' : 'bg-green-500 hover:bg-green-400 hover:shadow-green-900/20'}
                     `}
                  >
                     {loading ? (

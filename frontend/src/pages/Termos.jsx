@@ -34,13 +34,16 @@ const Termos = () => {
             <h2 className="text-lg font-bold text-gray-900 mt-4">6. Integrações de Terceiros (Google e WhatsApp)</h2>
             <p>Nossa plataforma integra-se com serviços como Google Calendar e WhatsApp. Ao utilizar essas funcionalidades, você nos autoriza a enviar e receber dados necessários para a prestação do serviço (como criar eventos na sua agenda ou responder mensagens), conforme detalhado em nossa Política de Privacidade.</p>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">7. Limitação de Responsabilidade</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">7. Integração Bancária e Open Finance</h2>
+            <p>Para oferecer funcionalidades de agregação de contas e categorização automática, o Simplific Pro utiliza a API da <strong>Klavi</strong> (e/ou outros provedores de Open Finance regulamentados). Ao conectar sua conta bancária, você autoriza expressamente a leitura dos seus dados transacionais (extrato e saldo) de forma automática. <strong>Suas credenciais bancárias (senhas) não são armazenadas pelo Simplific Pro</strong>, e o consentimento de acesso pode ser revogado por você a qualquer momento.</p>
+
+            <h2 className="text-lg font-bold text-gray-900 mt-4">8. Limitação de Responsabilidade</h2>
             <p>O Simplific Pro fornece ferramentas para auxiliar na organização financeira, mas as decisões econômicas são de inteira responsabilidade do usuário. Não nos responsabilizamos por prejuízos financeiros decorrentes de decisões tomadas com base nas informações da plataforma.</p>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">8. Alterações nos Termos</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">9. Alterações nos Termos</h2>
             <p>Reservamo-nos o direito de modificar estes termos a qualquer momento. Notificaremos sobre alterações significativas através do e-mail cadastrado ou aviso na plataforma.</p>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">9. Foro</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">10. Foro</h2>
             <p>Fica eleito o foro da comarca de Goiânia/GO para dirimir quaisquer dúvidas oriundas deste contrato, com renúncia a qualquer outro.</p>
         </div>
       </div>

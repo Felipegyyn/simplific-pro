@@ -57,17 +57,34 @@ const Privacidade = () => {
                 </ul>
             </div>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">4. Armazenamento e Segurança</h2>
-            <p>Utilizamos criptografia de ponta a ponta e armazenamos seus dados em servidores seguros (nuvem) com protocolos rígidos de segurança. As senhas são armazenadas com hash criptográfico e não são acessíveis por nossa equipe.</p>
+            {/* SEÇÃO OBRIGATÓRIA PARA OPEN FINANCE (KLAVI) */}
+            <div className="border-l-4 border-green-500 pl-4 py-2 my-6 bg-green-50/50 rounded-r-lg">
+                <h2 className="text-lg font-bold text-green-900 flex items-center gap-2">
+                    <ShieldCheck size={20}/> 4. Open Finance e Proteção de Dados Bancários
+                </h2>
+                <p className="text-green-800 mt-2">
+                    Para oferecer a funcionalidade de conexão bancária automática, utilizamos a infraestrutura de Open Finance da <strong>Klavi</strong>. Garantimos que:
+                </p>
+                <ul className="list-disc pl-5 text-green-800 mt-1">
+                    <li><strong>Não armazenamos</strong> em nossos servidores as suas senhas de acesso ao banco (credenciais).</li>
+                    <li>O tráfego de dados transacionais é criptografado de ponta a ponta.</li>
+                    <li>Os dados bancários coletados (saldos e extratos) são utilizados estritamente para apresentar relatórios e gráficos dentro da nossa plataforma (Gestão Financeira Pessoal).</li>
+                    <li>Você pode <strong>revogar o consentimento</strong> de acesso a qualquer momento, interrompendo a sincronização.</li>
+                </ul>
+            </div>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">5. Compartilhamento de Dados</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">5. Armazenamento e Segurança</h2>
+            <p>Utilizamos criptografia de ponta a ponta e armazenamos seus dados em servidores seguros (nuvem) com protocolos rígidos de segurança. As senhas da sua conta no Simplific Pro são armazenadas com hash criptográfico e não são acessíveis por nossa equipe.</p>
+
+            <h2 className="text-lg font-bold text-gray-900 mt-4">6. Compartilhamento de Dados</h2>
             <p>Não vendemos seus dados pessoais. Compartilhamos informações apenas com:</p>
             <ul className="list-disc pl-5">
+                <li><strong>Klavi (Open Finance):</strong> Apenas os tokens de acesso necessários para a sincronização segura dos seus extratos bancários, sem acesso às suas senhas.</li>
                 <li><strong>Mercado Pago:</strong> Apenas os dados necessários para processar o pagamento da assinatura.</li>
                 <li><strong>Twilio/OpenAI:</strong> Para processamento das mensagens do Assessor Inteligente (os dados são anonimizados quando possível).</li>
             </ul>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">6. Seus Direitos (LGPD)</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">7. Seus Direitos (LGPD)</h2>
             <p>Você tem o direito de solicitar, a qualquer momento:</p>
             <ul className="list-disc pl-5">
                 <li>A confirmação da existência de tratamento de dados.</li>
@@ -76,7 +93,7 @@ const Privacidade = () => {
                 <li>A exclusão definitiva dos seus dados de nossos servidores.</li>
             </ul>
 
-            <h2 className="text-lg font-bold text-gray-900 mt-4">7. Contato</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-4">8. Contato</h2>
             <p>Para exercer seus direitos ou tirar dúvidas sobre esta política, entre em contato com nosso Encarregado de Proteção de Dados (DPO) através do e-mail: <a href="mailto:contato@simplificpro.com" className="text-green-600 font-bold hover:underline">contato@simplificpro.com</a></p>
         </div>
       </div>

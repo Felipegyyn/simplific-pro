@@ -8,7 +8,8 @@ import {
   ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
   ArrowRight, Linkedin, Users, Calendar, Video,
   Wallet, FileText, TrendingUp, Brain, Search, Mic,
-  XCircle, Minus // <-- NOVOS ÍCONES IMPORTADOS PARA A COMPARAÇÃO
+  XCircle, Minus,
+  Heart, Send, Bookmark, MoreVertical // <-- ÍCONES PARA O INSTAGRAM
 } from 'lucide-react';
 
 const FaqItem = ({ question, answer }) => {
@@ -44,6 +45,33 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
         </div>
     );
 };
+
+const instagramPosts = [
+  {
+    id: 1,
+    image: '/assets/insta_placeholder1.png', // Substitua pela sua imagem
+    link: 'https://instagram.com/simplifipro.ia',
+    caption: 'SimplificPro Simplificando sua vida financeira com IA. #financas #ia #organizacao',
+  },
+  {
+    id: 2,
+    image: '/assets/insta_placeholder2.png', // Substitua pela sua imagem
+    link: 'https://instagram.com/simplifipro.ia',
+    caption: 'SimplificPro Inteligência artificial a favor do seu bolso. #investimentos #futuro',
+  },
+  {
+    id: 3,
+    image: '/assets/insta_placeholder3.png', // Substitua pela sua imagem
+    link: 'https://instagram.com/simplifipro.ia',
+    caption: 'SimplificPro Controle total, na palma da sua mão. #app #controlefinanceiro',
+  },
+  {
+    id: 4,
+    image: '/assets/insta_placeholder4.png', // Substitua pela sua imagem
+    link: 'https://instagram.com/simplifipro.ia',
+    caption: 'SimplificPro Planeje hoje para viver melhor amanhã. #planejamento #educacaofinanceira',
+  }
+];
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -416,6 +444,64 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* --- SEÇÃO DICAS NO INSTAGRAM --- */}
+      <section className="py-24 bg-[#111827] border-t border-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Dicas no Instagram</h2>
+            <p className="text-gray-400">
+              Acompanhe nosso conteúdo diário e aprenda a organizar suas finanças. <a href="https://instagram.com/simplifipro.ia" target="_blank" rel="noreferrer" className="text-yellow-500 hover:text-yellow-400 font-medium">@simplifipro.ia</a>
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {instagramPosts.map((post) => (
+              <div key={post.id} className="bg-[#1f2937] rounded-xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col group">
+                {/* Header do Insta */}
+                <div className="flex items-center justify-between p-3 border-b border-gray-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-500 to-pink-500 p-[2px]">
+                      <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
+                        <span className="text-white text-[10px] font-bold">SP</span>
+                      </div>
+                    </div>
+                    <span className="text-white font-bold text-sm tracking-tight">simplifipro.ia</span>
+                    <CheckCircle size={14} className="text-blue-500" fill="currentColor" />
+                  </div>
+                  <a href={post.link} target="_blank" rel="noreferrer" className="text-yellow-500 font-semibold text-sm hover:text-yellow-400">
+                    Seguir
+                  </a>
+                </div>
+
+                {/* Imagem do Post */}
+                <a href={post.link} target="_blank" rel="noreferrer" className="relative aspect-square w-full bg-gray-900 block overflow-hidden">
+                  {/* Container da imagem - Imagem placeholder ou real */}
+                  <img src={post.image} alt="Instagram post" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x400/222/666?text=Post+Instagram'; }} />
+                </a>
+
+                {/* Rodapé de Ações */}
+                <div className="p-4 bg-[#1f2937]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-4">
+                      <Heart size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+                      <MessageCircle size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+                      <Send size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+                    </div>
+                    <Bookmark size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+                  </div>
+                  
+                  {/* Legenda */}
+                  <p className="text-sm text-gray-300 line-clamp-2">
+                    <span className="text-white font-bold mr-2">simplifipro.ia</span>
+                    {post.caption}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* --- SEÇÃO DOS FUNDADORES --- */}
       <section className="py-24 bg-black border-t border-gray-900 relative">
         <div className="container mx-auto px-4">
@@ -451,6 +537,13 @@ const HomePage = () => {
                 <div className="group flex flex-col items-center space-y-4">
                     <div className="h-8 transition-all duration-500 hover:scale-105"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
                     <div className="text-center"><span className="block text-white font-bold text-sm">Artificial Intelligence</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span></div>
+                </div>
+                {/* Integração Bancária - Open Finance Klavi */}
+                <div className="group flex flex-col items-center space-y-4">
+                    <div className="h-10 w-10 bg-green-500/10 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105">
+                        <ShieldCheck size={24} className="text-green-500" />
+                    </div>
+                    <div className="text-center"><span className="block text-white font-bold text-sm">Open Finance Integrado</span><span className="text-[10px] text-green-500 uppercase tracking-wider font-bold">Conexão 100% Segura</span></div>
                 </div>
                 {/* Reclame Aqui Dinâmico */}
                 <div className="group flex flex-col items-center justify-center">
