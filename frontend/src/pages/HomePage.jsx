@@ -21,16 +21,16 @@ const fadeInVariant = {
 const FaqItem = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="border-b border-white/5 py-6">
+    <div className="border-b border-gray-800 py-6">
       <button className="flex justify-between items-center w-full text-left focus:outline-none group" onClick={() => setIsOpen(!isOpen)}>
-        <span className="text-sm md:text-base font-medium text-zinc-300 group-hover:text-white transition-colors tracking-wide">{question}</span>
-        {isOpen ? <ChevronUp className="text-zinc-400" /> : <ChevronDown className="text-zinc-600" />}
+        <span className="text-sm md:text-base font-medium text-gray-200 group-hover:text-green-400 transition-colors tracking-wide">{question}</span>
+        {isOpen ? <ChevronUp className="text-green-500" /> : <ChevronDown className="text-gray-600" />}
       </button>
       {isOpen && (
         <motion.p 
           initial={{ opacity: 0, height: 0 }} 
           animate={{ opacity: 1, height: 'auto' }} 
-          className="mt-4 text-sm text-zinc-500 font-light leading-relaxed"
+          className="mt-4 text-sm text-gray-400 font-light leading-relaxed"
         >
           {answer}
         </motion.p>
@@ -45,17 +45,17 @@ const FounderCard = ({ name, role, description, image, linkedin }) => {
             whileHover={{ y: -10 }}
             className="group relative w-full max-w-sm mx-auto"
         >
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-600 to-zinc-400 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition duration-700"></div>
-            <div className="relative z-10 bg-zinc-950/80 backdrop-blur-md border border-white/5 rounded-2xl p-10 h-full flex flex-col items-center text-center transition-colors">
-                <div className="relative w-32 h-32 mb-8 rounded-full overflow-hidden border border-white/10 group-hover:border-zinc-500 transition-all duration-700">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition duration-700"></div>
+            <div className="relative z-10 bg-gray-900/80 backdrop-blur-md border border-gray-800 rounded-2xl p-10 h-full flex flex-col items-center text-center transition-colors">
+                <div className="relative w-32 h-32 mb-8 rounded-full overflow-hidden border border-gray-700 group-hover:border-green-500 transition-all duration-700">
                     <img src={image} alt={name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105" />
                 </div>
                 <h3 className="text-xl font-black text-white uppercase tracking-wider mb-2">{name}</h3>
-                <span className="text-zinc-500 font-light text-[10px] tracking-[0.2em] uppercase mb-6 block">{role}</span>
-                <p className="text-zinc-400 text-sm font-light leading-relaxed">{description}</p>
-                <div className="mt-8 pt-8 border-t border-white/5 w-full flex justify-center">
-                   <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-white/5 rounded-full transition-all">
-                       <Linkedin size={20} className="text-zinc-600 hover:text-white transition-colors" />
+                <span className="text-green-500 font-bold text-[10px] tracking-[0.2em] uppercase mb-6 block">{role}</span>
+                <p className="text-gray-400 text-sm font-light leading-relaxed">{description}</p>
+                <div className="mt-8 pt-8 border-t border-gray-800 w-full flex justify-center">
+                   <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-gray-800 rounded-full transition-all">
+                       <Linkedin size={20} className="text-gray-500 hover:text-white transition-colors" />
                    </a>
                 </div>
             </div>
@@ -152,6 +152,7 @@ const HomePage = () => {
   const featureCategories = [
     {
       title: "Gestão do Dia a Dia",
+      color: "bg-blue-500",
       items: [
         { icon: Wallet, title: "Lançamentos Mágicos", desc: "Mande um áudio ou texto: 'Gastei 50 no iFood no Nubank'. O Simplific categoriza, deduz do limite e atualiza seu saldo na hora." },
         { icon: FileText, title: "Leitura de Comprovantes", desc: "Tirou foto da nota fiscal ou recebeu um comprovante de PIX? Envie a imagem para o WhatsApp e o Simplific anota tudo sozinho." },
@@ -160,6 +161,7 @@ const HomePage = () => {
     },
     {
       title: "Patrimônio e Futuro",
+      color: "bg-green-500",
       items: [
         { icon: Target, title: "Criação de Metas", desc: "Crie objetivos (ex: Viagem Europa) e injete valores diretamente pelo chat para ver seu patrimônio crescer a cada dia." },
         { icon: TrendingUp, title: "Mercado & Investimentos", desc: "Consulte cotações na bolsa (PETR4, MXRF11), veja notícias em tempo real e registre suas compras de ações e FIIs." },
@@ -168,6 +170,7 @@ const HomePage = () => {
     },
     {
       title: "Produtividade Pessoal",
+      color: "bg-purple-500",
       items: [
         { icon: Video, title: "Agendamento Automático", desc: "Peça: 'Marque reunião com o Carlos'. O Simplific cria o evento na agenda, gera o link do Google Meet e envia o convite via WhatsApp." },
         { icon: Calendar, title: "Lembretes Inteligentes", desc: "Agende lembretes rápidos para cancelar assinaturas, pagar boletos ou cobrar pessoas. O Simplific te avisa direto no chat." },
@@ -176,6 +179,7 @@ const HomePage = () => {
     },
     {
       title: "Superpoderes do Simplific",
+      color: "bg-emerald-500",
       items: [
         { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
         { icon: Search, title: "Pesquisa na Internet", desc: "O Simplific sai do WhatsApp para pesquisar voos, hotéis, preços atualizados de produtos e notícias, trazendo os links de compra direto pra você." },
@@ -185,14 +189,14 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-black font-sans text-zinc-300 selection:bg-white/20 selection:text-white overflow-x-hidden">
-      <div className="bg-black/50 backdrop-blur-2xl sticky top-0 z-50 border-b border-white/[0.02]">
+    <div className="min-h-screen bg-gray-950 font-sans text-gray-300 selection:bg-green-500/30 selection:text-white overflow-x-hidden">
+      <div className="bg-gray-950/80 backdrop-blur-2xl sticky top-0 z-50 border-b border-gray-800">
         <Navbar /> 
       </div>
 
       {/* --- HERO SECTION --- */}
-      <header className="relative pt-32 pb-40 md:pt-40 md:pb-56 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-white/[0.03] via-black to-black pointer-events-none" />
+      <header className="relative pt-32 pb-40 md:pt-40 md:pb-56 overflow-hidden bg-gray-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-gray-950 to-gray-950 pointer-events-none" />
         
         <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center relative z-10">
           
@@ -203,18 +207,18 @@ const HomePage = () => {
             variants={fadeInVariant}
             className="space-y-10 relative flex flex-col items-start text-left"
           >
-            <div className="inline-flex items-center gap-3 bg-white/[0.02] border border-white/5 text-zinc-400 px-5 py-2 rounded-full text-[10px] font-light tracking-[0.2em] uppercase">
-               <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse"></span> Disponível para novos assinantes
+            <div className="inline-flex items-center gap-3 bg-green-500/10 border border-green-500/20 text-green-400 px-5 py-2 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase">
+               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter text-white">
               Sua vida financeira, <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 to-zinc-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
                 totalmente autônoma.
               </span>
             </h1>
             
-            <p className="text-lg md:text-xl text-zinc-500 font-light max-w-xl leading-relaxed text-justify md:text-left">
+            <p className="text-lg md:text-xl text-gray-400 font-light max-w-xl leading-relaxed text-justify md:text-left">
               O Simplific Pro é o primeiro <strong>Assessor Financeiro e Pessoal movido a inteligência no seu WhatsApp</strong>. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro e seus investimentos.
             </p>
             
@@ -222,7 +226,7 @@ const HomePage = () => {
               <Button 
                 onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
                 size="lg" 
-                className="bg-white hover:bg-zinc-200 text-black font-bold text-sm tracking-widest uppercase h-16 px-10 rounded-none shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all w-full sm:w-auto"
+                className="bg-green-600 hover:bg-green-500 text-white font-bold text-sm tracking-widest uppercase h-16 px-10 rounded-none shadow-[0_0_30px_rgba(34,197,94,0.2)] transition-all w-full sm:w-auto"
               >
                 Ver Oferta Especial
               </Button>
@@ -230,14 +234,14 @@ const HomePage = () => {
               <Button 
                 onClick={() => navigate('/login')} 
                 variant="outline" 
-                className="h-16 px-10 rounded-none border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white font-medium tracking-wide w-full sm:w-auto transition-all"
+                className="h-16 px-10 rounded-none border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white font-medium tracking-wide w-full sm:w-auto transition-all"
               >
                 Já sou cliente
               </Button>
             </div>
             
-            <p className="text-xs text-zinc-600 font-light tracking-wide flex items-center gap-2 mt-4">
-                <ShieldCheck size={14} className="text-zinc-500" /> Cancelamento fácil a qualquer momento.
+            <p className="text-xs text-gray-500 font-light tracking-wide flex items-center gap-2 mt-4">
+                <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento.
             </p>
           </motion.div>
           
@@ -248,12 +252,12 @@ const HomePage = () => {
              transition={{ duration: 1, delay: 0.2 }}
              className="relative pt-12 flex justify-center items-center md:hidden"
           >
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-white/[0.02] blur-[80px] rounded-full pointer-events-none"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-green-500/10 blur-[80px] rounded-full pointer-events-none"></div>
               
-              <div className="relative border-zinc-900 bg-black border-[8px] rounded-[2.5rem] h-[520px] w-[270px] shadow-2xl overflow-hidden ring-1 ring-white/10">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-zinc-900 rounded-b-xl z-20"></div>
+              <div className="relative border-gray-900 bg-gray-950 border-[8px] rounded-[2.5rem] h-[520px] w-[270px] shadow-2xl overflow-hidden ring-1 ring-white/10">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-gray-900 rounded-b-xl z-20"></div>
                 <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
-                    <video className="w-full h-full object-cover opacity-80 mix-blend-screen" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
+                    <video className="w-full h-full object-cover opacity-90 mix-blend-screen" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
                         <source src="/assets/mobile_demo.mp4" type="video/mp4" />
                     </video>
                 </div>
@@ -267,7 +271,7 @@ const HomePage = () => {
              transition={{ duration: 1.2, ease: "easeOut" }}
              className="hidden md:flex relative justify-center items-center"
           >
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/[0.03] blur-[120px] rounded-full pointer-events-none"></div>
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/5 blur-[120px] rounded-full pointer-events-none"></div>
              
              <div className="relative transform scale-100 lg:scale-105 transition-transform duration-1000 origin-center">
                 <motion.div 
@@ -275,14 +279,14 @@ const HomePage = () => {
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                     className="relative z-10 transform translate-x-[-15%]"
                 >
-                    <div className="relative mx-auto border-zinc-900 bg-black border-[6px] rounded-t-2xl h-[294px] w-[512px] shadow-2xl ring-1 ring-white/5">
+                    <div className="relative mx-auto border-gray-900 bg-black border-[6px] rounded-t-2xl h-[294px] w-[512px] shadow-2xl ring-1 ring-white/5">
                         <div className="rounded-xl overflow-hidden h-full w-full bg-black">
-                            <video className="w-full h-full object-cover opacity-80" autoPlay muted loop playsInline poster="/assets/dashboard_cover.png">
+                            <video className="w-full h-full object-cover opacity-90" autoPlay muted loop playsInline poster="/assets/dashboard_cover.png">
                                 <source src="/assets/demo_video.mp4" type="video/mp4" />
                             </video>
                         </div>
                     </div>
-                    <div className="relative mx-auto bg-zinc-900 rounded-b-2xl h-[16px] w-[597px] shadow-xl border-t border-white/10">
+                    <div className="relative mx-auto bg-gray-900 rounded-b-2xl h-[16px] w-[597px] shadow-xl border-t border-gray-800">
                         <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-lg w-[80px] h-[6px] bg-black"></div>
                     </div>
                 </motion.div>
@@ -292,10 +296,10 @@ const HomePage = () => {
                     transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                     className="absolute bottom-0 right-0 z-20 transform translate-x-[5%] translate-y-[10%]"
                 >
-                    <div className="relative border-zinc-900 bg-black border-[8px] rounded-[2.5rem] h-[380px] w-[190px] shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden ring-1 ring-white/10">
-                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-zinc-900 rounded-b-xl z-20"></div>
+                    <div className="relative border-gray-900 bg-gray-950 border-[8px] rounded-[2.5rem] h-[380px] w-[190px] shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden ring-1 ring-gray-800">
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-gray-900 rounded-b-xl z-20"></div>
                         <div className="rounded-[1.8rem] overflow-hidden h-full w-full bg-black">
-                            <video className="w-full h-full object-cover opacity-80" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
+                            <video className="w-full h-full object-cover opacity-90" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
                                 <source src="/assets/mobile_demo.mp4" type="video/mp4" />
                             </video>
                         </div>
@@ -307,20 +311,20 @@ const HomePage = () => {
       </header>
 
       {/* --- FAIXA DE VALIDACAO --- */}
-      <div className="border-y border-white/[0.02] bg-zinc-950 py-20">
+      <div className="border-y border-gray-800 bg-gray-900 py-20">
         <div className="container mx-auto px-6 text-center">
-            <p className="text-[10px] text-zinc-600 uppercase tracking-[0.3em] font-light mb-16">Porque visionários escolhem o Simplific</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 opacity-80">
-                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">+15 Anos</span><span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-3">Experiência Financeira</span></div>
-                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">24h/7</span><span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-3">Disponibilidade</span></div>
-                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">100%</span><span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-3">Criptografado</span></div>
-                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">4.9/5</span><span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-3">Satisfação C-Level</span></div>
+            <p className="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold mb-16">Porque visionários escolhem o Simplific</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 opacity-90">
+                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">+15 Anos</span><span className="text-[10px] text-green-500 uppercase tracking-widest mt-3 font-bold">Experiência Financeira</span></div>
+                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">24h/7</span><span className="text-[10px] text-green-500 uppercase tracking-widest mt-3 font-bold">Disponibilidade</span></div>
+                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">100%</span><span className="text-[10px] text-green-500 uppercase tracking-widest mt-3 font-bold">Criptografado</span></div>
+                <div className="flex flex-col items-center"><span className="text-4xl font-black text-white tracking-tighter">4.9/5</span><span className="text-[10px] text-green-500 uppercase tracking-widest mt-3 font-bold">Satisfação C-Level</span></div>
             </div>
         </div>
       </div>
 
       {/* --- FUNCIONALIDADES --- */}
-      <section id="beneficios" className="py-32 md:py-48 bg-black relative">
+      <section id="beneficios" className="py-32 md:py-48 bg-gray-950 relative">
         <div className="container mx-auto px-6">
           <motion.div 
              initial="hidden"
@@ -329,8 +333,8 @@ const HomePage = () => {
              variants={fadeInVariant}
              className="text-center mb-32"
           >
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">Tudo o que você precisa. <br className="hidden md:block"/><span className="text-zinc-500 font-light tracking-tight">Direto no WhatsApp.</span></h2>
-            <p className="text-lg md:text-xl text-zinc-500 font-light max-w-2xl mx-auto leading-relaxed">Esqueça a obrigação de abrir aplicativos complexos e categorizar gastos na mão. A nossa tecnologia trabalha para você.</p>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tighter">Tudo o que você precisa. <br className="hidden md:block"/><span className="text-green-500 font-light tracking-tight">Direto no WhatsApp.</span></h2>
+            <p className="text-lg md:text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">Esqueça a obrigação de abrir aplicativos complexos e categorizar gastos na mão. A nossa tecnologia trabalha para você.</p>
           </motion.div>
 
           <div className="space-y-32">
@@ -344,7 +348,7 @@ const HomePage = () => {
                  className="relative"
               >
                 <div className="flex flex-col items-center md:items-start mb-16">
-                  <span className="text-[10px] text-zinc-600 tracking-[0.2em] uppercase font-light mb-4">{`0${index + 1} // Categoria`}</span>
+                  <span className="text-[10px] text-gray-500 tracking-[0.2em] uppercase font-bold mb-4">{`0${index + 1} // Categoria`}</span>
                   <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter">{category.title}</h3>
                 </div>
                 
@@ -354,14 +358,14 @@ const HomePage = () => {
                        key={idx} 
                        whileHover={{ y: -8 }}
                        transition={{ duration: 0.4, ease: "easeOut" }}
-                       className="p-10 bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] transition-colors group relative overflow-hidden"
+                       className="p-10 bg-gray-900 border border-gray-800 hover:border-gray-700 transition-colors group relative overflow-hidden"
                     >
-                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                        <div className="w-12 h-12 border border-white/10 text-zinc-400 flex items-center justify-center mb-10 group-hover:text-white transition-colors rounded-none">
+                        <div className="absolute top-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ backgroundColor: 'var(--tw-colors-green-500)' }} />
+                        <div className="w-12 h-12 border border-gray-700 text-gray-400 flex items-center justify-center mb-10 group-hover:text-green-400 group-hover:border-green-500/50 transition-colors rounded-none bg-gray-950">
                           <item.icon size={20} strokeWidth={1.5} />
                         </div>
                         <h4 className="text-lg font-bold text-white tracking-wide mb-4">{item.title}</h4>
-                        <p className="text-zinc-500 font-light leading-relaxed text-sm">{item.desc}</p>
+                        <p className="text-gray-400 font-light leading-relaxed text-sm">{item.desc}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -374,18 +378,18 @@ const HomePage = () => {
              whileInView="visible"
              viewport={{ once: true }}
              variants={fadeInVariant}
-             className="mt-40 bg-zinc-950 p-12 md:p-20 text-center border border-white/5 relative overflow-hidden"
+             className="mt-40 bg-gray-900 p-12 md:p-20 text-center border border-gray-800 relative overflow-hidden"
           >
-             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/[0.02] blur-[100px] rounded-full pointer-events-none"></div>
-             <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-8">Sua Sala de Comando <br className="hidden md:block"/><span className="text-zinc-600">Premium</span></h3>
-             <p className="text-zinc-400 font-light max-w-2xl mx-auto mb-16 text-lg leading-relaxed">Enquanto o seu WhatsApp faz o trabalho sujo do dia a dia, a nossa Plataforma Web Premium gera gráficos profundos, fluxos de caixa e painéis belíssimos para você analisar seu patrimônio na tela grande.</p>
-             <MessageCircle className="mx-auto text-zinc-700" size={48} strokeWidth={1} />
+             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-green-500/5 blur-[100px] rounded-full pointer-events-none"></div>
+             <h3 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-8">Sua Sala de Comando <br className="hidden md:block"/><span className="text-green-500">Premium</span></h3>
+             <p className="text-gray-400 font-light max-w-2xl mx-auto mb-16 text-lg leading-relaxed">Enquanto o seu WhatsApp faz o trabalho sujo do dia a dia, a nossa Plataforma Web Premium gera gráficos profundos, fluxos de caixa e painéis belíssimos para você analisar seu patrimônio na tela grande.</p>
+             <MessageCircle className="mx-auto text-green-500/50" size={48} strokeWidth={1.5} />
           </motion.div>
         </div>
       </section>
 
       {/* --- NOVA SEÇÃO: COMPARAÇÃO (US VS THEM) --- */}
-      <section className="py-32 bg-zinc-950 border-t border-white/[0.02] relative">
+      <section className="py-32 bg-gray-900 border-t border-gray-800 relative">
         <div className="container mx-auto px-6 max-w-6xl">
             <motion.div 
                initial="hidden"
@@ -394,9 +398,9 @@ const HomePage = () => {
                variants={fadeInVariant}
                className="text-center mb-24"
             >
-                <span className="text-zinc-500 font-light tracking-[0.2em] text-[10px] uppercase mb-6 block">Evolução Natural</span>
+                <span className="text-green-500 font-bold tracking-[0.2em] text-[10px] uppercase mb-6 block">Evolução Natural</span>
                 <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">A armadilha da configuração <br className="hidden md:block"/>infinita acabou.</h2>
-                <p className="text-zinc-400 font-light mt-8 max-w-2xl mx-auto text-lg leading-relaxed">Veja por que o Simplific Pro substitui ferramentas financeiras antigas que exigem trabalho manual e tempo precioso.</p>
+                <p className="text-gray-400 font-light mt-8 max-w-2xl mx-auto text-lg leading-relaxed">Veja por que o Simplific Pro substitui ferramentas financeiras antigas que exigem trabalho manual e tempo precioso.</p>
             </motion.div>
 
             <motion.div 
@@ -406,51 +410,51 @@ const HomePage = () => {
                variants={fadeInVariant}
                className="overflow-x-auto pb-8"
             >
-                <div className="min-w-[800px] grid grid-cols-4 gap-0 items-center border border-white/5 bg-black">
+                <div className="min-w-[800px] grid grid-cols-4 gap-0 items-center border border-gray-800 bg-gray-950">
                     
                     {/* Cabeçalho da Tabela */}
-                    <div className="col-span-1 p-8 border-b border-white/5 border-r"></div>
-                    <div className="text-center p-8 text-zinc-600 font-light uppercase tracking-widest text-[10px] border-b border-white/5 border-r">Planilhas</div>
-                    <div className="text-center p-8 text-zinc-600 font-light uppercase tracking-widest text-[10px] border-b border-white/5 border-r">Apps Tradicionais</div>
-                    <div className="text-center p-8 bg-white/[0.02] border-b border-white/5 text-white font-bold uppercase tracking-widest text-xs relative">
-                        <div className="absolute top-0 left-0 w-full h-0.5 bg-white"></div>
+                    <div className="col-span-1 p-8 border-b border-gray-800 border-r"></div>
+                    <div className="text-center p-8 text-gray-500 font-bold uppercase tracking-widest text-[10px] border-b border-gray-800 border-r">Planilhas</div>
+                    <div className="text-center p-8 text-gray-500 font-bold uppercase tracking-widest text-[10px] border-b border-gray-800 border-r">Apps Tradicionais</div>
+                    <div className="text-center p-8 bg-green-900/10 border-b border-gray-800 text-green-400 font-black uppercase tracking-widest text-xs relative">
+                        <div className="absolute top-0 left-0 w-full h-0.5 bg-green-500"></div>
                         Simplific Pro
                     </div>
 
                     {/* Linha 1 */}
-                    <div className="col-span-1 p-8 text-zinc-400 font-light text-sm border-b border-white/5 border-r">Preenchimento Manual</div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><XCircle className="text-zinc-700" strokeWidth={1.5} /></div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><XCircle className="text-zinc-700" strokeWidth={1.5} /></div>
-                    <div className="flex justify-center p-8 bg-white/[0.02] border-b border-white/5">
-                        <span className="text-zinc-200 text-xs font-bold flex items-center gap-2"><CheckCircle size={16} strokeWidth={1.5}/> Automático via IA</span>
+                    <div className="col-span-1 p-8 text-gray-400 font-medium text-sm border-b border-gray-800 border-r">Preenchimento Manual</div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><XCircle className="text-red-500/60" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><XCircle className="text-red-500/60" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 bg-green-900/10 border-b border-gray-800">
+                        <span className="text-white text-xs font-bold flex items-center gap-2"><CheckCircle size={16} strokeWidth={2} className="text-green-500" /> Automático via IA</span>
                     </div>
 
                     {/* Linha 2 */}
-                    <div className="col-span-1 p-8 text-zinc-400 font-light text-sm border-b border-white/5 border-r">Interface Principal</div>
-                    <div className="text-center p-8 text-zinc-600 text-xs tracking-widest uppercase border-b border-white/5 border-r">Computador</div>
-                    <div className="text-center p-8 text-zinc-600 text-xs tracking-widest uppercase border-b border-white/5 border-r">App Pesado</div>
-                    <div className="text-center p-8 bg-white/[0.02] border-b border-white/5 text-zinc-200 text-xs tracking-widest uppercase font-bold">
+                    <div className="col-span-1 p-8 text-gray-400 font-medium text-sm border-b border-gray-800 border-r">Interface Principal</div>
+                    <div className="text-center p-8 text-gray-500 text-xs tracking-widest uppercase border-b border-gray-800 border-r">Computador</div>
+                    <div className="text-center p-8 text-gray-500 text-xs tracking-widest uppercase border-b border-gray-800 border-r">App Pesado</div>
+                    <div className="text-center p-8 bg-green-900/10 border-b border-gray-800 text-white text-xs tracking-widest uppercase font-bold">
                         WhatsApp + Web
                     </div>
 
                     {/* Linha 3 */}
-                    <div className="col-span-1 p-8 text-zinc-400 font-light text-sm border-b border-white/5 border-r">Lê Notas Fiscais e Áudio</div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><Minus className="text-zinc-800" strokeWidth={1} /></div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><Minus className="text-zinc-800" strokeWidth={1} /></div>
-                    <div className="flex justify-center p-8 bg-white/[0.02] border-b border-white/5"><CheckCircle className="text-white" strokeWidth={1.5} /></div>
+                    <div className="col-span-1 p-8 text-gray-400 font-medium text-sm border-b border-gray-800 border-r">Lê Notas Fiscais e Áudio</div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><Minus className="text-gray-700" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><Minus className="text-gray-700" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 bg-green-900/10 border-b border-gray-800"><CheckCircle className="text-green-500" strokeWidth={2} /></div>
 
                     {/* Linha 4 */}
-                    <div className="col-span-1 p-8 text-zinc-400 font-light text-sm border-b border-white/5 border-r">Agenda e Reuniões Automáticas</div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><Minus className="text-zinc-800" strokeWidth={1} /></div>
-                    <div className="flex justify-center p-8 border-b border-white/5 border-r"><Minus className="text-zinc-800" strokeWidth={1} /></div>
-                    <div className="flex justify-center p-8 bg-white/[0.02] border-b border-white/5"><CheckCircle className="text-white" strokeWidth={1.5} /></div>
+                    <div className="col-span-1 p-8 text-gray-400 font-medium text-sm border-b border-gray-800 border-r">Agenda e Reuniões Automáticas</div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><Minus className="text-gray-700" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 border-b border-gray-800 border-r"><Minus className="text-gray-700" strokeWidth={1.5} /></div>
+                    <div className="flex justify-center p-8 bg-green-900/10 border-b border-gray-800"><CheckCircle className="text-green-500" strokeWidth={2} /></div>
 
                     {/* Linha 5 */}
-                    <div className="col-span-1 p-8 text-zinc-400 font-light text-sm border-r border-white/5">Tempo gasto por dia</div>
-                    <div className="text-center p-8 text-zinc-600 text-xs font-bold tracking-widest uppercase border-r border-white/5">20 Minutos</div>
-                    <div className="text-center p-8 text-zinc-500 text-xs font-bold tracking-widest uppercase border-r border-white/5">10 Minutos</div>
-                    <div className="text-center p-8 bg-white/[0.02]">
-                        <span className="text-white font-black tracking-tighter text-2xl">10 Seg</span>
+                    <div className="col-span-1 p-8 text-gray-400 font-medium text-sm border-r border-gray-800">Tempo gasto por dia</div>
+                    <div className="text-center p-8 text-gray-500 text-xs font-bold tracking-widest uppercase border-r border-gray-800">20 Minutos</div>
+                    <div className="text-center p-8 text-gray-500 text-xs font-bold tracking-widest uppercase border-r border-gray-800">10 Minutos</div>
+                    <div className="text-center p-8 bg-green-900/10">
+                        <span className="text-green-400 font-black tracking-tighter text-2xl">10 Seg</span>
                     </div>
 
                 </div>
@@ -459,7 +463,7 @@ const HomePage = () => {
       </section>
 
       {/* --- OFERTA --- */}
-      <section id="oferta" className="py-32 md:py-48 bg-black">
+      <section id="oferta" className="py-32 md:py-48 bg-gray-950">
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.div 
              initial="hidden"
@@ -468,9 +472,9 @@ const HomePage = () => {
              variants={fadeInVariant}
              className="text-center mb-16"
           >
-            <span className="text-zinc-600 font-light tracking-[0.3em] text-[10px] uppercase mb-6 block">Welcome Offer</span>
+            <span className="text-green-500 font-bold tracking-[0.3em] text-[10px] uppercase mb-6 block">Welcome Offer</span>
             <h2 className="text-5xl md:text-7xl font-black text-white tracking-tighter mb-8">Sua autonomia <br className="hidden md:block"/>começa aqui.</h2>
-            <p className="text-zinc-400 font-light text-lg">Selecione o plano ideal para as suas necessidades financeiras.</p>
+            <p className="text-gray-400 font-light text-lg">Selecione o plano ideal para as suas necessidades financeiras.</p>
           </motion.div>
           
           <motion.div 
@@ -480,12 +484,12 @@ const HomePage = () => {
              variants={fadeInVariant}
              className="flex justify-center mb-16"
           >
-            <div className="bg-zinc-950 border border-white/5 p-1 flex relative rounded-none">
-                <button onClick={() => setBillingCycle('annual')} className={`px-10 py-4 text-[10px] tracking-[0.2em] font-bold uppercase transition-all flex items-center gap-3 ${billingCycle === 'annual' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}>
+            <div className="bg-gray-900 border border-gray-800 p-1 flex relative rounded-none">
+                <button onClick={() => setBillingCycle('annual')} className={`px-10 py-4 text-[10px] tracking-[0.2em] font-bold uppercase transition-all flex items-center gap-3 ${billingCycle === 'annual' ? 'bg-green-600 text-white' : 'text-gray-500 hover:text-white'}`}>
                     Anual
-                    <span className={`text-[9px] px-2 py-1 font-black ${billingCycle === 'annual' ? 'bg-black text-white' : 'bg-zinc-800 text-zinc-300'}`}>-45%</span>
+                    <span className={`text-[9px] px-2 py-1 font-black ${billingCycle === 'annual' ? 'bg-black/20 text-white' : 'bg-gray-800 text-green-500'}`}>-45%</span>
                 </button>
-                <button onClick={() => setBillingCycle('monthly')} className={`px-10 py-4 text-[10px] tracking-[0.2em] font-bold uppercase transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-zinc-500 hover:text-white'}`}>
+                <button onClick={() => setBillingCycle('monthly')} className={`px-10 py-4 text-[10px] tracking-[0.2em] font-bold uppercase transition-all ${billingCycle === 'monthly' ? 'bg-green-600 text-white' : 'text-gray-500 hover:text-white'}`}>
                     Mensal
                 </button>
             </div>
@@ -496,37 +500,37 @@ const HomePage = () => {
              whileInView="visible"
              viewport={{ once: true }}
              variants={fadeInVariant}
-             className="bg-zinc-950 border border-white/5 p-10 md:p-16 relative overflow-hidden transition-all duration-500"
+             className="bg-gray-900 border border-gray-800 p-10 md:p-16 relative overflow-hidden transition-all duration-500"
           >
-            <div className="absolute top-0 left-0 w-full h-1 bg-white"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-emerald-600"></div>
             <div className="flex flex-col md:flex-row justify-between items-center gap-12">
                 <div className="text-left space-y-6 flex-1">
-                    <div className="inline-block border border-white/10 text-zinc-300 text-[10px] tracking-[0.2em] font-bold px-4 py-2 uppercase">
+                    <div className="inline-block border border-green-500/30 text-green-400 bg-green-500/10 text-[10px] tracking-[0.2em] font-bold px-4 py-2 uppercase">
                         {currentPlan.badge}
                     </div>
                     <div>
-                        {currentPlan.oldPrice && <p className="text-zinc-600 text-sm line-through font-light mb-2">{currentPlan.oldPrice}</p>}
+                        {currentPlan.oldPrice && <p className="text-gray-500 text-sm line-through font-light mb-2">{currentPlan.oldPrice}</p>}
                         <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-light text-zinc-500">R$</span>
+                            <span className="text-2xl font-light text-gray-400">R$</span>
                             <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">{currentPlan.priceDisplay}</span>
-                            <span className="text-zinc-600 font-light text-xl tracking-wide">{currentPlan.priceSuffix}</span>
+                            <span className="text-gray-500 font-light text-xl tracking-wide">{currentPlan.priceSuffix}</span>
                         </div>
                     </div>
                     
-                    <p className="text-zinc-400 font-light text-base border-l border-zinc-700 pl-6 py-2 leading-relaxed">
+                    <p className="text-gray-400 font-light text-base border-l-2 border-green-500 pl-6 py-2 leading-relaxed">
                         {currentPlan.subDetail}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-6 text-xs text-zinc-500 pt-4 uppercase tracking-widest">
-                        <span className="flex items-center gap-2"><CheckCircle size={14} className="text-zinc-300" strokeWidth={1.5} /> Acesso Imediato</span>
-                        <span className="flex items-center gap-2"><CheckCircle size={14} className="text-zinc-300" strokeWidth={1.5} /> Compra Segura</span>
+                    <div className="flex flex-col sm:flex-row gap-6 text-xs text-gray-400 pt-4 uppercase tracking-widest font-bold">
+                        <span className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500" strokeWidth={2} /> Acesso Imediato</span>
+                        <span className="flex items-center gap-2"><CheckCircle size={14} className="text-green-500" strokeWidth={2} /> Compra Segura</span>
                     </div>
                 </div>
                 <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center md:items-end">
-                      <Button onClick={handleBuyClick} className="w-full md:w-auto bg-white text-black hover:bg-zinc-200 font-bold text-xs tracking-[0.2em] uppercase py-8 px-12 rounded-none transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                      <Button onClick={handleBuyClick} className="w-full md:w-auto bg-green-600 text-white hover:bg-green-500 font-bold text-xs tracking-[0.2em] uppercase py-8 px-12 rounded-none transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]">
                           {currentPlan.buttonText}
                       </Button>
-                      <p className="text-center text-[10px] tracking-widest text-zinc-600 uppercase mt-6">Pagamento seguro via Asaas</p>
+                      <p className="text-center text-[10px] tracking-widest text-gray-500 uppercase mt-6">Pagamento seguro via Asaas</p>
                 </div>
             </div>
           </motion.div>
@@ -534,7 +538,7 @@ const HomePage = () => {
       </section>
 
       {/* --- SEÇÃO DICAS NO INSTAGRAM --- */}
-      <section className="py-32 bg-zinc-950 border-t border-white/[0.02]">
+      <section className="py-32 bg-gray-950 border-t border-gray-800">
         <div className="container mx-auto px-6">
           <motion.div 
              initial="hidden"
@@ -544,8 +548,8 @@ const HomePage = () => {
              className="text-center mb-20"
           >
             <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-6">Lifestyle Financeiro</h2>
-            <p className="text-zinc-500 font-light text-lg">
-              Insights diários para sua jornada. <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="text-zinc-300 hover:text-white font-medium transition-colors border-b border-zinc-700 hover:border-white pb-1">@simplificpro.ia</a>
+            <p className="text-gray-400 font-light text-lg">
+              Insights diários para sua jornada. <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="text-green-400 hover:text-green-300 font-medium transition-colors border-b border-green-500/30 hover:border-green-400 pb-1">@simplificpro.ia</a>
             </p>
           </motion.div>
 
@@ -558,41 +562,41 @@ const HomePage = () => {
                  transition={{ duration: 0.6, delay: index * 0.1 }}
                  viewport={{ once: true }}
                  whileHover={{ y: -8 }}
-                 className="bg-black border border-white/5 flex flex-col group transition-all duration-500 hover:border-white/20"
+                 className="bg-gray-900 border border-gray-800 flex flex-col group transition-all duration-500 hover:border-green-500/50"
               >
                 {/* Header do Insta */}
-                <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <div className="flex items-center justify-between p-4 border-b border-gray-800">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-zinc-900 border border-white/10 flex items-center justify-center">
-                      <span className="text-zinc-400 text-[10px] font-bold tracking-widest">SP</span>
+                    <div className="w-8 h-8 bg-gray-950 border border-gray-700 flex items-center justify-center">
+                      <span className="text-green-500 text-[10px] font-bold tracking-widest">SP</span>
                     </div>
-                    <span className="text-zinc-300 font-bold text-xs tracking-wide">simplificpro.ia</span>
-                    <CheckCircle size={12} className="text-zinc-500" strokeWidth={2} />
+                    <span className="text-white font-bold text-xs tracking-wide">simplificpro.ia</span>
+                    <CheckCircle size={12} className="text-blue-500" strokeWidth={2} />
                   </div>
-                  <a href={post.link} target="_blank" rel="noreferrer" className="text-white text-[10px] uppercase tracking-widest font-bold hover:text-zinc-400 transition-colors">
+                  <a href={post.link} target="_blank" rel="noreferrer" className="text-green-500 text-[10px] uppercase tracking-widest font-bold hover:text-green-400 transition-colors">
                     Seguir
                   </a>
                 </div>
 
                 {/* Imagem do Post */}
-                <a href={post.link} target="_blank" rel="noreferrer" className="relative aspect-square w-full bg-zinc-950 block overflow-hidden">
-                  <img src={post.image} alt="Instagram post" className="w-full h-full object-cover filter grayscale opacity-70 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x400/111/444?text=Post+Instagram'; }} />
+                <a href={post.link} target="_blank" rel="noreferrer" className="relative aspect-square w-full bg-gray-950 block overflow-hidden">
+                  <img src={post.image} alt="Instagram post" className="w-full h-full object-cover opacity-80 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x400/111/444?text=Post+Instagram'; }} />
                 </a>
 
                 {/* Rodapé de Ações */}
-                <div className="p-6 bg-black">
+                <div className="p-6 bg-gray-900">
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-5">
-                      <Heart size={20} strokeWidth={1.5} className="text-zinc-400 hover:text-white cursor-pointer transition-colors" />
-                      <MessageCircle size={20} strokeWidth={1.5} className="text-zinc-400 hover:text-white cursor-pointer transition-colors" />
-                      <Send size={20} strokeWidth={1.5} className="text-zinc-400 hover:text-white cursor-pointer transition-colors" />
+                      <Heart size={20} strokeWidth={1.5} className="text-gray-400 hover:text-red-500 cursor-pointer transition-colors" />
+                      <MessageCircle size={20} strokeWidth={1.5} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                      <Send size={20} strokeWidth={1.5} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
                     </div>
-                    <Bookmark size={20} strokeWidth={1.5} className="text-zinc-400 hover:text-white cursor-pointer transition-colors" />
+                    <Bookmark size={20} strokeWidth={1.5} className="text-gray-400 hover:text-white cursor-pointer transition-colors" />
                   </div>
                   
                   {/* Legenda */}
-                  <p className="text-xs text-zinc-500 font-light leading-relaxed line-clamp-2">
-                    <span className="text-zinc-300 font-bold mr-2">simplificpro.ia</span>
+                  <p className="text-xs text-gray-400 font-light leading-relaxed line-clamp-2">
+                    <span className="text-white font-bold mr-2">simplificpro.ia</span>
                     {post.caption}
                   </p>
                 </div>
@@ -603,7 +607,7 @@ const HomePage = () => {
       </section>
 
       {/* --- SEÇÃO DOS FUNDADORES --- */}
-      <section className="py-32 bg-black border-t border-white/[0.02] relative">
+      <section className="py-32 bg-gray-950 border-t border-gray-800 relative">
         <div className="container mx-auto px-6">
             <motion.div 
                initial="hidden"
@@ -612,9 +616,9 @@ const HomePage = () => {
                variants={fadeInVariant}
                className="text-center mb-24"
             >
-                <span className="text-zinc-600 font-light tracking-[0.3em] text-[10px] uppercase mb-6 block">Arquitetos</span>
+                <span className="text-green-500 font-bold tracking-[0.3em] text-[10px] uppercase mb-6 block">Arquitetos</span>
                 <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">As mentes por trás <br className="hidden md:block"/>do Simplific</h2>
-                <p className="text-zinc-500 font-light mt-8 max-w-2xl mx-auto text-lg leading-relaxed">Especialistas em finanças e tecnologia dedicados a construir a ferramenta que nós mesmos queríamos usar.</p>
+                <p className="text-gray-400 font-light mt-8 max-w-2xl mx-auto text-lg leading-relaxed">Especialistas em finanças e tecnologia dedicados a construir a ferramenta que nós mesmos queríamos usar.</p>
             </motion.div>
             <div className="grid md:grid-cols-2 gap-16 max-w-5xl mx-auto">
                 <FounderCard name="Felipe Viana" role="Finanças & Estratégia" image="/assets/felipe_viana.jpg" linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" description="Economista especialista em controladoria com mais de 15 anos de mercado. Uniu gestão de patrimônio e tecnologia para democratizar o controle financeiro." />
@@ -624,7 +628,7 @@ const HomePage = () => {
       </section>
 
       {/* --- SEÇÃO: TECH STACK --- */}
-      <section className="py-24 bg-zinc-950 border-t border-white/[0.02]">
+      <section className="py-24 bg-gray-900 border-t border-gray-800">
         <div className="container mx-auto px-6">
             <motion.div 
                initial="hidden"
@@ -633,28 +637,28 @@ const HomePage = () => {
                variants={fadeInVariant}
                className="text-center mb-16"
             >
-                <span className="text-zinc-600 font-light tracking-[0.3em] text-[10px] uppercase mb-4 block">Segurança Nível Global</span>
+                <span className="text-gray-500 font-bold tracking-[0.3em] text-[10px] uppercase mb-4 block">Segurança Nível Global</span>
                 <h3 className="text-2xl font-black text-white tracking-tighter">Powered by Big Tech</h3>
             </motion.div>
-            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60">
+            <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-12 md:gap-24 opacity-80">
                 <div className="group flex flex-col items-center space-y-5">
                     <div className="h-8 transition-all duration-700 filter grayscale group-hover:grayscale-0 group-hover:scale-105"><img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" /></div>
-                    <div className="text-center"><span className="block text-zinc-300 font-bold text-xs uppercase tracking-widest">WhatsApp API</span><span className="text-[9px] text-zinc-600 uppercase tracking-widest font-light mt-1 block">Oficial</span></div>
+                    <div className="text-center"><span className="block text-gray-300 font-bold text-xs uppercase tracking-widest">WhatsApp API</span><span className="text-[9px] text-green-500 uppercase tracking-widest font-bold mt-1 block">Oficial</span></div>
                 </div>
                 <div className="group flex flex-col items-center space-y-5">
                     <div className="h-6 transition-all duration-700 filter grayscale group-hover:grayscale-0 group-hover:scale-105"><img src="/assets/logo_twilio.png" alt="Infraestrutura Twilio" className="h-full object-contain" /></div>
-                    <div className="text-center"><span className="block text-zinc-300 font-bold text-xs uppercase tracking-widest">Global Infra</span><span className="text-[9px] text-zinc-600 uppercase tracking-widest font-light mt-1 block">Latência Zero</span></div>
+                    <div className="text-center"><span className="block text-gray-300 font-bold text-xs uppercase tracking-widest">Global Infra</span><span className="text-[9px] text-green-500 uppercase tracking-widest font-bold mt-1 block">Latência Zero</span></div>
                 </div>
                 <div className="group flex flex-col items-center space-y-5">
                     <div className="h-6 transition-all duration-700 filter grayscale group-hover:grayscale-0 group-hover:scale-105"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
-                    <div className="text-center"><span className="block text-zinc-300 font-bold text-xs uppercase tracking-widest">Artificial Intel</span><span className="text-[9px] text-zinc-600 uppercase tracking-widest font-light mt-1 block">Seguro</span></div>
+                    <div className="text-center"><span className="block text-gray-300 font-bold text-xs uppercase tracking-widest">Artificial Intel</span><span className="text-[9px] text-green-500 uppercase tracking-widest font-bold mt-1 block">Seguro</span></div>
                 </div>
                 {/* Integração Bancária - Open Finance */}
                 <div className="group flex flex-col items-center space-y-5">
                     <div className="h-8 flex items-center justify-center transition-all duration-700 group-hover:scale-105">
-                        <ShieldCheck size={28} strokeWidth={1.5} className="text-zinc-400 group-hover:text-white transition-colors" />
+                        <ShieldCheck size={28} strokeWidth={1.5} className="text-gray-400 group-hover:text-green-500 transition-colors" />
                     </div>
-                    <div className="text-center"><span className="block text-zinc-300 font-bold text-xs uppercase tracking-widest">Open Finance</span><span className="text-[9px] text-zinc-600 uppercase tracking-widest font-light mt-1 block">100% Seguro</span></div>
+                    <div className="text-center"><span className="block text-gray-300 font-bold text-xs uppercase tracking-widest">Open Finance</span><span className="text-[9px] text-green-500 uppercase tracking-widest font-bold mt-1 block">100% Seguro</span></div>
                 </div>
                 {/* Reclame Aqui Dinâmico */}
                 <div className="group flex flex-col items-center justify-center filter grayscale hover:grayscale-0 transition-all duration-700 opacity-80 hover:opacity-100">
@@ -665,7 +669,7 @@ const HomePage = () => {
       </section>
 
       {/* --- FAQ ATUALIZADO --- */}
-      <section className="py-32 bg-black border-t border-white/[0.02]">
+      <section className="py-32 bg-gray-950 border-t border-gray-800">
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.h2 
              initial="hidden"
@@ -681,7 +685,7 @@ const HomePage = () => {
              whileInView="visible"
              viewport={{ once: true }}
              variants={fadeInVariant}
-             className="space-y-2 border-t border-white/5"
+             className="space-y-2 border-t border-gray-800"
           >
             <FaqItem 
                 question="O plano mensal tem fidelidade?" 
@@ -695,7 +699,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <div className="bg-zinc-950 border-t border-white/[0.02] pt-12">
+      <div className="bg-gray-900 border-t border-gray-800 pt-12">
         <Footer />
       </div>
     </div>
