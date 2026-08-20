@@ -1,715 +1,1160 @@
 import React, { useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+
 import Navbar from '@/components/Navbar';
+
+import Footer from '@/components/Footer';
+
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { 
-  CheckCircle, MessageCircle, BarChart3, CreditCard, Target, 
-  ChevronDown, ChevronUp, ShieldCheck, Smartphone, 
+
+import {
+
+  CheckCircle, MessageCircle, BarChart3, CreditCard, Target,
+
+  ChevronDown, ChevronUp, ShieldCheck, Smartphone,
+
   ArrowRight, Linkedin, Users, Calendar, Video,
+
   Wallet, FileText, TrendingUp, Brain, Search, Mic,
-  Minus, Heart, Send, Bookmark, Image as ImageIcon, ArrowUpCircle,
-  MessageSquare
+
+  XCircle, Minus,
+
+  Heart, Send, Bookmark, MoreVertical // <-- ÍCONES PARA O INSTAGRAM
+
 } from 'lucide-react';
 
-const fadeInVariant = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
-};
+
 
 const FaqItem = ({ question, answer }) => {
+
   const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="border-b border-[#1a1a1a] py-6">
+
+    <div className="border-b border-gray-900 py-5">
+
       <button className="flex justify-between items-center w-full text-left focus:outline-none group" onClick={() => setIsOpen(!isOpen)}>
-        <span className="text-base md:text-lg font-medium text-white group-hover:text-white transition-colors">{question}</span>
-        {isOpen ? <ChevronUp size={20} className="text-[#a3a3a3]" /> : <ChevronDown size={20} className="text-[#a3a3a3]" />}
+
+        <span className="text-lg font-bold text-gray-100 group-hover:text-green-400 transition-colors uppercase tracking-tight">{question}</span>
+
+        {isOpen ? <ChevronUp className="text-green-500" /> : <ChevronDown className="text-gray-600" />}
+
       </button>
-      {isOpen && (
-        <motion.p 
-          initial={{ opacity: 0, height: 0 }} 
-          animate={{ opacity: 1, height: 'auto' }} 
-          className="mt-4 text-[15px] text-[#a3a3a3] font-light leading-relaxed max-w-3xl"
-        >
-          {answer}
-        </motion.p>
-      )}
+
+      {isOpen && <p className="mt-3 text-gray-400 leading-relaxed font-medium">{answer}</p>}
+
     </div>
+
   );
+
 };
+
+
 
 const FounderCard = ({ name, role, description, image, linkedin }) => {
-    return (
-        <motion.div 
-            whileHover={{ y: -6 }}
-            className="group relative w-full bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl p-8 md:p-10 flex flex-col items-center text-center transition-all hover:border-[#222]"
-        >
-            <div className="relative w-40 h-40 mb-8 rounded-full overflow-hidden border border-[#1a1a1a]">
-                <img src={image} alt={name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-105" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
-            <span className="text-[#4ade80] text-[11px] tracking-[0.2em] uppercase mb-6 font-medium">{role}</span>
-            <p className="text-[#a3a3a3] text-[15px] font-light leading-relaxed mb-8">{description}</p>
-            <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-3 bg-[#111] border border-[#1a1a1a] rounded-full hover:bg-[#1a1a1a] transition-all">
-                <Linkedin size={18} className="text-white" />
-            </a>
-        </motion.div>
-    );
+
+  return (
+
+    <div className="group relative w-full max-w-sm mx-auto">
+
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
+
+      <div className="relative z-10 bg-black border border-gray-800 rounded-2xl p-6 h-full flex flex-col items-center text-center hover:bg-gray-900/50 transition-colors">
+
+        <div className="relative w-32 h-32 mb-6 rounded-full overflow-hidden border-4 border-gray-800 group-hover:border-green-500 transition-all duration-500">
+
+          <img src={image} alt={name} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-110" />
+
+        </div>
+
+        <h3 className="text-2xl font-black text-white uppercase mb-1">{name}</h3>
+
+        <span className="text-green-500 font-bold text-sm tracking-widest uppercase mb-4 block">{role}</span>
+
+        <p className="text-gray-400 text-sm leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{description}</p>
+
+        <div className="mt-6 pt-6 border-t border-gray-800 w-full flex justify-center">
+
+          <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-3 hover:bg-gray-800 rounded-full transition-all group-hover:scale-110">
+
+            <Linkedin size={24} className="text-gray-400 hover:text-white cursor-pointer" />
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  );
+
 };
 
+
+
 const instagramPosts = [
+
   {
+
     id: 1,
-    image: '/assets/insta_placeholder1.png', 
+
+    image: '/assets/insta_placeholder1.png', // Substitua pela sua imagem
+
     link: 'https://www.instagram.com/reel/DbmQlVxO1np/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+
     caption: 'Simplificando sua vida financeira com IA. #financas #ia #organizacao',
+
   },
+
   {
+
     id: 2,
-    image: '/assets/insta_placeholder2.png', 
+
+    image: '/assets/insta_placeholder2.png', // Substitua pela sua imagem
+
     link: 'https://www.instagram.com/reel/DUReZ1RDUjT/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+
     caption: 'Inteligência artificial a favor do seu bolso. #investimentos #futuro',
+
   },
+
   {
+
     id: 3,
-    image: '/assets/insta_placeholder3.png', 
+
+    image: '/assets/insta_placeholder3.png', // Substitua pela sua imagem
+
     link: 'https://www.instagram.com/p/DSbExK6jdBO/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==',
+
     caption: 'Controle total, na palma da sua mão. #app #controlefinanceiro',
+
   },
+
   {
+
     id: 4,
-    image: '/assets/insta_placeholder4.png', 
+
+    image: '/assets/insta_placeholder4.png', // Substitua pela sua imagem
+
     link: 'https://www.instagram.com/p/DSXyoOdDvlc/?utm_source=ig_web_copy_link&igsi=NTc4MTIwNjQ2YQ==',
+
     caption: 'Planeje hoje para viver melhor amanhã. #planejamento #educacaofinanceira',
+
   }
+
 ];
 
+
+
 const HomePage = () => {
+
   const navigate = useNavigate();
+
   const [billingCycle, setBillingCycle] = useState('annual');
 
+
+
   useEffect(() => {
+
     const script = document.createElement("script");
+
     script.src = "https://s3.amazonaws.com/raichu-beta/ra-verified/bundle.js";
+
     script.async = true;
+
     script.id = "ra-embed-verified-seal";
+
     script.setAttribute("data-id", "UWJISTEzOXlvV09HWFhuOTo0MS04NTEtMDI5LWZlbGlwZS12aWFuYS1kZS1vbGl2ZWlyYQ==");
+
     script.setAttribute("data-target", "ra-verified-seal");
+
     script.setAttribute("data-model", "compact_3");
-    
+
+
+
     document.body.appendChild(script);
 
+
+
     return () => {
-        const existingScript = document.getElementById("ra-embed-verified-seal");
-        if (existingScript) {
-            document.body.removeChild(existingScript);
-        }
+
+      const existingScript = document.getElementById("ra-embed-verified-seal");
+
+      if (existingScript) {
+
+        document.body.removeChild(existingScript);
+
+      }
+
     };
+
   }, []);
 
+
+
   const handleBuyClick = () => {
+
     if (window.fbq) {
+
       window.fbq('track', 'InitiateCheckout', {
+
         content_name: billingCycle === 'monthly' ? 'Plano Mensal' : 'Plano Anual',
+
         value: billingCycle === 'monthly' ? 29.90 : 199.00,
+
         currency: 'BRL'
+
       });
+
     }
+
     if (billingCycle === 'monthly') {
-        navigate('/checkout');
+
+      navigate('/checkout');
+
     } else {
-        navigate('/checkout?plan=annual');      
+
+      navigate('/checkout?plan=annual');
+
     }
+
   };
 
+
+
   const pricing = {
+
     annual: {
-        oldPrice: "R$ 358,80",
-        priceDisplay: "16,58",
-        priceSuffix: "/mês",
-        subDetail: "No plano anual. Ou R$ 199,00 à vista",
-        buttonText: "Garantir oferta anual",
-        badge: "Melhor escolha"
-      },
+
+      oldPrice: "R$ 358,80",
+
+      priceDisplay: "16,58",
+
+      priceSuffix: "/mês",
+
+      subDetail: "No plano anual. Ou R$ 199,00 à vista",
+
+      buttonText: "GARANTIR OFERTA ANUAL",
+
+      badge: "💎 MELHOR ESCOLHA: 45% OFF"
+
+    },
+
     monthly: {
+
       oldPrice: null,
-      priceDisplay: "29,90",        
-      priceSuffix: "/mês",  
+
+      priceDisplay: "29,90",
+
+      priceSuffix: "/mês",
+
       subDetail: "Sem fidelidade. Cancele quando quiser.",
-      buttonText: "Assinar mensal",
-      badge: "Flexibilidade"
+
+      buttonText: "ASSINAR MENSAL",
+
+      badge: "FLEXIBILIDADE TOTAL"
+
     }
+
   };
+
+
 
   const currentPlan = pricing[billingCycle];
 
+
+
   const featureCategories = [
+
     {
+
       title: "Gestão do Dia a Dia",
-      image: "/assets/insta_placeholder1.png",
+
+      color: "bg-blue-500",
+
       items: [
+
         { icon: Wallet, title: "Lançamentos Mágicos", desc: "Mande um áudio ou texto: 'Gastei 50 no iFood no Nubank'. O Simplific categoriza, deduz do limite e atualiza seu saldo na hora." },
+
         { icon: FileText, title: "Leitura de Comprovantes", desc: "Tirou foto da nota fiscal ou recebeu um comprovante de PIX? Envie a imagem para o WhatsApp e o Simplific anota tudo sozinho." },
+
         { icon: CreditCard, title: "Gestão de Cartões", desc: "Acompanhe limites disponíveis, pague faturas abertas e controle parcelamentos sem precisar abrir o aplicativo do banco." }
+
       ]
+
     },
+
     {
+
       title: "Patrimônio e Futuro",
-      image: "/assets/insta_placeholder2.png",
+
+      color: "bg-green-500",
+
       items: [
+
         { icon: Target, title: "Criação de Metas", desc: "Crie objetivos (ex: Viagem Europa) e injete valores diretamente pelo chat para ver seu patrimônio crescer a cada dia." },
+
         { icon: TrendingUp, title: "Mercado & Investimentos", desc: "Consulte cotações na bolsa (PETR4, MXRF11), veja notícias em tempo real e registre suas compras de ações e FIIs." },
+
         { icon: BarChart3, title: "Simulador Financeiro", desc: "Pergunte ao Simplific: 'Se eu financiar 50 mil em 48x a 1.5% ao mês, quanto pago?'. Ele faz cálculos matemáticos complexos para você." }
+
       ]
+
     },
+
     {
+
       title: "Produtividade Pessoal",
-      image: "/assets/insta_placeholder3.png",
+
+      color: "bg-purple-500",
+
       items: [
+
         { icon: Video, title: "Agendamento Automático", desc: "Peça: 'Marque reunião com o Carlos'. O Simplific cria o evento na agenda, gera o link do Google Meet e envia o convite via WhatsApp." },
+
         { icon: Calendar, title: "Lembretes Inteligentes", desc: "Agende lembretes rápidos para cancelar assinaturas, pagar boletos ou cobrar pessoas. O Simplific te avisa direto no chat." },
+
         { icon: Users, title: "Conta Casal/Sócios", desc: "Adicione um segundo número de celular na sua conta. O Simplific sabe com quem está falando e mantém as finanças unificadas." }
+
       ]
+
     },
+
     {
+
       title: "Superpoderes do Simplific",
-      image: "/assets/insta_placeholder4.png",
+
+      color: "bg-orange-500",
+
       items: [
+
         { icon: Mic, title: "Transcrição e Áudio", desc: "Esqueça botões e planilhas. Envie áudios enormes do trânsito. O Simplific transcreve, separa as tarefas e executa múltiplas ordens de uma vez." },
+
         { icon: Search, title: "Pesquisa na Internet", desc: "O Simplific sai do WhatsApp para pesquisar voos, hotéis, preços atualizados de produtos e notícias, trazendo os links de compra direto pra você." },
+
         { icon: Brain, title: "Memória Permanente", desc: "Conte fatos da sua vida. O Simplific guarda em sua memória de longo prazo o nome da sua esposa, filhos e bens, personalizando seu atendimento." }
+
       ]
+
     }
+
   ];
 
+
+
   return (
-    <div className="min-h-screen bg-[#050505] font-sans text-white selection:bg-[#4ade80]/30 selection:text-white overflow-x-hidden">
-      
-      {/* NAVBAR PILL FLUTUANTE */}
-      <div className="fixed top-4 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-        <div className="w-full max-w-5xl bg-[#0a0a0a]/80 backdrop-blur-md border border-[#1a1a1a] rounded-full overflow-hidden pointer-events-auto shadow-2xl">
-           <Navbar />
-        </div>
+
+    <div className="min-h-screen bg-black font-sans text-gray-100 selection:bg-green-500 selection:text-black overflow-x-hidden">
+
+      <div className="bg-black/90 backdrop-blur-xl sticky top-0 z-50 border-b border-green-900/30">
+
+        <Navbar />
+
       </div>
+
+
 
       {/* --- HERO SECTION --- */}
-      <header className="relative pt-40 pb-48 md:pt-56 md:pb-64 overflow-hidden bg-[#050505]">
-        <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center">
-          
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeInVariant}
-            className="flex flex-col items-center w-full max-w-4xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 bg-[#0d0d0d] border border-[#1a1a1a] text-[#a3a3a3] px-4 py-1.5 rounded-full text-[10px] font-medium tracking-[0.2em] uppercase mb-8">
-               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> Disponível para novos assinantes
+
+      <header className="relative pt-28 pb-32 md:pt-24 md:pb-40 overflow-hidden">
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-green-900/10 via-black to-black pointer-events-none" />
+
+
+
+        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
+
+
+
+          {/* BLOCO DE TEXTO */}
+
+          <div className="space-y-8 relative flex flex-col items-start text-left">
+
+
+
+            <div className="inline-flex items-center gap-2 bg-gray-900 border border-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase">
+
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Disponível para novos assinantes
+
             </div>
-            
-            <h1 className="text-5xl md:text-[80px] font-black leading-[1.05] tracking-tighter text-white mb-8">
-              Sua vida financeira,<br className="hidden md:block" /> totalmente autônoma.
+
+
+
+            <h1 className="text-4xl md:text-7xl font-bold leading-tight tracking-tight text-white">
+
+              Sua vida financeira, <br />
+
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
+
+                totalmente autônoma.
+
+              </span>
+
             </h1>
-            
-            <p className="text-lg md:text-[20px] text-[#a3a3a3] font-light max-w-2xl leading-relaxed mb-10">
-              O Simplific Pro é o primeiro Assessor Financeiro e Pessoal movido a inteligência no seu WhatsApp. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro e seus investimentos.
+
+
+
+            <p className="text-lg md:text-xl text-gray-400 max-w-xl leading-relaxed text-justify md:text-left">
+
+              O Simplific Pro é o primeiro <strong>Assessor Financeiro e Pessoal movido a inteligência no seu WhatsApp</strong>. Mande áudios, fotos ou textos e deixe a tecnologia organizar seu dinheiro, sua agenda e seus investimentos sem você precisar abrir planilhas.
+
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto mb-10">
-              <Button 
-                onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
-                className="bg-white hover:bg-gray-200 text-black font-medium text-base h-14 px-8 rounded-full transition-all w-full sm:w-auto"
+
+
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 w-full md:w-auto">
+
+              <Button
+
+                onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })}
+
+                size="lg"
+
+                className="bg-green-600 hover:bg-green-500 text-white font-bold text-lg h-16 px-10 rounded-lg shadow-lg shadow-green-900/20 transition-all w-full sm:w-auto"
+
               >
-                Começar agora
+
+                Ver Oferta Especial <ArrowRight className="ml-2" />
+
               </Button>
+
+
+
+              <Button
+
+                onClick={() => navigate('/login')}
+
+                variant="outline"
+
+                className="h-16 px-8 rounded-lg border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white font-medium w-full sm:w-auto"
+
+              >
+
+                Já sou cliente
+
+              </Button>
+
             </div>
-            
-            <div className="flex items-center gap-4 text-[11px] text-[#a3a3a3] uppercase tracking-widest font-medium">
-                <span>Segurança Open Finance</span>
-                <span className="w-1 h-1 rounded-full bg-[#333]"></span>
-                <span>Chat Oficial WhatsApp</span>
-                <span className="w-1 h-1 rounded-full bg-[#333]"></span>
-                <span>Cancele quando quiser</span>
+
+
+
+            <p className="text-xs text-gray-500 flex items-center gap-2 mt-4">
+
+              <ShieldCheck size={14} className="text-green-500" /> Cancelamento fácil a qualquer momento.
+
+            </p>
+
+          </div>
+
+
+
+          {/* --- VISUAL 1: APENAS CELULAR (Exclusivo MOBILE) --- */}
+
+          <div className="relative pt-8 flex justify-center items-center md:hidden">
+
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-green-500/20 blur-[80px] rounded-full pointer-events-none"></div>
+
+
+
+            <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[520px] w-[270px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50 transform hover:scale-[1.02] transition-transform">
+
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[70px] bg-black rounded-b-xl z-20"></div>
+
+              <div className="rounded-[2rem] overflow-hidden h-full w-full bg-black">
+
+                <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
+
+                  <source src="/assets/mobile_demo.mp4" type="video/mp4" />
+
+                </video>
+
+              </div>
+
             </div>
-          </motion.div>
-          
-          {/* VISUAL MOCKUP HERO */}
-          <motion.div 
-             initial={{ opacity: 0, y: 50 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 1, delay: 0.2 }}
-             className="relative mt-24 flex justify-center w-full max-w-4xl"
-          >
-              <div className="relative border-[#1a1a1a] bg-[#0d0d0d] border-[8px] rounded-[2.5rem] h-[600px] w-[300px] md:h-[680px] md:w-[340px] shadow-2xl overflow-hidden ring-1 ring-white/5 z-10">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[24px] w-[90px] bg-[#1a1a1a] rounded-b-xl z-20"></div>
-                <div className="rounded-[2rem] overflow-hidden h-full w-full bg-[#050505] relative">
-                    {/* Chat simulation UI inside mockup */}
-                    <div className="pt-16 px-6 flex flex-col items-center">
-                        <div className="w-16 h-16 bg-[#111] rounded-full flex items-center justify-center mb-4 border border-[#222]">
-                            <MessageSquare size={24} className="text-white" />
-                        </div>
-                        <p className="text-white font-medium text-lg">Olá,</p>
-                        <p className="text-[#a3a3a3] text-sm">Como eu posso te ajudar hoje?</p>
-                    </div>
-                    
-                    {/* Input pattern */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%]">
-                      <div className="flex gap-2 mb-3 overflow-x-auto no-scrollbar">
-                        <div className="bg-[#1a1a1a] rounded-full px-3 py-1.5 text-[10px] text-white flex items-center gap-1.5 whitespace-nowrap"><CreditCard size={12}/> Gastos com cartão</div>
-                        <div className="bg-[#1a1a1a] rounded-full px-3 py-1.5 text-[10px] text-white flex items-center gap-1.5 whitespace-nowrap"><Users size={12}/> Contas conectadas</div>
-                      </div>
-                      <div className="bg-[#111] border border-[#222] rounded-full flex items-center p-1 pl-4 w-full h-12">
-                         <input type="text" placeholder="Converse com o Simplific" className="bg-transparent border-none outline-none text-xs text-white w-full placeholder-[#666]" readOnly />
-                         <div className="flex gap-2 items-center pr-1 flex-shrink-0">
-                           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center"><ArrowUpCircle size={18} className="text-black" /></div>
-                         </div>
-                      </div>
-                    </div>
+
+          </div>
+
+
+
+          {/* --- VISUAL 2: ECOSSISTEMA COMPLETO (Exclusivo DESKTOP) --- */}
+
+          <div className="hidden md:flex relative justify-center items-center">
+
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+
+
+            <div className="relative transform scale-100 lg:scale-108 transition-transform duration-700 origin-center">
+
+              <div className="relative z-10 transform translate-x-[-15%]">
+
+                <div className="relative mx-auto border-gray-800 bg-gray-900 border-[8px] rounded-t-xl h-[294px] w-[512px] shadow-2xl">
+
+                  <div className="rounded-lg overflow-hidden h-full w-full bg-black">
+
+                    <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/dashboard_cover.png">
+
+                      <source src="/assets/demo_video.mp4" type="video/mp4" />
+
+                    </video>
+
+                  </div>
+
                 </div>
-             </div>
 
-             {/* FLOATING ELEMENTS - DESKTOP ONLY */}
-             <div className="hidden lg:block">
-                 {/* Left Floating Card: Transactions */}
-                 <motion.div
-                   animate={{ y: [0, -15, 0] }}
-                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                   className="absolute -left-10 top-32 bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl p-5 w-[300px] shadow-2xl z-20"
-                 >
-                   <div className="flex items-center gap-4 mb-5">
-                     <div className="w-10 h-10 rounded-full bg-[#EA1D2C] flex items-center justify-center text-white font-black text-sm">iF</div>
-                     <div>
-                       <p className="text-white text-sm font-medium">Delivery de comida</p>
-                       <p className="text-[#a3a3a3] text-[11px]">Alimentação • 28 de Jun</p>
-                     </div>
-                     <div className="ml-auto text-white font-bold text-sm">R$ 42,00</div>
-                   </div>
-                   <div className="flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-full bg-[#FF5A5F] flex items-center justify-center text-white font-black text-sm">ab</div>
-                     <div>
-                       <p className="text-white text-sm font-medium">Hospedagem</p>
-                       <p className="text-[#a3a3a3] text-[11px]">Viagens • 24 de Jun</p>
-                     </div>
-                     <div className="ml-auto text-white font-bold text-sm">R$ 120,00</div>
-                   </div>
-                 </motion.div>
+                <div className="relative mx-auto bg-gray-800 rounded-b-xl rounded-t-sm h-[21px] w-[597px] shadow-xl">
 
-                 {/* Right Floating Card: Chart */}
-                 <motion.div
-                   animate={{ y: [0, 15, 0] }}
-                   transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                   className="absolute -right-4 bottom-32 bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl p-6 w-[260px] shadow-2xl z-20"
-                 >
-                   <p className="text-white text-sm font-medium mb-4">Gastos essa semana</p>
-                   <div className="flex items-end justify-between gap-2 h-24 mb-3">
-                     <div className="w-full bg-[#4ade80] rounded-sm h-[40%]"></div>
-                     <div className="w-full bg-[#1a1a1a] rounded-sm h-[70%]"></div>
-                     <div className="w-full bg-[#1a1a1a] rounded-sm h-[30%]"></div>
-                     <div className="w-full bg-[#4ade80] rounded-sm h-[90%]"></div>
-                     <div className="w-full bg-[#1a1a1a] rounded-sm h-[50%]"></div>
-                     <div className="w-full bg-[#1a1a1a] rounded-sm h-[80%]"></div>
-                   </div>
-                   <div className="flex justify-between text-[#666] text-[10px] uppercase font-bold tracking-wider px-1">
-                     <span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
-                   </div>
-                 </motion.div>
-                 
-                 {/* Floating Avatars */}
-                 <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute right-12 top-20 flex items-center gap-2 bg-[#0d0d0d] border border-[#1a1a1a] rounded-full p-1.5 pr-4 shadow-xl z-0">
-                     <img src="/assets/felipe_viana.jpg" alt="Felipe" className="w-8 h-8 rounded-full" />
-                     <span className="text-white text-xs font-medium">Felipe</span>
-                 </motion.div>
-                 <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }} className="absolute left-12 bottom-48 flex items-center gap-2 bg-[#0d0d0d] border border-[#1a1a1a] rounded-full p-1.5 pr-4 shadow-xl z-0">
-                     <img src="/assets/michel_borges.jpg" alt="Michel" className="w-8 h-8 rounded-full" />
-                     <span className="text-white text-xs font-medium">Michel</span>
-                 </motion.div>
-             </div>
-          </motion.div>
+                  <div className="absolute left-1/2 top-0 -translate-x-1/2 rounded-b-xl w-[96px] h-[8px] bg-gray-700"></div>
+
+                </div>
+
+              </div>
+
+
+
+              <div className="absolute bottom-0 right-0 z-20 transform translate-x-[5%] translate-y-[5%]">
+
+                <div className="relative border-gray-900 bg-gray-900 border-[10px] rounded-[2.5rem] h-[380px] w-[190px] shadow-2xl overflow-hidden ring-1 ring-gray-700/50">
+
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 h-[20px] w-[60px] bg-black rounded-b-xl z-20"></div>
+
+                  <div className="rounded-[1.8rem] overflow-hidden h-full w-full bg-black">
+
+                    <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster="/assets/mobile_cover.png">
+
+                      <source src="/assets/mobile_demo.mp4" type="video/mp4" />
+
+                    </video>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+
         </div>
+
       </header>
 
-      {/* --- FAIXA DE VALIDAÇÃO (STATS) --- */}
-      <div className="border-y border-[#1a1a1a] bg-[#050505] py-12">
-        <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-[#1a1a1a]">
-                <div className="flex flex-col items-center pt-4 md:pt-0">
-                    <span className="text-4xl font-black text-white tracking-tighter mb-2">15+ Anos</span>
-                    <span className="text-[10px] text-[#a3a3a3] uppercase tracking-[0.2em]">Experiência Financeira</span>
-                </div>
-                <div className="flex flex-col items-center pt-8 md:pt-0">
-                    <span className="text-4xl font-black text-white tracking-tighter mb-2">24h/7</span>
-                    <span className="text-[10px] text-[#a3a3a3] uppercase tracking-[0.2em]">Disponibilidade</span>
-                </div>
-                <div className="flex flex-col items-center pt-8 md:pt-0">
-                    <span className="text-4xl font-black text-white tracking-tighter mb-2">100% Seguro</span>
-                    <span className="text-[10px] text-[#a3a3a3] uppercase tracking-[0.2em]">Criptografia e Open Finance</span>
-                </div>
-            </div>
+
+
+      {/* --- FAIXA DE VALIDACAO --- */}
+
+      <div className="border-y border-gray-900 bg-gray-950/50 py-12">
+
+        <div className="container mx-auto px-4 text-center">
+
+          <p className="text-sm text-gray-500 uppercase tracking-widest font-bold mb-8">Porque empreendedores e casais escolhem o Simplific</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+
+            <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">+15 Anos</span><span className="text-xs text-gray-500">De experiência dos fundadores</span></div>
+
+            <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">24h/7</span><span className="text-xs text-gray-500">Disponibilidade do Simplific</span></div>
+
+            <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">100%</span><span className="text-xs text-gray-500">Seguro e Criptografado</span></div>
+
+            <div className="flex flex-col items-center"><span className="text-3xl font-black text-white">4.9/5</span><span className="text-xs text-gray-500">Satisfação dos usuários</span></div>
+
+          </div>
+
         </div>
+
       </div>
 
-      {/* --- FUNCIONALIDADES (LAYOUT PIERRE ZIG-ZAG) --- */}
-      <section id="beneficios" className="py-32 md:py-48 bg-[#050505]">
-        <div className="container mx-auto px-6 max-w-6xl space-y-40">
-          
-          {featureCategories.map((category, index) => {
-            const isReverse = index % 2 !== 0;
-            return (
-              <motion.div 
-                 key={index} 
-                 initial="hidden"
-                 whileInView="visible"
-                 viewport={{ once: true, margin: "-100px" }}
-                 variants={fadeInVariant}
-                 className={`flex flex-col ${isReverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-16 lg:gap-24`}
-              >
-                {/* Imagem / Artwork */}
-                <div className="w-full lg:w-1/2">
-                    <div className="aspect-[4/3] md:aspect-square w-full rounded-[2rem] bg-[#0d0d0d] border border-[#1a1a1a] overflow-hidden relative shadow-2xl">
-                        <img src={category.image} alt={category.title} className="w-full h-full object-cover opacity-70" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/800x800/0d0d0d/1a1a1a?text=Ilustração'; }} />
-                    </div>
+
+
+      {/* --- FUNCIONALIDADES --- */}
+
+      <section id="beneficios" className="py-32 bg-black relative">
+
+        <div className="container mx-auto px-4">
+
+          <div className="text-center mb-20">
+
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Tudo o que você precisa. <span className="text-green-500">Direto no WhatsApp.</span></h2>
+
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">Esqueça a obrigação de abrir aplicativos e categorizar gastos na mão. A nossa tecnologia trabalha para você, não o contrário.</p>
+
+          </div>
+
+
+
+          <div className="space-y-16">
+
+            {featureCategories.map((category, index) => (
+
+              <div key={index} className="relative">
+
+                <div className="flex items-center gap-4 mb-8">
+
+                  <div className={`h-10 w-2 rounded-full ${category.color}`}></div>
+
+                  <h3 className="text-2xl md:text-3xl font-bold text-white">{category.title}</h3>
+
                 </div>
 
-                {/* Texto */}
-                <div className="w-full lg:w-1/2 flex flex-col items-start text-left">
-                  <span className="text-[11px] text-[#a3a3a3] tracking-[0.2em] uppercase mb-4">{`0${index + 1} // ${category.title}`}</span>
-                  <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-tight mb-8">
-                     {category.items[0].title}.<br />
-                     <span className="text-[#a3a3a3] font-light">E muito mais.</span>
-                  </h2>
-                  
-                  <div className="space-y-6 mb-10 w-full">
-                     {category.items.map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-4">
-                            <div className="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-[#111] border border-[#222] flex items-center justify-center">
-                                <item.icon size={14} className="text-[#a3a3a3]" />
-                            </div>
-                            <div>
-                                <h4 className="text-white font-medium mb-1">{item.title}</h4>
-                                <p className="text-[#a3a3a3] text-[15px] font-light leading-relaxed">{item.desc}</p>
-                            </div>
-                        </div>
-                     ))}
+
+
+                <div className="grid md:grid-cols-3 gap-6">
+
+                  {category.items.map((item, idx) => (
+
+                    <div key={idx} className="p-8 bg-gray-900/30 rounded-2xl border border-gray-800 hover:border-gray-600 hover:bg-gray-900/80 transition-all group">
+
+                      <div className="w-12 h-12 bg-gray-800 text-gray-300 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:text-green-400 group-hover:bg-green-900/20 transition-all">
+
+                        <item.icon size={24} />
+
+                      </div>
+
+                      <h4 className="text-xl font-bold text-white mb-3">{item.title}</h4>
+
+                      <p className="text-gray-400 leading-relaxed text-sm">{item.desc}</p>
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+
+
+          <div className="mt-24 bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-8 md:p-12 text-center border border-gray-700 shadow-2xl relative overflow-hidden">
+
+            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Acompanhe tudo na sua Sala de Comando 🖥️</h3>
+
+            <p className="text-gray-300 max-w-2xl mx-auto mb-8">Enquanto o seu WhatsApp faz o trabalho sujo do dia a dia, a nossa Plataforma Web Premium gera gráficos profundos, fluxos de caixa e painéis lindíssimos para você analisar seu patrimônio na tela grande.</p>
+
+            <MessageCircle className="mx-auto text-green-500 opacity-50" size={48} />
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* --- NOVA SEÇÃO: COMPARAÇÃO (US VS THEM) --- */}
+
+      <section className="py-24 bg-gray-950 border-t border-gray-900 relative">
+
+        <div className="container mx-auto px-4 max-w-6xl">
+
+          <div className="text-center mb-16">
+
+            <span className="text-green-500 font-bold tracking-widest text-sm uppercase mb-2 block">Por que somos diferentes?</span>
+
+            <h2 className="text-3xl md:text-5xl font-bold text-white">A armadilha da configuração infinita acabou.</h2>
+
+            <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Veja por que o Simplific Pro é a evolução natural das ferramentas financeiras antigas que dão trabalho em vez de ajudar.</p>
+
+          </div>
+
+
+
+          <div className="overflow-x-auto pb-8">
+
+            <div className="min-w-[700px] grid grid-cols-4 gap-4 md:gap-6 items-center">
+
+
+
+              {/* Cabeçalho da Tabela */}
+
+              <div className="col-span-1"></div>
+
+              <div className="text-center p-4 text-gray-400 font-bold uppercase tracking-wider text-sm">Planilhas (Excel/Notion)</div>
+
+              <div className="text-center p-4 text-gray-400 font-bold uppercase tracking-wider text-sm">Apps Tradicionais</div>
+
+              <div className="text-center p-6 bg-green-900/20 border border-green-500/30 rounded-t-2xl text-green-400 font-black uppercase tracking-wider text-lg relative overflow-hidden">
+
+                <div className="absolute top-0 left-0 w-full h-1 bg-green-500 shadow-[0_0_10px_#22c55e]"></div>
+
+                Simplific Pro
+
+              </div>
+
+
+
+              {/* Linha 1 */}
+
+              <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Preenchimento Manual</div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><XCircle className="text-red-500 opacity-70" /></div>
+
+              <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20">
+
+                <span className="bg-green-900/40 text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"><CheckCircle size={14} /> Automático via inteligência</span>
+
+              </div>
+
+
+
+              {/* Linha 2 */}
+
+              <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Interface Principal</div>
+
+              <div className="text-center p-4 text-gray-500 text-sm border-b border-gray-800">Computador</div>
+
+              <div className="text-center p-4 text-gray-500 text-sm border-b border-gray-800">App Pesado</div>
+
+              <div className="text-center p-4 bg-green-900/10 border-x border-b border-green-500/20 text-white font-bold">
+
+                WhatsApp + Dashboard Web
+
+              </div>
+
+
+
+              {/* Linha 3 */}
+
+              <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Lê Notas Fiscais e Áudio</div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+
+              <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20"><CheckCircle className="text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] rounded-full" /></div>
+
+
+
+              {/* Linha 4 */}
+
+              <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Agenda e Reuniões Automáticas</div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+
+              <div className="flex justify-center p-4 border-b border-gray-800"><Minus className="text-gray-600" /></div>
+
+              <div className="flex justify-center p-4 bg-green-900/10 border-x border-b border-green-500/20"><CheckCircle className="text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.4)] rounded-full" /></div>
+
+
+
+              {/* Linha 5 */}
+
+              <div className="col-span-1 p-4 text-gray-300 font-medium text-sm md:text-base border-b border-gray-800">Tempo gasto por dia</div>
+
+              <div className="text-center p-4 text-red-400 text-sm font-bold border-b border-gray-800">20 Minutos</div>
+
+              <div className="text-center p-4 text-orange-400 text-sm font-bold border-b border-gray-800">10 Minutos</div>
+
+              <div className="text-center p-4 bg-green-900/10 border-x border-b border-green-500/20 rounded-b-2xl shadow-[0_10px_20px_rgba(34,197,94,0.05)]">
+
+                <span className="text-green-400 font-black text-lg">10 Segundos</span>
+
+              </div>
+
+
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      {/* --- OFERTA --- */}
+
+      <section id="oferta" className="py-24 bg-gradient-to-b from-gray-900 to-black">
+
+        <div className="container mx-auto px-4 max-w-4xl">
+
+          <div className="text-center mb-12">
+
+            <span className="text-green-500 font-bold tracking-wider text-sm uppercase mb-2 block">Welcome Offer</span>
+
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Comece sem compromisso</h2>
+
+            <p className="text-gray-400">Preparamos uma condição especial para você ter seu próprio assessor.</p>
+
+          </div>
+
+
+
+          <div className="flex justify-center mb-10">
+
+            <div className="bg-gray-900 p-1 rounded-lg inline-flex relative">
+
+              <button onClick={() => setBillingCycle('annual')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-green-600 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
+
+                Anual
+
+                <span className="bg-white text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-black">-45%</span>
+
+              </button>
+
+              <button onClick={() => setBillingCycle('monthly')} className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-500 hover:text-white'}`}>
+
+                Mensal
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+
+          <div className="bg-black border border-gray-700 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden transition-all duration-300">
+
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
+
+            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+
+              <div className="text-left space-y-4 flex-1">
+
+                <div className="inline-block bg-green-900/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase">
+
+                  {currentPlan.badge}
+
+                </div>
+
+                <div>
+
+                  <p className="text-gray-400 text-sm line-through font-medium mb-1">{currentPlan.oldPrice}</p>
+
+                  <div className="flex items-baseline gap-2">
+
+                    <span className="text-xl font-bold text-gray-400">R$</span>
+
+                    <span className="text-6xl font-bold text-white tracking-tighter">{currentPlan.priceDisplay}</span>
+
+                    <span className="text-gray-500 font-medium text-lg">{currentPlan.priceSuffix}</span>
+
                   </div>
 
-                  <Button 
-                    onClick={() => document.getElementById('oferta').scrollIntoView({ behavior: 'smooth' })} 
-                    className="bg-white hover:bg-gray-200 text-black font-medium px-8 h-12 rounded-full transition-all"
-                  >
-                    Começar agora
-                  </Button>
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
 
-      {/* --- SEÇÃO DE COMPARAÇÃO (VS THEM) --- */}
-      <section className="py-32 md:py-48 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6 max-w-5xl">
-            <motion.div 
-               initial="hidden"
-               whileInView="visible"
-               viewport={{ once: true }}
-               variants={fadeInVariant}
-               className="text-center mb-20"
-            >
-                <h2 className="text-4xl md:text-[56px] font-black text-white tracking-tighter leading-tight mb-6">A armadilha da configuração <br className="hidden md:block"/>infinita acabou.</h2>
-                <p className="text-[#a3a3a3] text-lg font-light max-w-2xl mx-auto">Veja por que o Simplific Pro substitui ferramentas financeiras antigas que exigem trabalho manual e tempo precioso.</p>
-            </motion.div>
 
-            <motion.div 
-               initial="hidden"
-               whileInView="visible"
-               viewport={{ once: true }}
-               variants={fadeInVariant}
-               className="overflow-x-auto pb-4"
-            >
-                <div className="min-w-[800px] border border-[#1a1a1a] rounded-[2rem] bg-[#050505] overflow-hidden">
-                    <div className="grid grid-cols-4 items-center">
-                        {/* Header */}
-                        <div className="p-8 border-b border-r border-[#1a1a1a]"></div>
-                        <div className="text-center p-8 text-[#a3a3a3] font-medium uppercase tracking-[0.2em] text-[10px] border-b border-r border-[#1a1a1a]">Planilhas</div>
-                        <div className="text-center p-8 text-[#a3a3a3] font-medium uppercase tracking-[0.2em] text-[10px] border-b border-r border-[#1a1a1a]">Apps Antigos</div>
-                        <div className="text-center p-8 bg-[#0d0d0d] border-b border-[#1a1a1a] text-white font-bold uppercase tracking-[0.2em] text-xs relative">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-[#4ade80]"></div>
-                            Simplific Pro
-                        </div>
 
-                        {/* Linhas */}
-                        {[
-                          { label: "Preenchimento Manual", p: <Minus size={20} className="text-[#333] mx-auto"/>, a: <Minus size={20} className="text-[#333] mx-auto"/>, s: <CheckCircle size={20} className="text-[#4ade80] mx-auto" /> },
-                          { label: "Interface Principal", p: <span className="text-[#666] text-[11px] uppercase tracking-widest font-medium">Computador</span>, a: <span className="text-[#666] text-[11px] uppercase tracking-widest font-medium">App Pesado</span>, s: <span className="text-white text-[11px] uppercase tracking-widest font-bold">WhatsApp</span> },
-                          { label: "Lê Notas Fiscais e Áudio", p: <Minus size={20} className="text-[#333] mx-auto"/>, a: <Minus size={20} className="text-[#333] mx-auto"/>, s: <CheckCircle size={20} className="text-[#4ade80] mx-auto" /> },
-                          { label: "Agenda e Reuniões", p: <Minus size={20} className="text-[#333] mx-auto"/>, a: <Minus size={20} className="text-[#333] mx-auto"/>, s: <CheckCircle size={20} className="text-[#4ade80] mx-auto" /> },
-                          { label: "Tempo gasto por dia", p: <span className="text-[#666] text-[11px] uppercase tracking-widest font-medium">20 Minutos</span>, a: <span className="text-[#666] text-[11px] uppercase tracking-widest font-medium">10 Minutos</span>, s: <span className="text-white font-black text-xl">10 Seg</span> },
-                        ].map((row, i, arr) => {
-                          const isLast = i === arr.length - 1;
-                          return (
-                            <React.Fragment key={i}>
-                              <div className={`p-6 md:p-8 text-[#a3a3a3] font-light text-[15px] border-r border-[#1a1a1a] ${!isLast ? 'border-b' : ''}`}>{row.label}</div>
-                              <div className={`text-center p-6 md:p-8 border-r border-[#1a1a1a] ${!isLast ? 'border-b' : ''}`}>{row.p}</div>
-                              <div className={`text-center p-6 md:p-8 border-r border-[#1a1a1a] ${!isLast ? 'border-b' : ''}`}>{row.a}</div>
-                              <div className={`text-center p-6 md:p-8 bg-[#0d0d0d] ${!isLast ? 'border-b border-[#1a1a1a]' : ''}`}>{row.s}</div>
-                            </React.Fragment>
-                          );
-                        })}
-                    </div>
+                <p className="text-gray-300 font-medium text-lg border-l-4 border-green-500 pl-4 py-1">
+
+                  {currentPlan.subDetail}
+
+                </p>
+
+
+
+                <div className="flex gap-4 text-sm text-gray-500 pt-2">
+
+                  <span className="flex items-center gap-1"><CheckCircle size={16} className="text-green-600" /> Acesso Imediato</span>
+
+                  <span className="flex items-center gap-1"><CheckCircle size={16} className="text-green-600" /> Compra Segura</span>
+
                 </div>
-            </motion.div>
-        </div>
-      </section>
 
-      {/* --- OFERTA / PREÇOS --- */}
-      <section id="oferta" className="py-32 md:py-48 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="text-center mb-16"
-          >
-            <h2 className="text-5xl md:text-[72px] font-black text-white tracking-tighter mb-6 leading-none">Escolha seu plano</h2>
-            <p className="text-[#a3a3a3] font-light text-lg">Comece grátis. Evolua quando quiser. Economize 45% no plano anual.</p>
-          </motion.div>
-          
-          <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="flex justify-center mb-16"
-          >
-            <div className="bg-[#0d0d0d] border border-[#1a1a1a] p-1.5 flex relative rounded-full">
-                <button onClick={() => setBillingCycle('annual')} className={`px-8 py-3 text-[12px] font-medium rounded-full transition-all flex items-center gap-2 ${billingCycle === 'annual' ? 'bg-white text-black' : 'text-[#a3a3a3] hover:text-white'}`}>
-                    Anual
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${billingCycle === 'annual' ? 'bg-[#e5e5e5] text-black' : 'bg-[#1a1a1a] text-white'}`}>-45%</span>
-                </button>
-                <button onClick={() => setBillingCycle('monthly')} className={`px-8 py-3 text-[12px] font-medium rounded-full transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-[#a3a3a3] hover:text-white'}`}>
-                    Mensal
-                </button>
+              </div>
+
+              <div className="w-full md:w-auto flex-shrink-0">
+
+                <Button onClick={handleBuyClick} className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-bold text-lg py-8 px-10 rounded-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+
+                  {currentPlan.buttonText} <ArrowRight className="ml-2" />
+
+                </Button>
+
+                <p className="text-center text-xs text-gray-600 mt-3">Pagamento seguro via Asaas</p>
+
+              </div>
+
             </div>
-          </motion.div>
 
-          <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-[2rem] p-10 md:p-14 relative shadow-2xl"
-          >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
-                <div className="text-left flex-1">
-                    <div className="inline-block bg-[#1a1a1a] text-white rounded-full text-[10px] tracking-[0.2em] font-medium px-4 py-1.5 uppercase mb-6">
-                        {currentPlan.badge}
-                    </div>
-                    <div>
-                        {currentPlan.oldPrice && <p className="text-[#666] text-sm line-through font-light mb-1">{currentPlan.oldPrice}</p>}
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-light text-[#a3a3a3]">R$</span>
-                            <span className="text-7xl md:text-[96px] font-black text-white tracking-tighter leading-none">{currentPlan.priceDisplay}</span>
-                            <span className="text-[#666] font-light text-xl">/mês</span>
-                        </div>
-                    </div>
-                    
-                    <p className="text-[#a3a3a3] text-base mt-4 mb-8">
-                        {currentPlan.subDetail}
-                    </p>
+          </div>
 
-                    <div className="flex flex-col gap-3 text-[14px] text-[#a3a3a3] font-light">
-                        <span className="flex items-center gap-3"><CheckCircle size={16} className="text-[#4ade80]" /> Acesso Imediato à IA e Automações</span>
-                        <span className="flex items-center gap-3"><CheckCircle size={16} className="text-[#4ade80]" /> Compra Segura e Criptografada</span>
-                    </div>
-                </div>
-                <div className="w-full md:w-auto flex-shrink-0 flex flex-col items-center">
-                      <Button onClick={handleBuyClick} className="w-full md:w-[240px] bg-white text-black hover:bg-gray-200 font-medium text-[15px] h-14 rounded-full transition-all">
-                          {currentPlan.buttonText}
-                      </Button>
-                      <p className="text-center text-[10px] text-[#666] uppercase tracking-widest mt-4 font-medium">Pagamento via Asaas</p>
-                </div>
-            </div>
-          </motion.div>
         </div>
+
       </section>
+
+
 
       {/* --- SEÇÃO DICAS NO INSTAGRAM --- */}
-      <section className="py-32 md:py-48 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6">
-          <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="text-center mb-20"
-          >
-            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">Lifestyle Financeiro</h2>
-            <p className="text-[#a3a3a3] font-light text-lg">
-              Insights diários para sua jornada. <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="text-white border-b border-[#333] hover:border-white transition-colors pb-0.5">@simplificpro.ia</a>
-            </p>
-          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            {instagramPosts.map((post, index) => (
-              <motion.div 
-                 key={post.id} 
-                 initial={{ opacity: 0, y: 30 }}
-                 whileInView={{ opacity: 1, y: 0 }}
-                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                 viewport={{ once: true }}
-                 whileHover={{ y: -4 }}
-                 className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl flex flex-col overflow-hidden transition-transform"
-              >
+      <section className="py-24 bg-[#111827] border-t border-gray-900">
+
+        <div className="container mx-auto px-4">
+
+          <div className="text-center mb-12">
+
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Dicas no Instagram</h2>
+
+            <p className="text-gray-400">
+
+              Acompanhe nosso conteúdo diário e aprenda a organizar suas finanças. <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="text-yellow-500 hover:text-yellow-400 font-medium">@simplificpro.ia</a>
+
+            </p>
+
+          </div>
+
+
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+
+            {instagramPosts.map((post) => (
+
+              <div key={post.id} className="bg-[#1f2937] rounded-xl overflow-hidden border border-gray-800 shadow-2xl flex flex-col group">
+
                 {/* Header do Insta */}
-                <div className="flex items-center justify-between p-4 border-b border-[#1a1a1a]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#111] border border-[#222] flex items-center justify-center">
-                      <span className="text-[#a3a3a3] text-[9px] font-bold tracking-widest">SP</span>
+
+                <div className="flex items-center justify-between p-3 border-b border-gray-800">
+
+                  <div className="flex items-center gap-2">
+
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-500 to-pink-500 p-[2px]">
+
+                      <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
+
+                        <span className="text-white text-[10px] font-bold">SP</span>
+
+                      </div>
+
                     </div>
-                    <span className="text-white font-medium text-xs">simplificpro.ia</span>
+
+                    <span className="text-white font-bold text-sm tracking-tight">simplificpro.ia</span>
+
+                    <CheckCircle size={14} className="text-blue-500" fill="currentColor" />
+
                   </div>
-                  <a href={post.link} target="_blank" rel="noreferrer" className="text-white text-[11px] font-medium hover:text-[#a3a3a3] transition-colors">
+
+                  <a href={post.link} target="_blank" rel="noreferrer" className="text-yellow-500 font-semibold text-sm hover:text-yellow-400">
+
                     Seguir
+
                   </a>
+
                 </div>
+
+
 
                 {/* Imagem do Post */}
-                <a href={post.link} target="_blank" rel="noreferrer" className="relative aspect-square w-full bg-[#111] block overflow-hidden">
-                  <img src={post.image} alt="Instagram post" className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x400/111/222?text=Post'; }} />
+
+                <a href={post.link} target="_blank" rel="noreferrer" className="relative aspect-square w-full bg-gray-900 block overflow-hidden">
+
+                  {/* Container da imagem - Imagem placeholder ou real */}
+
+                  <img src={post.image} alt="Instagram post" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/400x400/222/666?text=Post+Instagram'; }} />
+
                 </a>
 
+
+
                 {/* Rodapé de Ações */}
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-4">
+
+                <div className="p-4 bg-[#1f2937]">
+
+                  <div className="flex items-center justify-between mb-3">
+
                     <div className="flex items-center gap-4">
-                      <Heart size={20} className="text-[#a3a3a3] hover:text-white cursor-pointer transition-colors" />
-                      <MessageCircle size={20} className="text-[#a3a3a3] hover:text-white cursor-pointer transition-colors" />
-                      <Send size={20} className="text-[#a3a3a3] hover:text-white cursor-pointer transition-colors" />
+
+                      <Heart size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+
+                      <MessageCircle size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+
+                      <Send size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+
                     </div>
-                    <Bookmark size={20} className="text-[#a3a3a3] hover:text-white cursor-pointer transition-colors" />
+
+                    <Bookmark size={22} className="text-white hover:text-gray-300 cursor-pointer transition-colors" />
+
                   </div>
-                  
+
+
+
                   {/* Legenda */}
-                  <p className="text-[13px] text-[#a3a3a3] font-light leading-relaxed line-clamp-2">
-                    <span className="text-white font-medium mr-2">simplificpro.ia</span>
+
+                  <p className="text-sm text-gray-300 line-clamp-2">
+
+                    <span className="text-white font-bold mr-2">simplifipro.ia</span>
+
                     {post.caption}
+
                   </p>
+
                 </div>
-              </motion.div>
+
+              </div>
+
             ))}
+
           </div>
+
         </div>
+
       </section>
+
+
 
       {/* --- SEÇÃO DOS FUNDADORES --- */}
-      <section className="py-32 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6">
-            <motion.div 
-               initial="hidden"
-               whileInView="visible"
-               viewport={{ once: true }}
-               variants={fadeInVariant}
-               className="text-center mb-20"
-            >
-                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-6">Arquitetos do Simplific</h2>
-                <p className="text-[#a3a3a3] font-light max-w-2xl mx-auto text-lg">Especialistas em finanças e tecnologia dedicados a construir a ferramenta que nós mesmos queríamos usar.</p>
-            </motion.div>
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <FounderCard name="Felipe Viana" role="Finanças & Estratégia" image="/assets/felipe_viana.jpg" linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" description="Economista especialista em controladoria com mais de 15 anos de mercado. Uniu gestão de patrimônio e tecnologia para democratizar o controle financeiro." />
-                <FounderCard name="Michel Borges" role="Tecnologia & Inovação" image="/assets/michel_borges.jpg" linkedin="//www.linkedin.com/in/michel-borges-14218116a/" description="Estrategista apaixonado por arquitetura de software. Acredita que a tecnologia só faz sentido quando simplifica a vida humana de forma invisível." />
-            </div>
+
+      <section className="py-24 bg-black border-t border-gray-900 relative">
+
+        <div className="container mx-auto px-4">
+
+          <div className="text-center mb-16">
+
+            <span className="text-green-500 font-bold tracking-widest text-sm uppercase mb-2 block">Quem Somos</span>
+
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Mentes por trás do Simplific</h2>
+
+            <p className="text-gray-400 mt-4 max-w-2xl mx-auto">Não somos apenas um app. Somos especialistas em finanças e tecnologia dedicados a construir a ferramenta que nós mesmos queríamos usar.</p>
+
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+
+            <FounderCard name="Felipe Viana" role="Co-Founder & Finanças" image="/assets/felipe_viana.jpg" linkedin="https://www.linkedin.com/in/felipe-viana-87017376/" description="Economista especialista em controladoria financeira com mais de 15 anos de mercado. Uniu sua experiência sólida em gestão de patrimônio com a paixão por tecnologia para criar uma solução que democratiza o controle financeiro de alto nível." />
+
+            <FounderCard name="Michel Borges" role="Co-Founder & Tecnologia" image="/assets/michel_borges.jpg" linkedin="//www.linkedin.com/in/michel-borges-14218116a/" description="Publicitário e estrategista apaixonado por vendas e inovação. Acredita que a tecnologia só faz sentido quando simplifica a vida das pessoas. Responsável por transformar a complexidade financeira em uma experiência fluida e intuitiva." />
+
+          </div>
+
         </div>
+
       </section>
+
+
 
       {/* --- SEÇÃO: TECH STACK --- */}
-      <section className="py-24 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6">
-            <motion.div 
-               initial="hidden"
-               whileInView="visible"
-               viewport={{ once: true }}
-               variants={fadeInVariant}
-               className="flex flex-col md:flex-row justify-between items-center gap-16 max-w-6xl mx-auto opacity-70"
-            >
-                <div className="group flex flex-col items-center gap-4">
-                    <div className="h-6 filter grayscale group-hover:grayscale-0 transition-all duration-300"><img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" /></div>
-                    <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] font-medium">WhatsApp API</span>
-                </div>
-                <div className="group flex flex-col items-center gap-4">
-                    <div className="h-5 filter grayscale group-hover:grayscale-0 transition-all duration-300"><img src="/assets/logo_twilio.png" alt="Infraestrutura Twilio" className="h-full object-contain" /></div>
-                    <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] font-medium">Infra Global</span>
-                </div>
-                <div className="group flex flex-col items-center gap-4">
-                    <div className="h-5 filter grayscale group-hover:grayscale-0 transition-all duration-300"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
-                    <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] font-medium">Cloud AI</span>
-                </div>
-                <div className="group flex flex-col items-center gap-4">
-                    <ShieldCheck size={24} className="text-[#666] group-hover:text-white transition-colors" />
-                    <span className="text-[10px] text-[#666] uppercase tracking-[0.2em] font-medium">Open Finance</span>
-                </div>
-                <div className="group flex flex-col items-center justify-center filter grayscale hover:grayscale-0 transition-all duration-300">
-                    <div id="ra-verified-seal" className="scale-90"></div>
-                </div>
-            </motion.div>
+
+      <section className="py-16 bg-gray-950 border-t border-gray-900">
+
+        <div className="container mx-auto px-4">
+
+          <div className="text-center mb-10">
+
+            <span className="text-green-500 font-bold tracking-widest text-xs uppercase mb-2 block">Segurança de Nível Global</span>
+
+            <h3 className="text-2xl font-bold text-white">Powered by Big Tech</h3>
+
+            <p className="text-gray-500 text-sm mt-2">Utilizamos a infraestrutura oficial das maiores empresas de tecnologia do mundo.</p>
+
+          </div>
+
+          <div className="flex flex-col md:flex-row flex-wrap justify-center items-center gap-10 md:gap-16">
+
+            <div className="group flex flex-col items-center space-y-4">
+
+              <div className="h-10 transition-all duration-500 hover:scale-105"><img src="/assets/logo_meta.png" alt="Tecnologia Meta" className="h-full object-contain" /></div>
+
+              <div className="text-center"><span className="block text-white font-bold text-sm">WhatsApp Business API</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Integração Oficial</span></div>
+
+            </div>
+
+            <div className="group flex flex-col items-center space-y-4">
+
+              <div className="h-8 transition-all duration-500 hover:scale-105"><img src="/assets/logo_twilio.png" alt="Infraestrutura Twilio" className="h-full object-contain" /></div>
+
+              <div className="text-center"><span className="block text-white font-bold text-sm">Infraestrutura Global</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Latência Zero</span></div>
+
+            </div>
+
+            <div className="group flex flex-col items-center space-y-4">
+
+              <div className="h-8 transition-all duration-500 hover:scale-105"><img src="/assets/logo_google.png" alt="Google Cloud AI" className="h-full object-contain" /></div>
+
+              <div className="text-center"><span className="block text-white font-bold text-sm">Artificial Intelligence</span><span className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Processamento Seguro</span></div>
+
+            </div>
+
+            {/* Integração Bancária - Open Finance Klavi */}
+
+            <div className="group flex flex-col items-center space-y-4">
+
+              <div className="h-10 w-10 bg-green-500/10 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105">
+
+                <ShieldCheck size={24} className="text-green-500" />
+
+              </div>
+
+              <div className="text-center"><span className="block text-white font-bold text-sm">Open Finance Integrado</span><span className="text-[10px] text-green-500 uppercase tracking-wider font-bold">Conexão 100% Segura</span></div>
+
+            </div>
+
+            {/* Reclame Aqui Dinâmico */}
+
+            <div className="group flex flex-col items-center justify-center">
+
+              <div id="ra-verified-seal" className="hover:scale-105 transition-transform duration-500"></div>
+
+            </div>
+
+          </div>
+
         </div>
+
       </section>
 
-      {/* --- FAQ --- */}
-      <section className="py-32 md:py-48 bg-[#050505] border-t border-[#1a1a1a]">
-        <div className="container mx-auto px-6 max-w-3xl">
-          <motion.h2 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="text-4xl md:text-6xl font-black text-center mb-16 text-white tracking-tighter"
-          >
-            Dúvidas Frequentes
-          </motion.h2>
-          <motion.div 
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             variants={fadeInVariant}
-             className="border-t border-[#1a1a1a]"
-          >
-            <FaqItem 
-                question="O plano mensal tem fidelidade?" 
-                answer="Não. O valor é de R$ 29,90 mensais e você tem total liberdade. Pode usar por um mês e cancelar no próximo se desejar, sem multas ou taxas surpresas." 
+
+
+      {/* --- FAQ ATUALIZADO --- */}
+
+      <section className="py-24 bg-gray-950/50 border-t border-gray-900">
+
+        <div className="container mx-auto px-4 max-w-3xl">
+
+          <h2 className="text-3xl font-bold text-center mb-12 text-white">Dúvidas Frequentes</h2>
+
+          <div className="space-y-4">
+
+            <FaqItem
+
+              question="O plano mensal tem fidelidade?"
+
+              answer="Não. O valor é de R$ 29,90 mensais e você tem total liberdade. Pode usar por um mês e cancelar no próximo se desejar, sem multas ou taxas surpresas."
+
             />
-            <FaqItem question="Posso parcelar o plano anual?" answer="Sim! O plano anual de R$ 199,00 oferece o maior desconto e você pode parcelá-lo em até 12x no cartão de crédito." />
-            <FaqItem question="Meus dados bancários ficam salvos?" answer="Nós não temos acesso às suas senhas bancárias e não realizamos movimentações. Usamos provedores de Open Finance certificados pelo Banco Central." />
-            <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a essência do design. Você pode registrar gastos, consultar saldo e marcar reuniões apenas pelo WhatsApp. O Dashboard Web é opcional para visões mais profundas." />
+
+            <FaqItem question="Posso parcelar o plano anual?" answer="Sim! O plano anual de R$ 199,00 oferece o maior desconto (apenas R$ 16,58/mês) e você pode parcelá-lo em até 12x no cartão de crédito." />
+
+            <FaqItem question="Meus dados bancários ficam salvos?" answer="Nós não temos acesso às suas senhas bancárias e não realizamos movimentações. O Simplific apenas lê e organiza as informações para você. Usamos criptografia de ponta a ponta com segurança nível bancário." />
+
+            <FaqItem question="Consigo usar apenas pelo WhatsApp?" answer="Sim! Essa é a mágica. Você pode registrar gastos, consultar saldo, marcar reuniões e pedir relatórios apenas mandando áudios ou textos no WhatsApp. O Dashboard Web serve para quando você quiser uma visão analítica mais profunda." />
+
             <FaqItem question="Como cancelo se não gostar?" answer="Diretamente pelo seu painel, com um clique. Sem ligar para ninguém, sem burocracia. Queremos que você fique pelos resultados, não por obrigação." />
-          </motion.div>
+
+          </div>
+
         </div>
+
       </section>
 
-      {/* --- FOOTER INLINE MINIMALISTA --- */}
-      <footer className="bg-[#050505] border-t border-[#1a1a1a] pt-16 pb-8">
-        <div className="container mx-auto px-6 max-w-6xl">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
-                <div>
-                    <h3 className="text-xl font-bold text-white mb-2 tracking-tighter">Simplific Pro</h3>
-                    <p className="text-[#666] text-sm">Seu assistente financeiro de IA direto no WhatsApp.</p>
-                </div>
-                <div className="flex gap-4">
-                    <a href="https://instagram.com/simplificpro.ia" target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full bg-[#111] border border-[#1a1a1a] flex items-center justify-center hover:bg-[#1a1a1a] transition-colors">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
-                    </a>
-                </div>
-            </div>
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-[#1a1a1a]">
-                <p className="text-[11px] text-[#666]">Nosso atendimento técnico e operacional é realizado exclusivamente de segunda a sexta, das 10h às 16h.</p>
-                <div className="flex gap-6">
-                    <a href="/termos" className="text-[10px] uppercase tracking-widest text-[#666] hover:text-white transition-colors">Termos de Uso</a>
-                    <a href="/privacidade" className="text-[10px] uppercase tracking-widest text-[#666] hover:text-white transition-colors">Privacidade</a>
-                </div>
-            </div>
-        </div>
-      </footer>
+
+
+      <div className="bg-black border-t border-gray-900 pt-10">
+
+        <Footer />
+
+      </div>
+
     </div>
+
   );
+
 };
- 
+
+
+
 export default HomePage;
+
