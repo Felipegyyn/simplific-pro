@@ -24,6 +24,7 @@ const AdminPanel = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isVitalicio, setIsVitalicio] = useState(false);
 
   const [editUsuario, setEditUsuario] = useState({
     id: '', name: '', email: '', whatsapp: '', subscription_plan: '', subscription_valid_until: ''
@@ -120,9 +121,13 @@ const AdminPanel = ({ user, onLogout }) => {
 
   const abrirEditModal = (usuario) => {
     let formattedDate = '';
+    let isVit = false;
     if (usuario.subscription_valid_until) {
       formattedDate = usuario.subscription_valid_until.split('T')[0];
+    } else {
+      isVit = true; // Se for null, consideramos vitalício
     }
+    
     setEditUsuario({
       id: usuario.id,
       name: usuario.name || '',
@@ -131,6 +136,7 @@ const AdminPanel = ({ user, onLogout }) => {
       subscription_plan: usuario.subscription_plan || '',
       subscription_valid_until: formattedDate
     });
+    setIsVitalicio(isVit);
     setEditModalOpen(true);
   };
 
@@ -139,8 +145,15 @@ const AdminPanel = ({ user, onLogout }) => {
       alert('Por favor, preencha nome e email.');
       return;
     }
+    
+    // Preparar os dados de envio
+    const dadosEnvio = { ...editUsuario };
+    if (isVitalicio) {
+      dadosEnvio.subscription_valid_until = ''; // Backend vai transformar em null
+    }
+
     try {
-      await apiService.put(`/api/admin/users/${editUsuario.id}`, editUsuario);
+      await apiService.put(`/api/admin/users/${editUsuario.id}`, dadosEnvio);
       alert('Usuário atualizado com sucesso!');
       setEditModalOpen(false);
       fetchUsers();
@@ -192,12 +205,12 @@ const AdminPanel = ({ user, onLogout }) => {
   };
   // ▲▲▲ FIM DA FUNÇÃO ▲▲▲
 
-  const formatarData = (dataString) => {
-    if (!dataString) return 'Nunca';
-    return new Date(dataString).toLocaleDateString('pt-BR', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-    });
-  };
+  const formatarData = (dataString) => {
+    if (!dataString) return 'Vitalício';
+    return new Date(dataString).toLocaleDateString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+    });
+  };
 
 // ▼▼▼ COLE O BLOCO DE CÓDIGO EXATAMENTE AQUI ▼▼▼
   const totalUsuarios = usuarios.length;
@@ -364,13 +377,33 @@ const AdminPanel = ({ user, onLogout }) => {
                         <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                           <SelectItem value="mensal">Mensal</SelectItem>
                           <SelectItem value="anual">Anual</SelectItem>
+                          <SelectItem value="vitalicio">Vitalício</SelectItem>
                           <SelectItem value="nenhum">Nenhum</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="edit_valid_until">Validade do Acesso</Label>
-                      <Input id="edit_valid_until" type="date" value={editUsuario.subscription_valid_until} onChange={(e) => setEditUsuario({...editUsuario, subscription_valid_until: e.target.value})} />
+                    <div className="space-y-2 border-t border-slate-200 dark:border-white/10 pt-4 mt-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="edit_valid_until" className={isVitalicio ? 'text-slate-400' : ''}>Validade do Acesso</Label>
+                        <div className="flex items-center space-x-2">
+                          <input 
+                            type="checkbox" 
+                            id="vitalicio_check" 
+                            checked={isVitalicio}
+                            onChange={(e) => setIsVitalicio(e.target.checked)}
+                            className="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+                          />
+                          <Label htmlFor="vitalicio_check" className="text-sm font-medium text-emerald-600 dark:text-emerald-400 cursor-pointer">Acesso Vitalício</Label>
+                        </div>
+                      </div>
+                      <Input 
+                        id="edit_valid_until" 
+                        type="date" 
+                        value={isVitalicio ? '' : editUsuario.subscription_valid_until} 
+                        onChange={(e) => setEditUsuario({...editUsuario, subscription_valid_until: e.target.value})} 
+                        disabled={isVitalicio}
+                        className={isVitalicio ? 'opacity-50 cursor-not-allowed' : ''}
+                      />
                     </div>
                   </div>
                   <div className="flex justify-end mt-4">
