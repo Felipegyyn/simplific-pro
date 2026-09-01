@@ -24,6 +24,7 @@ class User(db.Model):
     # Adicione esta linha junto com as outras colunas do modelo User
     subscription_id = db.Column(db.String(100), nullable=True)
     subscription_valid_until = db.Column(db.DateTime, nullable=True, default=None)
+    subscription_plan = db.Column(db.String(50), nullable=True, default=None)
     # Adicione esta linha dentro da classe User
     password_reset_tokens = db.relationship('PasswordResetToken', backref='user', lazy=True, cascade="all, delete-orphan")
     # Adicione esta linha junto com as outras colunas do modelo User
@@ -64,7 +65,9 @@ class User(db.Model):
             'first_login': self.first_login,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None,
-            'profile_image_url': self.profile_image_url
+            'profile_image_url': self.profile_image_url,
+            'subscription_plan': self.subscription_plan,
+            'subscription_valid_until': self.subscription_valid_until.isoformat() if self.subscription_valid_until else None
         }
 
 # COLE ESTE BLOCO NO FINAL DO ARQUIVO user.py

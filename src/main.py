@@ -322,6 +322,7 @@ with app.app_context():
         # Tenta adicionar as colunas. Se já existirem, o banco ignora ou dá erro que tratamos.
         db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_id VARCHAR(100);"))
         db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_valid_until TIMESTAMP;"))
+        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(50);"))
         db.session.commit()
         print("--- [DB FIX] Colunas garantidas com sucesso! ---")
     except Exception as e:

@@ -126,11 +126,18 @@ def asaas_webhook():
             
             # Renova o acesso
             # Se for mensal, +32 dias. Se for anual (valor > 100), +366 dias.
-            value = float(payment.get('value', 0))
-            days = 366 if value > 100 else 32
             
             user.status = 'ativo'
-            user.subscription_valid_until = datetime.utcnow().date() + timedelta(days=days)
+            
+            # PROTEÇÃO: Se o plano for anual, não devemos reduzir a data de validade 
+            # quando uma parcela for paga e o webhook for chamado.
+            if user.subscription_plan == 'anual':
+                # A validade já foi definida como 1 ano no checkout.
+                # Só vamos garantir que ela não expire acidentalmente.
+                pass
+            else:
+                user.subscription_valid_until = datetime.utcnow().date() + timedelta(days=32)
+                
             db.session.commit()
             
         elif event in ['PAYMENT_OVERDUE', 'PAYMENT_REFUNDED', 'PAYMENT_DUNNING_RECEIVED']:

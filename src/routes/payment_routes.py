@@ -109,6 +109,7 @@ def process_subscription_route():
         user.status = 'ativo'
         user.profile = 'usuario'
         user.subscription_id = transaction_id
+        user.subscription_plan = 'anual' if plan_type == 'yearly' else 'mensal'
         user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
         
         db.session.commit()

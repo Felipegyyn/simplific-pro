@@ -23,6 +23,11 @@ const AdminPanel = ({ user, onLogout }) => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const [editUsuario, setEditUsuario] = useState({
+    id: '', name: '', email: '', whatsapp: '', subscription_plan: '', subscription_valid_until: ''
+  });
 
   const [novoUsuario, setNovoUsuario] = useState({
     name: '',
@@ -112,6 +117,39 @@ const AdminPanel = ({ user, onLogout }) => {
       alert(`Erro ao criar usuário: ${error.response?.data?.error || 'Tente novamente.'}`);
     }
   };
+
+  const abrirEditModal = (usuario) => {
+    let formattedDate = '';
+    if (usuario.subscription_valid_until) {
+      formattedDate = usuario.subscription_valid_until.split('T')[0];
+    }
+    setEditUsuario({
+      id: usuario.id,
+      name: usuario.name || '',
+      email: usuario.email || '',
+      whatsapp: usuario.whatsapp || '',
+      subscription_plan: usuario.subscription_plan || '',
+      subscription_valid_until: formattedDate
+    });
+    setEditModalOpen(true);
+  };
+
+  const atualizarUsuario = async () => {
+    if (!editUsuario.name || !editUsuario.email) {
+      alert('Por favor, preencha nome e email.');
+      return;
+    }
+    try {
+      await apiService.put(`/api/admin/users/${editUsuario.id}`, editUsuario);
+      alert('Usuário atualizado com sucesso!');
+      setEditModalOpen(false);
+      fetchUsers();
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      alert(`Erro ao atualizar usuário: ${error.response?.data?.error || 'Tente novamente.'}`);
+    }
+  };
+
   
  // Dentro do AdminPanel.jsx
 
@@ -298,6 +336,48 @@ const AdminPanel = ({ user, onLogout }) => {
                   </div>
                 </DialogContent>
               </Dialog>
+
+              <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+                <DialogContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
+                  <DialogHeader>
+                    <DialogTitle className="text-slate-800 dark:text-white">Editar Usuário</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit_name">Nome Completo</Label>
+                      <Input id="edit_name" value={editUsuario.name} onChange={(e) => setEditUsuario({...editUsuario, name: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit_email">Email</Label>
+                      <Input id="edit_email" type="email" value={editUsuario.email} onChange={(e) => setEditUsuario({...editUsuario, email: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit_whatsapp">WhatsApp</Label>
+                      <Input id="edit_whatsapp" value={editUsuario.whatsapp} onChange={(e) => setEditUsuario({...editUsuario, whatsapp: e.target.value})} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit_plan">Plano Adquirido</Label>
+                      <Select value={editUsuario.subscription_plan} onValueChange={(val) => setEditUsuario({...editUsuario, subscription_plan: val})}>
+                        <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10">
+                          <SelectValue placeholder="Selecione o plano" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
+                          <SelectItem value="mensal">Mensal</SelectItem>
+                          <SelectItem value="anual">Anual</SelectItem>
+                          <SelectItem value="nenhum">Nenhum</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit_valid_until">Validade do Acesso</Label>
+                      <Input id="edit_valid_until" type="date" value={editUsuario.subscription_valid_until} onChange={(e) => setEditUsuario({...editUsuario, subscription_valid_until: e.target.value})} />
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    <Button onClick={atualizarUsuario} className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">Salvar Alterações</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -321,6 +401,14 @@ const AdminPanel = ({ user, onLogout }) => {
                             <p className="font-medium text-slate-500">Data Criação</p>
                             <p className="text-slate-700 dark:text-slate-300">{formatarData(u.created_at)}</p>
                           </div>
+                          <div className="col-span-2 sm:col-span-1">
+                            <p className="font-medium text-slate-500">Plano</p>
+                            <p className="text-slate-700 dark:text-slate-300 capitalize">{u.subscription_plan || 'Nenhum'}</p>
+                          </div>
+                          <div className="col-span-2 sm:col-span-1">
+                            <p className="font-medium text-slate-500">Validade do Acesso</p>
+                            <p className="text-slate-700 dark:text-slate-300">{formatarData(u.subscription_valid_until)}</p>
+                          </div>
                         </div>
                       </div>
                       <div className="flex space-x-2 self-start sm:self-center mt-4 sm:mt-0 sm:ml-4">
@@ -336,6 +424,9 @@ const AdminPanel = ({ user, onLogout }) => {
                           </Button>
                           )
                         )}
+                        <Button variant="outline" size="sm" title="Editar Usuário" onClick={() => abrirEditModal(u)} className="border-slate-200 dark:border-white/10 hover:bg-cyan-50 dark:hover:bg-cyan-900/20">
+                          <Edit className="h-4 w-4 text-cyan-600" />
+                        </Button>
                       </div>
                     </div>
                   </div>

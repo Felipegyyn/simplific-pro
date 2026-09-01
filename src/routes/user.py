@@ -194,6 +194,50 @@ def manage_users():
         return jsonify(new_user.to_dict()), 201
 
 
+@user_bp.route('/admin/users/<int:user_id>', methods=['PUT'])
+@jwt_required()
+@active_user_required
+def update_user(user_id):
+    admin_id = get_jwt_identity()
+    admin = User.query.get(admin_id)
+
+    if not admin or admin.profile != 'admin':
+        return jsonify({'error': 'Acesso negado'}), 403
+
+    user = User.query.get_or_404(user_id)
+    data = request.json
+
+    if 'name' in data:
+        user.name = data['name']
+    if 'email' in data:
+        # Check if email is used by another user
+        existing_user = User.query.filter_by(email=data['email']).first()
+        if existing_user and existing_user.id != user.id:
+            return jsonify({'error': 'Email já está em uso por outro usuário'}), 400
+        user.email = data['email']
+    if 'whatsapp' in data:
+        existing_user = User.query.filter_by(whatsapp=data['whatsapp']).first()
+        if existing_user and existing_user.id != user.id:
+            return jsonify({'error': 'WhatsApp já está em uso por outro usuário'}), 400
+        user.whatsapp = data['whatsapp']
+    if 'subscription_plan' in data:
+        user.subscription_plan = data['subscription_plan']
+    if 'subscription_valid_until' in data:
+        date_str = data['subscription_valid_until']
+        if date_str:
+            try:
+                # Expecting format YYYY-MM-DD
+                parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+                user.subscription_valid_until = parsed_date
+            except ValueError:
+                return jsonify({'error': 'Formato de data inválido. Use YYYY-MM-DD'}), 400
+        else:
+            user.subscription_valid_until = None
+
+    db.session.commit()
+    return jsonify(user.to_dict()), 200
+
+
 @user_bp.route('/admin/users/<int:user_id>/status', methods=['PUT'])
 @jwt_required()
 @active_user_required # <-- TRAVA APLICADA
