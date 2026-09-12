@@ -3,34 +3,19 @@ import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
   const navigate = useNavigate();
-
-  const handleNav = (path) => {
-    navigate(path);
-    window.scrollTo(0, 0);
-  };
-
+  const go = (path) => { navigate(path); window.scrollTo(0, 0); };
   return (
-    <footer className="bg-gray-900 text-gray-400 py-12">
-      <div className="container mx-auto px-4 text-center">
-        <div 
-          className="flex items-center justify-center gap-2 mb-6 cursor-pointer"
-          onClick={() => handleNav('/')}
-        >
-            <div className="bg-green-600 text-white p-1 rounded font-bold">SP</div>
-            <span className="text-xl font-bold text-white tracking-tight">Simplific Pro</span>
+    <footer className="border-t border-white/10 bg-[#080908] py-12 text-white/45">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 md:flex-row md:items-end md:justify-between md:px-10">
+        <div>
+          <button type="button" onClick={() => go('/')} className="flex items-center gap-2.5 text-left"><span className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime-300 text-sm font-black text-[#10130d]">SP</span><span className="text-base font-semibold text-white">Simplific <span className="text-white/40">Pro</span></span></button>
+          <p className="mt-4 max-w-xs text-sm leading-6">A inteligência que simplifica sua vida financeira.</p>
         </div>
-        <p className="mb-6">A solução completa para sua vida financeira.</p>
-        
-        <div className="flex flex-wrap justify-center gap-6 text-sm mb-8">
-          <button onClick={() => handleNav('/termos')} className="hover:text-white transition-colors">Termos de Uso</button>
-          <button onClick={() => handleNav('/privacidade')} className="hover:text-white transition-colors">Privacidade</button>
-          <button onClick={() => handleNav('/contato')} className="hover:text-white transition-colors">Contato</button>
+        <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm"><button type="button" onClick={() => go('/termos')} className="transition-colors hover:text-lime-300">Termos de uso</button><button type="button" onClick={() => go('/privacidade')} className="transition-colors hover:text-lime-300">Privacidade</button><button type="button" onClick={() => go('/contato')} className="transition-colors hover:text-lime-300">Contato</button><a href="mailto:contato@simplificpro.com" className="transition-colors hover:text-lime-300">Fale com a gente</a></div>
+        <div className="flex flex-col gap-4 md:items-end">
+          <div id="ra-verified-seal" className="min-h-6" aria-label="Selo de verificação Reclame Aqui" />
+          <p className="text-xs text-white/25 md:text-right">© 2026 Simplific Pro<br />41.851.029/0001-64. Todos os direitos reservados.</p>
         </div>
-        
-        <p className="text-sm mb-4">
-            Dúvidas? Envie um e-mail para <a href="mailto:contato@simplificpro.com" className="text-green-400 hover:underline">contato@simplificpro.com</a>
-        </p>
-        <p className="text-xs opacity-50">© 2026 Simplific Pro - 41.851.029/0001-64. Todos os direitos reservados.</p>
       </div>
     </footer>
   );

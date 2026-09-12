@@ -1,103 +1,29 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, ShieldCheck } from 'lucide-react';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Função auxiliar para navegar
-  const handleNav = (path) => {
-    setIsMobileMenuOpen(false);
-    navigate(path);
-    window.scrollTo(0, 0); 
-  };
+  const [open, setOpen] = useState(false);
+  const go = (path) => { setOpen(false); navigate(path); window.scrollTo(0, 0); };
+  const links = [['/beneficios', 'Recursos'], ['/inteligencia', 'Inteligência'], ['/seguranca', 'Segurança'], ['/planos', 'Planos']];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        {/* Logo */}
-        <div 
-          className="flex items-center gap-2 cursor-pointer" 
-          onClick={() => handleNav('/')}
-        >
-           <div className="bg-green-600 text-white p-1 rounded font-bold text-xl">SP</div>
-           <span className="text-xl font-bold text-gray-900 tracking-tight">Simplific Pro</span>
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#080908]/85 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-10">
+        <button type="button" onClick={() => go('/')} className="flex items-center gap-2.5 text-left">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime-300 text-sm font-black text-[#10130d]">SP</span>
+          <span className="text-base font-semibold tracking-[-.02em] text-white">Simplific <span className="text-white/40">Pro</span></span>
+        </button>
+        <div className="hidden items-center gap-8 md:flex">
+          {links.map(([path, label]) => <button key={path} type="button" onClick={() => go(path)} className="text-sm text-white/55 transition-colors hover:text-lime-300">{label}</button>)}
+          <Button type="button" onClick={() => go('/login')} variant="outline" className="h-10 rounded-full border-white/15 bg-white/[.03] px-5 text-sm text-white hover:bg-white/10">Entrar</Button>
+          <Button type="button" onClick={() => go('/planos')} className="h-10 rounded-full bg-lime-300 px-5 text-sm font-semibold text-[#10130d] hover:bg-lime-200">Começar agora</Button>
         </div>
-
-        {/* Menu Desktop */}
-        <div className="hidden md:flex items-center gap-6">
-          <button onClick={() => handleNav('/beneficios')} className="text-gray-600 hover:text-green-600 font-medium">Benefícios</button>
-          <button onClick={() => handleNav('/inteligencia')} className="text-gray-600 hover:text-green-600 font-medium">Inteligência</button>
-          
-          <button 
-            onClick={() => handleNav('/seguranca')} 
-            className="text-gray-600 hover:text-green-600 font-medium flex items-center gap-1"
-          >
-            <ShieldCheck size={18} /> Segurança
-          </button>
-
-          <button onClick={() => handleNav('/planos')} className="text-gray-600 hover:text-green-600 font-medium">Planos</button>
-          
-          <Button 
-            onClick={() => navigate('/login')} 
-            variant="outline" 
-            className="border-green-600 text-green-600 hover:bg-green-50"
-          >
-            Área do Cliente
-          </Button>
-          <Button onClick={() => handleNav('/planos')} className="bg-green-600 hover:bg-green-700 text-white">
-            Quero Assinar
-          </Button>
-        </div>
-
-        {/* Menu Mobile Toggle */}
-        <div className="md:hidden">
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-900">
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
+        <button type="button" aria-label={open ? 'Fechar menu' : 'Abrir menu'} onClick={() => setOpen((value) => !value)} className="rounded-full border border-white/10 p-2 text-white md:hidden">{open ? <X size={19} /> : <Menu size={19} />}</button>
       </div>
-
-      {/* Menu Mobile Dropdown - CORRIGIDO AQUI */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t p-4 flex flex-col gap-4 shadow-lg">
-          {/* Adicionei 'text-gray-900' para forçar a cor escura no fundo branco */}
-          
-          <button 
-            onClick={() => handleNav('/beneficios')} 
-            className="text-left py-2 text-gray-900 font-medium hover:text-green-600"
-          >
-            Benefícios
-          </button>
-          
-          <button 
-            onClick={() => handleNav('/inteligencia')} 
-            className="text-left py-2 text-gray-900 font-medium hover:text-green-600"
-          >
-            Inteligência
-          </button>
-          
-          <button 
-            onClick={() => handleNav('/seguranca')} 
-            className="text-left py-2 text-gray-900 font-medium hover:text-green-600 flex items-center gap-2"
-          >
-            <ShieldCheck size={18} className="text-green-600"/> Segurança
-          </button>
-
-          <button 
-            onClick={() => handleNav('/planos')} 
-            className="text-left py-2 text-gray-900 font-medium hover:text-green-600"
-          >
-            Planos
-          </button>
-          
-          <Button onClick={() => navigate('/login')} variant="outline" className="w-full">Área do Cliente</Button>
-          <Button onClick={() => handleNav('/planos')} className="w-full bg-green-600 text-white">Quero Assinar</Button>
-        </div>
-      )}
+      {open && <div className="border-t border-white/10 bg-[#0b0c0b] px-5 py-5 md:hidden"><div className="flex flex-col gap-2">{links.map(([path, label]) => <button key={path} type="button" onClick={() => go(path)} className="rounded-xl px-3 py-3 text-left text-sm text-white/70 hover:bg-white/5 hover:text-lime-300">{label}</button>)}<div className="mt-2 grid grid-cols-2 gap-2"><Button type="button" onClick={() => go('/login')} variant="outline" className="rounded-full border-white/15 text-white">Entrar</Button><Button type="button" onClick={() => go('/planos')} className="rounded-full bg-lime-300 font-semibold text-[#10130d]">Começar</Button></div></div></div>}
     </nav>
   );
 };
