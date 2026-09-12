@@ -10,8 +10,8 @@ const Navbar = () => {
   const links = [['/beneficios', 'Recursos'], ['/inteligencia', 'Inteligência'], ['/seguranca', 'Segurança'], ['/planos', 'Planos']];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#080908]/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-10">
+    <nav className="sticky top-0 z-50 bg-[#080908] py-5">
+      <div className="mx-auto flex max-w-5xl items-center justify-between rounded-full border border-white/10 bg-[#0b0c0b]/90 px-5 py-3 shadow-2xl backdrop-blur-xl md:px-7">
         <button type="button" onClick={() => go('/')} className="flex items-center gap-2.5 text-left">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-lime-300 text-sm font-black text-[#10130d]">SP</span>
           <span className="text-base font-semibold tracking-[-.02em] text-white">Simplific <span className="text-white/40">Pro</span></span>

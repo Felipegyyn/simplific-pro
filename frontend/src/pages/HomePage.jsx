@@ -143,16 +143,33 @@ const HomePage = () => {
       <Navbar />
       <main>
         <section className="relative overflow-hidden border-b border-white/10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(192,255,72,.11),transparent_31%),radial-gradient(circle_at_90%_50%,rgba(192,255,72,.06),transparent_27%)]" />
-          <div className="container relative mx-auto grid max-w-7xl items-center gap-10 px-5 pb-20 pt-20 md:grid-cols-[.9fr_1.1fr] md:px-10 md:pb-28 md:pt-28">
-            <div className="max-w-xl">
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-lime-300/25 bg-lime-300/10 px-3 py-1.5 text-xs font-medium text-lime-200"><span className="h-1.5 w-1.5 rounded-full bg-lime-300" /> Assistente financeiro pessoal</div>
-              <h1 className="max-w-2xl text-5xl font-semibold leading-[.98] tracking-[-.055em] text-white sm:text-6xl md:text-7xl">Sua vida financeira, <span className="text-lime-300">mais simples.</span></h1>
-              <p className="mt-7 max-w-lg text-base leading-7 text-white/55 md:text-lg">O Simplific entende sua rotina, organiza seu dinheiro e mostra o que está acontecendo antes de você precisar perguntar.</p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row"><Button onClick={() => navigate('/planos')} className="h-14 rounded-full bg-lime-300 px-7 text-base font-semibold text-[#10130d] shadow-[0_0_35px_rgba(192,255,72,.16)] hover:bg-lime-200">Começar agora <ArrowRight className="ml-2" size={18} /></Button><Button onClick={() => navigate('/login')} variant="outline" className="h-14 rounded-full border-white/15 bg-white/[.03] px-7 text-base text-white hover:bg-white/10">Já sou cliente</Button></div>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs text-white/40"><span className="flex items-center gap-2"><ShieldCheck size={14} className="text-lime-300" /> Segurança de nível bancário</span><span className="flex items-center gap-2"><LockKeyhole size={14} className="text-lime-300" /> Só leitura</span></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,rgba(192,255,72,.10),transparent_24%),radial-gradient(circle_at_50%_100%,rgba(192,255,72,.05),transparent_45%)]" />
+          <div className="container relative mx-auto flex max-w-7xl flex-col items-center px-5 pb-16 pt-12 md:px-10 md:pb-20 md:pt-16">
+            <div className="max-w-2xl text-center">
+              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[.03] px-3 py-1.5 text-xs font-medium text-white/65"><span className="h-1.5 w-1.5 rounded-full bg-lime-300" /> Seu assistente financeiro pessoal</div>
+              <h1 className="text-5xl font-semibold leading-[.98] tracking-[-.06em] text-white sm:text-6xl md:text-7xl">Uma inteligência que cuida da sua grana enquanto você <span className="text-lime-300">cuida da sua vida.</span></h1>
+              <p className="mx-auto mt-6 max-w-xl text-base leading-7 text-white/50 md:text-lg">Eu organizo seus gastos, encontro padrões e te mostro o que está acontecendo com seu dinheiro antes de você precisar perguntar.</p>
+              <div className="mt-8 flex justify-center"><Button onClick={() => navigate('/planos')} className="h-14 rounded-full bg-lime-300 px-8 text-base font-semibold text-[#10130d] shadow-[0_0_35px_rgba(192,255,72,.16)] hover:bg-lime-200">Começar agora <ArrowRight className="ml-2" size={18} /></Button></div>
             </div>
-            <PhoneMockup />
+            <div className="relative mt-12 flex h-[620px] w-full max-w-5xl justify-center sm:mt-14 md:h-[700px]">
+              <div className="absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime-300/[.06] blur-3xl" />
+              <div className="absolute left-[calc(50%-275px)] top-24 z-20 hidden w-52 rounded-2xl border border-white/10 bg-[#101210]/95 p-3 shadow-2xl lg:block">
+                <div className="mb-3 flex items-center gap-2 text-[10px] text-white/45"><CircleDollarSign size={14} className="text-lime-300" /> Últimas transações</div>
+                <div className="flex items-center justify-between border-t border-white/10 py-3 text-xs"><span className="text-white/75">Delivery de comida</span><span className="text-white">R$ 42,00</span></div>
+                <div className="flex items-center justify-between border-t border-white/10 pt-3 text-xs"><span className="text-white/75">Hospedagem</span><span className="text-white">R$ 120,00</span></div>
+              </div>
+              <div className="absolute right-[calc(50%-300px)] top-52 z-20 hidden w-52 rounded-2xl border border-white/10 bg-[#101210]/95 p-3 shadow-2xl lg:block">
+                <div className="flex items-center justify-between text-[10px] text-white/45"><span>Gastos essa semana</span><TrendingUp size={13} className="text-lime-300" /></div>
+                <div className="mt-2 text-lg font-semibold text-white">R$ 1.200,00</div>
+                <div className="mt-3 flex h-16 items-end gap-2 border-b border-white/10">{[20, 42, 28, 12, 10, 8, 9].map((height, index) => <div key={index} className={`flex-1 rounded-t-sm ${index < 3 ? 'bg-lime-300' : 'bg-white/10'}`} style={{ height: `${height}%` }} />)}</div>
+                <p className="mt-2 text-[10px] text-white/40">Insights financeiros</p>
+              </div>
+              <div className="absolute left-[calc(50%-330px)] top-0 z-30 hidden items-center gap-2 lg:flex"><div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#080908] bg-[#7e75c8] text-white shadow-xl"><Sparkles size={18} /></div><span className="rounded-xl bg-[#ff8fab] px-3 py-2 text-xs font-semibold text-[#24131a]">Marie</span></div>
+              <div className="absolute right-[calc(50%-330px)] top-32 z-30 hidden items-center gap-2 lg:flex"><span className="rounded-xl bg-[#fff074] px-3 py-2 text-xs font-semibold text-[#241f05]">Einstein</span><div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#080908] bg-[#bf7bd7] text-white shadow-xl"><Brain size={18} /></div></div>
+              <div className="absolute bottom-20 left-[calc(50%-285px)] z-30 hidden items-center gap-2 lg:flex"><div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#080908] bg-[#a9c95e] text-[#17200b] shadow-xl"><Target size={18} /></div><span className="rounded-xl bg-[#98bcff] px-3 py-2 text-xs font-semibold text-[#101b35]">Galileu</span></div>
+              <PhoneMockup />
+            </div>
+            <div className="-mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-white/35"><span className="flex items-center gap-2"><ShieldCheck size={14} className="text-lime-300" /> Segurança de nível bancário</span><span className="flex items-center gap-2"><LockKeyhole size={14} className="text-lime-300" /> Só leitura</span><span className="flex items-center gap-2"><Network size={14} className="text-lime-300" /> Open Finance</span></div>
           </div>
         </section>
 
