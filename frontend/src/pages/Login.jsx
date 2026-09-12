@@ -134,7 +134,7 @@ const Login = ({ onLogin }) => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="pl-10 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-all"
+                    className="pl-10 h-12 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all"
                     placeholder="exemplo@simplific.com"
                   />
                 </div>
@@ -156,7 +156,7 @@ const Login = ({ onLogin }) => {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className="pl-10 pr-10 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-all"
+                    className="pl-10 pr-10 h-12 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all"
                     placeholder="••••••••"
                   />
                   <button
