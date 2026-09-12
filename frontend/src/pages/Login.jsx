@@ -88,17 +88,20 @@ const Login = ({ onLogin }) => {
 
   return (
     <>
-      {/* --- FUNDO TECNOLÓGICO --- */}
-      <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 relative overflow-hidden font-sans">
+      {/* --- SPLIT SCREEN LOGIN --- */}
+      <div className="min-h-screen w-full flex font-sans bg-slate-950">
         
-        {/* Efeitos de Luz de Fundo (Glow) */}
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green-500/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px]" />
-        
-        {/* Grid Sutil no Fundo */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+        {/* LADO ESQUERDO: Formulário de Login */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center relative overflow-hidden p-4 sm:p-8">
+          
+          {/* Efeitos de Luz de Fundo (Glow) */}
+          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
+          
+          {/* Grid Sutil no Fundo */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
-        <Card className="relative z-10 w-full max-w-md border-0 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <Card className="relative z-10 w-full max-w-md border-0 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
           
           {/* Barra superior colorida */}
           <div className="h-2 w-full bg-gradient-to-r from-green-500 to-emerald-600"></div>
@@ -197,6 +200,16 @@ const Login = ({ onLogin }) => {
             </p>
           </div>
         </Card>
+        </div>
+
+        {/* LADO DIREITO: Imagem */}
+        <div 
+          className="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
+          style={{ backgroundImage: "url('/novo simplific/Login.jpg')" }}
+        >
+          {/* Overlay opcional para dar um contraste elegante na imagem */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 to-transparent pointer-events-none"></div>
+        </div>
       </div>
 
       {/* Modal de Primeiro Acesso (Mantido igual) */}
