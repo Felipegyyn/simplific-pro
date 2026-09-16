@@ -61,6 +61,29 @@ def login():
         # Se o usuário não estiver ativo, barramos o login aqui.
         return jsonify({'error': 'Sua conta está inativa. Entre em contato com o suporte.'}), 403 # Retorna 403 Proibido
 
+    # ▼▼▼ TRAVA DE VERIFICAÇÃO DE E-MAIL ▼▼▼
+    if not user.is_verified:
+        return jsonify({'error': 'Por favor, confirme seu e-mail antes de fazer login. Verifique sua caixa de entrada.'}), 403
+
+    # Disparo de boas-vindas do WhatsApp no primeiro login após a verificação
+    if user.first_login:
+        try:
+            from src.services.notification_service import _send_welcome_whatsapp
+            # O template espera email, password e name, mas não temos a senha em texto plano aqui.
+            # O template 'welcome_simplific' usa {{1}} Nome, {{2}} Email, {{3}} Senha.
+            # Como a senha já foi definida pelo usuário no cadastro, podemos mandar algo como 'A senha que você cadastrou' ou omitir.
+            # Vamos mandar "***" ou "Sua senha cadastrada".
+            creds = {
+                'name': user.name,
+                'email': user.email,
+                'whatsapp': user.whatsapp,
+                'password': 'Sua senha cadastrada'
+            }
+            _send_welcome_whatsapp(creds)
+            user.first_login = False
+        except Exception as e:
+            print(f"Erro ao enviar WA de boas-vindas: {e}")
+
     # Update last login
     user.last_login = datetime.utcnow()
     db.session.commit()

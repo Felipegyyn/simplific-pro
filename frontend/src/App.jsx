@@ -28,6 +28,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import HomePage from './pages/HomePage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 import CategoriesSettings from './pages/CategoriesSettings';
 import Maintenance from './pages/Maintenance';
 
@@ -167,6 +168,7 @@ const App = () => {
 
             {/* ------------------------------------------- */}
 
+            <Route path="/home" element={<HomePage />} />
             <Route 
                 path="/login" 
                 element={user ? <Navigate to="/inicio" replace /> : <Login onLogin={handleLogin} />} 
@@ -174,6 +176,7 @@ const App = () => {
 
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify" element={<VerifyEmail />} />
 
               {/* Rota de Layout Protegido COM TRAVA DE MANUTENÇÃO */}
             <Route 

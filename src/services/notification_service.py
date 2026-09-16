@@ -106,6 +106,33 @@ def send_password_reset_email(user_email, user_name, token):
         print(f"ERRO CRÍTICO ao enviar e-mail de recuperação: {e}")
         return False
 
+def send_verification_email(user_email, user_name, token):
+    """Envia o e-mail de verificação para o cadastro de 7 dias grátis."""
+    try:
+        verify_url = f"https://simplificpro.com/#/verify?token={token}"
+
+        msg = Message(
+            subject="Verifique seu e-mail e ative seus 7 dias grátis!",
+            recipients=[user_email]
+        )
+
+        msg.body = (
+            f"Olá, {user_name}!\n\n"
+            f"Falta apenas um passo para você ativar seus 7 dias de acesso gratuito ao Simplific Pro.\n"
+            f"Por favor, confirme seu e-mail clicando no link abaixo:\n\n"
+            f"{verify_url}\n\n"
+            f"Se você não solicitou este cadastro, pode ignorar esta mensagem.\n\n"
+            f"Atenciosamente,\n"
+            f"Equipe Simplific Pro"
+        )
+
+        mail.send(msg)
+        print(f"✅ E-mail de verificação enviado para {user_email}.")
+        return True
+    except Exception as e:
+        print(f"ERRO CRÍTICO ao enviar e-mail de verificação: {e}")
+        return False
+
 # --- MÁQUINA DE VENDAS (VERSÃO ONLY CARDS) ---
 
 def send_payment_failed_notification(name, whatsapp):

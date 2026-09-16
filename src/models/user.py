@@ -20,6 +20,7 @@ class User(db.Model):
     last_login = db.Column(db.DateTime)
     preferred_response_format = db.Column(db.String(10), nullable=False, default='text')
     receive_weekly_summary = db.Column(db.Boolean, nullable=False, default=True)
+    is_verified = db.Column(db.Boolean, nullable=False, default=False)
     
     # Adicione esta linha junto com as outras colunas do modelo User
     subscription_id = db.Column(db.String(100), nullable=True)
@@ -63,6 +64,7 @@ class User(db.Model):
             'profile': self.profile,
             'status': self.status,
             'first_login': self.first_login,
+            'is_verified': self.is_verified,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None,
             'profile_image_url': self.profile_image_url,
