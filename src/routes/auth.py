@@ -120,6 +120,9 @@ def register_lead():
         print(f"✅ Novo Lead capturado: {email} vindo do Diagnóstico.")
         return jsonify({'message': 'Lead cadastrado com sucesso'}), 201
 
+    except Exception as e:
+        print(f"❌ Erro ao salvar Lead: {e}")
+        db.session.rollback()
         return jsonify({'error': 'Erro interno ao salvar lead'}), 500
 
 @auth_bp.route('/register', methods=['POST'])
