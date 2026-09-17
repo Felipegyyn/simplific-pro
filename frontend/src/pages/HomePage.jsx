@@ -111,8 +111,8 @@ const HomePage = () => {
                             <div className="reg-chart" data-ato="1">
                                 <span className="reg-chart-top">Alimentação · este mês</span>
                                 <ul className="reg-rows">
-                                    <li><em>jul</em><span className="reg-track"><i style={'--w': '87%'}></i></span><b>R$ 1.079</b></li>
-                                    <li className="is-now"><em>ago</em><span className="reg-track"><i style={'--w': '100%'}></i></span><b>R$ 1.240</b></li>
+                                    <li><em>jul</em><span className="reg-track"><i style={{'--w': '87%'}}></i></span><b>R$ 1.079</b></li>
+                                    <li className="is-now"><em>ago</em><span className="reg-track"><i style={{'--w': '100%'}}></i></span><b>R$ 1.240</b></li>
                                 </ul>
                             </div>
 
@@ -214,20 +214,20 @@ const HomePage = () => {
                             
                             <div className="reg-days">
                                 
-                                <div className="reg-day"><i style={'--t': '1'}></i><i style={'--t': '4'}></i></div>
+                                <div className="reg-day"><i style={{'--t': '1'}}></i><i style={{'--t': '4'}}></i></div>
                                 
-                                <div className="reg-day"><i style={'--t': '0'}></i><i style={'--t': '2'}></i></div>
+                                <div className="reg-day"><i style={{'--t': '0'}}></i><i style={{'--t': '2'}}></i></div>
                                 
-                                <div className="reg-day"><i style={'--t': '2'}></i><i style={'--t': '4'}></i></div>
+                                <div className="reg-day"><i style={{'--t': '2'}}></i><i style={{'--t': '4'}}></i></div>
                                 <div className="reg-day is-day">
                                     
-                                    <i style={'--t': '1'}></i>
+                                    <i style={{'--t': '1'}}></i>
                                     <span className="reg-slot"><i></i><b>15:00</b></span>
                                     
                                     <em className="reg-slot-ring"></em>
                                 </div>
                                 
-                                <div className="reg-day"><i style={'--t': '0'}></i><i style={'--t': '4'}></i></div>
+                                <div className="reg-day"><i style={{'--t': '0'}}></i><i style={{'--t': '4'}}></i></div>
                             </div>
                         </div>
 
@@ -240,9 +240,9 @@ const HomePage = () => {
                             <span className="reg-fila-top">Tarefas</span>
                             <div className="reg-tasks">
                                 
-                                <div className="reg-task" style={'--i': '0'}><i></i><span>Renovar o seguro do carro</span><b>seg 25</b></div>
-                                <div className="reg-task" style={'--i': '1'}><i></i><span>Enviar o contrato assinado</span><b>qua 27</b></div>
-                                <div className="reg-task" style={'--i': '2'}><i></i><span>Marcar o check-up</span><b>sex 29</b></div>
+                                <div className="reg-task" style={{'--i': '0'}}><i></i><span>Renovar o seguro do carro</span><b>seg 25</b></div>
+                                <div className="reg-task" style={{'--i': '1'}}><i></i><span>Enviar o contrato assinado</span><b>qua 27</b></div>
+                                <div className="reg-task" style={{'--i': '2'}}><i></i><span>Marcar o check-up</span><b>sex 29</b></div>
 
                                 <span className="reg-nova">
                                     <i></i>
@@ -382,7 +382,7 @@ const HomePage = () => {
                     </div>
                 </div>
 
-                <svg style={width: '0', '--height': '0', position: 'absolute'} aria-hidden="true" focusable="false">
+                <svg style={{width: '0', '--height': '0', position: 'absolute'}} aria-hidden="true" focusable="false">
                     <linearGradient id="verifiedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#bc85f8" />
                         <stop offset="100%" stop-color="#e27bb7" />
@@ -493,22 +493,22 @@ const HomePage = () => {
 
                             <div className="dash-chart">
                                 <ul className="dash-bars">
-                                    <li className="dash-bar is-top" style={'--w': '100%'}>
+                                    <li className="dash-bar is-top" style={{'--w': '100%'}}>
                                         <span className="dash-bar-key">Luna <em>tarefas</em></span>
                                         <span className="dash-bar-track"><i></i></span>
                                         <span className="dash-bar-val" data-count="46">46</span>
                                     </li>
-                                    <li className="dash-bar" style={'--w': '74%'}>
+                                    <li className="dash-bar" style={{'--w': '74%'}}>
                                         <span className="dash-bar-key">Martin <em>contas pagas</em></span>
                                         <span className="dash-bar-track"><i></i></span>
                                         <span className="dash-bar-val" data-count="34">34</span>
                                     </li>
-                                    <li className="dash-bar" style={'--w': '46%'}>
+                                    <li className="dash-bar" style={{'--w': '46%'}}>
                                         <span className="dash-bar-key">Sofi <em>compromissos</em></span>
                                         <span className="dash-bar-track"><i></i></span>
                                         <span className="dash-bar-val" data-count="21">21</span>
                                     </li>
-                                    <li className="dash-bar" style={'--w': '39%'}>
+                                    <li className="dash-bar" style={{'--w': '39%'}}>
                                         <span className="dash-bar-key">Theo <em>avisos</em></span>
                                         <span className="dash-bar-track"><i></i></span>
                                         <span className="dash-bar-val" data-count="18">18</span>
@@ -579,13 +579,13 @@ const HomePage = () => {
 
                             <div className="dash-chart">
                                 <div className="dash-week">
-                                    <div className="dash-day is-today" style={'--h': '66%'}><b>2</b><span className="dash-day-col"><i></i></span><em>qui</em></div>
-                                    <div className="dash-day" style={'--h': '33%'}><b>1</b><span className="dash-day-col"><i></i></span><em>sex</em></div>
-                                    <div className="dash-day" style={'--h': '100%'}><b>3</b><span className="dash-day-col"><i></i></span><em>sáb</em></div>
-                                    <div className="dash-day" style={'--h': '0'}><b></b><span className="dash-day-col"><i></i></span><em>dom</em></div>
-                                    <div className="dash-day" style={'--h': '66%'}><b>2</b><span className="dash-day-col"><i></i></span><em>seg</em></div>
-                                    <div className="dash-day" style={'--h': '33%'}><b>1</b><span className="dash-day-col"><i></i></span><em>ter</em></div>
-                                    <div className="dash-day" style={'--h': '0'}><b></b><span className="dash-day-col"><i></i></span><em>qua</em></div>
+                                    <div className="dash-day is-today" style={{'--h': '66%'}}><b>2</b><span className="dash-day-col"><i></i></span><em>qui</em></div>
+                                    <div className="dash-day" style={{'--h': '33%'}}><b>1</b><span className="dash-day-col"><i></i></span><em>sex</em></div>
+                                    <div className="dash-day" style={{'--h': '100%'}}><b>3</b><span className="dash-day-col"><i></i></span><em>sáb</em></div>
+                                    <div className="dash-day" style={{'--h': '0'}}><b></b><span className="dash-day-col"><i></i></span><em>dom</em></div>
+                                    <div className="dash-day" style={{'--h': '66%'}}><b>2</b><span className="dash-day-col"><i></i></span><em>seg</em></div>
+                                    <div className="dash-day" style={{'--h': '33%'}}><b>1</b><span className="dash-day-col"><i></i></span><em>ter</em></div>
+                                    <div className="dash-day" style={{'--h': '0'}}><b></b><span className="dash-day-col"><i></i></span><em>qua</em></div>
                                 </div>
                             </div>
 
@@ -611,10 +611,10 @@ const HomePage = () => {
 
                             <div className="dash-chart">
                                 <div className="dash-seg">
-                                    <i className="s1" style={'--w': '21%'}></i>
-                                    <i className="s2" style={'--w': '29%'}></i>
-                                    <i className="s3" style={'--w': '13%'}></i>
-                                    <i className="s4" style={'--w': '37%'}></i>
+                                    <i className="s1" style={{'--w': '21%'}}></i>
+                                    <i className="s2" style={{'--w': '29%'}}></i>
+                                    <i className="s3" style={{'--w': '13%'}}></i>
+                                    <i className="s4" style={{'--w': '37%'}}></i>
                                 </div>
                                 <ul className="dash-legend">
                                     <li className="s1"><i></i><span>Vencendo</span><b>5</b></li>
@@ -760,7 +760,7 @@ const HomePage = () => {
                     <div className="dia2-cena is-ativa" data-ato="1">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">07:40</span>
-                        <div className="dia-arte" style={'--dia-arte': 'url(\'images/7-40.webp\')'} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/7-40.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti">
                         <span className="dia-noti-icone is-nubank"><img src="/meuassessor/images/bancos/nubank.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
@@ -776,12 +776,12 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="2">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">09:15</span>
-                        <div className="dia-arte" style={'--dia-arte': 'url(\'images/9-15.webp\')'} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/9-15.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-zap" aria-hidden="true">
                         <div className="dia-zap-audio">
                         <div className="dia-zap-linha">
                         <span className="dia-zap-play"><svg viewBox="0 0 12 14" focusable="false"><path d="M2.2 1.5 10.6 7 2.2 12.5Z"/></svg></span>
-                        <span className="dia-zap-onda"><i style={'--h': '22%'}></i><i style={'--h': '30%'}></i><i style={'--h': '40%'}></i><i style={'--h': '54%'}></i><i style={'--h': '68%'}></i><i style={'--h': '82%'}></i><i style={'--h': '94%'}></i><i style={'--h': '88%'}></i><i style={'--h': '74%'}></i><i style={'--h': '60%'}></i><i style={'--h': '46%'}></i><i style={'--h': '34%'}></i><i style={'--h': '26%'}></i><i style={'--h': '36%'}></i><i style={'--h': '50%'}></i><i style={'--h': '66%'}></i><i style={'--h': '80%'}></i><i style={'--h': '92%'}></i><i style={'--h': '100%'}></i><i style={'--h': '90%'}></i><i style={'--h': '76%'}></i><i style={'--h': '62%'}></i><i style={'--h': '50%'}></i><i style={'--h': '38%'}></i><i style={'--h': '28%'}></i><i style={'--h': '34%'}></i><i style={'--h': '46%'}></i><i style={'--h': '58%'}></i><i style={'--h': '72%'}></i><i style={'--h': '86%'}></i><i style={'--h': '96%'}></i><i style={'--h': '84%'}></i><i style={'--h': '70%'}></i><i style={'--h': '56%'}></i><i style={'--h': '44%'}></i><i style={'--h': '32%'}></i><i style={'--h': '26%'}></i><i style={'--h': '38%'}></i><i style={'--h': '52%'}></i><i style={'--h': '64%'}></i><i style={'--h': '78%'}></i><i style={'--h': '70%'}></i><i style={'--h': '58%'}></i><i style={'--h': '46%'}></i><i style={'--h': '34%'}></i><i style={'--h': '24%'}></i></span>
+                        <span className="dia-zap-onda"><i style={{'--h': '22%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '40%'}}></i><i style={{'--h': '54%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '82%'}}></i><i style={{'--h': '94%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '26%'}}></i><i style={{'--h': '36%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '100%'}}></i><i style={{'--h': '90%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '62%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '86%'}}></i><i style={{'--h': '96%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '26%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '64%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '24%'}}></i></span>
                         <span className="dia-zap-dur">0:08</span>
                         </div>
                         <div className="dia-zap-fio"></div>
@@ -799,7 +799,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="3">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">12:30</span>
-                        <div className="dia-arte" style={'--dia-arte': 'url(\'images/12-30.webp\')'} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/12-30.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti">
                         <span className="dia-noti-icone is-ifood"><img src="/meuassessor/images/bancos/ifood.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
@@ -815,7 +815,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="4">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">15:30</span>
-                        <div className="dia-arte" style={'--dia-arte': 'url(\'images/15-30.webp\')'} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/15-30.webp\')'}} aria-hidden="true"></div>
                         <div className="zap4-fio" aria-hidden="true">
                         <div className="zap4-bolha is-voce">
                         <span className="zap4-txt">Preciso do contrato assinado do Rodrigo.</span>
@@ -832,7 +832,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="5">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">22:00</span>
-                        <div className="dia-arte" style={'--dia-arte': 'url(\'images/22-00.webp\')'} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/22-00.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti is-equipe">
                         <span className="dia-noti-icone is-equipe"><img src="favicon.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
@@ -1334,7 +1334,7 @@ const HomePage = () => {
                                 <strong>R$ 2.847,30</strong>
                                 
                                 <span className="ofr-mini">
-                                    <i style={'--h': '100%'}></i><i style={'--h': '62%'}></i><i style={'--h': '33%'}></i><i style={'--h': '14%'}></i><i style={'--h': '0%'}></i>
+                                    <i style={{'--h': '100%'}}></i><i style={{'--h': '62%'}}></i><i style={{'--h': '33%'}}></i><i style={{'--h': '14%'}}></i><i style={{'--h': '0%'}}></i>
                                 </span>
                             </span>
 
@@ -1375,11 +1375,11 @@ const HomePage = () => {
                                 <span className="ofr-rot">Já comprometido por mês</span>
                                 
                                 <div className="ofr-cols">
-                                    <div className="ofr-colu" style={'--b': '42px'}><b>R$ 2.847,30</b><i></i></div>
-                                    <div className="ofr-colu is-prev" style={'--b': '26px'}><b>R$ 1.757,40</b><i></i></div>
-                                    <div className="ofr-colu is-prev" style={'--b': '14px'}><b>R$ 945,40</b><i></i></div>
-                                    <div className="ofr-colu is-prev" style={'--b': '6px'}><b>R$ 387,20</b><i></i></div>
-                                    <div className="ofr-colu is-prev" style={'--b': '0px'}><b>R$ 0</b><i></i></div>
+                                    <div className="ofr-colu" style={{'--b': '42px'}}><b>R$ 2.847,30</b><i></i></div>
+                                    <div className="ofr-colu is-prev" style={{'--b': '26px'}}><b>R$ 1.757,40</b><i></i></div>
+                                    <div className="ofr-colu is-prev" style={{'--b': '14px'}}><b>R$ 945,40</b><i></i></div>
+                                    <div className="ofr-colu is-prev" style={{'--b': '6px'}}><b>R$ 387,20</b><i></i></div>
+                                    <div className="ofr-colu is-prev" style={{'--b': '0px'}}><b>R$ 0</b><i></i></div>
                                 </div>
                                 <div className="ofr-meses">
                                     <span>ago</span><span>set</span><span>out</span><span>nov</span><span>dez</span>
@@ -1442,7 +1442,7 @@ const HomePage = () => {
                         </header>
 
                         <div className="gd-kpis">
-                            <div className="gd-w gd-kpi" style={'--gd-i': '0'}>
+                            <div className="gd-w gd-kpi" style={{'--gd-i': '0'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1454,7 +1454,7 @@ const HomePage = () => {
                                 <span className="gd-num">R$ 18.240</span>
                                 <span className="gd-var gd-var--alta">+8,6% vs. julho</span>
                             </div>
-                            <div className="gd-w gd-kpi" style={'--gd-i': '1'}>
+                            <div className="gd-w gd-kpi" style={{'--gd-i': '1'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1467,7 +1467,7 @@ const HomePage = () => {
                                 
                                 <span className="gd-var gd-var--baixa">+3,2% vs. julho</span>
                             </div>
-                            <div className="gd-w gd-kpi gd-kpi--forte" style={'--gd-i': '2'}>
+                            <div className="gd-w gd-kpi gd-kpi--forte" style={{'--gd-i': '2'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1481,7 +1481,7 @@ const HomePage = () => {
                             </div>
                         </div>
 
-                        <div className="gd-w gd-carta gd-carta--fluxo" style={'--gd-i': '3'}>
+                        <div className="gd-w gd-carta gd-carta--fluxo" style={{'--gd-i': '3'}}>
                             <div className="gd-whead">
                                 <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                 <span className="gd-wtxt">
@@ -1493,42 +1493,42 @@ const HomePage = () => {
 
                             <div className="gd-graf">
                                 <div className="gd-ycol">
-                                    <span style={bottom: '100%'}>20 mil</span>
-                                    <span style={bottom: '75%'}>15 mil</span>
-                                    <span style={bottom: '50%'}>10 mil</span>
-                                    <span style={bottom: '25%'}>5 mil</span>
-                                    <span style={bottom: '0%'}>R$ 0</span>
+                                    <span style={{bottom: '100%'}}>20 mil</span>
+                                    <span style={{bottom: '75%'}}>15 mil</span>
+                                    <span style={{bottom: '50%'}}>10 mil</span>
+                                    <span style={{bottom: '25%'}}>5 mil</span>
+                                    <span style={{bottom: '0%'}}>R$ 0</span>
                                 </div>
                                 <div className="gd-plot">
-                                    <i className="gd-grade" style={bottom: '100%'}></i>
-                                    <i className="gd-grade" style={bottom: '75%'}></i>
-                                    <i className="gd-grade" style={bottom: '50%'}></i>
-                                    <i className="gd-grade" style={bottom: '25%'}></i>
-                                    <i className="gd-grade gd-grade--chao" style={bottom: '0%'}></i>
+                                    <i className="gd-grade" style={{bottom: '100%'}}></i>
+                                    <i className="gd-grade" style={{bottom: '75%'}}></i>
+                                    <i className="gd-grade" style={{bottom: '50%'}}></i>
+                                    <i className="gd-grade" style={{bottom: '25%'}}></i>
+                                    <i className="gd-grade gd-grade--chao" style={{bottom: '0%'}}></i>
                                     <div className="gd-barras gd-barras--par">
-                                        <div className="gd-bgrupo" style={'--gd-n': '0'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '56%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '54.5%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '0'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '56%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '54.5%'}}></span>
                                         </div>
-                                        <div className="gd-bgrupo" style={'--gd-n': '1'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '69.5%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '58.5%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '1'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '69.5%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '58.5%'}}></span>
                                         </div>
-                                        <div className="gd-bgrupo" style={'--gd-n': '2'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '65.5%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '62%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '2'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '65.5%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '62%'}}></span>
                                         </div>
-                                        <div className="gd-bgrupo" style={'--gd-n': '3'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '78%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '60.5%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '3'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '78%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '60.5%'}}></span>
                                         </div>
-                                        <div className="gd-bgrupo" style={'--gd-n': '4'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '84%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '67.5%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '4'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '84%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '67.5%'}}></span>
                                         </div>
-                                        <div className="gd-bgrupo" style={'--gd-n': '5'}>
-                                            <span className="gd-bar gd-bar--azul" style={'--gd-h': '91.2%'}></span>
-                                            <span className="gd-bar gd-bar--menta" style={'--gd-h': '69.65%'}></span>
+                                        <div className="gd-bgrupo" style={{'--gd-n': '5'}}>
+                                            <span className="gd-bar gd-bar--azul" style={{'--gd-h': '91.2%'}}></span>
+                                            <span className="gd-bar gd-bar--menta" style={{'--gd-h': '69.65%'}}></span>
                                         </div>
                                     </div>
                                 </div>
@@ -1553,7 +1553,7 @@ const HomePage = () => {
                         </header>
 
                         <div className="gd-duas">
-                            <div className="gd-w gd-carta gd-carta--donut" style={'--gd-i': '1'}>
+                            <div className="gd-w gd-carta gd-carta--donut" style={{'--gd-i': '1'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1565,11 +1565,11 @@ const HomePage = () => {
                                 <div className="gd-donut">
                                     <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
                                         
-                                        <circle className="gd-fatia gd-fatia--1" style={'--gd-len': '81.83', '--gd-dur': '322ms', '--gd-off': '0ms'} cx="60" cy="60" r="42" transform="rotate(-90 60 60)" stroke-dasharray="81.83 264"/>
-                                        <circle className="gd-fatia gd-fatia--2" style={'--gd-len': '66.85', '--gd-dur': '263ms', '--gd-off': '322ms'} cx="60" cy="60" r="42" transform="rotate(24.36 60 60)" stroke-dasharray="66.85 264"/>
-                                        <circle className="gd-fatia gd-fatia--3" style={'--gd-len': '48.95', '--gd-dur': '193ms', '--gd-off': '585ms'} cx="60" cy="60" r="42" transform="rotate(118.29 60 60)" stroke-dasharray="48.95 264"/>
-                                        <circle className="gd-fatia gd-fatia--4" style={'--gd-len': '34.34', '--gd-dur': '135ms', '--gd-off': '778ms'} cx="60" cy="60" r="42" transform="rotate(187.80 60 60)" stroke-dasharray="34.34 264"/>
-                                        <circle className="gd-fatia gd-fatia--5" style={'--gd-len': '21.92', '--gd-dur': '87ms', '--gd-off': '913ms'} cx="60" cy="60" r="42" transform="rotate(237.37 60 60)" stroke-dasharray="21.92 264"/>
+                                        <circle className="gd-fatia gd-fatia--1" style={{'--gd-len': '81.83', '--gd-dur': '322ms', '--gd-off': '0ms'}} cx="60" cy="60" r="42" transform="rotate(-90 60 60)" stroke-dasharray="81.83 264"/>
+                                        <circle className="gd-fatia gd-fatia--2" style={{'--gd-len': '66.85', '--gd-dur': '263ms', '--gd-off': '322ms'}} cx="60" cy="60" r="42" transform="rotate(24.36 60 60)" stroke-dasharray="66.85 264"/>
+                                        <circle className="gd-fatia gd-fatia--3" style={{'--gd-len': '48.95', '--gd-dur': '193ms', '--gd-off': '585ms'}} cx="60" cy="60" r="42" transform="rotate(118.29 60 60)" stroke-dasharray="48.95 264"/>
+                                        <circle className="gd-fatia gd-fatia--4" style={{'--gd-len': '34.34', '--gd-dur': '135ms', '--gd-off': '778ms'}} cx="60" cy="60" r="42" transform="rotate(187.80 60 60)" stroke-dasharray="34.34 264"/>
+                                        <circle className="gd-fatia gd-fatia--5" style={{'--gd-len': '21.92', '--gd-dur': '87ms', '--gd-off': '913ms'}} cx="60" cy="60" r="42" transform="rotate(237.37 60 60)" stroke-dasharray="21.92 264"/>
                                     </svg>
                                     <span className="gd-donut-meio">
                                         <b>32,2%</b>
@@ -1587,7 +1587,7 @@ const HomePage = () => {
                             </div>
 
                             <div className="gd-coluna">
-                                <div className="gd-w gd-kpi gd-kpi--forte" style={'--gd-i': '0'}>
+                                <div className="gd-w gd-kpi gd-kpi--forte" style={{'--gd-i': '0'}}>
                                     <div className="gd-whead">
                                         <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                         <span className="gd-wtxt">
@@ -1601,7 +1601,7 @@ const HomePage = () => {
                                     <span className="gd-var gd-var--baixa">+4,1% vs. julho</span>
                                 </div>
 
-                            <div className="gd-w gd-carta gd-carta--lista" style={'--gd-i': '2'}>
+                            <div className="gd-w gd-carta gd-carta--lista" style={{'--gd-i': '2'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1611,11 +1611,11 @@ const HomePage = () => {
                                     <span className="gd-menu"><i></i><i></i><i></i></span>
                                 </div>
                                 <ul className="gd-lista">
-                                    <li className="gd-item" style={'--gd-n': '0'}><i className="gd-marca gd-marca--1"></i><span className="gd-item-nome">Mercado</span><span className="gd-item-fat">32,2%</span><span className="gd-item-val">R$ 2.240</span></li>
-                                    <li className="gd-item" style={'--gd-n': '1'}><i className="gd-marca gd-marca--2"></i><span className="gd-item-nome">Casa</span><span className="gd-item-fat">26,3%</span><span className="gd-item-val">R$ 1.830</span></li>
-                                    <li className="gd-item" style={'--gd-n': '2'}><i className="gd-marca gd-marca--3"></i><span className="gd-item-nome">Restaurantes</span><span className="gd-item-fat">19,3%</span><span className="gd-item-val">R$ 1.340</span></li>
-                                    <li className="gd-item" style={'--gd-n': '3'}><i className="gd-marca gd-marca--4"></i><span className="gd-item-nome">Transporte</span><span className="gd-item-fat">13,5%</span><span className="gd-item-val">R$ 940</span></li>
-                                    <li className="gd-item" style={'--gd-n': '4'}><i className="gd-marca gd-marca--5"></i><span className="gd-item-nome">Outros</span><span className="gd-item-fat">8,7%</span><span className="gd-item-val">R$ 600</span></li>
+                                    <li className="gd-item" style={{'--gd-n': '0'}}><i className="gd-marca gd-marca--1"></i><span className="gd-item-nome">Mercado</span><span className="gd-item-fat">32,2%</span><span className="gd-item-val">R$ 2.240</span></li>
+                                    <li className="gd-item" style={{'--gd-n': '1'}}><i className="gd-marca gd-marca--2"></i><span className="gd-item-nome">Casa</span><span className="gd-item-fat">26,3%</span><span className="gd-item-val">R$ 1.830</span></li>
+                                    <li className="gd-item" style={{'--gd-n': '2'}}><i className="gd-marca gd-marca--3"></i><span className="gd-item-nome">Restaurantes</span><span className="gd-item-fat">19,3%</span><span className="gd-item-val">R$ 1.340</span></li>
+                                    <li className="gd-item" style={{'--gd-n': '3'}}><i className="gd-marca gd-marca--4"></i><span className="gd-item-nome">Transporte</span><span className="gd-item-fat">13,5%</span><span className="gd-item-val">R$ 940</span></li>
+                                    <li className="gd-item" style={{'--gd-n': '4'}}><i className="gd-marca gd-marca--5"></i><span className="gd-item-nome">Outros</span><span className="gd-item-fat">8,7%</span><span className="gd-item-val">R$ 600</span></li>
                                 </ul>
                             </div>
                             </div>
@@ -1629,7 +1629,7 @@ const HomePage = () => {
                             <span className="gd-salvar">Salvar painel</span>
                         </header>
 
-                        <div className="gd-w gd-carta gd-carta--barras" style={'--gd-i': '0'}>
+                        <div className="gd-w gd-carta gd-carta--barras" style={{'--gd-i': '0'}}>
                             <div className="gd-whead">
                                 <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                 <span className="gd-wtxt">
@@ -1641,24 +1641,24 @@ const HomePage = () => {
 
                             <div className="gd-graf">
                                 <div className="gd-ycol">
-                                    <span style={bottom: '84%'}>240</span>
-                                    <span style={bottom: '56%'}>160</span>
-                                    <span style={bottom: '28%'}>80</span>
-                                    <span style={bottom: '0%'}>R$ 0</span>
+                                    <span style={{bottom: '84%'}}>240</span>
+                                    <span style={{bottom: '56%'}}>160</span>
+                                    <span style={{bottom: '28%'}}>80</span>
+                                    <span style={{bottom: '0%'}}>R$ 0</span>
                                 </div>
                                 <div className="gd-plot">
-                                    <i className="gd-grade" style={bottom: '84%'}></i>
-                                    <i className="gd-grade" style={bottom: '56%'}></i>
-                                    <i className="gd-grade" style={bottom: '28%'}></i>
-                                    <i className="gd-grade gd-grade--chao" style={bottom: '0%'}></i>
+                                    <i className="gd-grade" style={{bottom: '84%'}}></i>
+                                    <i className="gd-grade" style={{bottom: '56%'}}></i>
+                                    <i className="gd-grade" style={{bottom: '28%'}}></i>
+                                    <i className="gd-grade gd-grade--chao" style={{bottom: '0%'}}></i>
                                     <div className="gd-barras gd-barras--sete">
-                                        <div className="gd-bcol" style={'--gd-n': '0'}><span className="gd-coroa">85</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '29.75%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '1'}><span className="gd-coroa">40</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '14%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '2'}><span className="gd-coroa">160</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '56%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '3'}><span className="gd-coroa">75</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '26.25%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '4'}><span className="gd-coroa">220</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '77%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '5'}><span className="gd-coroa">130</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '45.5%'}></span></div>
-                                        <div className="gd-bcol" style={'--gd-n': '6'}><span className="gd-coroa">55</span><span className="gd-bar gd-bar--menta" style={'--gd-h': '19.25%'}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '0'}}><span className="gd-coroa">85</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '29.75%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '1'}}><span className="gd-coroa">40</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '14%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '2'}}><span className="gd-coroa">160</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '56%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '3'}}><span className="gd-coroa">75</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '26.25%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '4'}}><span className="gd-coroa">220</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '77%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '5'}}><span className="gd-coroa">130</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '45.5%'}}></span></div>
+                                        <div className="gd-bcol" style={{'--gd-n': '6'}}><span className="gd-coroa">55</span><span className="gd-bar gd-bar--menta" style={{'--gd-h': '19.25%'}}></span></div>
                                     </div>
                                 </div>
                             </div>
@@ -1673,7 +1673,7 @@ const HomePage = () => {
                         </div>
 
                         <div className="gd-kpis gd-kpis--dois">
-                            <div className="gd-w gd-kpi gd-kpi--forte" style={'--gd-i': '1'}>
+                            <div className="gd-w gd-kpi gd-kpi--forte" style={{'--gd-i': '1'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1686,7 +1686,7 @@ const HomePage = () => {
                                 
                                 <span className="gd-var gd-var--alta">+10,9% vs. semana anterior</span>
                             </div>
-                            <div className="gd-w gd-kpi" style={'--gd-i': '2'}>
+                            <div className="gd-w gd-kpi" style={{'--gd-i': '2'}}>
                                 <div className="gd-whead">
                                     <span className="gd-alca"><i></i><i></i><i></i><i></i><i></i><i></i></span>
                                     <span className="gd-wtxt">
@@ -1733,15 +1733,15 @@ const HomePage = () => {
                                     </span>
                                     
                                     <span className="ag1-onda">
-                                        <span className="ag1-barras"><i style={'--h': '28%'}></i><i style={'--h': '38%'}></i><i style={'--h': '52%'}></i><i style={'--h': '66%'}></i><i style={'--h': '80%'}></i><i style={'--h': '92%'}></i><i style={'--h': '84%'}></i><i style={'--h': '70%'}></i><i style={'--h': '58%'}></i><i style={'--h': '44%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '30%'}></i><i style={'--h': '42%'}></i><i style={'--h': '56%'}></i><i style={'--h': '72%'}></i><i style={'--h': '88%'}></i><i style={'--h': '96%'}></i><i style={'--h': '90%'}></i><i style={'--h': '78%'}></i><i style={'--h': '64%'}></i><i style={'--h': '50%'}></i><i style={'--h': '38%'}></i><i style={'--h': '46%'}></i><i style={'--h': '60%'}></i><i style={'--h': '74%'}></i><i style={'--h': '68%'}></i><i style={'--h': '54%'}></i><i style={'--h': '42%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '18%'}></i></span>
-                                        <span className="ag1-barras ag1-lidas"><i style={'--h': '28%'}></i><i style={'--h': '38%'}></i><i style={'--h': '52%'}></i><i style={'--h': '66%'}></i><i style={'--h': '80%'}></i><i style={'--h': '92%'}></i><i style={'--h': '84%'}></i><i style={'--h': '70%'}></i><i style={'--h': '58%'}></i><i style={'--h': '44%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '30%'}></i><i style={'--h': '42%'}></i><i style={'--h': '56%'}></i><i style={'--h': '72%'}></i><i style={'--h': '88%'}></i><i style={'--h': '96%'}></i><i style={'--h': '90%'}></i><i style={'--h': '78%'}></i><i style={'--h': '64%'}></i><i style={'--h': '50%'}></i><i style={'--h': '38%'}></i><i style={'--h': '46%'}></i><i style={'--h': '60%'}></i><i style={'--h': '74%'}></i><i style={'--h': '68%'}></i><i style={'--h': '54%'}></i><i style={'--h': '42%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '18%'}></i></span>
+                                        <span className="ag1-barras"><i style={{'--h': '28%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '96%'}}></i><i style={{'--h': '90%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '64%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '54%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '18%'}}></i></span>
+                                        <span className="ag1-barras ag1-lidas"><i style={{'--h': '28%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '96%'}}></i><i style={{'--h': '90%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '64%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '54%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '18%'}}></i></span>
                                         <i className="ag1-cabeca"></i>
                                     </span>
                                     <span className="ag1-dur">0:07</span>
                                 </div>
 
                                 <div className="ag1-fio"></div>
-                                <p className="ag1-tr"><i style={'--i': '0'}>Marca</i> <i style={'--i': '1'}>o</i> <i style={'--i': '2'}>dentista</i> <i style={'--i': '3'}>quinta</i> <i style={'--i': '4'}>às</i> <i style={'--i': '5'}>três</i> <i style={'--i': '6'}>da</i> <i style={'--i': '7'}>tarde.</i></p>
+                                <p className="ag1-tr"><i style={{'--i': '0'}}>Marca</i> <i style={{'--i': '1'}}>o</i> <i style={{'--i': '2'}}>dentista</i> <i style={{'--i': '3'}}>quinta</i> <i style={{'--i': '4'}}>às</i> <i style={{'--i': '5'}}>três</i> <i style={{'--i': '6'}}>da</i> <i style={{'--i': '7'}}>tarde.</i></p>
                                 
                                 <div className="ag1-meta">
                                     <span>08:12</span>
@@ -1804,7 +1804,7 @@ const HomePage = () => {
                                                     </span>
                                                     
                                                     <span className="ag2-onda">
-                                                        <span className="ag2-barras"><i style={'--h': '28%'}></i><i style={'--h': '38%'}></i><i style={'--h': '52%'}></i><i style={'--h': '66%'}></i><i style={'--h': '80%'}></i><i style={'--h': '92%'}></i><i style={'--h': '84%'}></i><i style={'--h': '70%'}></i><i style={'--h': '58%'}></i><i style={'--h': '44%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '30%'}></i><i style={'--h': '42%'}></i><i style={'--h': '56%'}></i><i style={'--h': '72%'}></i><i style={'--h': '88%'}></i><i style={'--h': '96%'}></i><i style={'--h': '90%'}></i><i style={'--h': '78%'}></i><i style={'--h': '64%'}></i><i style={'--h': '50%'}></i><i style={'--h': '38%'}></i><i style={'--h': '46%'}></i><i style={'--h': '60%'}></i><i style={'--h': '74%'}></i><i style={'--h': '68%'}></i><i style={'--h': '54%'}></i><i style={'--h': '42%'}></i><i style={'--h': '32%'}></i><i style={'--h': '24%'}></i><i style={'--h': '18%'}></i></span>
+                                                        <span className="ag2-barras"><i style={{'--h': '28%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '96%'}}></i><i style={{'--h': '90%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '64%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '54%'}}></i><i style={{'--h': '42%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '18%'}}></i></span>
                                                         <i className="ag2-cabeca"></i>
                                                     </span>
                                                     <span className="ag2-dur">0:07</span>
@@ -1957,15 +1957,15 @@ const HomePage = () => {
                                     </span>
                                     
                                     <span className="ag3-onda">
-                                        <span className="ag3-barras"><i style={'--h': '26%'}></i><i style={'--h': '34%'}></i><i style={'--h': '44%'}></i><i style={'--h': '50%'}></i><i style={'--h': '60%'}></i><i style={'--h': '68%'}></i><i style={'--h': '74%'}></i><i style={'--h': '84%'}></i><i style={'--h': '88%'}></i><i style={'--h': '92%'}></i><i style={'--h': '84%'}></i><i style={'--h': '78%'}></i><i style={'--h': '72%'}></i><i style={'--h': '68%'}></i><i style={'--h': '58%'}></i><i style={'--h': '52%'}></i><i style={'--h': '46%'}></i><i style={'--h': '36%'}></i><i style={'--h': '30%'}></i><i style={'--h': '24%'}></i><i style={'--h': '28%'}></i><i style={'--h': '34%'}></i><i style={'--h': '44%'}></i><i style={'--h': '50%'}></i><i style={'--h': '62%'}></i><i style={'--h': '66%'}></i><i style={'--h': '76%'}></i><i style={'--h': '82%'}></i><i style={'--h': '86%'}></i><i style={'--h': '80%'}></i><i style={'--h': '76%'}></i><i style={'--h': '68%'}></i><i style={'--h': '60%'}></i><i style={'--h': '56%'}></i><i style={'--h': '46%'}></i><i style={'--h': '38%'}></i><i style={'--h': '34%'}></i><i style={'--h': '28%'}></i><i style={'--h': '24%'}></i></span>
-                                        <span className="ag3-barras ag3-lidas"><i style={'--h': '26%'}></i><i style={'--h': '34%'}></i><i style={'--h': '44%'}></i><i style={'--h': '50%'}></i><i style={'--h': '60%'}></i><i style={'--h': '68%'}></i><i style={'--h': '74%'}></i><i style={'--h': '84%'}></i><i style={'--h': '88%'}></i><i style={'--h': '92%'}></i><i style={'--h': '84%'}></i><i style={'--h': '78%'}></i><i style={'--h': '72%'}></i><i style={'--h': '68%'}></i><i style={'--h': '58%'}></i><i style={'--h': '52%'}></i><i style={'--h': '46%'}></i><i style={'--h': '36%'}></i><i style={'--h': '30%'}></i><i style={'--h': '24%'}></i><i style={'--h': '28%'}></i><i style={'--h': '34%'}></i><i style={'--h': '44%'}></i><i style={'--h': '50%'}></i><i style={'--h': '62%'}></i><i style={'--h': '66%'}></i><i style={'--h': '76%'}></i><i style={'--h': '82%'}></i><i style={'--h': '86%'}></i><i style={'--h': '80%'}></i><i style={'--h': '76%'}></i><i style={'--h': '68%'}></i><i style={'--h': '60%'}></i><i style={'--h': '56%'}></i><i style={'--h': '46%'}></i><i style={'--h': '38%'}></i><i style={'--h': '34%'}></i><i style={'--h': '28%'}></i><i style={'--h': '24%'}></i></span>
+                                        <span className="ag3-barras"><i style={{'--h': '26%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '36%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '62%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '82%'}}></i><i style={{'--h': '86%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '24%'}}></i></span>
+                                        <span className="ag3-barras ag3-lidas"><i style={{'--h': '26%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '36%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '24%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '62%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '82%'}}></i><i style={{'--h': '86%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '24%'}}></i></span>
                                         <i className="ag3-cabeca"></i>
                                     </span>
                                     <span className="ag3-dur">0:04</span>
                                 </div>
 
                                 <div className="ag3-fio"></div>
-                                <p className="ag3-tr"><i style={'--i': '0'}>Marca</i> <i style={'--i': '1'}>reunião</i> <i style={'--i': '2'}>com</i> <i style={'--i': '3'}>a</i> <i style={'--i': '4'}>Ana</i> <i style={'--i': '5'}>e</i> <i style={'--i': '6'}>o</i> <i style={'--i': '7'}>Lucas</i> <i style={'--i': '8'}>terça</i> <i style={'--i': '9'}>às</i> <i style={'--i': '10'}>dez.</i></p>
+                                <p className="ag3-tr"><i style={{'--i': '0'}}>Marca</i> <i style={{'--i': '1'}}>reunião</i> <i style={{'--i': '2'}}>com</i> <i style={{'--i': '3'}}>a</i> <i style={{'--i': '4'}}>Ana</i> <i style={{'--i': '5'}}>e</i> <i style={{'--i': '6'}}>o</i> <i style={{'--i': '7'}}>Lucas</i> <i style={{'--i': '8'}}>terça</i> <i style={{'--i': '9'}}>às</i> <i style={{'--i': '10'}}>dez.</i></p>
 
                                 <div className="ag3-ped-meta">
                                     <span>17:23</span>
@@ -2072,19 +2072,19 @@ const HomePage = () => {
                         <div className="vit-tela cob-tela">
                             <div className="chat-messages cob-conversa" id="cobConversa">
                                 <div className="chat-msg user cob-msg" data-passo="1"><div className="chat-msg-text" id="cobPedido" data-texto="Tenho R$ 5.000 pra receber todo dia 10 do Carlos. Gera as cobranças e a nota fiscal.">Tenho R$ 5.000 pra receber todo dia 10 do Carlos. Gera as cobranças e a nota fiscal.</div><div className="chat-msg-time">09:12 <svg viewBox="0 0 16 11" width="16" height="11" fill="none" className="chat-msg-checks" aria-hidden="true"><path d="M1.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M7.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="2"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#00897B'}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
-                                <div className="chat-msg bot cob-msg" data-passo="3"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#00897B'}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Fechado. Cobrança do <b>Carlos</b>: <b>R$ 5.000,00 todo dia 10</b>, a partir de outubro. O link já foi pra ele.</div><div className="chat-msg-time">09:12</div></div>
+                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="2"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
+                                <div className="chat-msg bot cob-msg" data-passo="3"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Fechado. Cobrança do <b>Carlos</b>: <b>R$ 5.000,00 todo dia 10</b>, a partir de outubro. O link já foi pra ele.</div><div className="chat-msg-time">09:12</div></div>
                                 <div className="chat-msg bot cob-msg cob-card" data-passo="4"><span className="blk-b-corpo"><span className="blk-etiq cob-etiq">Link de cobrança · vence 10/10</span><span className="blk-b-valor">R$ 5.000,00</span><span className="blk-b-parcela">em até 10x · todo dia 10</span><span className="blk-b-botao" id="cobBotao">Pagar agora</span><span className="blk-bandeiras">
                                                 <span className="blk-band blk-band--mc"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 999.2 618"><rect x="364" y="66.1" fill="#FF5A00" width="270.4" height="485.8"/> <path fill="#EB001B" d="M382,309c0-98.7,46.4-186.3,117.6-242.9 C447.2,24.9,381.1,0,309,0C138.2,0,0,138.2,0,309s138.2,309,309,309c72.1,0,138.2-24.9,190.6-66.1C428.3,496.1,382,407.7,382,309z" /> <path fill="#F79E1B" d="M999.2,309c0,170.8-138.2,309-309,309 c-72.1,0-138.2-24.9-190.6-66.1c72.1-56.7,117.6-144.2,117.6-242.9S570.8,122.7,499.6,66.1C551.9,24.9,618,0,690.1,0 C861,0,999.2,139.1,999.2,309z"/></svg></span>
                                                 <span className="blk-band blk-band--visa"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 324.68"><path fill="#1434cb" d="m651.19.5c-70.93,0-134.32,36.77-134.32,104.69,0,77.9,112.42,83.28,112.42,122.42,0,16.48-18.88,31.23-51.14,31.23-45.77,0-79.98-20.61-79.98-20.61l-14.64,68.55s39.41,17.41,91.73,17.41c77.55,0,138.58-38.57,138.58-107.66,0-82.32-112.89-87.54-112.89-123.86,0-12.91,15.5-27.05,47.66-27.05,36.29,0,65.89,14.99,65.89,14.99l14.33-66.2S696.61.5,651.18.5h0ZM2.22,5.5L.5,15.49s29.84,5.46,56.72,16.36c34.61,12.49,37.07,19.77,42.9,42.35l63.51,244.83h85.14L379.93,5.5h-84.94l-84.28,213.17-34.39-180.7c-3.15-20.68-19.13-32.48-38.68-32.48,0,0-135.41,0-135.41,0Zm411.87,0l-66.63,313.53h81L494.85,5.5h-80.76Zm451.76,0c-19.53,0-29.88,10.46-37.47,28.73l-118.67,284.8h84.94l16.43-47.47h103.48l9.99,47.47h74.95L934.12,5.5h-68.27Zm11.05,84.71l25.18,117.65h-67.45l42.28-117.65h0Z"/></svg></span>
                                                 <span className="blk-band blk-band--elo"><svg viewBox="0 0 74 29" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd"><path d="M11.552 6.174a8.538 8.538 0 0 1 2.66-.42c4.06 0 7.449 2.824 8.225 6.58l5.753-1.15C26.87 4.801 21.115 0 14.213 0c-1.582 0-3.1.252-4.523.718l1.862 5.456z" fill="#FFCA05"/><path d="M4.872 24.667l3.938-4.353c-1.758-1.523-2.867-3.745-2.867-6.22 0-2.475 1.107-4.696 2.864-6.217L4.87 3.524C1.884 6.11 0 9.887 0 14.094c0 4.208 1.884 7.986 4.872 10.573" fill="#00A4DF"/><path d="M22.438 15.857c-.779 3.755-4.164 6.577-8.22 6.577a8.49 8.49 0 0 1-2.664-.423L9.69 27.473c1.422.466 2.944.717 4.527.717 6.894 0 12.648-4.797 13.973-11.176l-5.752-1.157z" fill="#EE4123"/><path d="M44.476 18.725l-.004.004-.163-.11c-.47.764-1.2 1.384-2.125 1.786-1.757.767-3.385.57-4.554-.46l-.107.164c-.002-.002-.002-.003-.004-.003l-1.994 2.996a8.524 8.524 0 0 0 1.585.872c2.203.92 4.456.877 6.676-.093 1.607-.699 2.866-1.765 3.728-3.116l-3.038-2.04zm-6.225-7.393c-1.855.8-2.812 2.549-2.615 4.599l7.86-3.398c-1.352-1.596-3.11-2.124-5.245-1.201zm-5.218 9.128a10.248 10.248 0 0 1-.596-1.153c-.907-2.115-.95-4.303-.185-6.404.842-2.304 2.45-4.068 4.529-4.966 2.613-1.13 5.502-.907 8.006.586 1.591.916 2.719 2.332 3.575 4.333.11.256.205.53.299.763l-15.628 6.84zm21.09-16.936v16.659l2.579 1.05-1.465 3.434-2.846-1.19c-.639-.279-1.074-.704-1.403-1.184-.315-.49-.55-1.16-.55-2.065V3.524h3.685zm6.68 12.415a4.722 4.722 0 0 0 1.6 3.552l-2.642 2.966a8.698 8.698 0 0 1-2.918-6.522 8.695 8.695 0 0 1 2.927-6.514l2.645 2.963a4.72 4.72 0 0 0-1.612 3.555zm4.7 4.728c2.272.002 4.168-1.615 4.61-3.766l3.883.796c-.81 3.969-4.308 6.954-8.497 6.95a8.628 8.628 0 0 1-2.75-.451l1.264-3.773c.468.156.97.243 1.49.244zm.012-13.428c4.192.003 7.686 3 8.485 6.974l-3.884.79a4.708 4.708 0 0 0-4.605-3.785 4.72 4.72 0 0 0-1.491.242l-1.252-3.777a8.62 8.62 0 0 1 2.747-.444z" fill="#000"/></g></svg></span>
                                                                                                 
                                                                                                 <span className="blk-band blk-band--amex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 997.5"><g transform="translate(-55.5,-1002.3)"><path fill="#016fd0" d="m55.5,1002.3 997.5,0 0,538.5 -49.4,77.1 49.4,68.7 0,313.2 -997.5,0 0-507.6L86.4,1456.7 55.5,1422.8Z"/><path fill="#fff" d="m249.1,1697.4 0-156.6 165.8,0 17.8,23.2 18.4-23.2 601.9,0 0,145.8c0,0 -15.7,10.6 -33.9,10.8l-333.3,0 -20.1-24.7 0,24.7 -65.7,0 0-42.1c0,0 -9,5.9 -28.4,5.9l-22.4,0 0,36.3 -99.5,0 -17.8-23.7 -18,23.7z"/><path fill="#fff" d="m55.5,1422.8 37.4-87.2 64.7,0 21.2,48.8 0-48.8 80.4,0 12.6,35.3 12.2-35.3 360.9,0 0,17.7c0,0 19-17.7 50.1-17.7l117.1,0.4 20.9,48.2 0-48.6 67.3,0 18.5,27.7 0-27.7 67.9,0 0,156.6 -67.9,0 -17.7-27.8 0,27.8 -98.8,0 -9.9-24.7 -26.6,0 -9.8,24.7 -67,0c-26.8,0 -44-17.4 -44-17.4l0,17.4 -101.1,0 -20.1-24.7 0,24.7 -375.8,0 -9.9-24.7 -26.5,0 -9.9,24.7 -46.2,0z"/><path fill="#016fd0" d="m106.1,1354.9 -50.4,117.3 32.8,0 9.3-23.5 54.1,0 9.3,23.5 33.6,0 -50.4-117.3 -38.2,0zm18.7,27.3 16.5,41 -33,0 16.5-41z"/><path fill="#016fd0" d="m198.2,1472.2 0-117.3 46.7,0.2 27.1,75.6 26.5-75.8 46.3,0 0,117.3 -29.3,0 0-86.4 -31.1,86.4 -25.7,0 -31.2-86.4 0,86.4z"/><path fill="#016fd0" d="m364.9,1472.2 0-117.3 95.7,0 0,26.2 -66,0 0,20.1 64.5,0 0,24.7 -64.5,0 0,20.8 66,0 0,25.5z"/><path fill="#016fd0" d="m477.5,1354.9 0,117.3 29.3,0 0-41.7 12.3,0 35.2,41.7 35.8,0 -38.6-43.2c15.8-1.3 32.2-14.9 32.2-36 0-24.7 -19.4-38 -41-38l-65.2,0zm29.3,26.2 33.5,0c8,0 13.9,6.3 13.9,12.3 0,7.8 -7.6,12.3 -13.5,12.3l-33.9,0 0-24.7z"/><path fill="#016fd0" d="m625.6,1472.2 -29.9,0 0-117.3 29.9,0z"/><path fill="#016fd0" d="m696.6,1472.2 -6.5,0c-31.3,0 -50.2-24.6 -50.2-58.1 0-34.3 18.8-59.1 58.2-59.1l32.4,0 0,27.8 -33.6,0c-16,0 -27.4,12.5 -27.4,31.6 0,22.7 13,32.2 31.6,32.2l7.7,0z"/><path fill="#016fd0" d="m760.4,1354.9 -50.4,117.3 32.8,0 9.3-23.5 54.1,0 9.3,23.5 33.6,0 -50.4-117.3 -38.2,0zm18.7,27.3 16.5,41 -33,0 16.5-41z"/><path fill="#016fd0" d="m852.4,1472.2 0-117.3 37.3,0 47.6,73.7 0-73.7 29.3,0 0,117.3 -36.1,0 -48.8-75.6 0,75.6z"/><path fill="#016fd0" d="m269.2,1677.4 0-117.3 95.7,0 0,26.2 -66,0 0,20.1 64.5,0 0,24.7 -64.5,0 0,20.8 66,0 0,25.5z"/><path fill="#016fd0" d="m737.9,1677.4 0-117.3 95.7,0 0,26.2 -66,0 0,20.1 64.2,0 0,24.7 -64.2,0 0,20.8 66,0 0,25.5z"/><path fill="#016fd0" d="m368.6,1677.4 46.6-57.9 -47.7-59.4 36.9,0 28.4,36.7 28.5-36.7 35.5,0 -47.1,58.6 46.7,58.6 -36.9,0 -27.6-36.1 -26.9,36.1z"/><path fill="#016fd0" d="m499.9,1560.1 0,117.3 30.1,0 0-37 30.9,0c26.1,0 45.9-13.9 45.9-40.8 0-22.3 -15.5-39.4 -42.1-39.4l-64.8,0zm30.1,26.5 32.5,0c8.4,0 14.5,5.2 14.5,13.5 0,7.8 -6,13.5 -14.6,13.5l-32.4,0 0-27z"/><path fill="#016fd0" d="m619.4,1560.1 0,117.3 29.3,0 0-41.7 12.3,0 35.2,41.7 35.8,0 -38.6-43.2c15.8-1.3 32.2-14.9 32.2-36 0-24.7 -19.4-38 -41-38l-65.2,0zm29.3,26.2 33.5,0c8,0 13.9,6.3 13.9,12.3 0,7.8 -7.6,12.3 -13.5,12.3l-33.9,0 0-24.7z"/><path fill="#016fd0" d="m847.2,1677.4 0-25.5 58.7,0c8.7,0 12.4-4.7 12.4-9.8 0-4.9 -3.7-9.9 -12.4-9.9l-26.5,0c-23,0 -35.9-14 -35.9-35.1 0-18.8 11.8-36.9 46-36.9l57.1,0 -12.3,26.4 -49.4,0c-9.4,0 -12.3,5 -12.3,9.7 0,4.9 3.6,10.2 10.8,10.2l27.8,0c25.7,0 36.8,14.6 36.8,33.7 0,20.5 -12.4,37.3 -38.2,37.3z"/><path fill="#016fd0" d="m954.8,1677.4 0-25.5 58.7,0c8.7,0 12.4-4.7 12.4-9.8 0-4.9 -3.7-9.9 -12.4-9.9l-26.5,0c-23,0 -35.9-14 -35.9-35.1 0-18.8 11.8-36.9 46-36.9l57.1,0 -12.3,26.4 -49.4,0c-9.4,0 -12.3,5 -12.3,9.7 0,4.9 3.6,10.2 10.8,10.2l27.8,0c25.7,0 36.8,14.6 36.8,33.7 0,20.5 -12.4,37.3 -38.2,37.3z"/></g></svg></span></span></span></div>
-                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="5"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#E91E63'}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
-                                <div className="chat-msg bot cob-msg" data-passo="6"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#E91E63'}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-msg-text">Nota emitida 🧾 <b>NFS-e nº 158</b> · R$ 5.000,00 · Carlos Mendes. O PDF já está aqui na conversa.</div><div className="chat-msg-time">09:13</div></div>
-                                <div className="chat-msg bot cob-msg cob-arquivo" data-passo="7"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#E91E63'}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="cob-pdf"><span className="cob-pdf-icone" aria-hidden="true">PDF</span><span className="cob-pdf-info"><span className="cob-pdf-nome">NFS-e-158-Carlos-Mendes.pdf</span><span className="cob-pdf-meta">1 página · 84 KB · PDF</span></span></div><div className="chat-msg-time">09:13</div></div>
-                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="9"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#00897B'}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
-                                <div className="chat-msg bot cob-msg" data-passo="10"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={color: '#00897B'}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Pagamento confirmado ✅ O Carlos pagou o link: <b>R$ 5.000,00</b> na sua conta. Próxima cobrança: 10/11.</div><div className="chat-msg-time">10:41</div></div>
+                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="5"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
+                                <div className="chat-msg bot cob-msg" data-passo="6"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-msg-text">Nota emitida 🧾 <b>NFS-e nº 158</b> · R$ 5.000,00 · Carlos Mendes. O PDF já está aqui na conversa.</div><div className="chat-msg-time">09:13</div></div>
+                                <div className="chat-msg bot cob-msg cob-arquivo" data-passo="7"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="cob-pdf"><span className="cob-pdf-icone" aria-hidden="true">PDF</span><span className="cob-pdf-info"><span className="cob-pdf-nome">NFS-e-158-Carlos-Mendes.pdf</span><span className="cob-pdf-meta">1 página · 84 KB · PDF</span></span></div><div className="chat-msg-time">09:13</div></div>
+                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="9"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
+                                <div className="chat-msg bot cob-msg" data-passo="10"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Pagamento confirmado ✅ O Carlos pagou o link: <b>R$ 5.000,00</b> na sua conta. Próxima cobrança: 10/11.</div><div className="chat-msg-time">10:41</div></div>
                             </div>
                         </div>
                         <img className="vit-moldura" src="/meuassessor/images/iphone.webp" alt="" loading="lazy" decoding="async" />
@@ -2339,44 +2339,44 @@ const HomePage = () => {
 
                                     <div className="pn-dir">
                                         <div className="pn-dia">
-                                            <span className="pn-hora" style={top: '0%'}>08h</span>
-                                            <span className="pn-hora" style={top: '16.67%'}>10h</span>
-                                            <span className="pn-hora" style={top: '33.33%'}>12h</span>
-                                            <span className="pn-hora" style={top: '50%'}>14h</span>
-                                            <span className="pn-hora" style={top: '66.67%'}>16h</span>
-                                            <span className="pn-hora" style={top: '83.33%'}>18h</span>
-                                            <span className="pn-hora" style={top: '100%'}>20h</span>
+                                            <span className="pn-hora" style={{top: '0%'}}>08h</span>
+                                            <span className="pn-hora" style={{top: '16.67%'}}>10h</span>
+                                            <span className="pn-hora" style={{top: '33.33%'}}>12h</span>
+                                            <span className="pn-hora" style={{top: '50%'}}>14h</span>
+                                            <span className="pn-hora" style={{top: '66.67%'}}>16h</span>
+                                            <span className="pn-hora" style={{top: '83.33%'}}>18h</span>
+                                            <span className="pn-hora" style={{top: '100%'}}>20h</span>
 
-                                            <i className="pn-risco" style={top: '0%'}></i>
-                                            <i className="pn-risco" style={top: '16.67%'}></i>
-                                            <i className="pn-risco" style={top: '33.33%'}></i>
-                                            <i className="pn-risco" style={top: '50%'}></i>
-                                            <i className="pn-risco" style={top: '66.67%'}></i>
-                                            <i className="pn-risco" style={top: '83.33%'}></i>
-                                            <i className="pn-risco" style={top: '100%'}></i>
+                                            <i className="pn-risco" style={{top: '0%'}}></i>
+                                            <i className="pn-risco" style={{top: '16.67%'}}></i>
+                                            <i className="pn-risco" style={{top: '33.33%'}}></i>
+                                            <i className="pn-risco" style={{top: '50%'}}></i>
+                                            <i className="pn-risco" style={{top: '66.67%'}}></i>
+                                            <i className="pn-risco" style={{top: '83.33%'}}></i>
+                                            <i className="pn-risco" style={{top: '100%'}}></i>
 
-                                            <span className="pn-ev" style={top: '8.33%'}>
+                                            <span className="pn-ev" style={{top: '8.33%'}}>
                                                 <span className="pn-pino"></span>
                                                 <span className="pn-ev-txt">
                                                     <b><em>09:00</em><span>Reunião semanal do time</span></b>
                                                     <i><em>09:00 às 10:00</em><span className="pn-chip">1H</span></i>
                                                 </span>
                                             </span>
-                                            <span className="pn-ev" style={top: '25%'}>
+                                            <span className="pn-ev" style={{top: '25%'}}>
                                                 <span className="pn-pino"></span>
                                                 <span className="pn-ev-txt">
                                                     <b><em>11:00</em><span>Call com investidor</span></b>
                                                     <i><em>11:00 às 11:45</em><span className="pn-chip">45MIN</span></i>
                                                 </span>
                                             </span>
-                                            <span className="pn-ev" style={top: '58.33%'}>
+                                            <span className="pn-ev" style={{top: '58.33%'}}>
                                                 <span className="pn-pino"></span>
                                                 <span className="pn-ev-txt">
                                                     <b><em>15:00</em><span>Consulta no dentista</span></b>
                                                     <i><em>15:00 às 16:00</em><span className="pn-chip">1H</span></i>
                                                 </span>
                                             </span>
-                                            <span className="pn-ev" style={top: '75%'}>
+                                            <span className="pn-ev" style={{top: '75%'}}>
                                                 <span className="pn-pino"></span>
                                                 <span className="pn-ev-txt">
                                                     <b><em>17:00</em><span>Alinhamento com os sócios</span></b>
@@ -2402,10 +2402,10 @@ const HomePage = () => {
                                         <p className="pn-num"><strong data-count="24">24</strong><em>tarefas</em></p>
 
                                         <div className="pn-barra">
-                                            <span className="pn-seg is-vermelho" style={flex: '5'}></span>
-                                            <span className="pn-seg is-ambar" style={flex: '7'}></span>
-                                            <span className="pn-seg is-azul" style={flex: '3'}></span>
-                                            <span className="pn-seg is-verde" style={flex: '9'}></span>
+                                            <span className="pn-seg is-vermelho" style={{flex: '5'}}></span>
+                                            <span className="pn-seg is-ambar" style={{flex: '7'}}></span>
+                                            <span className="pn-seg is-azul" style={{flex: '3'}}></span>
+                                            <span className="pn-seg is-verde" style={{flex: '9'}}></span>
                                         </div>
 
                                         <ul className="pn-status">
@@ -2519,12 +2519,12 @@ const HomePage = () => {
 
                                     <div className="pn-dir">
                                         <ul className="pn-meses">
-                                                <li><b>Março</b><span className="pn-trilho"><i style={width: '70.1%'}></i></span><em data-count="176">176</em></li>
-                                                <li><b>Abril</b><span className="pn-trilho"><i style={width: '85.3%'}></i></span><em data-count="214">214</em></li>
-                                                <li><b>Maio</b><span className="pn-trilho"><i style={width: '91.2%'}></i></span><em data-count="229">229</em></li>
-                                                <li><b>Junho</b><span className="pn-trilho"><i style={width: '77.3%'}></i></span><em data-count="194">194</em></li>
-                                                <li><b>Julho</b><span className="pn-trilho"><i style={width: '100%'}></i></span><em data-count="251">251</em></li>
-                                                <li><b>Agosto</b><span className="pn-trilho"><i style={width: '94.0%'}></i></span><em data-count="236">236</em></li>
+                                                <li><b>Março</b><span className="pn-trilho"><i style={{width: '70.1%'}}></i></span><em data-count="176">176</em></li>
+                                                <li><b>Abril</b><span className="pn-trilho"><i style={{width: '85.3%'}}></i></span><em data-count="214">214</em></li>
+                                                <li><b>Maio</b><span className="pn-trilho"><i style={{width: '91.2%'}}></i></span><em data-count="229">229</em></li>
+                                                <li><b>Junho</b><span className="pn-trilho"><i style={{width: '77.3%'}}></i></span><em data-count="194">194</em></li>
+                                                <li><b>Julho</b><span className="pn-trilho"><i style={{width: '100%'}}></i></span><em data-count="251">251</em></li>
+                                                <li><b>Agosto</b><span className="pn-trilho"><i style={{width: '94.0%'}}></i></span><em data-count="236">236</em></li>
                                         </ul>
                                         <p className="pn-nota">REGISTROS POR MÊS &middot; GASTOS, AGENDA E TAREFAS</p>
                                     </div>
@@ -2562,7 +2562,7 @@ const HomePage = () => {
                                     <p className="cv-rot"><span>SUA EQUIPE DE ACESSO</span></p>
 
                                     <ul className="cv-menu">
-                                        <li className="cv-fila cv-fila--alvo" style={'--i': '0'}>
+                                        <li className="cv-fila cv-fila--alvo" style={{'--i': '0'}}>
                                             <span className="cv-icone">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                                     <circle cx="9.4" cy="8.6" r="3.3"/>
@@ -2575,7 +2575,7 @@ const HomePage = () => {
                                             <span className="cv-chev">›</span>
                                         </li>
 
-                                        <li className="cv-fila cv-fila--convites" style={'--i': '1'}>
+                                        <li className="cv-fila cv-fila--convites" style={{'--i': '1'}}>
                                             <span className="cv-icone">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                                     <rect x="2.8" y="6" width="13.4" height="10" rx="2.1"/>
@@ -2588,7 +2588,7 @@ const HomePage = () => {
                                             <span className="cv-chev">›</span>
                                         </li>
 
-                                        <li className="cv-fila cv-fila--contador" style={'--i': '2'}>
+                                        <li className="cv-fila cv-fila--contador" style={{'--i': '2'}}>
                                             <span className="cv-icone">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                                     <rect x="2.9" y="7.6" width="18.2" height="11.6" rx="2.3"/>
@@ -3095,7 +3095,7 @@ const HomePage = () => {
                                     <p className="dv-rot"><span>PASTAS &middot; 4</span></p>
 
                                     <ul className="dv-lista">
-                                        <li className="dv-fila" style={'--i': '0'} data-ir="pasta:boletos" data-toque="fila">
+                                        <li className="dv-fila" style={{'--i': '0'}} data-ir="pasta:boletos" data-toque="fila">
                                             <span className="dv-glifo">
                                                 <svg viewBox="0 0 20 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"><path d="M1.4 3.4a1.8 1.8 0 0 1 1.8-1.8h3.9l2 2.2h7.7a1.8 1.8 0 0 1 1.8 1.8v8a1.8 1.8 0 0 1-1.8 1.8H3.2a1.8 1.8 0 0 1-1.8-1.8Z"/></svg>
                                             </span>
@@ -3103,7 +3103,7 @@ const HomePage = () => {
                                             <span className="dv-chev">&rsaquo;</span>
                                         </li>
 
-                                        <li className="dv-fila" style={'--i': '1'} data-ir="pasta:notas" data-toque="fila">
+                                        <li className="dv-fila" style={{'--i': '1'}} data-ir="pasta:notas" data-toque="fila">
                                             <span className="dv-glifo">
                                                 <svg viewBox="0 0 20 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"><path d="M1.4 3.4a1.8 1.8 0 0 1 1.8-1.8h3.9l2 2.2h7.7a1.8 1.8 0 0 1 1.8 1.8v8a1.8 1.8 0 0 1-1.8 1.8H3.2a1.8 1.8 0 0 1-1.8-1.8Z"/></svg>
                                             </span>
@@ -3111,7 +3111,7 @@ const HomePage = () => {
                                             <span className="dv-chev">&rsaquo;</span>
                                         </li>
 
-                                        <li className="dv-fila" style={'--i': '2'} data-ir="pasta:contratos" data-toque="fila">
+                                        <li className="dv-fila" style={{'--i': '2'}} data-ir="pasta:contratos" data-toque="fila">
                                             <span className="dv-glifo">
                                                 <svg viewBox="0 0 20 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"><path d="M1.4 3.4a1.8 1.8 0 0 1 1.8-1.8h3.9l2 2.2h7.7a1.8 1.8 0 0 1 1.8 1.8v8a1.8 1.8 0 0 1-1.8 1.8H3.2a1.8 1.8 0 0 1-1.8-1.8Z"/></svg>
                                             </span>
@@ -3119,7 +3119,7 @@ const HomePage = () => {
                                             <span className="dv-chev">&rsaquo;</span>
                                         </li>
 
-                                        <li className="dv-fila" style={'--i': '3'} data-ir="pasta:casa" data-toque="fila">
+                                        <li className="dv-fila" style={{'--i': '3'}} data-ir="pasta:casa" data-toque="fila">
                                             <span className="dv-glifo">
                                                 <svg viewBox="0 0 20 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"><path d="M1.4 3.4a1.8 1.8 0 0 1 1.8-1.8h3.9l2 2.2h7.7a1.8 1.8 0 0 1 1.8 1.8v8a1.8 1.8 0 0 1-1.8 1.8H3.2a1.8 1.8 0 0 1-1.8-1.8Z"/></svg>
                                             </span>
@@ -3416,10 +3416,10 @@ const HomePage = () => {
                                         <span className="mk-apoio mk-apoio--dia">Mostrando horários para <b>Quarta-feira, 26 de agosto</b></span>
 
                                         <span className="mk-horas">
-                                            <span className="mk-hora mk-hora--alvo" style={'--i': '0'}>19:00</span>
-                                            <span className="mk-hora" style={'--i': '1'}>19:30</span>
-                                            <span className="mk-hora" style={'--i': '2'}>20:00</span>
-                                            <span className="mk-hora" style={'--i': '3'}>20:30</span>
+                                            <span className="mk-hora mk-hora--alvo" style={{'--i': '0'}}>19:00</span>
+                                            <span className="mk-hora" style={{'--i': '1'}}>19:30</span>
+                                            <span className="mk-hora" style={{'--i': '2'}}>20:00</span>
+                                            <span className="mk-hora" style={{'--i': '3'}}>20:30</span>
                                         </span>
                                     </div>
 
@@ -3447,7 +3447,7 @@ const HomePage = () => {
                                                 <svg className="mk-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20c0-3.6 3.2-6 7.2-6s7.2 2.4 7.2 6"/></svg>
                                                 <span className="mk-campo-val">
                                                     <i className="mk-ph mk-ph--nome">Seu nome completo</i>
-                                                    <b className="mk-tec mk-tec--nome" style={'--w': '7.05em'}>Camila Prado</b>
+                                                    <b className="mk-tec mk-tec--nome" style={{'--w': '7.05em'}}>Camila Prado</b>
                                                 </span>
                                             </span>
                                         </span>
@@ -3458,7 +3458,7 @@ const HomePage = () => {
                                                 <svg className="mk-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="2.8" y="5" width="18.4" height="14" rx="2.6"/><path d="M3.4 7.4 12 13.2l8.6-5.8"/></svg>
                                                 <span className="mk-campo-val">
                                                     <i className="mk-ph mk-ph--mail">seuemail@dominio.com</i>
-                                                    <b className="mk-tec mk-tec--mail" style={'--w': '13.36em'}>camila.prado@email.com</b>
+                                                    <b className="mk-tec mk-tec--mail" style={{'--w': '13.36em'}}>camila.prado@email.com</b>
                                                 </span>
                                             </span>
                                         </span>
@@ -3469,7 +3469,7 @@ const HomePage = () => {
                                                 <svg className="mk-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M20.4 11.6c0 4.2-3.8 7.6-8.4 7.6-1 0-2-.16-2.9-.46L4 20l1.4-4.1a7.2 7.2 0 0 1-1.4-4.3C4 7.4 7.8 4 12.4 4s8 3.4 8 7.6z"/></svg>
                                                 <span className="mk-campo-val">
                                                     <i className="mk-ph mk-ph--zap">(00) 00000-0000</i>
-                                                    <b className="mk-tec mk-tec--zap" style={'--w': '7.94em'}>(11) 91234-5678</b>
+                                                    <b className="mk-tec mk-tec--zap" style={{'--w': '7.94em'}}>(11) 91234-5678</b>
                                                 </span>
                                             </span>
                                         </span>
@@ -3481,8 +3481,8 @@ const HomePage = () => {
                                         <span className="mk-selo">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5.6 12.4 10 16.8l8.4-9.2"/></svg>
                                         </span>
-                                        <b className="mk-fim-t mk-fim-l" style={'--i': '0'}>Horário confirmado</b>
-                                        <span className="mk-resumo mk-resumo--fim mk-fim-l" style={'--i': '1'}>
+                                        <b className="mk-fim-t mk-fim-l" style={{'--i': '0'}}>Horário confirmado</b>
+                                        <span className="mk-resumo mk-resumo--fim mk-fim-l" style={{'--i': '1'}}>
                                             <span className="mk-resumo-l">
                                                 <svg className="mk-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="3.2" y="5" width="17.6" height="16" rx="2.6"/><path d="M3.2 9.8h17.6"/><path d="M8.2 3v4"/><path d="M15.8 3v4"/></svg>
                                                 Quarta-feira, 26 de agosto
@@ -3492,7 +3492,7 @@ const HomePage = () => {
                                                 19:00 - 19:30
                                             </span>
                                         </span>
-                                        <span className="mk-fim-p mk-fim-l" style={'--i': '2'}>A Sofi manda a confirmação no seu WhatsApp antes do horário.</span>
+                                        <span className="mk-fim-p mk-fim-l" style={{'--i': '2'}}>A Sofi manda a confirmação no seu WhatsApp antes do horário.</span>
                                     </div>
 
                                 </div>
@@ -3507,8 +3507,8 @@ const HomePage = () => {
                 </article>
 
                 <article className="cli-card">
-                    <div className="cli-vao cli-vao-sofi" aria-hidden="true" style={position: 'relative'}>
-                        <div className="cli-papel cli-papel-sofi" style={position: 'absolute', '--inset': '0'}>
+                    <div className="cli-vao cli-vao-sofi" aria-hidden="true" style={{position: 'relative'}}>
+                        <div className="cli-papel cli-papel-sofi" style={{position: 'absolute', '--inset': '0'}}>
 
                             <div className="sf-palco">
                                 <div className="sf-fone">
@@ -4172,12 +4172,12 @@ const HomePage = () => {
                             </div>
 
                             <ul className="ofm-cats">
-                                <li><span>Mercado</span><i style={'--w': '100%'}></i><b>R$ 1.240</b></li>
-                                <li><span>Restaurante</span><i style={'--w': '74%'}></i><b>R$ 918</b></li>
-                                <li><span>Transporte</span><i style={'--w': '58%'}></i><b>R$ 720</b></li>
-                                <li><span>Saúde</span><i style={'--w': '44%'}></i><b>R$ 546</b></li>
-                                <li><span>Assinaturas</span><i style={'--w': '31%'}></i><b>R$ 384</b></li>
-                                <li><span>Beleza</span><i style={'--w': '22%'}></i><b>R$ 272</b></li>
+                                <li><span>Mercado</span><i style={{'--w': '100%'}}></i><b>R$ 1.240</b></li>
+                                <li><span>Restaurante</span><i style={{'--w': '74%'}}></i><b>R$ 918</b></li>
+                                <li><span>Transporte</span><i style={{'--w': '58%'}}></i><b>R$ 720</b></li>
+                                <li><span>Saúde</span><i style={{'--w': '44%'}}></i><b>R$ 546</b></li>
+                                <li><span>Assinaturas</span><i style={{'--w': '31%'}}></i><b>R$ 384</b></li>
+                                <li><span>Beleza</span><i style={{'--w': '22%'}}></i><b>R$ 272</b></li>
                             </ul>
                         </div>
                     </div>
@@ -4220,12 +4220,12 @@ const HomePage = () => {
                             <strong className="ofm-valor">R$ 7.180,00</strong>
 
                             <div className="ofm-barras">
-                                <i style={'--h': '62%'}></i>
-                                <i style={'--h': '78%'}></i>
-                                <i style={'--h': '70%'}></i>
-                                <i style={'--h': '88%'}></i>
-                                <i style={'--h': '74%'}></i>
-                                <i className="is-prevista" style={'--h': '92%'}></i>
+                                <i style={{'--h': '62%'}}></i>
+                                <i style={{'--h': '78%'}}></i>
+                                <i style={{'--h': '70%'}}></i>
+                                <i style={{'--h': '88%'}}></i>
+                                <i style={{'--h': '74%'}}></i>
+                                <i className="is-prevista" style={{'--h': '92%'}}></i>
                             </div>
 
                             <div className="ofm-meses">
@@ -4329,11 +4329,11 @@ const HomePage = () => {
                                         <svg viewBox="0 0 10 12" fill="currentColor"><path d="M1.4 1.2 8.8 6l-7.4 4.8z"/></svg>
                                     </span>
                                     <span className="ofw-onda">
-                                        <i style={'--h': '30%'}></i><i style={'--h': '58%'}></i><i style={'--h': '86%'}></i>
-                                        <i style={'--h': '48%'}></i><i style={'--h': '72%'}></i><i style={'--h': '100%'}></i>
-                                        <i style={'--h': '62%'}></i><i style={'--h': '36%'}></i><i style={'--h': '80%'}></i>
-                                        <i style={'--h': '54%'}></i><i style={'--h': '26%'}></i><i style={'--h': '68%'}></i>
-                                        <i style={'--h': '44%'}></i><i style={'--h': '30%'}></i>
+                                        <i style={{'--h': '30%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '86%'}}></i>
+                                        <i style={{'--h': '48%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '100%'}}></i>
+                                        <i style={{'--h': '62%'}}></i><i style={{'--h': '36%'}}></i><i style={{'--h': '80%'}}></i>
+                                        <i style={{'--h': '54%'}}></i><i style={{'--h': '26%'}}></i><i style={{'--h': '68%'}}></i>
+                                        <i style={{'--h': '44%'}}></i><i style={{'--h': '30%'}}></i>
                                     </span>
                                     <span className="ofw-dur">0:06</span>
                                 </div>

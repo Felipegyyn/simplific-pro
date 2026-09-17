@@ -3,7 +3,7 @@
     
     if (video) {
         // Tenta forçar o play imediato caso o navegador atrase o autoplay
-        video.play().catch(() => {})();
+        video.play().catch(() => {});
 
         /* O FILME ENTRA QUANDO A JANELA PASSA O DEGRAU (30/08/2026).
 
@@ -106,7 +106,7 @@
             celularBg.addEventListener('load', revelar, { once: true });
         }
     }
-});
+})();
 
 /* A CONVERSA ACOMPANHA O TAMANHO DO APARELHO (22/08/2026).
 
@@ -298,7 +298,7 @@
 
     encaixarConversa();
     window.addEventListener('resize', encaixarConversa);
-});
+})();
 
 /* O BLOCO DO TÍTULO FICA NO MEIO DO VÃO, EM QUALQUER TELA (08/09/2026).
 
@@ -403,7 +403,7 @@
     if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(equilibrarBloco);
     }
-});
+})();
 
 // Chat Simulation Animation
 (() => {
@@ -421,9 +421,9 @@
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: 'Anotado ✅ <b>R$ 62 em Saúde</b>. Esse mês: R$ 214.',
             time: '09:10'
@@ -435,9 +435,9 @@
         },
         {
             type: 'bot',
-            name: 'Sofi',
+            name: 'Simplific',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#1E88E5',
             text: 'Marcado 📅 Já está no seu <b>Google Agenda</b>. Te lembro 1h antes.',
             time: '09:12'
@@ -449,9 +449,9 @@
         },
         {
             type: 'bot',
-            name: 'Luna',
+            name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#E91E63',
             text: 'Deixa comigo ✅ Sexta, <b>9h</b>, eu te lembro.',
             time: '09:14'
@@ -463,9 +463,9 @@
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: 'Link enviado 🔗 <b>Eu aviso o Diego</b> e te falo quando cair.',
             time: '09:16'
@@ -477,9 +477,9 @@
         },
         {
             type: 'bot',
-            name: 'Rita',
+            name: 'Simplific',
             role: 'Assistente fiscal',
-            avatar: 'images/rita.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#5E35B1',
             text: 'Nota emitida 🧾 <b>PDF aqui na conversa</b> e cópia pro seu contador.',
             time: '09:18'
@@ -491,9 +491,9 @@
         },
         {
             type: 'bot',
-            name: 'Ítalo',
+            name: 'Simplific',
             role: 'Estagiário de pesquisas',
-            avatar: 'images/italo_otim.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#FB8C00',
             text: 'Menor preço: <b>R$ 1.149</b> 🔎 Te mandei os 3 links, com fonte.',
             time: '09:20'
@@ -505,9 +505,9 @@
         },
         {
             type: 'bot',
-            name: 'Sofi',
+            name: 'Simplific',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#1E88E5',
             text: 'Reunião criada 📅 <b>Link do Meet</b> enviado pros dois. No fim, mando a ata.',
             time: '09:22'
@@ -519,18 +519,18 @@
         },
         {
             type: 'bot',
-            name: 'Theo',
+            name: 'Simplific',
             role: 'Diretor de operações',
-            avatar: 'images/theo.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#8E24AA',
             text: 'Feito! A <b>Bia</b> já pode chamar a equipe do WhatsApp dela 👋',
             time: '09:24'
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: '⚠️ Sua assinatura de streaming subiu: <b>R$ 34,90 → R$ 44,90</b>.',
             time: '09:26'
@@ -542,9 +542,9 @@
         },
         {
             type: 'bot',
-            name: 'Luna',
+            name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#E91E63',
             text: '📄 <b>Contrato_Apartamento.pdf</b> — guardado desde março.',
             time: '09:28'
@@ -556,9 +556,9 @@
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: '<b>R$ 1.240</b> em 11 compras 🛒 15% acima de julho.',
             time: '09:30'
@@ -570,9 +570,9 @@
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: 'Pronto 📊 Entradas R$ 8.430, saídas R$ 6.957 — <b>sobra de R$ 1.473</b>.',
             time: '09:32'
@@ -584,9 +584,9 @@
         },
         {
             type: 'bot',
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#00897B',
             text: 'Movi pra <b>Despesas do trabalho</b> ✅ Da próxima, o Outback já entra certo.',
             time: '09:34'
@@ -598,9 +598,9 @@
         },
         {
             type: 'bot',
-            name: 'Luna',
+            name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#E91E63',
             text: 'Todo dia às <b>20h</b> ⏰ Eu não esqueço.',
             time: '09:36'
@@ -612,9 +612,9 @@
         },
         {
             type: 'bot',
-            name: 'Sofi',
+            name: 'Simplific',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#1E88E5',
             text: 'Enviado 🗓️ Quando marcarem, <b>eu confirmo com a pessoa</b> e te aviso.',
             time: '09:38'
@@ -626,9 +626,9 @@
         },
         {
             type: 'bot',
-            name: 'Rita',
+            name: 'Simplific',
             role: 'Assistente fiscal',
-            avatar: 'images/rita.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#5E35B1',
             text: 'Combinado 🧾 Todo dia 1º ela <b>sai sozinha</b>.',
             time: '09:40'
@@ -640,27 +640,27 @@
         },
         {
             type: 'bot',
-            name: 'Luna',
+            name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#E91E63',
             text: 'Guardei em <b>Notas fiscais</b> 📁 Quando precisar, é só pedir.',
             time: '09:42'
         },
         {
             type: 'bot',
-            name: 'Sofi',
+            name: 'Simplific',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#1E88E5',
             text: 'Amanhã: <b>3 compromissos</b> ☀️ O primeiro é às 9h, com a Carla.',
             time: '09:42'
         },
         {
             type: 'bot',
-            name: 'Theo',
+            name: 'Simplific',
             role: 'Diretor de operações',
-            avatar: 'images/theo.jpg',
+            avatar: '/favicon.ico',
             nameColor: '#8E24AA',
             text: 'Fechando o dia: <b>12 pedidos resolvidos</b>, nada esquecido ✅',
             time: '09:44'
@@ -776,7 +776,7 @@
 
     // Start animation 2s after load
     setTimeout(playNextMessage, 2000);
-});
+})();
 
 // ============================================================
 // SEÇÃO 2 — EQUIPE DE ASSESSORES: Interações + Canvas Mesh
@@ -785,45 +785,45 @@
     // --- Assessor Data ---
     const assessors = {
         theo: {
-            name: 'Theo',
+            name: 'Simplific',
             role: 'Diretor de operações',
             portrait: 'images/theo_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Sua manhã foi organizada! Separei 3 prioridades.'
         },
         martin: {
-            name: 'Martin',
+            name: 'Simplific',
             role: 'Gerente financeiro',
             portrait: 'images/martin_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Sua fatura vence em 3 dias. Saldo sob controle!'
         },
         sofi: {
-            name: 'Sofi',
+            name: 'Simplific',
             role: 'Secretária executiva',
             portrait: 'images/sofi_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Você tem uma reunião hoje das 14h às 16h'
         },
         luna: {
-            name: 'Luna',
+            name: 'Simplific',
             role: 'Organização & Docs',
             portrait: 'images/luna_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Salvei 2 documentos na sua pasta de contratos'
         },
         italo: {
-            name: 'Ítalo',
+            name: 'Simplific',
             role: 'Estagiário de pesquisas',
             portrait: 'images/italo_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Achei 3 preços do monitor. O menor: R$ 1.149, com fonte.'
         },
         rita: {
-            name: 'Rita',
+            name: 'Simplific',
             role: 'Assistente fiscal',
             portrait: 'images/rita_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            avatar: '/favicon.ico',
             message: 'Nota emitida! O PDF já está na sua conversa.'
         }
     };
@@ -1058,7 +1058,7 @@
 
     // Iniciar rotação automática
     startAutoRotate();
-});
+})();
 
 // ============================================================
 // SEÇÃO 2 — ESFERA DE ENERGIA (núcleo de IA)
@@ -2549,7 +2549,7 @@ const ESFERAS = {
 
 document.querySelectorAll('[data-esfera]').forEach((c) => {
     montaEsfera(c, ESFERAS[c.dataset.esfera] || {});
-});
+})();
 
 // ============================================================
 // SEÇÃO 2 — A ILUSTRAÇÃO: de uma mensagem a um painel
@@ -3047,7 +3047,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         if (document.hidden) dorme();
         else acorda();
     });
-});
+})();
 
 /* =========================================================
    SEÇÃO 4 — O CARTÃO BLACK (card 1 do Open Finance)
@@ -3160,7 +3160,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         alvoX = 0; alvoY = 0;
         acorda();
     });
-});
+})();
 
 /* =========================================================
    O CAMINHO DO GASTO (card 2 do Open Finance)
@@ -3283,7 +3283,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const r = card.getBoundingClientRect();
         if (r.top < window.innerHeight && r.bottom > 0) acorda();
     });
-});
+})();
 
 /* =========================================================
    O CAMINHO DA PERGUNTA (card 3 do Open Finance)
@@ -3511,7 +3511,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const r = card.getBoundingClientRect();
         if (r.top < window.innerHeight && r.bottom > 0) acorda();
     });
-});
+})();
 
 /* =========================================================
    AS JANELAS DOS CARDS (detalhes do Open Finance)
@@ -3563,7 +3563,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const modal = document.getElementById(botao.getAttribute('aria-controls'));
         if (modal) ligaJanela(botao, modal);
     });
-});
+})();
 
 function ligaJanela(botao, modal) {
     const caixa = modal.querySelector('.of-modal-caixa');
@@ -3789,8 +3789,8 @@ function ligaJanela(botao, modal) {
        acontecer sozinha. O load é a segunda passada, para o caso de
        imagem ou fonte ainda ter mexido na altura da página. */
     avaliar();
-    window.addEventListener('load', pedir);
-});
+    if (document.readyState === 'complete') { pedir(); } else { window.addEventListener('load', pedir); }
+})();
 
 
 
@@ -9769,5 +9769,5 @@ function cvBater(el, nome) {
        âncora. O load é a segunda passada, para o caso de imagem ou
        fonte ainda ter mexido na altura da página. */
     pedir();
-    window.addEventListener('load', pedir);
+    if (document.readyState === 'complete') { pedir(); } else { window.addEventListener('load', pedir); }
 })();
