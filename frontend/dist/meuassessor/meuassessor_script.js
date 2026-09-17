@@ -3,7 +3,7 @@
     
     if (video) {
         // Tenta forçar o play imediato caso o navegador atrase o autoplay
-        video.play().catch(() => {});
+        video.play().catch(() => {})();
 
         /* O FILME ENTRA QUANDO A JANELA PASSA O DEGRAU (30/08/2026).
 
@@ -106,7 +106,7 @@
             celularBg.addEventListener('load', revelar, { once: true });
         }
     }
-})();
+});
 
 /* A CONVERSA ACOMPANHA O TAMANHO DO APARELHO (22/08/2026).
 
@@ -298,7 +298,7 @@
 
     encaixarConversa();
     window.addEventListener('resize', encaixarConversa);
-})();
+});
 
 /* O BLOCO DO TÍTULO FICA NO MEIO DO VÃO, EM QUALQUER TELA (08/09/2026).
 
@@ -403,7 +403,7 @@
     if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(equilibrarBloco);
     }
-})();
+});
 
 // Chat Simulation Animation
 (() => {
@@ -776,7 +776,7 @@
 
     // Start animation 2s after load
     setTimeout(playNextMessage, 2000);
-})();
+});
 
 // ============================================================
 // SEÇÃO 2 — EQUIPE DE ASSESSORES: Interações + Canvas Mesh
@@ -1058,7 +1058,7 @@
 
     // Iniciar rotação automática
     startAutoRotate();
-})();
+});
 
 // ============================================================
 // SEÇÃO 2 — ESFERA DE ENERGIA (núcleo de IA)
@@ -2549,7 +2549,7 @@ const ESFERAS = {
 
 document.querySelectorAll('[data-esfera]').forEach((c) => {
     montaEsfera(c, ESFERAS[c.dataset.esfera] || {});
-})();
+});
 
 // ============================================================
 // SEÇÃO 2 — A ILUSTRAÇÃO: de uma mensagem a um painel
@@ -3047,7 +3047,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         if (document.hidden) dorme();
         else acorda();
     });
-})();
+});
 
 /* =========================================================
    SEÇÃO 4 — O CARTÃO BLACK (card 1 do Open Finance)
@@ -3160,7 +3160,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         alvoX = 0; alvoY = 0;
         acorda();
     });
-})();
+});
 
 /* =========================================================
    O CAMINHO DO GASTO (card 2 do Open Finance)
@@ -3283,7 +3283,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const r = card.getBoundingClientRect();
         if (r.top < window.innerHeight && r.bottom > 0) acorda();
     });
-})();
+});
 
 /* =========================================================
    O CAMINHO DA PERGUNTA (card 3 do Open Finance)
@@ -3511,7 +3511,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const r = card.getBoundingClientRect();
         if (r.top < window.innerHeight && r.bottom > 0) acorda();
     });
-})();
+});
 
 /* =========================================================
    AS JANELAS DOS CARDS (detalhes do Open Finance)
@@ -3563,7 +3563,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         const modal = document.getElementById(botao.getAttribute('aria-controls'));
         if (modal) ligaJanela(botao, modal);
     });
-})();
+});
 
 function ligaJanela(botao, modal) {
     const caixa = modal.querySelector('.of-modal-caixa');
@@ -3789,8 +3789,8 @@ function ligaJanela(botao, modal) {
        acontecer sozinha. O load é a segunda passada, para o caso de
        imagem ou fonte ainda ter mexido na altura da página. */
     avaliar();
-    if (document.readyState === 'complete') { pedir(); } else { window.addEventListener('load', pedir); }
-})();
+    window.addEventListener('load', pedir);
+});
 
 
 
@@ -9769,5 +9769,5 @@ function cvBater(el, nome) {
        âncora. O load é a segunda passada, para o caso de imagem ou
        fonte ainda ter mexido na altura da página. */
     pedir();
-    if (document.readyState === 'complete') { pedir(); } else { window.addEventListener('load', pedir); }
+    window.addEventListener('load', pedir);
 })();
