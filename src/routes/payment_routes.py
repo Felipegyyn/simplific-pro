@@ -6,8 +6,8 @@ from src.models.user import User
 from src.models.db import db
 from datetime import datetime, timedelta
 from src.services.user_service import create_user_from_purchase, normalize_phone_number
-from src.services.notification_service import send_welcome_credentials
-# Importa as DUAS funções agora
+from src.services.notification_service import send_welcome_credentials, send_plan_acquired_whatsapp
+# Importa as funções do Asaas
 from src.services.asaas_service import get_or_create_customer, create_asaas_subscription, create_asaas_payment
 
 payment_bp = Blueprint('payment', __name__)
@@ -97,6 +97,7 @@ def process_subscription_route():
         print(f"✅ [ASAAS] Sucesso! ID: {transaction_id}")
 
         # Ativa Usuário
+        # Ativa Usuário
         new_credentials = None
         if not user:
             success_c, result_c = create_user_from_purchase(name, email, whatsapp_normalized)
@@ -118,6 +119,9 @@ def process_subscription_route():
         if new_credentials:
             send_welcome_credentials(new_credentials)
             msg += " Credenciais enviadas."
+            
+        # SEMPRE envia notificação de compra do plano (seja novo usuário ou alguém que assinou após 7 dias grátis)
+        send_plan_acquired_whatsapp(name, whatsapp_normalized, plan_type)
 
         return jsonify({"message": msg, "subscription_id": transaction_id}), 200
 

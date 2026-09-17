@@ -169,3 +169,28 @@ def send_payment_failed_notification(name, whatsapp):
     except Exception as e:
         print(f"❌ Erro Crítico Cartão: {e}")
         return False
+
+def send_plan_acquired_whatsapp(name, whatsapp, plan_type):
+    """Envia uma mensagem (sessão de 24h aberta pela compra) confirmando a aquisição do plano."""
+    if not whatsapp: return False
+    
+    target = f"whatsapp:{whatsapp}"
+    first_name = name.split()[0] if name else "Visitante"
+    plano_nome = "Anual" if plan_type == 'yearly' else "Mensal"
+    
+    mensagem = (
+        f"Uhul, {first_name}! 🎉\n\n"
+        f"Seu pagamento do *Plano {plano_nome}* foi confirmado com sucesso!\n"
+        f"Seu acesso premium ao Simplific Pro e à nossa Inteligência Artificial já está liberado e ativo na sua conta.\n\n"
+        f"Aproveite ao máximo para organizar sua vida financeira. Qualquer dúvida, é só chamar por aqui!"
+    )
+    
+    try:
+        resultado = send_whatsapp_message(to=target, body=mensagem)
+        if resultado:
+            print(f"✅ Notificação de compra de plano enviada para {whatsapp}")
+            return True
+        return False
+    except Exception as e:
+        print(f"❌ Erro ao enviar confirmação de plano para {whatsapp}: {e}")
+        return False
