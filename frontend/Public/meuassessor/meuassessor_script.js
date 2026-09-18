@@ -2598,6 +2598,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
     const flow = document.getElementById('promiseFlow');
     const alvo = document.getElementById('flowText');
     if (!flow || !alvo) return;
+    try {
 
     /* Os três casos. A frase de cada ato é curta de propósito: o ponto da
        peça é a distância entre o que você diz e o que aparece pronto, e
@@ -3031,11 +3032,11 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
     if (palco && 'IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (entry.intersectionRatio >= 0.4) { visivel = true;  acorda(); }
+                if (entry.isIntersecting) { visivel = true; acorda(); }
                 else if (!entry.isIntersecting)     { visivel = false; dorme();  }
             });
-        }, { threshold: [0, 0.4] });
-        io.observe(palco);
+        }, { threshold: [0, 0.1] });
+        io.observe(palco); setTimeout(() => { if (!visivel) { visivel = true; acorda(); } }, 2000);
     } else {
         visivel = true;
         acorda();
@@ -3047,6 +3048,11 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
         if (document.hidden) dorme();
         else acorda();
     });
+    } catch(e) {
+        flow.style.background = "red";
+        flow.style.minHeight = "200px";
+        alvo.textContent = "ERROR: " + (e.message || e);
+    }
 })();
 
 /* =========================================================
