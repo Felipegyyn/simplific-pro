@@ -239,9 +239,8 @@ setTimeout( () => {
 
         if (espera > 0) {
             setTimeout(revelar, espera);
-        } else if (celularBg.complete && celularBg.naturalHeight) {
-            revelar();
         } else {
+            revelar(); // Simplific patch: force reveal
             celularBg.addEventListener('load', revelar, { once: true });
         }
     }

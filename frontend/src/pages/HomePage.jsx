@@ -9,7 +9,7 @@ const HomePage = () => {
     const script = document.createElement('script');
     script.src = "/meuassessor/meuassessor_script.js?v=" + Date.now();
     script.async = true;
-    document.body.appendChild(script);
+    setTimeout(() => document.body.appendChild(script), 500);
 
     return () => {
       document.body.removeChild(script);
