@@ -9,10 +9,17 @@ const HomePage = () => {
     const script = document.createElement('script');
     script.src = "/meuassessor/meuassessor_script.js?v=" + Date.now();
     script.async = true;
-    setTimeout(() => document.body.appendChild(script), 500);
+    let appended = false;
+    const timeoutId = setTimeout(() => {
+      document.body.appendChild(script);
+      appended = true;
+    }, 500);
 
     return () => {
-      document.body.removeChild(script);
+      clearTimeout(timeoutId);
+      if (appended) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
