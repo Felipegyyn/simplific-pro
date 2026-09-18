@@ -7,7 +7,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = "/meuassessor/meuassessor_script.js";
+    script.src = "/meuassessor/meuassessor_script.js?v=" + Date.now();
     script.async = true;
     document.body.appendChild(script);
 
@@ -18,7 +18,7 @@ const HomePage = () => {
 
   return (
     <div className="clone-wrapper">
-      <link rel="stylesheet" href="/meuassessor/meuassessor.css" />
+      <link rel="stylesheet" href={"/meuassessor/meuassessor.css?v=" + Date.now()} />
       
     
     <img src="/meuassessor/images/celular-2.webp" id="global-celular-bg" alt="Celular Background" />
