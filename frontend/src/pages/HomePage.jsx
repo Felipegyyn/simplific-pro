@@ -121,7 +121,7 @@ const HomePage = () => {
                                     <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/>
                                     <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/>
                                 </svg>
-                                <p><b>Martin</b> · alimentação está <b>15% acima</b> de julho. No ritmo de agora, o mês fecha perto de R$ 1.430.</p>
+                                <p><b>Simplific</b> · alimentação está <b>15% acima</b> de julho. No ritmo de agora, o mês fecha perto de R$ 1.430.</p>
                             </div>
 
                             <div className="reg-tags" data-ato="2">
@@ -185,7 +185,7 @@ const HomePage = () => {
                                     <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/>
                                     <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/>
                                 </svg>
-                                <p><b>Luna</b> · quinta sua tarde já é da Ana, então te lembro <b>na quarta</b>. Ainda dá tempo de pagar sem multa.</p>
+                                <p><b>Simplific</b> · quinta sua tarde já é da Ana, então te lembro <b>na quarta</b>. Ainda dá tempo de pagar sem multa.</p>
                             </div>
                         </div>
                     </div>
@@ -366,13 +366,13 @@ const HomePage = () => {
                         <img src="/meuassessor/images/theo.jpg" alt="Theo" className="team-selector-avatar" />
                     </div>
                     <div className="team-selector-card" data-assessor="martin" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/meuassessor/images/martin.jpg" alt="Martin" className="team-selector-avatar" />
+                        <img src="/favicon.svg" alt="Martin" className="team-selector-avatar" />
                     </div>
                     <div className="team-selector-card" data-assessor="sofi" role="button" tabIndex="0" aria-pressed="false">
                         <img src="/meuassessor/images/sofi.jpg" alt="Sofi" className="team-selector-avatar" />
                     </div>
                     <div className="team-selector-card" data-assessor="luna" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/meuassessor/images/luna.jpg" alt="Luna" className="team-selector-avatar" />
+                        <img src="/favicon.svg" alt="Luna" className="team-selector-avatar" />
                     </div>
                     <div className="team-selector-card" data-assessor="italo" role="button" tabIndex="0" aria-pressed="false">
                         <img src="/meuassessor/images/italo_otim.jpg" alt="Ítalo" className="team-selector-avatar" />
@@ -406,11 +406,11 @@ const HomePage = () => {
 
                     <div className="team-carousel-card pos-right" data-index="1" data-assessor="martin">
                         <div className="team-main-portrait">
-                            <img src="/meuassessor/images/martin_large_otim.jpg" alt="Martin" className="team-portrait-img" loading="lazy" decoding="async" />
+                            <img src="/favicon.svg" alt="Martin" className="team-portrait-img" loading="lazy" decoding="async" />
                         </div>
                         <div className="team-main-card-footer">
                             <div className="team-main-name">
-                                <span>Martin</span>
+                                <span>Simplific</span>
 
                             </div>
                             <div className="team-main-role">Gerente financeiro</div>
@@ -432,11 +432,11 @@ const HomePage = () => {
 
                     <div className="team-carousel-card pos-back" data-index="3" data-assessor="luna">
                         <div className="team-main-portrait">
-                            <img src="/meuassessor/images/luna_large_otim.jpg" alt="Luna" className="team-portrait-img" loading="lazy" decoding="async" />
+                            <img src="/favicon.svg" alt="Luna" className="team-portrait-img" loading="lazy" decoding="async" />
                         </div>
                         <div className="team-main-card-footer">
                             <div className="team-main-name">
-                                <span>Luna</span>
+                                <span>Simplific</span>
 
                             </div>
                             <div className="team-main-role">Organização & Docs</div>
@@ -525,7 +525,7 @@ const HomePage = () => {
 
                             <footer className="dash-foot">
                                 <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>a <b>Luna</b> puxou o mês: 46 tarefas fechadas, 12 delas hoje.</p>
+                                <p>a <b>Simplific</b> puxou o mês: 46 tarefas fechadas, 12 delas hoje.</p>
                             </footer>
                         </article>
 
@@ -768,7 +768,7 @@ const HomePage = () => {
                         <strong className="dia-noti-titulo">Fatura de cartão</strong>
                         <span className="dia-noti-hora">7:40</span>
                         </span>
-                        <span className="dia-noti-sub">Martin: Sua fatura do Nubank vence hoje!<span className="dia-noti-pergunta">Quer que eu gere o relatório dos gastos?</span></span>
+                        <span className="dia-noti-sub">Simplific: Sua fatura do Nubank vence hoje!<span className="dia-noti-pergunta">Quer que eu gere o relatório dos gastos?</span></span>
                         </span>
                         </div>
                         </div>
@@ -807,7 +807,7 @@ const HomePage = () => {
                         <strong className="dia-noti-titulo">Gasto registrado</strong>
                         <span className="dia-noti-hora">12:30</span>
                         </span>
-                        <span className="dia-noti-sub">Martin: Registrei seu almoço no iFood: R$38 em Alimentação.</span>
+                        <span className="dia-noti-sub">Simplific: Registrei seu almoço no iFood: R$38 em Alimentação.</span>
                         </span>
                         </div>
                         </div>
@@ -822,7 +822,7 @@ const HomePage = () => {
                         <span className="zap4-meta">15:30<svg className="zap4-visto" viewBox="0 0 17 11" focusable="false"><path d="M1.2 6.4 4.1 9.2 9.9 2.1"/><path d="M7.4 9.2 13.2 2.1"/></svg></span>
                         </div>
                         <div className="zap4-bolha is-luna">
-                        <span className="zap4-quem"><span className="zap4-nome">Luna</span><span className="zap4-cargo">Organização &amp; Docs</span></span>
+                        <span className="zap4-quem"><span className="zap4-nome">Simplific</span><span className="zap4-cargo">Organização &amp; Docs</span></span>
                         <span className="zap4-txt">Achei! 📄 <span className="zap4-arq">contrato-rodrigo.pdf</span> estava na pasta de Contratos<span className="zap4-envio-desktop"> — acabei de te enviar</span>.</span>
                         <span className="zap4-meta">15:30</span>
                         </div>
@@ -1297,7 +1297,7 @@ const HomePage = () => {
 
                             <div className="ofr-vao ofr-vao-martin">
                                 <div className="ofr-bolha ofr-martin">
-                                    <em>Martin</em>
+                                    <em>Simplific</em>
                                     <span className="ofr-slot">
                                         <span className="ofr-pontos"><i></i><i></i><i></i></span>
                                         <span className="ofr-resp">São 4 compras parceladas rodando. Montei o mês a mês até dezembro.</span>
@@ -2072,8 +2072,8 @@ const HomePage = () => {
                         <div className="vit-tela cob-tela">
                             <div className="chat-messages cob-conversa" id="cobConversa">
                                 <div className="chat-msg user cob-msg" data-passo="1"><div className="chat-msg-text" id="cobPedido" data-texto="Tenho R$ 5.000 pra receber todo dia 10 do Carlos. Gera as cobranças e a nota fiscal.">Tenho R$ 5.000 pra receber todo dia 10 do Carlos. Gera as cobranças e a nota fiscal.</div><div className="chat-msg-time">09:12 <svg viewBox="0 0 16 11" width="16" height="11" fill="none" className="chat-msg-checks" aria-hidden="true"><path d="M1.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M7.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div></div>
-                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="2"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
-                                <div className="chat-msg bot cob-msg" data-passo="3"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Fechado. Cobrança do <b>Carlos</b>: <b>R$ 5.000,00 todo dia 10</b>, a partir de outubro. O link já foi pra ele.</div><div className="chat-msg-time">09:12</div></div>
+                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="2"><div className="chat-msg-header"><img src="/favicon.svg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Simplific</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
+                                <div className="chat-msg bot cob-msg" data-passo="3"><div className="chat-msg-header"><img src="/favicon.svg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Simplific</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Fechado. Cobrança do <b>Carlos</b>: <b>R$ 5.000,00 todo dia 10</b>, a partir de outubro. O link já foi pra ele.</div><div className="chat-msg-time">09:12</div></div>
                                 <div className="chat-msg bot cob-msg cob-card" data-passo="4"><span className="blk-b-corpo"><span className="blk-etiq cob-etiq">Link de cobrança · vence 10/10</span><span className="blk-b-valor">R$ 5.000,00</span><span className="blk-b-parcela">em até 10x · todo dia 10</span><span className="blk-b-botao" id="cobBotao">Pagar agora</span><span className="blk-bandeiras">
                                                 <span className="blk-band blk-band--mc"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 999.2 618"><rect x="364" y="66.1" fill="#FF5A00" width="270.4" height="485.8"/> <path fill="#EB001B" d="M382,309c0-98.7,46.4-186.3,117.6-242.9 C447.2,24.9,381.1,0,309,0C138.2,0,0,138.2,0,309s138.2,309,309,309c72.1,0,138.2-24.9,190.6-66.1C428.3,496.1,382,407.7,382,309z" /> <path fill="#F79E1B" d="M999.2,309c0,170.8-138.2,309-309,309 c-72.1,0-138.2-24.9-190.6-66.1c72.1-56.7,117.6-144.2,117.6-242.9S570.8,122.7,499.6,66.1C551.9,24.9,618,0,690.1,0 C861,0,999.2,139.1,999.2,309z"/></svg></span>
                                                 <span className="blk-band blk-band--visa"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 324.68"><path fill="#1434cb" d="m651.19.5c-70.93,0-134.32,36.77-134.32,104.69,0,77.9,112.42,83.28,112.42,122.42,0,16.48-18.88,31.23-51.14,31.23-45.77,0-79.98-20.61-79.98-20.61l-14.64,68.55s39.41,17.41,91.73,17.41c77.55,0,138.58-38.57,138.58-107.66,0-82.32-112.89-87.54-112.89-123.86,0-12.91,15.5-27.05,47.66-27.05,36.29,0,65.89,14.99,65.89,14.99l14.33-66.2S696.61.5,651.18.5h0ZM2.22,5.5L.5,15.49s29.84,5.46,56.72,16.36c34.61,12.49,37.07,19.77,42.9,42.35l63.51,244.83h85.14L379.93,5.5h-84.94l-84.28,213.17-34.39-180.7c-3.15-20.68-19.13-32.48-38.68-32.48,0,0-135.41,0-135.41,0Zm411.87,0l-66.63,313.53h81L494.85,5.5h-80.76Zm451.76,0c-19.53,0-29.88,10.46-37.47,28.73l-118.67,284.8h84.94l16.43-47.47h103.48l9.99,47.47h74.95L934.12,5.5h-68.27Zm11.05,84.71l25.18,117.65h-67.45l42.28-117.65h0Z"/></svg></span>
@@ -2083,8 +2083,8 @@ const HomePage = () => {
                                 <div className="chat-msg bot typing-indicator cob-msg" data-passo="5"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
                                 <div className="chat-msg bot cob-msg" data-passo="6"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="chat-msg-text">Nota emitida 🧾 <b>NFS-e nº 158</b> · R$ 5.000,00 · Carlos Mendes. O PDF já está aqui na conversa.</div><div className="chat-msg-time">09:13</div></div>
                                 <div className="chat-msg bot cob-msg cob-arquivo" data-passo="7"><div className="chat-msg-header"><img src="/meuassessor/images/rita.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#E91E63'}}>Rita</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Assistente fiscal</span></div><div className="cob-pdf"><span className="cob-pdf-icone" aria-hidden="true">PDF</span><span className="cob-pdf-info"><span className="cob-pdf-nome">NFS-e-158-Carlos-Mendes.pdf</span><span className="cob-pdf-meta">1 página · 84 KB · PDF</span></span></div><div className="chat-msg-time">09:13</div></div>
-                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="9"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
-                                <div className="chat-msg bot cob-msg" data-passo="10"><div className="chat-msg-header"><img src="/meuassessor/images/martin.jpg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Martin</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Pagamento confirmado ✅ O Carlos pagou o link: <b>R$ 5.000,00</b> na sua conta. Próxima cobrança: 10/11.</div><div className="chat-msg-time">10:41</div></div>
+                                <div className="chat-msg bot typing-indicator cob-msg" data-passo="9"><div className="chat-msg-header"><img src="/favicon.svg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Simplific</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-typing-dots"><span></span><span></span><span></span></div></div>
+                                <div className="chat-msg bot cob-msg" data-passo="10"><div className="chat-msg-header"><img src="/favicon.svg" alt="" className="chat-msg-avatar" width="22" height="22" loading="lazy" decoding="async" /><span className="chat-msg-name" style={{color: '#00897B'}}>Simplific</span><svg className="chat-msg-verified" aria-hidden="true"><use href="#vit-ic-selo"></use></svg><span className="chat-msg-role">· Gerente financeiro</span></div><div className="chat-msg-text">Pagamento confirmado ✅ O Carlos pagou o link: <b>R$ 5.000,00</b> na sua conta. Próxima cobrança: 10/11.</div><div className="chat-msg-time">10:41</div></div>
                             </div>
                         </div>
                         <img className="vit-moldura" src="/meuassessor/images/iphone.webp" alt="" loading="lazy" decoding="async" />
@@ -2189,7 +2189,7 @@ const HomePage = () => {
                             <header className="pn-topo">
                                 <nav className="pn-abas">
                                     <span className="pn-aba is-ativa" data-aba="financas">
-                                        <span className="pn-aba-foto"><img src="/meuassessor/images/martin.jpg" alt="" /></span>
+                                        <span className="pn-aba-foto"><img src="/favicon.svg" alt="" /></span>
                                         <span className="pn-aba-txt"><b>FINANÇAS</b><i>por Martin</i></span>
                                     </span>
                                     <span className="pn-aba" data-aba="agenda">
@@ -2197,7 +2197,7 @@ const HomePage = () => {
                                         <span className="pn-aba-txt"><b>AGENDA</b><i>por Sofi</i></span>
                                     </span>
                                     <span className="pn-aba" data-aba="tarefas">
-                                        <span className="pn-aba-foto"><img src="/meuassessor/images/luna.jpg" alt="" /></span>
+                                        <span className="pn-aba-foto"><img src="/favicon.svg" alt="" /></span>
                                         <span className="pn-aba-txt"><b>TAREFAS</b><i>por Luna</i></span>
                                     </span>
                                     <span className="pn-aba" data-aba="operacao">
@@ -2231,9 +2231,9 @@ const HomePage = () => {
                                         <p className="pn-inicio"><b>INÍCIO DO MÊS</b><i>R$ <span data-count="2184" data-fmt="int">2.184</span>,60</i></p>
 
                                         <div className="pn-recado">
-                                            <span className="pn-recado-foto"><img src="/meuassessor/images/martin.jpg" alt="" /></span>
+                                            <span className="pn-recado-foto"><img src="/favicon.svg" alt="" /></span>
                                             <div className="pn-balao">
-                                                <p className="pn-balao-quem"><b>Martin</b> · Gerente financeiro</p>
+                                                <p className="pn-balao-quem"><b>Simplific</b> · Gerente financeiro</p>
                                                 <p className="pn-balao-txt">seu saldo está <b>18% acima</b> do saldo de julho, com <b>Mercado</b> puxando os gastos.</p>
                                                 <p className="pn-balao-sync">sincronizado às 00:06
                                                     <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6.6 4.2 10 11 2.3"/><path d="M8.4 6.9 10.6 10 18 2"/></svg>
@@ -2421,9 +2421,9 @@ const HomePage = () => {
                                         </div>
 
                                         <div className="pn-recado">
-                                            <span className="pn-recado-foto"><img src="/meuassessor/images/luna.jpg" alt="" /></span>
+                                            <span className="pn-recado-foto"><img src="/favicon.svg" alt="" /></span>
                                             <div className="pn-balao">
-                                                <p className="pn-balao-quem"><b className="is-luna">Luna</b> · Organização &amp; Docs</p>
+                                                <p className="pn-balao-quem"><b className="is-luna">Simplific</b> · Organização &amp; Docs</p>
                                                 <p className="pn-balao-txt"><b>5 vencendo</b>. Se resolver <b>Pagar o IPTU</b> primeiro, o resto anda.</p>
                                                 <p className="pn-balao-sync">sincronizado às 00:06
                                                     <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6.6 4.2 10 11 2.3"/><path d="M8.4 6.9 10.6 10 18 2"/></svg>
@@ -2859,7 +2859,7 @@ const HomePage = () => {
                                 <div className="cb-fala cb-fala--in">
                                     <span className="cb-dig cb-dig--in cb-dig--a2"><i></i><i></i><i></i></span>
                                     <div className="cb-balao cb-balao--in cb-ent--a2">
-                                        <b className="cb-quem">Martin</b>
+                                        <b className="cb-quem">Simplific</b>
                                         <p>Combinado. Todo dia 5 o João recebe o lembrete com o link de pagamento. Te aviso quando cair.</p>
                                         <span className="cb-meta">18:42</span>
                                     </div>
@@ -2933,7 +2933,7 @@ const HomePage = () => {
 
                                 <div className="cb-fala cb-fala--in">
                                     <div className="cb-balao cb-balao--in">
-                                        <b className="cb-quem">Martin</b>
+                                        <b className="cb-quem">Simplific</b>
                                         <p>Combinado. Todo dia 5 o João recebe o lembrete com o link de pagamento. Te aviso quando cair.</p>
                                         <span className="cb-meta">18:42</span>
                                     </div>
@@ -2944,7 +2944,7 @@ const HomePage = () => {
                                 <div className="cb-fala cb-fala--in">
                                     <span className="cb-dig cb-dig--in cb-dig--c1"><i></i><i></i><i></i></span>
                                     <div className="cb-balao cb-balao--in cb-ent--c1">
-                                        <b className="cb-quem">Martin</b>
+                                        <b className="cb-quem">Simplific</b>
                                         <p>O João pagou. R$ 350,00 já caiu na sua conta.</p>
                                         <span className="cb-meta">09:07</span>
                                     </div>
@@ -2993,7 +2993,7 @@ const HomePage = () => {
                                 <div className="dc-fala dc-fala--in">
                                     <span className="dc-dig dc-dig--in dc-dig--a2"><i></i><i></i><i></i></span>
                                     <div className="dc-balao dc-balao--in dc-ent--a2">
-                                        <b className="dc-quem">Luna</b>
+                                        <b className="dc-quem">Simplific</b>
                                         <p>Guardado. Quando precisar, é só me pedir.</p>
                                         <span className="dc-meta">14:20</span>
                                     </div>
@@ -3017,7 +3017,7 @@ const HomePage = () => {
                             <div className="dc-cena dc-cena--acha">
                                 <div className="dc-fala dc-fala--in">
                                     <div className="dc-balao dc-balao--in">
-                                        <b className="dc-quem">Luna</b>
+                                        <b className="dc-quem">Simplific</b>
                                         <p>Guardado. Quando precisar, é só me pedir.</p>
                                         <span className="dc-meta">14:20</span>
                                     </div>
@@ -3036,7 +3036,7 @@ const HomePage = () => {
                                 <div className="dc-fala dc-fala--in">
                                     <span className="dc-dig dc-dig--in dc-dig--c1"><i></i><i></i><i></i></span>
                                     <div className="dc-balao dc-balao--in dc-balao--doc dc-balao--nu dc-ent--c1">
-                                        <b className="dc-quem">Luna</b>
+                                        <b className="dc-quem">Simplific</b>
                                         <span className="dc-arq">
                                             <svg className="dc-folha" viewBox="0 0 13 16" aria-hidden="true"><path d="M1.1 1.5h6.2L11.9 6v8.5H1.1Z"/><path d="M7.3 1.5V6h4.6"/></svg>
                                             <span className="dc-arq-t">documento-4471.pdf</span>
@@ -4339,7 +4339,7 @@ const HomePage = () => {
                                 </div>
 
                                 <div className="ofw-bolha is-entra ofw-digitando">
-                                    <em>Martin</em>
+                                    <em>Simplific</em>
                                     <span className="ofw-pontos"><i></i><i></i><i></i></span>
                                 </div>
                             </div>
@@ -4355,7 +4355,7 @@ const HomePage = () => {
                         <div className="ofm-peca ofw-resposta">
                             <div className="ofw-quem">
                                 <span className="ofw-mono">M</span>
-                                <b>Martin</b>
+                                <b>Simplific</b>
                                 <span className="ofw-hora">09:41</span>
                             </div>
 
@@ -4382,7 +4382,7 @@ const HomePage = () => {
 
                             <div className="ofw-fio">
                                 <div className="ofw-bolha is-entra">
-                                    <em>Martin</em>
+                                    <em>Simplific</em>
                                     <span className="ofw-chip">
                                         <svg viewBox="0 0 12 12" fill="none">
                                             <path d="M6 1.4 11 10.6H1z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/>
@@ -4396,7 +4396,7 @@ const HomePage = () => {
                                 </div>
 
                                 <div className="ofw-bolha is-entra">
-                                    <em>Martin</em>
+                                    <em>Simplific</em>
                                     <span className="ofw-chip">
                                         <svg viewBox="0 0 12 12" fill="none">
                                             <path d="M6 1.4 11 10.6H1z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/>
@@ -4440,7 +4440,7 @@ const HomePage = () => {
                                 </li>
                                 <li>
                                     <span className="ofw-mono">M</span>
-                                    <div><b>Martin</b><span>Gerente financeiro</span></div>
+                                    <div><b>Simplific</b><span>Gerente financeiro</span></div>
                                 </li>
                                 <li>
                                     <span className="ofw-mono">S</span>
@@ -4448,7 +4448,7 @@ const HomePage = () => {
                                 </li>
                                 <li>
                                     <span className="ofw-mono">L</span>
-                                    <div><b>Luna</b><span>Organização e documentos</span></div>
+                                    <div><b>Simplific</b><span>Organização e documentos</span></div>
                                 </li>
                             </ul>
                         </div>
@@ -4536,7 +4536,7 @@ const HomePage = () => {
 
                             <ul className="pnm-abas">
                                 <li className="is-ativa">
-                                    <span className="pnm-aba-foto"><img src="/meuassessor/images/martin.jpg" alt="" /></span>
+                                    <span className="pnm-aba-foto"><img src="/favicon.svg" alt="" /></span>
                                     <span className="pnm-aba-txt"><b>FINANÇAS</b><i>por Martin</i></span>
                                 </li>
                                 <li>
@@ -4544,7 +4544,7 @@ const HomePage = () => {
                                     <span className="pnm-aba-txt"><b>AGENDA</b><i>por Sofi</i></span>
                                 </li>
                                 <li>
-                                    <span className="pnm-aba-foto"><img src="/meuassessor/images/luna.jpg" alt="" /></span>
+                                    <span className="pnm-aba-foto"><img src="/favicon.svg" alt="" /></span>
                                     <span className="pnm-aba-txt"><b>TAREFAS</b><i>por Luna</i></span>
                                 </li>
                                 <li>
@@ -4595,9 +4595,9 @@ const HomePage = () => {
                             </div>
 
                             <div className="pnm-recado">
-                                <span className="pnm-recado-foto"><img src="/meuassessor/images/martin.jpg" alt="" /></span>
+                                <span className="pnm-recado-foto"><img src="/favicon.svg" alt="" /></span>
                                 <div className="pnm-balao">
-                                    <p className="pnm-balao-quem"><b>Martin</b> · Gerente financeiro</p>
+                                    <p className="pnm-balao-quem"><b>Simplific</b> · Gerente financeiro</p>
                                     <p className="pnm-balao-txt">seu saldo está <b>18% acima</b> do saldo de julho, com <b>Mercado</b> puxando os gastos.</p>
                                     <p className="pnm-balao-sync">sincronizado às 00:06
                                         <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6.6 4.2 10 11 2.3"/><path d="M8.4 6.9 10.6 10 18 2"/></svg>
@@ -4841,7 +4841,7 @@ const HomePage = () => {
 
                                 <div className="cbm-fala cbm-fala--in">
                                     <div className="cbm-balao cbm-balao--in">
-                                        <b className="cbm-quem">Martin</b>
+                                        <b className="cbm-quem">Simplific</b>
                                         <p>Combinado. Todo dia 5 o João recebe o lembrete com o link de pagamento. Te aviso quando cair.</p>
                                         <span className="cbm-meta">18:42</span>
                                     </div>
@@ -4913,7 +4913,7 @@ const HomePage = () => {
 
                                 <div className="cbm-fala cbm-fala--in">
                                     <div className="cbm-balao cbm-balao--in">
-                                        <b className="cbm-quem">Martin</b>
+                                        <b className="cbm-quem">Simplific</b>
                                         <p>O João pagou. R$ 350,00 já caiu na sua conta.</p>
                                         <span className="cbm-meta">09:07</span>
                                     </div>
@@ -5021,7 +5021,7 @@ const HomePage = () => {
                             <div className="gdm-chat">
                                 <div className="gdm-fala gdm-fala--in">
                                     <div className="gdm-balao gdm-balao--in">
-                                        <b className="gdm-quem">Luna</b>
+                                        <b className="gdm-quem">Simplific</b>
                                         <p>Guardei em Notas fiscais. Quando precisar, é só me pedir.</p>
                                         <span className="gdm-meta">17:09</span>
                                     </div>
