@@ -46,7 +46,7 @@
    aberto num lugar onde a bandeja não existe mais, e o X continuaria
    desenhado no lugar das três linhas quando ela voltasse a existir.
    ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const header = document.querySelector('.glass-header');
     if (!header) return;
 
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* --- script.js --- */
 
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const video = document.getElementById('heroVideo');
     
     if (video) {
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
    Como a leitura acontece dentro da função, o resize atravessa o degrau
    nos dois sentidos sem precisar recarregar. */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const hero = document.querySelector('.hero-container');
     const conversa = document.getElementById('chatSimulation');
     if (!hero || !conversa) return;
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
    carrega um translateY de 40px, que o rect enxerga e o offsetTop não. A
    subida é zerada antes de medir para o offsetTop não devolver a posição
    já corrigida da vez anterior. */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const hero = document.querySelector('.hero-container');
     const bloco = document.querySelector('.hero-content');
     if (!hero || !bloco) return;
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Chat Simulation Animation
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const chatContainer = document.getElementById('chatMessages');
     if (!chatContainer) return;
 
@@ -920,7 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================================
 // SEÇÃO 2 — EQUIPE DE ASSESSORES: Interações + Canvas Mesh
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     // --- Assessor Data ---
     const assessors = {
         theo: {
@@ -2733,7 +2733,7 @@ document.querySelectorAll('[data-esfera]').forEach((c) => {
 // —, e quem zera tudo é a abertura fria, que agora só acontece quando a
 // seção entra na tela.
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const flow = document.getElementById('promiseFlow');
     const alvo = document.getElementById('flowText');
     if (!flow || !alvo) return;
@@ -3214,7 +3214,7 @@ document.addEventListener('DOMContentLoaded', () => {
    TRANSFORM, nunca cor, posição ou tamanho. É o que mantém o rosto
    do cartão rasterizado uma vez só — a mesma disciplina que tirou o
    chuvisco de repintura da superfície. */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const card = document.getElementById('ofCardCartao');
     if (!card) return;
 
@@ -3334,7 +3334,7 @@ document.addEventListener('DOMContentLoaded', () => {
    • A PARADA de 2,6s no fim é releitura, não leitura. O painel se
      escreveu em cascata e o olho foi lendo enquanto isso.
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const cena = document.getElementById('ofgCena');
     const card = document.getElementById('ofCardOrg');
     if (!cena || !card) return;
@@ -3484,7 +3484,7 @@ document.addEventListener('DOMContentLoaded', () => {
      arquivo garante é a folga entre chegar e bater — 120ms na primeira,
      100 na segunda. Sem ela o anel dispara com o dedo ainda viajando.
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const cena  = document.getElementById('ofrCena');
     const campo = document.getElementById('ofrTexto');
     const card  = document.getElementById('ofCardConversa');
@@ -3697,7 +3697,7 @@ document.addEventListener('DOMContentLoaded', () => {
    viraram <button> com o par de atributos, e este arquivo não recebeu
    uma linha. É a prova de que a busca pelo contrato de acessibilidade
    valeu a pena: cinco cards, cinco janelas, um seletor. */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     document.querySelectorAll('[aria-haspopup="dialog"][aria-controls]').forEach((botao) => {
         const modal = document.getElementById(botao.getAttribute('aria-controls'));
         if (modal) ligaJanela(botao, modal);
@@ -3854,7 +3854,7 @@ function ligaJanela(botao, modal) {
    aqui. É por isso que a marca é atributo e não o nome da classe da
    seção: o interruptor não precisa saber que seção é essa.
    ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
     const header = document.querySelector('.glass-header');
     const claras = [...document.querySelectorAll('[data-header="claro"]')];
     if (!header || !claras.length) return;
@@ -3928,7 +3928,7 @@ document.addEventListener('DOMContentLoaded', () => {
        acontecer sozinha. O load é a segunda passada, para o caso de
        imagem ou fonte ainda ter mexido na altura da página. */
     avaliar();
-    window.addEventListener('load', pedir);
+    setTimeout( pedir);
 });
 
 
@@ -9908,7 +9908,7 @@ function cvBater(el, nome) {
        âncora. O load é a segunda passada, para o caso de imagem ou
        fonte ainda ter mexido na altura da página. */
     pedir();
-    window.addEventListener('load', pedir);
+    setTimeout( pedir);
 })();
 
 
@@ -10007,7 +10007,7 @@ function cvBater(el, nome) {
       na folha, porque montado é uma POSE, não uma animação
       congelada.
    ========================================================= */
-document.addEventListener('DOMContentLoaded', () => {
+setTimeout( () => {
 
     const secao = document.getElementById('agendaSection');
     if (!secao) return;
@@ -10504,7 +10504,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* A fonte da web chegando depois muda a altura do bloco de texto e,
        com ela, nada do tile — mas muda a largura da barra de rolagem
        em alguns casos. Uma remedida no load fecha a conta. */
-    window.addEventListener('load', mede);
+    setTimeout( mede);
 
     /* ---------------------------------------------------------
        OS QUATRO ROTEIROS
