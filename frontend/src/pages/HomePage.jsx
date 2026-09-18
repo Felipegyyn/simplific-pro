@@ -760,7 +760,7 @@ const HomePage = () => {
                     <div className="dia2-cena is-ativa" data-ato="1">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">07:40</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/7-40.webp\')'}} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/7-40.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti">
                         <span className="dia-noti-icone is-nubank"><img src="/meuassessor/images/bancos/nubank.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
@@ -776,7 +776,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="2">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">09:15</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/9-15.webp\')'}} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/9-15.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-zap" aria-hidden="true">
                         <div className="dia-zap-audio">
                         <div className="dia-zap-linha">
@@ -799,7 +799,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="3">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">12:30</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/12-30.webp\')'}} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/12-30.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti">
                         <span className="dia-noti-icone is-ifood"><img src="/meuassessor/images/bancos/ifood.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
@@ -815,7 +815,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="4">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">15:30</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/15-30.webp\')'}} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/15-30.webp\')'}} aria-hidden="true"></div>
                         <div className="zap4-fio" aria-hidden="true">
                         <div className="zap4-bolha is-voce">
                         <span className="zap4-txt">Preciso do contrato assinado do Rodrigo.</span>
@@ -832,7 +832,7 @@ const HomePage = () => {
                     <div className="dia2-cena" data-ato="5">
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">22:00</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'images/22-00.webp\')'}} aria-hidden="true"></div>
+                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/22-00.webp\')'}} aria-hidden="true"></div>
                         <div className="dia-noti is-equipe">
                         <span className="dia-noti-icone is-equipe"><img src="favicon.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
