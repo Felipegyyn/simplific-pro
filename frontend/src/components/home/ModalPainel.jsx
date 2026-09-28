@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ModalPainel = () => {\n  return (\n    <><div className="of-modal of-modal--claro" id="pnmModalPainel" hidden>
+import React from 'react';
+
+const ModalPainel = () => {
+  return (
+    <><div className="of-modal of-modal--claro" id="pnmModalPainel" hidden>
         <div className="of-modal-veu" data-fechar></div>
 
         <div className="of-modal-caixa" role="dialog" aria-modal="true"
@@ -150,4 +154,8 @@ import React from 'react';\n\nconst ModalPainel = () => {\n  return (\n    <><di
                 <a href="/assessores" className="of-modal-link">Conhecer a equipe de assessores&nbsp;&rarr;</a>
             </footer>
         </div>
-    </div></>\n  );\n};\n\nexport default ModalPainel;\n
+    </div></>
+  );
+};
+
+export default ModalPainel;

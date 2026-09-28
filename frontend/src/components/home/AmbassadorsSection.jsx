@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst AmbassadorsSection = () => {\n  return (\n    <><section className="emb-section" id="embaixadores" data-header="claro">
+import React from 'react';
+
+const AmbassadorsSection = () => {
+  return (
+    <><section className="emb-section" id="embaixadores" data-header="claro">
         <svg className="vit-defs" aria-hidden="true" focusable="false">
             <linearGradient id="vitSeloGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="#bc85f8"/>
@@ -68,4 +72,8 @@ import React from 'react';\n\nconst AmbassadorsSection = () => {\n  return (\n  
                 </div>
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default AmbassadorsSection;\n
+    </section></>
+  );
+};
+
+export default AmbassadorsSection;

@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst FAQSection = () => {\n  return (\n    <><section className="faq-section" id="perguntas" data-header="claro">
+import React from 'react';
+
+const FAQSection = () => {
+  return (
+    <><section className="faq-section" id="perguntas" data-header="claro">
 
         <svg className="faq-defs" aria-hidden="true" focusable="false">
             <symbol id="faq-seta" viewBox="0 0 16 16">
@@ -165,4 +169,8 @@ import React from 'react';\n\nconst FAQSection = () => {\n  return (\n    <><sec
 
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default FAQSection;\n
+    </section></>
+  );
+};
+
+export default FAQSection;

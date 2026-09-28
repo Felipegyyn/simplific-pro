@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst DaySection = () => {\n  return (\n    <><section className="dia2-section" id="diaSection">
+import React from 'react';
+
+const DaySection = () => {
+  return (
+    <><section className="dia2-section" id="diaSection">
         <div className="dia2-grade">
             <div className="dia2-texto">
                 <header className="dia2-topo">
@@ -141,4 +145,8 @@ import React from 'react';\n\nconst DaySection = () => {\n  return (\n    <><sec
             </div>
             <a className="hero-btn dia2-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
         </div>
-    </section></>\n  );\n};\n\nexport default DaySection;\n
+    </section></>
+  );
+};
+
+export default DaySection;

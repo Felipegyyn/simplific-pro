@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst SecuritySection = () => {\n  return (\n    <><section className="conf-faixa" aria-label="Segurança e regulação">
+import React from 'react';
+
+const SecuritySection = () => {
+  return (
+    <><section className="conf-faixa" aria-label="Segurança e regulação">
 
         <svg className="conf-defs" aria-hidden="true" focusable="false">
             {/* O laço da Meta: geometria oficial da marca, em uma cor só. O
@@ -52,4 +56,8 @@ import React from 'react';\n\nconst SecuritySection = () => {\n  return (\n    <
 
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default SecuritySection;\n
+    </section></>
+  );
+};
+
+export default SecuritySection;

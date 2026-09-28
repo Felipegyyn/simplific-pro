@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ClientsSection = () => {\n  return (\n    <><section className="cli-section" id="clientesSection">
+import React from 'react';
+
+const ClientsSection = () => {
+  return (
+    <><section className="cli-section" id="clientesSection">
 
         <header className="cli-topo">
             <h2 className="cli-headline">Seus assessores respondem, marcam e confirmam por você.</h2>
@@ -290,4 +294,8 @@ import React from 'react';\n\nconst ClientsSection = () => {\n  return (\n    <>
 
         </div>
 
-    </section></>\n  );\n};\n\nexport default ClientsSection;\n
+    </section></>
+  );
+};
+
+export default ClientsSection;

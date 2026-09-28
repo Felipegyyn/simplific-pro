@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ModalDrive = () => {\n  return (\n    <><div className="of-modal of-modal--claro" id="drmModalDrive" hidden>
+import React from 'react';
+
+const ModalDrive = () => {
+  return (
+    <><div className="of-modal of-modal--claro" id="drmModalDrive" hidden>
         <div className="of-modal-veu" data-fechar></div>
 
         <div className="of-modal-caixa" role="dialog" aria-modal="true"
@@ -176,4 +180,8 @@ import React from 'react';\n\nconst ModalDrive = () => {\n  return (\n    <><div
                 <a href="/funcionalidades" className="of-modal-link">Ver todas as funcionalidades&nbsp;&rarr;</a>
             </footer>
         </div>
-    </div></>\n  );\n};\n\nexport default ModalDrive;\n
+    </div></>
+  );
+};
+
+export default ModalDrive;

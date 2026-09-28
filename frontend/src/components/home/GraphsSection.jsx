@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst GraphsSection = () => {\n  return (\n    <><section className="gd-section" id="graficosSection">
+import React from 'react';
+
+const GraphsSection = () => {
+  return (
+    <><section className="gd-section" id="graficosSection">
 
         <header className="gd-topo">
             <h2 className="gd-headline"><span className="hl-so-desktop">Quer ver apenas os números que importam para você? Peça ao Martin e ele monta um painel personalizado para você.</span><span className="hl-so-mobile">Crie painéis personalizados para ver apenas o que importa para você.</span></h2>
@@ -301,4 +305,8 @@ import React from 'react';\n\nconst GraphsSection = () => {\n  return (\n    <><
             </div>
 
         </div>
-    </section></>\n  );\n};\n\nexport default GraphsSection;\n
+    </section></>
+  );
+};
+
+export default GraphsSection;

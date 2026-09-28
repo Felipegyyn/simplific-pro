@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst AgendaSection = () => {\n  return (\n    <><section className="ag-section" id="agendaSection" data-header="claro">
+import React from 'react';
+
+const AgendaSection = () => {
+  return (
+    <><section className="ag-section" id="agendaSection" data-header="claro">
         <div className="ag-grade">
 
             <div className="ag-lado">
@@ -326,4 +330,8 @@ import React from 'react';\n\nconst AgendaSection = () => {\n  return (\n    <><
         </div>
 
         <a className="hero-btn ag-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
-    </section></>\n  );\n};\n\nexport default AgendaSection;\n
+    </section></>
+  );
+};
+
+export default AgendaSection;

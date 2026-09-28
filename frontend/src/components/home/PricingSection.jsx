@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst PricingSection = () => {\n  return (\n    <><section className="preco-section" id="planos" data-header="claro">
+import React from 'react';
+
+const PricingSection = () => {
+  return (
+    <><section className="preco-section" id="planos" data-header="claro">
 
         <svg className="preco-defs" aria-hidden="true" focusable="false">
             <symbol id="preco-tique" viewBox="0 0 16 16">
@@ -48,4 +52,8 @@ import React from 'react';\n\nconst PricingSection = () => {\n  return (\n    <>
 
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default PricingSection;\n
+    </section></>
+  );
+};
+
+export default PricingSection;

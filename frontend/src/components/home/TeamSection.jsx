@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst TeamSection = () => {\n  return (\n    <><section className="team-section" id="teamSection">
+import React from 'react';
+
+const TeamSection = () => {
+  return (
+    <><section className="team-section" id="teamSection">
         <div className="team-container">
             
             <div className="team-energy" aria-hidden="true">
@@ -356,4 +360,8 @@ import React from 'react';\n\nconst TeamSection = () => {\n  return (\n    <><se
                 <a href="/assessores" className="hero-btn team-btn"><span>Conheça seus assessores</span></a>
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default TeamSection;\n
+    </section></>
+  );
+};
+
+export default TeamSection;

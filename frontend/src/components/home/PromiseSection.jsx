@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst PromiseSection = () => {\n  return (\n    <><section className="promise-section" id="promiseSection">
+import React from 'react';
+
+const PromiseSection = () => {
+  return (
+    <><section className="promise-section" id="promiseSection">
         <div className="promise-container">
 
             <div className="promise-text">
@@ -193,4 +197,8 @@ import React from 'react';\n\nconst PromiseSection = () => {\n  return (\n    <>
                 </div>
             </div>
         </div>
-    </section></>\n  );\n};\n\nexport default PromiseSection;\n
+    </section></>
+  );
+};
+
+export default PromiseSection;

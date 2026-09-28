@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ExpedientSection = () => {\n  return (\n    <><section className="exp-section" id="expedienteSection" data-header="claro">
+import React from 'react';
+
+const ExpedientSection = () => {
+  return (
+    <><section className="exp-section" id="expedienteSection" data-header="claro">
 
         <header className="exp-topo">
             <h2 className="exp-headline">Tudo o que você pede pelo WhatsApp fica organizado para consultar, encontrar ou compartilhar depois.</h2>
@@ -980,4 +984,8 @@ import React from 'react';\n\nconst ExpedientSection = () => {\n  return (\n    
         </div>
 
         <a className="hero-btn exp-btn" href="/funcionalidades"><span>Conhecer todas as funcionalidades</span></a>
-    </section></>\n  );\n};\n\nexport default ExpedientSection;\n
+    </section></>
+  );
+};
+
+export default ExpedientSection;

@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ShowcaseSection = () => {\n  return (\n    <><section className="mostra-section" id="mostraSection" data-header="claro">
+import React from 'react';
+
+const ShowcaseSection = () => {
+  return (
+    <><section className="mostra-section" id="mostraSection" data-header="claro">
         <div className="mostra-grade">
 
             <header className="mostra-topo">
@@ -133,4 +137,8 @@ import React from 'react';\n\nconst ShowcaseSection = () => {\n  return (\n    <
         </div>
 
         <a className="hero-btn mostra-btn" href="/como-usar"><span>Veja o que dá para pedir</span></a>
-    </section></>\n  );\n};\n\nexport default ShowcaseSection;\n
+    </section></>
+  );
+};
+
+export default ShowcaseSection;

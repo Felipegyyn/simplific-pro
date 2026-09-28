@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst BenefitsSection = () => {\n  return (\n    <><section className="ben2-section" id="beneficiosSection">
+import React from 'react';
+
+const BenefitsSection = () => {
+  return (
+    <><section className="ben2-section" id="beneficiosSection">
         <header className="ben2-topo">
             <h2 className="ben2-headline">Você manda a mensagem. O resto acontece sozinho.</h2>
             <p className="ben2-sub">Link de pagamento pronto pra enviar, nota fiscal emitida sem outro aplicativo e a venda no cartão na sua conta em até dois dias úteis.</p>
@@ -52,4 +56,8 @@ import React from 'react';\n\nconst BenefitsSection = () => {\n  return (\n    <
             </article>
         </div>
         <div className="ben2-pontos" aria-hidden="true"><i className="ben2-ponto is-ativo"></i><i className="ben2-ponto"></i><i className="ben2-ponto"></i></div>
-    </section></>\n  );\n};\n\nexport default BenefitsSection;\n
+    </section></>
+  );
+};
+
+export default BenefitsSection;

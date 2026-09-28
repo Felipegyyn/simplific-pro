@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst Footer = () => {\n  return (\n    <><footer className="site-footer is-branco" data-header="claro">
+import React from 'react';
+
+const Footer = () => {
+  return (
+    <><footer className="site-footer is-branco" data-header="claro">
         <div className="footer-inner">
             <div className="footer-top">
 
@@ -60,4 +64,8 @@ import React from 'react';\n\nconst Footer = () => {\n  return (\n    <><footer 
                 </nav>
             </div>
         </div>
-    </footer></>\n  );\n};\n\nexport default Footer;\n
+    </footer></>
+  );
+};
+
+export default Footer;

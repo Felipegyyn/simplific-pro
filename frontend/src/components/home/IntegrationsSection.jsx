@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst IntegrationsSection = () => {\n  return (\n    <><section className="intg-section" id="integracoesSection" data-header="claro">
+import React from 'react';
+
+const IntegrationsSection = () => {
+  return (
+    <><section className="intg-section" id="integracoesSection" data-header="claro">
         <div className="intg-grade">
             <figure className="intg-figura" aria-hidden="true">
                 <div className="intg-palco">
@@ -167,4 +171,8 @@ import React from 'react';\n\nconst IntegrationsSection = () => {\n  return (\n 
                 <a href="#planos" className="hero-btn promise-btn"><span>Contratar minha equipe</span></a>
             </header>
         </div>
-    </section></>\n  );\n};\n\nexport default IntegrationsSection;\n
+    </section></>
+  );
+};
+
+export default IntegrationsSection;

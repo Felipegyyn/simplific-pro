@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst ModalDocumentos = () => {\n  return (\n    <><div className="of-modal of-modal--claro" id="gdmModalDocumentos" hidden>
+import React from 'react';
+
+const ModalDocumentos = () => {
+  return (
+    <><div className="of-modal of-modal--claro" id="gdmModalDocumentos" hidden>
         <div className="of-modal-veu" data-fechar></div>
 
         <div className="of-modal-caixa" role="dialog" aria-modal="true"
@@ -137,4 +141,8 @@ import React from 'react';\n\nconst ModalDocumentos = () => {\n  return (\n    <
                 <a href="/funcionalidades" className="of-modal-link">Ver todas as funcionalidades&nbsp;&rarr;</a>
             </footer>
         </div>
-    </div></>\n  );\n};\n\nexport default ModalDocumentos;\n
+    </div></>
+  );
+};
+
+export default ModalDocumentos;

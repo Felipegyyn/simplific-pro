@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst OpenFinanceSection = () => {\n  return (\n    <><section className="of-section" id="openFinanceSection">
+import React from 'react';
+
+const OpenFinanceSection = () => {
+  return (
+    <><section className="of-section" id="openFinanceSection">
         <div className="of-bancos">
             <p className="of-bancos-nota">Saiba exatamente para onde vai seu dinheiro<br />sem precisar somar faturas manualmente.</p>
             <div className="of-bancos-trilho">
@@ -397,4 +401,8 @@ import React from 'react';\n\nconst OpenFinanceSection = () => {\n  return (\n  
         </div>
 
         <a className="hero-btn of-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
-    </section></>\n  );\n};\n\nexport default OpenFinanceSection;\n
+    </section></>
+  );
+};
+
+export default OpenFinanceSection;

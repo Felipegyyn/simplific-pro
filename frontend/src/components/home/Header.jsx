@@ -1,4 +1,9 @@
-import React from 'react';\nimport logo from '../../assets/LOGO.png';\n\nconst Header = () => {\n  return (\n    <><header className="glass-header">
+import React from 'react';
+import logo from '../../assets/LOGO.png';
+
+const Header = () => {
+  return (
+    <><header className="glass-header">
         
         <a href="/" className="logo-link logo-troca">
             <img src={logo} alt="Simplific Pro Logo" className="header-logo logo-no-escuro" />
@@ -30,4 +35,8 @@ import React from 'react';\nimport logo from '../../assets/LOGO.png';\n\nconst H
             <a href="/checkout" className="mm-acao">Começar agora &rarr;</a>
             <a href="/login" className="mm-login">Fazer login</a>
         </nav>
-    </header></>\n  );\n};\n\nexport default Header;\n
+    </header></>
+  );
+};
+
+export default Header;

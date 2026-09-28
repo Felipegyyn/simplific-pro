@@ -1,4 +1,8 @@
-import React from 'react';\n\nconst HeroSection = () => {\n  return (\n    <><section className="hero-container">
+import React from 'react';
+
+const HeroSection = () => {
+  return (
+    <><section className="hero-container">
         
         {/* O FILME É SÓ DO DESKTOP (30/08/2026). No celular o hero ficou
              preto puro: as duas mãos se encontrando obrigavam o aparelho a
@@ -24,4 +28,8 @@ import React from 'react';\n\nconst HeroSection = () => {\n  return (\n    <><se
         <div className="chat-simulation-container" id="chatSimulation">
             <div className="chat-messages" id="chatMessages"></div>
         </div>
-    </section></>\n  );\n};\n\nexport default HeroSection;\n
+    </section></>
+  );
+};
+
+export default HeroSection;
