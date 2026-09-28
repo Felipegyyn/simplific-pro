@@ -7,7 +7,7 @@ const DaySection = () => {
             <div className="dia2-texto">
                 <header className="dia2-topo">
                     <h2 className="dia2-headline">Um dia normal. Só que alguém cuidou de tudo.</h2>
-                    <p className="dia2-sub">Cinco momentos de um dia comum, e o que a sua equipe resolve em cada um deles pelo WhatsApp.</p>
+                    <p className="dia2-sub">Cinco momentos de um dia comum, e o que a IA do Simplific resolve para você pelo WhatsApp.</p>
                 </header>
                 <ol className="dia2-lista" id="dia2Lista">
                     <li className="dia2-item is-ativo" data-ato="1" aria-current="true">
@@ -32,7 +32,7 @@ const DaySection = () => {
                     </li>
                     <li className="dia2-item" data-ato="5" aria-current="false">
                         <button type="button" className="dia2-botao"><span className="dia2-hora">22:00</span><span className="dia2-titulo">Antes de dormir, o resumo do dia já está pronto.</span></button>
-                        <div className="dia2-corpo"><p>Sua equipe reúne as atividades realizadas em um resumo enviado pelo WhatsApp. A Sofi também envia os compromissos, as prioridades e os prazos da agenda a cada manhã.</p></div>
+                        <div className="dia2-corpo"><p>A Inteligência Artificial reúne as movimentações do dia e te dá um panorama claro das suas finanças e metas financeiras.</p></div>
                         <i className="dia2-barra" aria-hidden="true"></i>
                     </li>
                 </ol>
@@ -115,11 +115,11 @@ const DaySection = () => {
                         <div className="dia-foto">
                         <span className="dia-agua" aria-hidden="true">22:00</span>
                         <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/22-00.webp\')'}} aria-hidden="true"></div>
-                        <div className="dia-noti is-equipe">
-                        <span className="dia-noti-icone is-equipe"><img src="favicon.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
+                        <div className="dia-noti is-ia">
+                        <span className="dia-noti-icone is-ia"><img src="favicon.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
                         <span className="dia-noti-corpo">
                         <span className="dia-noti-linha">
-                        <strong className="dia-noti-titulo">Sua equipe fechou o dia</strong>
+                        <strong className="dia-noti-titulo">Resumo Financeiro Gerado</strong>
                         <span className="dia-noti-hora">22:00</span>
                         </span>
                         <span className="dia-noti-sub">1 fatura avisada, 1 consulta marcada, 1 gasto registrado e 1 documento encontrado.</span>
@@ -143,7 +143,7 @@ const DaySection = () => {
                     <div className="dia2-legenda-item" data-ato="5"><h3>Antes de dormir, o resumo do dia já está pronto.</h3><p>Receba o resumo do dia e os próximos compromissos pelo WhatsApp.</p></div>
                 </div>
             </div>
-            <a className="hero-btn dia2-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
+            <a className="hero-btn dia2-btn cta-forte" href="#planos"><span>Falar com o Simplific</span></a>
         </div>
     </section></>
   );

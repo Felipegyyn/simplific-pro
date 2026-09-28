@@ -6,10 +6,10 @@ const PromiseSection = () => {
         <div className="promise-container">
 
             <div className="promise-text">
-                <h2 className="promise-headline">Vive esquecendo onde foi parar o dinheiro ou qual é o próximo compromisso?<span className="hl-so-desktop"> Mande uma mensagem ou áudio e deixe tudo organizado.</span></h2>
-                <p className="promise-description">Basta enviar uma simples mensagem por texto ou áudio no WhatsApp. A equipe registra tudo, organiza, e não deixa você esquecer de nada.</p>
+                <h2 className="promise-headline">Quer saber o saldo real, limite do cartão ou o preço de uma ação na B3?<span className="hl-so-desktop"> Mande uma mensagem e tenha a resposta na hora.</span></h2>
+                <p className="promise-description">Basta enviar um áudio ou texto. A IA registra receitas, despesas, consultas de ações (B3) e atualiza seu orçamento em tempo real.</p>
 
-                <a href="#planos" className="hero-btn promise-btn"><span>Contratar minha equipe</span></a>
+                <a href="#planos" className="hero-btn promise-btn"><span>Falar com o Simplific</span></a>
             </div>
 
             <div className="promise-stage" aria-hidden="true">

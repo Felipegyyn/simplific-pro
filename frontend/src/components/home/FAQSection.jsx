@@ -107,11 +107,11 @@ const FAQSection = () => {
 
                     <details className="faq-item" name="faq">
                         <summary className="faq-pergunta">
-                            <span>Posso usar com minha esposa, meu sócio ou minha equipe?</span>
+                            <span>Posso usar para finanças pessoais e também consultar investimentos?</span>
                             <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
                         </summary>
                         <div className="faq-corpo">
-                            <p>Sim, a conta é compartilhada. Você adiciona a sua esposa, os seus sócios ou a sua equipe, cada um fala com o Simplific Pro do próprio WhatsApp, e o que qualquer um pedir entra na mesma conta organizada.</p>
+                            <p>Sim! O Simplific não só anota gastos, mas consulta saldos, limites, preços de ativos da Bolsa (B3), e simula investimentos na mesma interface via WhatsApp.</p>
                         </div>
                     </details>
 

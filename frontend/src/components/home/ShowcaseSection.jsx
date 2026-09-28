@@ -8,7 +8,7 @@ const ShowcaseSection = () => {
             <header className="mostra-topo">
                 <h2 className="mostra-headline">Se você sabe mandar uma mensagem no WhatsApp, já sabe usar o Simplific Pro.</h2>
                 
-                <p className="mostra-sub">Fale com seus assessores do mesmo jeito que fala com qualquer pessoa. Peça com as palavras que vierem à cabeça. Sua equipe entende o que você precisa.</p>
+                <p className="mostra-sub">Fale com a IA do mesmo jeito que fala com um amigo. Peça com as palavras que vierem à cabeça, por texto ou áudio. Ela entende o que você precisa.</p>
             </header>
         </div>
 

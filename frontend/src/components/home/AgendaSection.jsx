@@ -329,7 +329,7 @@ const AgendaSection = () => {
             </div>
         </div>
 
-        <a className="hero-btn ag-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
+        <a className="hero-btn ag-btn cta-forte" href="#planos"><span>Falar com o Simplific</span></a>
     </section></>
   );
 };

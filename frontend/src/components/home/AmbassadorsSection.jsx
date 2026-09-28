@@ -15,7 +15,7 @@ const AmbassadorsSection = () => {
         </svg>
         <div className="emb-grade">
             <header className="emb-topo">
-                <h2 className="emb-headline">Gente que você conhece já tem uma equipe.</h2>
+                <h2 className="emb-headline">Simplific Pro: O braço direito do seu dinheiro.</h2>
                 <p className="emb-sub">Nossos embaixadores, com as palavras deles.</p>
             </header>
 

@@ -400,7 +400,7 @@ const OpenFinanceSection = () => {
 
         </div>
 
-        <a className="hero-btn of-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
+        <a className="hero-btn of-btn cta-forte" href="#planos"><span>Falar com o Simplific</span></a>
     </section></>
   );
 };

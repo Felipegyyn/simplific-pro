@@ -351,7 +351,7 @@ const ExpedientSection = () => {
                                             <span className="pn-recado-foto"><img src="/meuassessor/images/theo.jpg" alt="" /></span>
                                             <div className="pn-balao">
                                                 <p className="pn-balao-quem"><b className="is-theo">Theo</b> &middot; Diretor de operações</p>
-                                                <p className="pn-balao-txt">a equipe manteve o registro vivo, <b>2.610 movimentos</b> em 12 meses. <b>Nenhum deles</b> você anotou.</p>
+                                                <p className="pn-balao-txt">a IA manteve o registro vivo, <b>2.610 movimentos</b> em 12 meses. <b>Nenhum deles</b> você anotou.</p>
                                                 <p className="pn-balao-sync">sincronizado às 00:06
                                                     <svg viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M1 6.6 4.2 10 11 2.3"/><path d="M8.4 6.9 10.6 10 18 2"/></svg>
                                                 </p>
@@ -401,7 +401,7 @@ const ExpedientSection = () => {
                             <div className="cv-palco">
 
                                 <div className="cv-ato cv-ato--menu">
-                                    <p className="cv-rot"><span>SUA EQUIPE DE ACESSO</span></p>
+                                    <p className="cv-rot"><span>SEU ACESSO DIRETO</span></p>
 
                                     <ul className="cv-menu">
                                         <li className="cv-fila cv-fila--alvo" style={{'--i': '0'}}>
@@ -456,7 +456,7 @@ const ExpedientSection = () => {
                                         <span className="cv-carimbo">TITULAR</span>
                                     </div>
 
-                                    <p className="cv-lead">Só você por enquanto. Gere um convite para trazer alguém da família ou da equipe.</p>
+                                    <p className="cv-lead">Centralize seu controle financeiro com segurança total.</p>
 
                                     <span className="cv-btn cv-btn--largo">Convidar alguém →</span>
                                 </div>
@@ -663,7 +663,7 @@ const ExpedientSection = () => {
                         </div>
                     </div>
                     <div className="exp-text">
-                        <h3 className="exp-title">Adicione seu sócio, sua família ou a equipe inteira na mesma conta.</h3>
+                        <h3 className="exp-title">Acompanhe seus investimentos e finanças em uma mesma conta.</h3>
                         <p className="exp-desc">Cada participante usa o próprio WhatsApp e alimenta a mesma conta. Convide quantas pessoas quiser, sem custo adicional.</p>
                     </div>
                 </article>

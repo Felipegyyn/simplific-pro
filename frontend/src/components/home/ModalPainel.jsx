@@ -151,7 +151,7 @@ const ModalPainel = () => {
 
             <footer className="of-modal-pe">
                 <button type="button" className="of-modal-voltar" data-fechar>Voltar</button>
-                <a href="/assessores" className="of-modal-link">Conhecer a equipe de assessores&nbsp;&rarr;</a>
+                <a href="/assessores" className="of-modal-link">Conhecer a Inteligência Artificial&nbsp;&rarr;</a>
             </footer>
         </div>
     </div></>

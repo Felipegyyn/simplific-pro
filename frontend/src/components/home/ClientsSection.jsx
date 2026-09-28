@@ -6,7 +6,7 @@ const ClientsSection = () => {
 
         <header className="cli-topo">
             <h2 className="cli-headline">Seus assessores respondem, marcam e confirmam por você.</h2>
-            <p className="cli-sub">Quem precisa falar com você fala com a sua equipe. Os assessores entram em contato, marcam o horário, nunca se atrasam e nunca esquecem.</p>
+            <p className="cli-sub">Seu parceiro financeiro 24/7. Consulte limites de cartão, metas financeiras, e gerencie orçamentos num piscar de olhos.</p>
         </header>
 
         <div className="cli-grade">
