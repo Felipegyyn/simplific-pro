@@ -168,7 +168,7 @@ const IntegrationsSection = () => {
                 
                 <h2 className="intg-headline">Esqueça ter que baixar um aplicativo novo para cada coisa que precisa resolver.<span className="intg-headline-complemento"> Com o Simplific Pro, você faz tudo em um só lugar.</span></h2>
                 <p className="intg-passo">Seus assessores se conectam ao banco, ao Google Agenda, ao Meet, ao Gmail e às outras ferramentas de que precisam para trabalhar. Você continua pedindo tudo pelo WhatsApp, sem precisar aprender a usar cada uma delas.</p>
-                <a href="#planos" className="hero-btn promise-btn"><span>Falar com o Simplific</span></a>
+                <a href="#planos" className="hero-btn promise-btn"><span>Contratar minha equipe</span></a>
             </header>
         </div>
     </section></>

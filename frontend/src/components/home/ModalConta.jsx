@@ -17,7 +17,7 @@ const ModalConta = () => {
 
             <header className="of-modal-topo">
                 <span className="of-modal-etiqueta">Conta compartilhada</span>
-                <h2 className="of-modal-titulo" id="cvmModalTitulo">A conta é sua. Centralize sua vida financeira num só lugar.</h2>
+                <h2 className="of-modal-titulo" id="cvmModalTitulo">A conta é sua, e cabe a sua família e a sua equipe.</h2>
                 <p className="of-modal-lead">Você convida com um código, cada pessoa fala com o escritório do próprio WhatsApp, e todo mundo usa a mesma assinatura.</p>
             </header>
 
@@ -28,7 +28,7 @@ const ModalConta = () => {
                     <div className="ofm-palco" aria-hidden="true">
                         <div className="ofm-peca cvm-menu-peca">
                             <div className="ofm-painel-topo">
-                                <span className="ofm-rot">Seu controle financeiro</span>
+                                <span className="ofm-rot">Sua equipe de acesso</span>
                             </div>
 
                             <ul className="cvm-menu">
@@ -172,7 +172,7 @@ const ModalConta = () => {
                     </div>
 
                     <h3>Convide quantas pessoas quiser, sem custo adicional</h3>
-                    <p>Faça o acompanhamento integral do seu patrimônio: carteiras, limites, faturas e orçamentos, de forma unificada e simples pelo WhatsApp.</p>
+                    <p>Não existe limite de participantes nem cobrança por pessoa: a assinatura é uma só para o sócio, a família ou a equipe inteira.</p>
                 </section>
 
             </div>

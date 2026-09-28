@@ -19,10 +19,10 @@ const HeroSection = () => {
         </video>
         
         <div className="hero-content">
-            <p className="hero-chip">Sua Vida Financeira Organizada</p>
-            <h1 className="hero-title">Mais que um App, um Assessor Inteligente no WhatsApp.</h1>
-            <p className="hero-sub"><span className="hl-so-desktop">A Inteligência Artificial do Simplific cuida das suas despesas, limites, investimentos e agenda. Você manda um áudio ou texto, e ela organiza.</span><span className="hl-so-mobile">Uma IA no WhatsApp cuida do seu dinheiro e agenda. Você só manda mensagem.</span></p>
-            <a href="#planos" className="hero-btn cta-forte"><span>Falar com o Simplific</span></a>
+            <p className="hero-chip">+ 250 mil usuários aprovam</p>
+            <h1 className="hero-title">Sua vida organizada começa numa conversa.</h1>
+            <p className="hero-sub"><span className="hl-so-desktop">Uma equipe de assessores no seu WhatsApp cuida do seu dinheiro, da sua agenda e das suas notas. Você só manda mensagem.</span><span className="hl-so-mobile">Assessores no seu WhatsApp cuidam do dinheiro, da agenda e das notas. Você só manda mensagem.</span></p>
+            <a href="#planos" className="hero-btn cta-forte"><span>Contratar minha equipe</span></a>
         </div>
 
         <div className="chat-simulation-container" id="chatSimulation">

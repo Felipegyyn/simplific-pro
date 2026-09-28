@@ -356,7 +356,7 @@ const TeamSection = () => {
 
             <div className="team-text-block">
                 <h2 className="team-headline"><span className="hl-so-desktop">Pare de tentar organizar tudo sozinho. </span>Tenha um assessor especializado em cada parte da sua rotina.</h2>
-                <p className="team-description">O Simplific integra dezenas de funcionalidades numa única IA. Você envia uma mensagem pelo WhatsApp e ela processa dados financeiros complexos em algo simples e resolvido na hora.</p>
+                <p className="team-description">Cada assessor é especialista em uma área, mas todos trabalham juntos. Você envia uma mensagem pelo WhatsApp e a equipe transforma o pedido em algo resolvido.</p>
                 <a href="/assessores" className="hero-btn team-btn"><span>Conheça seus assessores</span></a>
             </div>
         </div>
