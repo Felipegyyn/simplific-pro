@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/LOGO.png';
 
 const Footer = () => {
@@ -8,10 +9,10 @@ const Footer = () => {
             <div className="footer-top">
 
                 <div className="footer-brand">
-                    <a href="/" className="footer-logo-link">
+                    <Link to="/" className="footer-logo-link">
                         
                         <img src={logo} alt="Simplific Pro" className="footer-logo" />
-                    </a>
+                    </Link>
                     <p className="footer-about">Um escritório de assessores de inteligência artificial dentro do seu WhatsApp. Dinheiro, agenda, tarefas e documentos entram organizados, numa conversa só.</p>
                     <div className="footer-social">
                         <a href="https://www.instagram.com/meuassessor.ia/" target="_blank" rel="noopener" aria-label="Instagram do Simplific Pro">
@@ -31,17 +32,17 @@ const Footer = () => {
 
                 <nav className="footer-col footer-links" aria-labelledby="footerColEscritorio">
                     <h3 className="footer-col-title" id="footerColEscritorio">Simplific Pro</h3>
-                    <a href="/beneficios">Benefícios</a>
-                    <a href="/inteligencia">Inteligência</a>
-                    <a href="/seguranca">Segurança</a>
-                    <a href="/contato">Contato</a>
+                    <Link to="/beneficios">Benefícios</Link>
+                    <Link to="/inteligencia">Inteligência</Link>
+                    <Link to="/seguranca">Segurança</Link>
+                    <Link to="/contato">Contato</Link>
                 </nav>
 
                 <nav className="footer-col footer-links" aria-labelledby="footerColConta">
                     <h3 className="footer-col-title" id="footerColConta">Conta</h3>
-                    <a href="/login">Login</a>
+                    <Link to="/login">Login</Link>
                     
-                    <a href="#planos">Começar agora</a>
+                    <Link to="/planos">Começar agora</Link>
                 </nav>
 
                 <div className="footer-col footer-support" aria-labelledby="footerColSuporte">
@@ -60,8 +61,8 @@ const Footer = () => {
             <div className="footer-bottom">
                 <p className="footer-legal">© 2026 Simplific Pro LTDA. Empresa do grupo Tittanium. Todos os direitos reservados.</p>
                 <nav className="footer-terms">
-                    <a href="/privacidade">Política de privacidade</a>
-                    <a href="/termos">Termos de uso</a>
+                    <Link to="/privacidade">Política de privacidade</Link>
+                    <Link to="/termos">Termos de uso</Link>
                 </nav>
             </div>
         </div>

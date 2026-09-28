@@ -1,23 +1,24 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/LOGO.png';
 
 const Header = () => {
   return (
     <><header className="glass-header">
         
-        <a href="/" className="logo-link logo-troca">
+        <Link to="/" className="logo-link logo-troca">
             <img src={logo} alt="Simplific Pro Logo" className="header-logo logo-no-escuro" />
             <img src={logo} alt="" aria-hidden="true" className="header-logo logo-no-claro" />
-        </a>
+        </Link>
         <nav className="header-nav">
-            <a href="/beneficios">Benefícios</a>
-            <a href="/inteligencia">Inteligência</a>
-            <a href="/planos">Planos</a>
-            <a href="/seguranca">Segurança</a>
-            <a href="/contato">Contato</a>
+            <Link to="/beneficios">Benefícios</Link>
+            <Link to="/inteligencia">Inteligência</Link>
+            <Link to="/planos">Planos</Link>
+            <Link to="/seguranca">Segurança</Link>
+            <Link to="/contato">Contato</Link>
         </nav>
         
-        <a href="/checkout" className="header-cta">Começar agora &rarr;</a>
+        <Link to="/checkout" className="header-cta">Começar agora &rarr;</Link>
 
         <button className="header-menu" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-do-celular">
             <span></span>
@@ -26,14 +27,14 @@ const Header = () => {
         </button>
 
         <nav className="menu-movel" id="menu-do-celular" aria-label="Menu do site">
-            <a href="/beneficios">Benefícios</a>
-            <a href="/inteligencia">Inteligência</a>
-            <a href="/planos">Planos</a>
-            <a href="/seguranca">Segurança</a>
-            <a href="/contato">Contato</a>
+            <Link to="/beneficios">Benefícios</Link>
+            <Link to="/inteligencia">Inteligência</Link>
+            <Link to="/planos">Planos</Link>
+            <Link to="/seguranca">Segurança</Link>
+            <Link to="/contato">Contato</Link>
             
-            <a href="/checkout" className="mm-acao">Começar agora &rarr;</a>
-            <a href="/login" className="mm-login">Fazer login</a>
+            <Link to="/checkout" className="mm-acao">Começar agora &rarr;</Link>
+            <Link to="/login" className="mm-login">Fazer login</Link>
         </nav>
     </header></>
   );
