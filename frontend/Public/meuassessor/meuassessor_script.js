@@ -1,3 +1,4 @@
+(function() {
 
 
 /* --- menu.js --- */
@@ -841,7 +842,7 @@ setTimeout( () => {
         
         // Scroll to bottom gently
         const simulationContainer = document.getElementById('chatSimulation');
-        simulationContainer.scrollTop = simulationContainer.scrollHeight;
+        if (simulationContainer) { simulationContainer.scrollTop = simulationContainer.scrollHeight; }
     }
 
     function playNextMessage() {
@@ -891,7 +892,7 @@ setTimeout( () => {
         chatContainer.appendChild(typingDiv);
         
         const simulationContainer = document.getElementById('chatSimulation');
-        simulationContainer.scrollTop = simulationContainer.scrollHeight;
+        if (simulationContainer) { simulationContainer.scrollTop = simulationContainer.scrollHeight; }
         
         // Tempo de "digitando": quem pede escreve depressa, quem responde
         // pensa um pouco mais. Antes os dois usavam a mesma faixa e o pedido
@@ -12150,4 +12151,6 @@ setTimeout( () => {
             });
         });
     });
+})();
+
 })();

@@ -1,30 +1,20 @@
-import re
+import os
 
-with open('frontend/public/meuassessor/meuassessor_script.js', 'r', encoding='utf-8') as f:
-    js = f.read()
+file_path = 'frontend/public/meuassessor/meuassessor_script.js'
 
-# 1. Video play catches
-js = js.replace('video.play();', 'video.play().catch(() => {});')
-js = js.replace('linha[i].play();', 'linha[i].play().catch(() => {});')
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-# 2. Bot names
-js = js.replace("'Luna'", "'Simplific'")
-js = js.replace("'Martin'", "'Simplific'")
-js = js.replace("foto: '/images/avatars/luna-32.jpg'", "foto: '/meuassessor/favicon.png'")
-js = js.replace("foto: '/images/avatars/martin-32.jpg'", "foto: '/meuassessor/favicon.png'")
-# The original might not have /meuassessor/ in front of /images, let's just replace the exact paths if needed.
-# To be safe, let's just use regex for the avatar URLs.
-js = re.sub(r"foto:\s*'[^']*luna-32\.jpg'", "foto: '/meuassessor/favicon.png'", js)
-js = re.sub(r"foto:\s*'[^']*martin-32\.jpg'", "foto: '/meuassessor/favicon.png'", js)
+# 1. Enclose in IIFE to prevent variable redeclaration
+if not content.startswith('(function() {'):
+    content = '(function() {\n' + content + '\n})();'
 
-# 3. Intersection Observer tweak (to ensure it triggers)
-js = js.replace('threshold: [0, 0.4]', 'threshold: [0, 0.1]')
-js = js.replace('entry.intersectionRatio >= 0.4', 'entry.isIntersecting')
+# 2. Add null check for simulationContainer.scrollTop
+old_code = "simulationContainer.scrollTop = simulationContainer.scrollHeight;"
+new_code = "if (simulationContainer) { simulationContainer.scrollTop = simulationContainer.scrollHeight; }"
+content = content.replace(old_code, new_code)
 
-js = js.replace('threshold: [0, 0.6]', 'threshold: [0, 0.1]')
-js = js.replace('entry.intersectionRatio >= 0.6', 'entry.isIntersecting')
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
 
-with open('frontend/public/meuassessor/meuassessor_script.js', 'w', encoding='utf-8') as f:
-    f.write(js)
-
-print("Script restored and patched.")
+print("meuassessor_script.js patched successfully.")
