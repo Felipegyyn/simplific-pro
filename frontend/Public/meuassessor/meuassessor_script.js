@@ -561,7 +561,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: 'Anotado ✅ <b>R$ 62 em Saúde</b>. Esse mês: R$ 214.',
             time: '09:10'
@@ -575,7 +575,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Sofi',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/meuassessor/images/sofi.jpg',
             nameColor: '#1E88E5',
             text: 'Marcado 📅 Já está no seu <b>Google Agenda</b>. Te lembro 1h antes.',
             time: '09:12'
@@ -589,7 +589,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/meuassessor/images/luna.jpg',
             nameColor: '#E91E63',
             text: 'Deixa comigo ✅ Sexta, <b>9h</b>, eu te lembro.',
             time: '09:14'
@@ -603,7 +603,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: 'Link enviado 🔗 <b>Eu aviso o Diego</b> e te falo quando cair.',
             time: '09:16'
@@ -617,7 +617,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Rita',
             role: 'Assistente fiscal',
-            avatar: 'images/rita.jpg',
+            avatar: '/meuassessor/images/rita.jpg',
             nameColor: '#5E35B1',
             text: 'Nota emitida 🧾 <b>PDF aqui na conversa</b> e cópia pro seu contador.',
             time: '09:18'
@@ -631,7 +631,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Ítalo',
             role: 'Estagiário de pesquisas',
-            avatar: 'images/italo_otim.jpg',
+            avatar: '/meuassessor/images/italo_otim.jpg',
             nameColor: '#FB8C00',
             text: 'Menor preço: <b>R$ 1.149</b> 🔎 Te mandei os 3 links, com fonte.',
             time: '09:20'
@@ -645,7 +645,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Sofi',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/meuassessor/images/sofi.jpg',
             nameColor: '#1E88E5',
             text: 'Reunião criada 📅 <b>Link do Meet</b> enviado pros dois. No fim, mando a ata.',
             time: '09:22'
@@ -659,7 +659,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Theo',
             role: 'Diretor de operações',
-            avatar: 'images/theo.jpg',
+            avatar: '/meuassessor/images/theo.jpg',
             nameColor: '#8E24AA',
             text: 'Feito! A <b>Bia</b> já pode chamar a equipe do WhatsApp dela 👋',
             time: '09:24'
@@ -668,7 +668,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: '⚠️ Sua assinatura de streaming subiu: <b>R$ 34,90 → R$ 44,90</b>.',
             time: '09:26'
@@ -682,7 +682,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/meuassessor/images/luna.jpg',
             nameColor: '#E91E63',
             text: '📄 <b>Contrato_Apartamento.pdf</b> — guardado desde março.',
             time: '09:28'
@@ -696,7 +696,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: '<b>R$ 1.240</b> em 11 compras 🛒 15% acima de julho.',
             time: '09:30'
@@ -710,7 +710,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: 'Pronto 📊 Entradas R$ 8.430, saídas R$ 6.957 — <b>sobra de R$ 1.473</b>.',
             time: '09:32'
@@ -724,7 +724,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Gerente financeiro',
-            avatar: 'images/martin.jpg',
+            avatar: '/meuassessor/images/martin.jpg',
             nameColor: '#00897B',
             text: 'Movi pra <b>Despesas do trabalho</b> ✅ Da próxima, o Outback já entra certo.',
             time: '09:34'
@@ -738,7 +738,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/meuassessor/images/luna.jpg',
             nameColor: '#E91E63',
             text: 'Todo dia às <b>20h</b> ⏰ Eu não esqueço.',
             time: '09:36'
@@ -752,7 +752,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Sofi',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/meuassessor/images/sofi.jpg',
             nameColor: '#1E88E5',
             text: 'Enviado 🗓️ Quando marcarem, <b>eu confirmo com a pessoa</b> e te aviso.',
             time: '09:38'
@@ -766,7 +766,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Rita',
             role: 'Assistente fiscal',
-            avatar: 'images/rita.jpg',
+            avatar: '/meuassessor/images/rita.jpg',
             nameColor: '#5E35B1',
             text: 'Combinado 🧾 Todo dia 1º ela <b>sai sozinha</b>.',
             time: '09:40'
@@ -780,7 +780,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Simplific',
             role: 'Organização & Docs',
-            avatar: 'images/luna.jpg',
+            avatar: '/meuassessor/images/luna.jpg',
             nameColor: '#E91E63',
             text: 'Guardei em <b>Notas fiscais</b> 📁 Quando precisar, é só pedir.',
             time: '09:42'
@@ -789,7 +789,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Sofi',
             role: 'Secretária executiva',
-            avatar: 'images/sofi.jpg',
+            avatar: '/meuassessor/images/sofi.jpg',
             nameColor: '#1E88E5',
             text: 'Amanhã: <b>3 compromissos</b> ☀️ O primeiro é às 9h, com a Carla.',
             time: '09:42'
@@ -798,7 +798,7 @@ setTimeout( () => {
             type: 'bot',
             name: 'Theo',
             role: 'Diretor de operações',
-            avatar: 'images/theo.jpg',
+            avatar: '/meuassessor/images/theo.jpg',
             nameColor: '#8E24AA',
             text: 'Fechando o dia: <b>12 pedidos resolvidos</b>, nada esquecido ✅',
             time: '09:44'
@@ -925,43 +925,43 @@ setTimeout( () => {
         theo: {
             name: 'Theo',
             role: 'Diretor de operações',
-            portrait: 'images/theo_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/theo_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Sua manhã foi organizada! Separei 3 prioridades.'
         },
         martin: {
             name: 'Simplific',
             role: 'Gerente financeiro',
-            portrait: 'images/martin_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/martin_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Sua fatura vence em 3 dias. Saldo sob controle!'
         },
         sofi: {
             name: 'Sofi',
             role: 'Secretária executiva',
-            portrait: 'images/sofi_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/sofi_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Você tem uma reunião hoje das 14h às 16h'
         },
         luna: {
             name: 'Simplific',
             role: 'Organização & Docs',
-            portrait: 'images/luna_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/luna_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Salvei 2 documentos na sua pasta de contratos'
         },
         italo: {
             name: 'Ítalo',
             role: 'Estagiário de pesquisas',
-            portrait: 'images/italo_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/italo_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Achei 3 preços do monitor. O menor: R$ 1.149, com fonte.'
         },
         rita: {
             name: 'Rita',
             role: 'Assistente fiscal',
-            portrait: 'images/rita_large_otim.jpg',
-            avatar: 'images/perfi-fundo-preto.png',
+            portrait: '/meuassessor/images/rita_large_otim.jpg',
+            avatar: '/meuassessor/images/perfi-fundo-preto.png',
             message: 'Nota emitida! O PDF já está na sua conversa.'
         }
     };
@@ -4280,7 +4280,7 @@ function cvBater(el, nome) {
 
         function irPara(ms) { for (var i = 0; i < linha.length; i++) linha[i].currentTime = ms; }
         function pausar()   { for (var i = 0; i < linha.length; i++) linha[i].pause(); }
-        function tocar()    { for (var i = 0; i < linha.length; i++) linha[i].play().catch(e => console.warn("Video play prevented", e)); }
+        function tocar()    { for (var i = 0; i < linha.length; i++) var _p = linha[i].play(); if (_p && _p.catch) _p.catch(e => console.warn("Video play prevented", e)); }
 
         /* A VEZ MUDA DE DONO E NUNCA TEM DOIS DONOS. A classe não
            desenha nada desde que o dono mandou tirar o anel: o que ela
