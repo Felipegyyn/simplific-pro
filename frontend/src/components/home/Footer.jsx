@@ -4,8 +4,8 @@ import logo from '../../assets/LOGO.png';
 
 const Footer = () => {
   return (
-    <><footer className="site-footer is-branco" data-header="claro">
-        <div className="footer-inner">
+    <><footer className="site-footer bg-black text-white border-t border-white/10" data-header="escuro">
+        <div className="footer-inner relative z-10">
             <div className="footer-top">
 
                 <div className="footer-brand">

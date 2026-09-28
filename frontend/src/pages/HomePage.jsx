@@ -51,11 +51,15 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="clone-wrapper">
+    <div className="clone-wrapper bg-black relative overflow-hidden">
+      {/* Efeitos de Fundo (Glow) idênticos aos da página Inteligência */}
+      <div className="fixed top-0 right-0 w-1/2 h-[100vh] bg-green-500/10 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed bottom-0 left-0 w-1/3 h-[50vh] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none z-0" />
+
       <link rel="stylesheet" href={"/meuassessor/meuassessor.css?v=" + Date.now()} />
       
     
-    <img src="/meuassessor/images/celular-2.webp" id="global-celular-bg" alt="Celular Background" />
+    <img src="/meuassessor/images/celular-2.webp" id="global-celular-bg" className="relative z-10" alt="Celular Background" />
     
     <Header />
 
