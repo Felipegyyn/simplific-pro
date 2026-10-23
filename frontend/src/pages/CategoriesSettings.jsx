@@ -196,12 +196,13 @@ const CategoriesSettings = () => {
           </h1>
           <p className={styles.pageSubtitle}>Gerencie como você classifica suas finanças.</p>
         </div>
-        <Button 
+        <button 
+          type="button"
           onClick={() => handleOpenModal()}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20"
+          className={styles.btnPrimaryDark}
         >
-          <Plus size={20} className="mr-2" /> Nova Categoria
-        </Button>
+          <Plus size={14} /> Nova Categoria
+        </button>
       </div>
 
       {/* Abas */}

@@ -702,29 +702,29 @@ const tutorials = [
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={dashboardData.chartData.evolution}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.1)" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                     <XAxis 
                       dataKey="month" 
-                      stroke="#94a3b8" 
-                      fontSize={10} 
+                      stroke="var(--text-muted)" 
+                      fontSize={11} 
                       tickLine={false} 
                       axisLine={false} 
                     />
                    <YAxis 
-                    stroke="#94a3b8" 
-                    fontSize={10} 
+                    stroke="var(--text-muted)" 
+                    fontSize={11} 
                     tickLine={false} 
                     axisLine={false} 
                     tickFormatter={(value) => `R$${value}`}
                   />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '12px', color: 'var(--text-main)' }}
+                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '6px', color: 'var(--text-main)', fontSize: '12px' }}
                       itemStyle={{ fontSize: '12px' }}
                       formatter={(value) => [formatCurrency(value), '']} 
                     />
-                    <Line type="monotone" dataKey="receitas" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} activeDot={{ r: 6 }} />
-                    <Line type="monotone" dataKey="despesas" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: '#ef4444' }} activeDot={{ r: 6 }} />
-                    <Line type="monotone" dataKey="saldo" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="receitas" stroke="#16a34a" strokeWidth={2} dot={{ r: 3, fill: '#16a34a' }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="despesas" stroke="#e11d48" strokeWidth={2} dot={{ r: 3, fill: '#e11d48' }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="saldo" stroke="#2563eb" strokeWidth={2} dot={{ r: 3, fill: '#2563eb' }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -734,12 +734,12 @@ const tutorials = [
           <div className={styles.premiumCard}>
             <div className={styles.cardHeader}>
                 <div className={styles.cardTitleArea}>
-                    <PieChartIcon className="h-4 w-4 text-purple-500" />
+                    <PieChartIcon className="h-4 w-4 text-muted-foreground" />
                     <h3 className={styles.cardTitle}>Planejado vs. Realizado</h3>
                 </div>
                 <div className="flex items-center gap-2">
                   <Select value={pvrTypeFilter} onValueChange={setPvrTypeFilter}>
-                    <SelectTrigger className="w-28 h-8 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 border-none shadow-none">
+                    <SelectTrigger className="w-28 h-8 text-xs font-medium bg-transparent border border-border shadow-none">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -748,7 +748,7 @@ const tutorials = [
                     </SelectContent>
                   </Select>
                   <Select value={pvrCategoryFilter} onValueChange={setPvrCategoryFilter}>
-                    <SelectTrigger className="w-32 h-8 text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 border-none shadow-none">
+                    <SelectTrigger className="w-32 h-8 text-xs font-medium bg-transparent border border-border shadow-none">
                       <SelectValue placeholder="Categoria..." />
                     </SelectTrigger>
                     <SelectContent className="max-h-[250px]">
@@ -766,27 +766,27 @@ const tutorials = [
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={pvrData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.1)" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                     <XAxis 
                       dataKey="month" 
-                      stroke="#94a3b8" 
-                      fontSize={10} 
+                      stroke="var(--text-muted)" 
+                      fontSize={11} 
                       tickLine={false} 
                       axisLine={false} 
                     />
                     <YAxis 
-                      stroke="#94a3b8" 
-                      fontSize={10} 
+                      stroke="var(--text-muted)" 
+                      fontSize={11} 
                       tickLine={false} 
                       axisLine={false} 
                     />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '12px', color: 'var(--text-main)' }}
+                      contentStyle={{ backgroundColor: 'var(--surface-elevated)', border: '1px solid var(--color-border)', borderRadius: '6px', color: 'var(--text-main)', fontSize: '12px' }}
                       formatter={(value) => [formatCurrency(value), '']} 
                     />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                    <Bar dataKey="planejado" fill="rgba(167, 139, 250, 0.4)" name="Planejado" radius={[4, 4, 0, 0]} />
-                    <Line type="monotone" dataKey="realizado" stroke="#10b981" strokeWidth={3} name="Realizado" dot={{ r: 4, fill: '#10b981' }} />
+                    <Bar dataKey="planejado" fill="rgba(161, 161, 170, 0.4)" name="Planejado" radius={[3, 3, 0, 0]} />
+                    <Line type="monotone" dataKey="realizado" stroke="#16a34a" strokeWidth={2} name="Realizado" dot={{ r: 3, fill: '#16a34a' }} />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>

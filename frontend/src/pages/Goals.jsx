@@ -254,126 +254,24 @@ const handleSubmit = (e) => {
   };
   return (
     <div className={styles.pageContainer}>
-      {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-500 hidden sm:block">
-                Bem-vindo, {user.name}
-              </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.pageTitle}>
-              Metas Financeiras
-            </h2>
-            <p className={styles.pageSubtitle}>Defina e acompanhe seus objetivos financeiros com precisão tecnológica</p>
-          </div>
+      {/* 1. HEADER EXECUTIVO */}
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Metas Financeiras</h1>
+          <p className={styles.pageSubtitle}>Acompanhamento de objetivos de capital, reservas e aquisições.</p>
         </div>
 
-        {/* Cards de Resumo */}
-        <div className={styles.summaryGrid}>
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
-                  <Target className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Total de Metas</p>
-              <p className={styles.summaryValue}>{metasAtivas.length}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxPurple}>
-                  <DollarSign className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Valor Total</p>
-              <p className={styles.summaryValue}>R$ {valorTotalMetas.toLocaleString()}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 rounded-full" style={{ width: '100%' }} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Valor Atual</p>
-              <p className={styles.summaryValue}>R$ {valorAtualTotal.toLocaleString()}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${valorTotalMetas > 0 ? (valorAtualTotal / valorTotalMetas) * 100 : 0}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
-                  <Star className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Progresso Médio</p>
-              <p className={styles.summaryValue}>{progressoMedio.toFixed(1)}%</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full" style={{ width: `${progressoMedio}%` }} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Tabs defaultValue="ativas" className="space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 glass-panel p-4 border-white/5">
-            <TabsList className={styles.tabsList}>
-              <TabsTrigger value="ativas" className={styles.tabsTrigger}>Ativas ({metasAtivas.length})</TabsTrigger>
-              <TabsTrigger value="concluidas" className={styles.tabsTrigger}>Concluídas ({metasConcluidas.length})</TabsTrigger>
-              <TabsTrigger value="arquivadas" className={styles.tabsTrigger}>Arquivadas ({metasArquivadas.length})</TabsTrigger>
-            </TabsList>
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Meta
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle className="text-white">Nova Meta Financeira</DialogTitle>
-                </DialogHeader>
+        <div className={styles.actionPanel}>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <button className={styles.btnPrimaryDark}>
+                <Plus size={14} /> Nova Meta
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Nova Meta Financeira</DialogTitle>
+              </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-slate-600 dark:text-slate-300">Nome da Meta *</Label>
@@ -447,10 +345,62 @@ const handleSubmit = (e) => {
                 </form>
               </DialogContent>
             </Dialog>
-          </div>
+        </div>
+      </header>
 
-          {/* Metas Ativas */}
-          <TabsContent value="ativas" className="space-y-6">
+      {/* 2. KPI STRIP (Taste Skill §5) */}
+      <section className={styles.summaryGrid}>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Total de Metas
+            <Target size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>{metasAtivas.length}</p>
+        </div>
+
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Valor Total Alvo
+            <DollarSign size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {valorTotalMetas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Valor Total Acumulado
+            <TrendingUp size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {valorAtualTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Progresso Médio
+            <Star size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            {progressoMedio.toFixed(1)}%
+          </p>
+        </div>
+      </section>
+
+      {/* 3. TABS E LISTAGEM */}
+      <Tabs defaultValue="ativas" className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          <TabsList className={styles.tabsList}>
+            <TabsTrigger value="ativas" className={styles.tabsTrigger}>Ativas ({metasAtivas.length})</TabsTrigger>
+            <TabsTrigger value="concluidas" className={styles.tabsTrigger}>Concluídas ({metasConcluidas.length})</TabsTrigger>
+            <TabsTrigger value="arquivadas" className={styles.tabsTrigger}>Arquivadas ({metasArquivadas.length})</TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* Metas Ativas */}
+        <TabsContent value="ativas" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {metasAtivas.map((meta) => {
                 const dias = diasRestantes(meta.target_date);
@@ -689,7 +639,6 @@ const handleSubmit = (e) => {
             </form>
           </DialogContent>
           </Dialog>
-        </div>
       </div>
     );
   };

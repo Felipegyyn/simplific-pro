@@ -1,12 +1,20 @@
+/* ==========================================================================
+   CONFIGURAÇÃO DE CATEGORIAS - TASTE SKILL (ACHROMATIC-LEDGER)
+   ========================================================================== */
+
 .pageContainer {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  animation: fadeIn var(--transition-slow);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  color: var(--text-main);
+  animation: fadeIn 0.15s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -14,46 +22,101 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .header {
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
   }
 }
 
 .pageTitle {
-  font-size: 2rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
+  font-family: var(--font-sans);
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--text-main);
-  margin-bottom: 0.25rem;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.25;
 }
 
 .pageSubtitle {
-  color: var(--text-muted);
+  font-family: var(--font-sans);
   font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.btnPrimaryDark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnPrimaryDark:hover {
+  background-color: #27272a;
+}
+
+:global(.dark) .btnPrimaryDark {
+  background-color: #f4f4f5;
+  color: #09090b;
+  border-color: #e4e4e7;
+}
+
+:global(.dark) .btnPrimaryDark:hover {
+  background-color: #ffffff;
+}
+
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-main);
+  background-color: var(--surface-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btnOutline:hover {
+  background-color: var(--surface-sub);
 }
 
 .premiumCard {
   background-color: var(--surface-main);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
   display: flex;
-  flex-direction: column;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .premiumCard:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-hover);
+  background-color: var(--surface-sub);
 }
 
 .cardContent {
-  padding: 1.5rem;
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }

@@ -2,9 +2,10 @@ import os
 import sys
 import click
 from dotenv import load_dotenv
-from src.routes.marketing_routes import marketing_bp # <--- Adicione isto
-from src.routes.pluggy_routes import pluggy_bp
 load_dotenv()
+
+from src.routes.marketing_routes import marketing_bp
+from src.routes.pluggy_routes import pluggy_bp
 import cloudinary
 import cloudinary.uploader
 cloudinary.config(
@@ -67,6 +68,7 @@ ALLOWED_ORIGINS = [
     "https://simplific-pro-git-main-felipe-vianas-projects.vercel.app",
     "http://localhost:3000",
     "http://localhost:5173", # Adicionado vite local comum
+    "http://localhost:5174", # Versão II Vite local
     "https://diagnostico.simplificpro.com.br",
     "https://www.diagnostico.simplificpro.com.br"
 ]

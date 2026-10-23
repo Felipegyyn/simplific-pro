@@ -463,71 +463,51 @@ const Schedule = ({ user, onLogout }) => {
 
   return (
     <div className={styles.pageContainer}>
-      <div className={styles.header}>
+      <header className={styles.header}>
         <div>
-          <h1 className={styles.pageTitle}>
-            Agenda Financeira
-          </h1>
-          <p className={styles.pageSubtitle}>Organize seus compromissos e lembretes financeiros.</p>
+          <h1 className={styles.pageTitle}>Agenda Financeira</h1>
+          <p className={styles.pageSubtitle}>Compromissos, vencimentos e conciliações programadas.</p>
         </div>
-      </div>
+      </header>
 
-      {/* Card de Resumo Agrupado */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className={styles.premiumCard}>
-          <div className={styles.cardContent + " relative"}>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-500/20 rounded-lg border border-blue-500/20">
-              <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Próximos Eventos</p>
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosProximos.length}</h3>
-          </div>
+      {/* 2. KPI STRIP (Taste Skill §5) */}
+      <section className={styles.summaryGrid}>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Próximos Eventos
+            <Calendar size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>{eventosProximos.length}</p>
         </div>
 
-        <div className={styles.premiumCard}>
-          <div className={styles.cardContent + " relative"}>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-emerald-500/20 rounded-lg border border-emerald-500/20">
-              <Clock className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Hoje</p>
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosHoje.length}</h3>
-          </div>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Compromissos Hoje
+            <Clock size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>{eventosHoje.length}</p>
         </div>
 
-        <div className={styles.premiumCard}>
-          <div className={styles.cardContent + " relative"}>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-red-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-red-500/20 rounded-lg border border-red-500/20">
-              <DollarSign className="h-5 w-5 text-red-600 dark:text-red-400" />
-            </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Pagamentos Pendentes</p>
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Pagamentos Pendentes
+            <DollarSign size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
             R$ {pagamentosPendentes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </h3>
-          </div>
+          </p>
         </div>
 
-        <div className={styles.premiumCard}>
-          <div className={styles.cardContent + " relative"}>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-yellow-500/20 rounded-lg border border-yellow-500/20">
-              <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-            </div>
-          </div>
-          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Atrasados</p>
-          <h3 className="text-2xl font-bold text-slate-800 dark:text-white mt-1">{eventosAtrasados.length}</h3>
-          </div>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Atrasados
+            <AlertTriangle size={14} className={cn(eventosAtrasados.length > 0 ? "text-rose-500" : "text-muted-foreground")} />
+          </p>
+          <p className={cn(styles.summaryValue, eventosAtrasados.length > 0 && "text-rose-600 dark:text-rose-400")}>
+            {eventosAtrasados.length}
+          </p>
         </div>
-      </div>
+      </section>
       
       {/* Estrutura Principal: Agenda + Bloco de Notas Lateral */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -536,40 +516,40 @@ const Schedule = ({ user, onLogout }) => {
         <div className="xl:col-span-3 space-y-6">
           <Tabs defaultValue="calendario" className="space-y-6">
         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
-          <TabsList className="grid w-full xl:w-auto grid-cols-5 glass-panel p-1 border-white/5">
-            <TabsTrigger value="calendario" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Calendário</TabsTrigger>
-            <TabsTrigger value="proximos" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Próximos</TabsTrigger>
-            <TabsTrigger value="hoje" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Hoje</TabsTrigger>
-            <TabsTrigger value="concluidos" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Concluídos</TabsTrigger>
-            <TabsTrigger value="atrasados" className="data-[state=active]:bg-white/10 data-[state=active]:text-white">Atrasados</TabsTrigger>
+          <TabsList className={styles.tabsList + " flex flex-wrap"}>
+            <TabsTrigger value="calendario" className={styles.tabsTrigger}>Calendário</TabsTrigger>
+            <TabsTrigger value="proximos" className={styles.tabsTrigger}>Próximos</TabsTrigger>
+            <TabsTrigger value="hoje" className={styles.tabsTrigger}>Hoje</TabsTrigger>
+            <TabsTrigger value="concluidos" className={styles.tabsTrigger}>Concluídos</TabsTrigger>
+            <TabsTrigger value="atrasados" className={styles.tabsTrigger}>Atrasados</TabsTrigger>
           </TabsList>
           
           <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
-            <Button 
-                variant="outline" 
+            <button 
+                type="button"
                 onClick={handleGoogleConnect} 
                 disabled={isSyncing}
-                className="glass-panel border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300"
+                className={styles.btnOutline}
             >
-                <Globe className="h-4 w-4 mr-2 text-cyan-400" />
-                Google
-            </Button>
+                <Globe size={13} className="text-muted-foreground" />
+                Google Calendar
+            </button>
 
-            <Button 
-                variant="outline" 
+            <button 
+                type="button"
                 onClick={handleAppleSync}
-                className="glass-panel border-white/10 hover:bg-white/5 text-slate-600 dark:text-slate-300"
+                className={styles.btnOutline}
             >
-                <Smartphone className="h-4 w-4 mr-2 text-cyan-400" />
-                Apple
-            </Button>
+                <Smartphone size={13} className="text-muted-foreground" />
+                Apple Calendar
+            </button>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-900/20">
-                    <Plus className="h-4 w-4 mr-2" />
+                <button type="button" className={styles.btnPrimaryDark}>
+                    <Plus size={14} />
                     Novo Evento
-                </Button>
+                </button>
               </DialogTrigger>
               <DialogContent className="glass-panel border-white/10 text-slate-200 sm:max-w-[500px]">
                 <DialogHeader><DialogTitle>Novo Evento da Agenda</DialogTitle></DialogHeader>

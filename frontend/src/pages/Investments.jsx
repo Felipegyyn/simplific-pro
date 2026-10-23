@@ -407,56 +407,57 @@ const handleCalculate = async (e) => {
         </div>
       </div>
 
-      <div className={styles.summaryGrid}>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryHeader}>
-            <p className={styles.summaryLabel}>Total Investido</p>
-            <div className={`${styles.iconBox} ${styles.iconBoxPrimary}`}>
-              <DollarSign className="h-5 w-5" />
-            </div>
-          </div>
-          <p className={styles.summaryValue}>R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+      {/* 2. KPI STRIP (Taste Skill §5) */}
+      <section className={styles.summaryGrid}>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Total Investido
+            <DollarSign size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {(valorTotalInvestido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryHeader}>
-            <p className={styles.summaryLabel}>Valor Atual</p>
-            <div className={`${styles.iconBox} ${styles.iconBoxSuccess}`}>
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </div>
-          <p className={styles.summaryValue}>R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Valor Atual
+            <TrendingUp size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {(valorAtualTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryHeader}>
-            <p className={styles.summaryLabel}>Lucro/Prejuízo</p>
-            <div className={`${styles.iconBox} ${lucroTotal >= 0 ? styles.iconBoxSuccess : styles.iconBoxDanger}`}>
-              {lucroTotal >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
-            </div>
-          </div>
-          <p className={styles.summaryValue}>R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Lucro / Prejuízo
+            {lucroTotal >= 0 ? <TrendingUp size={14} className="text-emerald-500" /> : <TrendingDown size={14} className="text-rose-500" />}
+          </p>
+          <p className={cn(styles.summaryValue, lucroTotal >= 0 ? styles.valuePositive : styles.valueNegative)}>
+            R$ {(lucroTotal ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryHeader}>
-            <p className={styles.summaryLabel}>Rentabilidade</p>
-            <div className={`${styles.iconBox} ${rentabilidadeTotal >= 0 ? styles.iconBoxSuccess : styles.iconBoxDanger}`}>
-              <BarChart3 className="h-5 w-5" />
-            </div>
-          </div>
-          <p className={styles.summaryValue}>{(rentabilidadeTotal ?? 0).toFixed(2)}%</p>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Rentabilidade
+            <BarChart3 size={14} className="text-muted-foreground" />
+          </p>
+          <p className={cn(styles.summaryValue, rentabilidadeTotal >= 0 ? styles.valuePositive : styles.valueNegative)}>
+            {(rentabilidadeTotal ?? 0).toFixed(2)}%
+          </p>
         </div>
-      </div>
+      </section>
 
-        <Tabs defaultValue="carteira" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 glass-panel p-1 border-white/5">
-            <TabsTrigger value="carteira" className="data-[state=active]:active-gradient">Carteira</TabsTrigger>
-            <TabsTrigger value="home-broker" className="data-[state=active]:active-gradient">Home Broker</TabsTrigger> 
-            <TabsTrigger value="performance" className="data-[state=active]:active-gradient">Performance</TabsTrigger>
-            <TabsTrigger value="analise" className="data-[state=active]:active-gradient">Análise</TabsTrigger>
-            <TabsTrigger value="calculadora" className="data-[state=active]:active-gradient">Calculadora</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="carteira" className="space-y-6">
+        <TabsList className={styles.tabsList + " flex flex-wrap"}>
+          <TabsTrigger value="carteira" className={styles.tabsTrigger}>Carteira</TabsTrigger>
+          <TabsTrigger value="home-broker" className={styles.tabsTrigger}>Home Broker</TabsTrigger> 
+          <TabsTrigger value="performance" className={styles.tabsTrigger}>Performance</TabsTrigger>
+          <TabsTrigger value="analise" className={styles.tabsTrigger}>Análise</TabsTrigger>
+          <TabsTrigger value="calculadora" className={styles.tabsTrigger}>Calculadora</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="home-broker">
             <div className="glass-panel p-6 border-white/5">

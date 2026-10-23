@@ -92,12 +92,10 @@
 }
 
 .logoText {
-  font-size: 1.125rem;
-  font-weight: 700;
-  background: linear-gradient(to right, var(--primary-accent), #00d4ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
 }
 
 .mainArea {
@@ -109,13 +107,16 @@
 
 @media (min-width: 768px) {
   .mainArea {
-    padding: 1.5rem;
+    padding: 1.5rem 2rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .mainArea {
-    padding: 2rem;
+    padding: 2rem 2.5rem;
+    max-width: 1540px;
+    margin: 0 auto;
+    width: 100%;
   }
 }
 
@@ -137,34 +138,28 @@
   position: absolute;
   inset: 0;
   background-color: var(--primary-accent);
-  opacity: 0.2;
+  opacity: 0.1;
   border-radius: 9999px;
-  filter: blur(1rem);
-  transition: opacity 0.5s;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  filter: blur(0.75rem);
+  transition: opacity 0.3s;
 }
 
 .floatingButton:hover .floatingGlow {
-  opacity: 0.4;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.4; }
+  opacity: 0.2;
 }
 
 .floatingCircle {
   position: relative;
-  width: 4rem;
-  height: 4rem;
+  width: 3.25rem;
+  height: 3.25rem;
   border-radius: 9999px;
-  background-color: var(--surface-elevated);
+  background-color: var(--surface-main);
   border: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-lg);
-  transition: transform 0.3s;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
   overflow: hidden;
 }
 

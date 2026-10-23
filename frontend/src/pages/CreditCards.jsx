@@ -453,92 +453,47 @@ const carregarFaturas = async (listaDeCartoes) => {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-500 hidden sm:block">
-                Bem-vindo, {user.name}
-              </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
+      
+      {/* 1. HEADER EXECUTIVO */}
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Cartões de Crédito</h1>
+          <p className={styles.pageSubtitle}>Gestão de limites, faturas e lançamentos consolidados por cartão.</p>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.pageTitle}>
-              Cartões de Crédito
-            </h2>
-            <p className={styles.pageSubtitle}>Gerencie seus cartões e faturas com precisão tecnológica</p>
-          </div>
+      {/* 2. KPI STRIP (Taste Skill §5: One container split by 1px hairlines) */}
+      <section className={styles.summaryGrid}>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Limite Total
+            <CreditCard size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {limiteTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        {/* Cards de Resumo */}
-        <div className={styles.summaryGrid}>
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
-                  <CreditCard className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Limite Total</p>
-              <p className={styles.summaryValue}>R$ {limiteTotal.toLocaleString()}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
-                  <DollarSign className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Limite Usado</p>
-              <p className={styles.summaryValue}>R$ {usadoTotal.toLocaleString()}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-rose-500 rounded-full" style={{ width: `${limiteTotal > 0 ? (usadoTotal / limiteTotal) * 100 : 0}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Limite Disponível</p>
-              <p className={styles.summaryValue}>R$ {disponivelTotal.toLocaleString()}</p>
-              <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${limiteTotal > 0 ? (disponivelTotal / limiteTotal) * 100 : 0}%` }} />
-              </div>
-            </div>
-          </div>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Limite Usado
+            <DollarSign size={14} className="text-rose-500" />
+          </p>
+          <p className={cn(styles.summaryValue, 'text-rose-600 dark:text-rose-400')}>
+            R$ {usadoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
+
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Limite Disponível
+            <TrendingUp size={14} className="text-emerald-500" />
+          </p>
+          <p className={cn(styles.summaryValue, 'text-emerald-600 dark:text-emerald-500')}>
+            R$ {disponivelTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+      </section>
 
         <Tabs defaultValue="cartoes" className="space-y-6">
           <TabsList className={styles.tabsList}>
@@ -1173,7 +1128,6 @@ const carregarFaturas = async (listaDeCartoes) => {
             </div>
           </DialogContent>
           </Dialog>
-        </div>
       </div>
     );
   };

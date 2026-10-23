@@ -404,18 +404,16 @@ const Inicio = ({ user }) => {
   return (
     <div className={styles.pageContainer}>
       
-      {/* CABEÇALHO */}
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.pageTitle}>
-            Página Inicial
-          </h1>
-          <p className={styles.pageSubtitle}>Visão rápida da sua operação financeira hoje.</p>
+      {/* 1. CABEÇALHO EXECUTIVO */}
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <h1 className={styles.pageTitle}>Visão Geral</h1>
+          <p className={styles.pageSubtitle}>Acompanhamento consolidado da sua operação e fluxo de caixa.</p>
         </div>
         
         <div className={styles.filterPanel}>
           <Select value={mesFiltro.toString()} onValueChange={(val) => setMesFiltro(parseInt(val))}>
-            <SelectTrigger className="w-[130px] border-none shadow-none focus:ring-0 bg-transparent font-bold h-9 text-slate-800 dark:text-white">
+            <SelectTrigger className="w-[125px] border-none shadow-none focus:ring-0 bg-transparent font-medium h-8 text-xs text-foreground">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -426,7 +424,7 @@ const Inicio = ({ user }) => {
           </Select>
           <div className={styles.filterDivider}></div>
           <Select value={anoFiltro.toString()} onValueChange={(val) => setAnoFiltro(parseInt(val))}>
-            <SelectTrigger className="w-[100px] border-none shadow-none focus:ring-0 bg-transparent font-bold h-9 text-slate-800 dark:text-white">
+            <SelectTrigger className="w-[85px] border-none shadow-none focus:ring-0 bg-transparent font-medium h-8 text-xs text-foreground">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -436,121 +434,172 @@ const Inicio = ({ user }) => {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </header>
 
+      {/* 2. KPI STRIP (Taste Skill §5: One container split by 1px hairlines) */}
+      <section className={styles.kpiStrip}>
+        <div className={styles.kpiCell}>
+          <p className={styles.kpiLabel}>
+            Saldo Consolidado
+            <Wallet size={14} className="text-muted-foreground" />
+          </p>
+          <p className={cn(styles.kpiValue, styles.kpiValueLead, saldoTotalGlobal < 0 && 'text-rose-600 dark:text-rose-400')}>
+            R$ {saldoTotalGlobal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+          <div className={styles.kpiMeta}>
+            <span>{contas.length} contas bancárias ativas</span>
+          </div>
+        </div>
+
+        <div className={styles.kpiCell}>
+          <p className={styles.kpiLabel}>
+            Entradas do Mês
+            <ArrowUpCircle size={14} className="text-emerald-600 dark:text-emerald-500" />
+          </p>
+          <p className={cn(styles.kpiValue, 'text-emerald-600 dark:text-emerald-500')}>
+            R$ {totaisDoMes.receitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+          <div className={styles.kpiMeta}>
+            <span>Confirmadas no período</span>
+          </div>
+        </div>
+
+        <div className={styles.kpiCell}>
+          <p className={styles.kpiLabel}>
+            Saídas do Mês
+            <ArrowDownCircle size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.kpiValue}>
+            R$ {totaisDoMes.despesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+          <div className={styles.kpiMeta}>
+            <span>Total debitado / liquidado</span>
+          </div>
+        </div>
+
+        <div className={styles.kpiCell}>
+          <p className={styles.kpiLabel}>
+            Pendências
+            <Clock size={14} className="text-amber-500" />
+          </p>
+          <p className={cn(styles.kpiValue, transacoesPendentes.length > 0 && 'text-amber-600 dark:text-amber-400')}>
+            {transacoesPendentes.length} {transacoesPendentes.length === 1 ? 'pendente' : 'pendentes'}
+          </p>
+          <div className={styles.kpiMeta}>
+            <span>Aguardando liquidação</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. MAIN DASHBOARD GRID */}
       <div className={styles.mainGrid}>
         
-        {/* 1. LANÇAMENTOS */}
-        <div className={styles.gridLancamentos}>
-          <div className={styles.premiumCard} style={{ height: '100%' }}>
-            <div className={`${styles.cardTopAccent} ${styles.accentGreen}`}></div>
-            
+        {/* COLUNA ESQUERDA: LANÇAMENTOS E PENDÊNCIAS */}
+        <div className={styles.leftColumn}>
+          
+          {/* CARD LANÇAMENTOS */}
+          <div className={styles.card}>
             <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <div className={`${styles.iconBox} ${styles.iconBoxSuccess}`}>
-                  <Wallet size={16} />
-                </div>
+                <span className={styles.cardIcon}><DollarSign size={16} /></span>
                 <h2 className={styles.cardTitle}>Lançamentos</h2>
               </div>
               
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white border-none h-8 text-[10px] font-black uppercase tracking-widest px-4">
-                    <Plus className="h-3.5 w-3.5 mr-1" /> Novo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Lançamento Rápido</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-5 mt-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase font-black ml-1">Tipo</Label>
-                        <Select value={formData.type} onValueChange={(val) => handleInputChange('type', val)}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="income">Receita</SelectItem>
-                            <SelectItem value="expense">Despesa</SelectItem>
+              <div className={styles.cardActionArea}>
+                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                  <DialogTrigger asChild>
+                    <button className={styles.btnPrimaryDark}>
+                      <Plus size={14} /> Novo
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Lançamento Rápido</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4 mt-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Tipo</Label>
+                          <Select value={formData.type} onValueChange={(val) => handleInputChange('type', val)}>
+                            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="income">Receita</SelectItem>
+                              <SelectItem value="expense">Despesa</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-medium">Valor (R$)</Label>
+                          <Input type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required className="h-9 font-mono" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium">Descrição</Label>
+                        <Input value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Mercado, Assinatura..." required className="h-9" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-medium">Categoria</Label>
+                        <Select value={formData.category} onValueChange={(val) => handleInputChange('category', val)}>
+                          <SelectTrigger className="h-9"><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                          <SelectContent className="max-h-[200px]">
+                            {categorias.filter(c => c.type === (formData.type === 'income' ? 'entrada' : 'saida')).map((cat, idx) => (
+                              <SelectItem key={idx} value={cat.name}>{cat.name}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-[10px] uppercase font-black ml-1">Valor (R$)</Label>
-                        <Input type="number" step="0.01" value={formData.amount} onChange={(e) => handleInputChange('amount', e.target.value)} placeholder="0,00" required />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] uppercase font-black ml-1">Descrição</Label>
-                      <Input value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Mercado" required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] uppercase font-black ml-1">Categoria</Label>
-                      <Select value={formData.category} onValueChange={(val) => handleInputChange('category', val)}>
-                        <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                        <SelectContent className="max-h-[200px]">
-                          {categorias.filter(c => c.type === (formData.type === 'income' ? 'entrada' : 'saida')).map((cat, idx) => (
-                            <SelectItem key={idx} value={cat.name}>{cat.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Confirmar Lançamento</Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div className={styles.summaryRow}>
-              <div className={`${styles.summaryBox} ${styles.summaryBoxUp}`}>
-                <ArrowUpCircle size={12} /> R$ {totaisDoMes.receitas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-              </div>
-              <div className={`${styles.summaryBox} ${styles.summaryBoxDown}`}>
-                <ArrowDownCircle size={12} /> R$ {totaisDoMes.despesas.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                      <Button type="submit" className="w-full h-9 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 font-medium">
+                        Confirmar Lançamento
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
-            <div className={styles.tabsContainer}>
+            {/* SEGMENTED CONTROL */}
+            <div className={styles.segmentedControl}>
               <button
+                type="button"
                 onClick={() => setAbaAtiva('expense')}
-                className={cn(styles.tabBtn, abaAtiva === 'expense' && styles.tabBtnActive)}
+                className={cn(styles.segmentBtn, abaAtiva === 'expense' && styles.segmentBtnActive)}
               >
                 Despesas
               </button>
               <button
+                type="button"
                 onClick={() => setAbaAtiva('income')}
-                className={cn(styles.tabBtn, abaAtiva === 'income' && styles.tabBtnActive)}
+                className={cn(styles.segmentBtn, abaAtiva === 'income' && styles.segmentBtnActive)}
               >
                 Receitas
               </button>
             </div>
 
-            <div className={`${styles.cardContent} ${styles.scrollableList}`}>
+            {/* LISTA DE TRANSAÇÕES */}
+            <div className={styles.cardContentScroll}>
               {loading ? (
                 <div className={styles.emptyState}>
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-zinc-500"></div>
                 </div>
               ) : transacoesFiltradas.length === 0 ? (
                 <div className={styles.emptyState}>
-                  <Zap className={styles.emptyIcon} />
-                  <p className={styles.emptyText}>Nenhum lançamento confirmado.</p>
+                  <Zap size={20} className="text-muted-foreground opacity-40" />
+                  <p className={styles.emptyText}>Nenhum lançamento no período.</p>
                 </div>
               ) : (
                 <div>
                   {transacoesFiltradas.map((t) => (
-                    <div key={t.id} className={styles.listItem}>
+                    <div key={t.id} className={styles.listRow}>
                       <div className={styles.itemMain}>
                         <span className={styles.itemTitle}>{t.description}</span>
                         <div className={styles.itemMeta}>
                           <span>{formatDateForDisplay(t.transaction_date)}</span>
-                          <span className="w-1 h-1 rounded-full bg-slate-400"></span>
-                          <span className={styles.itemBadge}>
-                            {t.category || 'Outros'}
-                          </span>
+                          <span>•</span>
+                          <span className={styles.itemCategoryTag}>{t.category || 'Geral'}</span>
                         </div>
                       </div>
-                      <div className={cn(styles.itemValue, abaAtiva === 'income' ? styles.valuePositive : styles.valueNeutral)}>
-                        {abaAtiva === 'expense' ? '-' : '+'} R$ {(t.amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                      <div className={cn(styles.itemValue, abaAtiva === 'income' ? styles.itemValuePositive : styles.itemValueNegative)}>
+                        {abaAtiva === 'expense' ? '-' : '+'} R$ {(t.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </div>
                     </div>
                   ))}
@@ -558,63 +607,55 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
-        </div>
 
-        {/* 2. PENDÊNCIAS */}
-        <div className={styles.gridPendencias}>
-          <div className={styles.premiumCard} style={{ height: '100%', minHeight: '300px' }}>
-             <div className={`${styles.cardTopAccent} ${styles.accentOrange}`}></div>
-            
+          {/* CARD PENDÊNCIAS */}
+          <div className={styles.card}>
             <div className={styles.cardHeader}>
-                <div className={styles.cardTitleArea}>
-                  <div className={`${styles.iconBox} ${styles.iconBoxWarning}`}>
-                    <Clock size={16} />
-                  </div>
-                  <h3 className={styles.cardTitle}>Pendências</h3>
-                </div>
-                <Badge className="bg-orange-500 text-white border-none text-[10px] px-2 py-0.5 font-black">
-                  {transacoesPendentes.length}
-                </Badge>
+              <div className={styles.cardTitleArea}>
+                <span className={styles.cardIcon}><Clock size={16} /></span>
+                <h2 className={styles.cardTitle}>Pendências a Liquidar</h2>
+              </div>
+              <Badge variant="outline" className="text-xs font-mono">
+                {transacoesPendentes.length}
+              </Badge>
             </div>
 
-            <div className={`${styles.cardContent} ${styles.scrollableList}`}>
+            <div className={styles.cardContentScroll}>
               {loading ? (
                 <div className={styles.emptyState}>
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-orange-400"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
                 </div>
               ) : transacoesPendentes.length === 0 ? (
                 <div className={styles.emptyState}>
-                  <div className={`${styles.iconBox} ${styles.iconBoxSuccess} mb-2`}>
-                    <CheckCircle size={20} />
-                  </div>
-                  <p className={styles.emptyText}>Tudo em dia!</p>
+                  <CheckCircle size={20} className="text-emerald-500 opacity-60" />
+                  <p className={styles.emptyText}>Tudo em dia! Sem pendências.</p>
                 </div>
               ) : (
                 <div>
                   {transacoesPendentes.map((t) => (
-                    <div key={t.id} className={styles.listItem}>
+                    <div key={t.id} className={styles.listRow}>
                       <div className={styles.itemMain}>
                         <span className={styles.itemTitle}>{t.description}</span>
                         <div className={styles.itemMeta}>
-                          <span className={t.type === 'income' ? styles.valuePositive : styles.valueNegative}>
+                          <span className={t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}>
                             {t.type === 'income' ? 'Receita' : 'Despesa'}
                           </span>
-                          <span className="w-1 h-1 rounded-full bg-slate-400"></span>
+                          <span>•</span>
                           <span>{formatDateForDisplay(t.transaction_date)}</span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-4">
-                        <span className={cn(styles.itemValue, t.type === 'income' ? styles.valuePositive : styles.valueNegative)}>
-                          R$ {(t.amount || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                      <div className="flex items-center gap-3">
+                        <span className={cn(styles.itemValue, t.type === 'income' ? styles.itemValuePositive : styles.itemValueNegative)}>
+                          R$ {(t.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </span>
                         
                         <button 
-                          className={styles.btnAction}
-                          style={{ color: '#10b981' }}
+                          className={styles.btnConfirmItem}
+                          title="Confirmar lançamento"
                           onClick={() => confirmarTransacao(t.id)}
                         >
-                          <CheckCircle size={18} />
+                          <CheckCircle size={14} />
                         </button>
                       </div>
                     </div>
@@ -623,174 +664,177 @@ const Inicio = ({ user }) => {
               )}
             </div>
           </div>
+
         </div>
 
-        {/* 3. VISÃO POR INSTITUIÇÃO */}
-        <div className={styles.gridVisao}>
-          <div className={styles.premiumCard} style={{ height: '100%' }}>
-            <div className={`${styles.cardTopAccent} ${styles.accentCyan}`}></div>
-            
-            <div className={styles.chartHeader}>
+        {/* COLUNA DIREITA: VISÃO POR CONTA, CARTÕES, METAS E AGENDA */}
+        <div className={styles.rightColumn}>
+          
+          {/* VISÃO POR INSTITUIÇÃO (GRÁFICO RECHARTS) */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <div className={`${styles.iconBox} ${styles.iconBoxCyan}`}>
-                    <Landmark size={16} />
-                </div>
-                <div>
-                    <h2 className={styles.cardTitle}>Visão por Instituição</h2>
-                </div>
+                <span className={styles.cardIcon}><Landmark size={16} /></span>
+                <h2 className={styles.cardTitle}>Saldos por Instituição</h2>
               </div>
-              <div className={styles.chartTotal}>
-                <p className={styles.chartTotalLabel}>Saldo Consolidado</p>
-                <p className={cn(styles.chartTotalValue, saldoTotalGlobal < 0 && styles.chartTotalValueNegative)}>
-                  R$ {saldoTotalGlobal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
-                </p>
+              <div className="text-right">
+                <span className="text-xs text-muted-foreground block">Consolidado</span>
+                <span className={cn('text-sm font-semibold font-mono', saldoTotalGlobal < 0 && 'text-rose-600')}>
+                  R$ {saldoTotalGlobal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </span>
               </div>
             </div>
             
-            <div className={styles.chartBody}>
-              {loading ? (
-                <div className={styles.emptyState}>
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-400"></div>
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={dadosGraficoSaldos} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                    <XAxis 
-                      dataKey="name" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: 'var(--text-muted)', fontSize: 10, fontWeight: 'bold' }} 
-                      dy={10}
-                    />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: 'var(--text-muted)', fontSize: 10 }} 
-                      tickFormatter={(value) => `R$${value/1000}k`}
-                    />
-                    <Tooltip content={<CustomTooltip />} cursor={{fill: 'var(--surface-elevated)'}} />
-                    <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={40} animationDuration={1000}>
-                      {dadosGraficoSaldos.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.value < 0 ? '#f43f5e' : '#06b6d4'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
+            <div className={styles.cardContent}>
+              <div className={styles.chartContainer}>
+                {loading ? (
+                  <div className={styles.emptyState}>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-zinc-500"></div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dadosGraficoSaldos} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--text-muted)', fontSize: 11 }} 
+                        dy={6}
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: 'var(--text-muted)', fontSize: 11 }} 
+                        tickFormatter={(val) => `R$${Math.round(val/1000)}k`}
+                      />
+                      <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--surface-elevated)' }} />
+                      <Bar dataKey="value" radius={[3, 3, 0, 0]} maxBarSize={36}>
+                        {dadosGraficoSaldos.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.value < 0 ? '#e11d48' : '#18181b'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 4. CARTÕES DE CRÉDITO */}
-        <div className={styles.gridCartoes}>
-          <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div className={styles.carouselHeader}>
+          {/* CARTÕES DE CRÉDITO */}
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>
               <div className={styles.cardTitleArea}>
-                <CreditCard size={16} style={{ color: '#a855f7' }} />
-                <h3 className={styles.cardTitle}>Cartões de Crédito</h3>
+                <span className={styles.cardIcon}><CreditCard size={16} /></span>
+                <h2 className={styles.cardTitle}>Cartões de Crédito</h2>
               </div>
-              <button className={styles.btnAction} style={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }} onClick={() => navigate('/credit-cards')}>
-                Expandir Tudo
+              <button className={styles.btnOutline} onClick={() => navigate('/credit-cards')}>
+                Gerenciar cartões
               </button>
             </div>
             
-            <div className={styles.carouselContainer}>
+            <div className={styles.cardContent}>
               {loading ? (
-                <div className="flex gap-4 w-full">
-                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
-                    <Skeleton className="h-44 w-72 bg-white/5 border-white/5" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Skeleton className="h-28 w-full" />
+                  <Skeleton className="h-28 w-full" />
                 </div>
               ) : cartoes.length === 0 ? (
                 <div className={styles.emptyState}>
-                   <p className={styles.emptyText}>Nenhum cartão ativo.</p>
-                   <button className={styles.btnAction} onClick={() => navigate('/credit-cards')}>Adicionar Agora</button>
+                  <p className={styles.emptyText}>Nenhum cartão cadastrado.</p>
+                  <button className={cn(styles.btnOutline, 'mt-2')} onClick={() => navigate('/credit-cards')}>
+                    Adicionar Cartão
+                  </button>
                 </div>
               ) : (
-                cartoes.map(cartao => {
-                  const bankDomain = getBankLogo(cartao.name);
-                  const percUsado = (cartao.usado / cartao.limit) * 100;
-                  
-                  return (
-                    <div key={cartao.id} className={styles.ccCard}>
-                      <div className={styles.ccBgEffect}></div>
-                      <div className={styles.ccLimitBarBg}>
-                        <div className={cn(styles.ccLimitBarFill, percUsado > 80 && styles.ccLimitBarFillWarning)} style={{ width: `${Math.min(percUsado, 100)}%` }}></div>
-                      </div>
-                      
-                      <div className={styles.ccTop}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div className={styles.ccLogoBox}>
-                            {bankDomain ? (
-                              <img src={`https://www.google.com/s2/favicons?domain=${bankDomain}&sz=128`} alt="Bco" className={styles.ccLogoImg} />
-                            ) : (
-                              <CreditCard size={18} style={{ color: 'var(--text-muted)' }} />
-                            )}
+                <div className={styles.cardsGrid}>
+                  {cartoes.map(cartao => {
+                    const bankDomain = getBankLogo(cartao.name);
+                    const percUsado = cartao.limit > 0 ? (cartao.usado / cartao.limit) * 100 : 0;
+                    
+                    return (
+                      <div key={cartao.id} className={styles.cardItem}>
+                        <div className={styles.cardItemTop}>
+                          <div className={styles.cardItemBrand}>
+                            <div className={styles.cardLogoBox}>
+                              {bankDomain ? (
+                                <img src={`https://www.google.com/s2/favicons?domain=${bankDomain}&sz=64`} alt="Banco" className={styles.cardLogoImg} />
+                              ) : (
+                                <CreditCard size={14} className="text-muted-foreground" />
+                              )}
+                            </div>
+                            <div>
+                              <p className={styles.cardName}>{cartao.name}</p>
+                              <span className={styles.cardDigits}>•••• {cartao.last_digits || '0000'}</span>
+                            </div>
                           </div>
-                          <div className={styles.ccInfo}>
-                            <h4 className={styles.ccName}>
-                              {cartao.name}
-                              <button onClick={() => abrirModalGasto(cartao)} className={styles.ccAddBtn}>
-                                <Plus size={14} />
-                              </button>
-                            </h4>
-                            <p className={styles.ccNumber}>FINAL {cartao.last_digits || '0000'}</p>
-                          </div>
+                          
+                          <button 
+                            onClick={() => abrirModalGasto(cartao)} 
+                            className={styles.btnIcon} 
+                            title="Lançar gasto neste cartão"
+                          >
+                            <Plus size={14} />
+                          </button>
                         </div>
-                        <span className={styles.ccBadge}>Padrão</span>
-                      </div>
 
-                      <div className={styles.ccBottom}>
-                        <div>
-                          <p className={styles.ccDispLabel}>Disponível</p>
-                          <p className={styles.ccDispValue}>R$ {cartao.disponivel.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        {/* PROGRESS BAR */}
+                        <div className={styles.cardProgressTrack}>
+                          <div 
+                            className={cn(styles.cardProgressFill, percUsado > 80 && styles.cardProgressFillDanger)} 
+                            style={{ width: `${Math.min(percUsado, 100)}%` }}
+                          />
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <p className={styles.ccTotalLabel}>Limite Total</p>
-                          <p className={styles.ccTotalValue}>R$ {cartao.limit.toLocaleString('pt-BR')}</p>
+
+                        <div className={styles.cardItemBottom}>
+                          <div>
+                            <p className={styles.cardMetricLabel}>Disponível</p>
+                            <p className={styles.cardMetricValue}>R$ {cartao.disponivel.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className={styles.cardMetricLabel}>Limite Total</p>
+                            <p className="text-xs text-muted-foreground font-mono">R$ {cartao.limit.toLocaleString('pt-BR')}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
-        </div>
 
-        {/* 5. EVENTOS E METAS */}
-        <div className={styles.gridBottomRow}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', height: '100%' }}>
+          {/* METAS E EVENTOS */}
+          <div className={styles.bottomRow}>
             
-            {/* WIDGET AGENDA */}
-            <div className={styles.premiumCard}>
+            {/* PRÓXIMOS EVENTOS */}
+            <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitleArea}>
-                  <div className={`${styles.iconBox} ${styles.iconBoxPink}`}>
-                    <Calendar size={16} />
-                  </div>
-                  <h3 className={styles.cardTitle}>Próximos Eventos</h3>
+                  <span className={styles.cardIcon}><Calendar size={16} /></span>
+                  <h2 className={styles.cardTitle}>Próximos Compromissos</h2>
                 </div>
-                <button onClick={() => navigate('/schedule')} className={styles.btnAction}>
-                  <Edit size={14} />
+                <button onClick={() => navigate('/schedule')} className={styles.btnIcon} title="Ver agenda completa">
+                  <Edit size={13} />
                 </button>
               </div>
               
-              <div className={styles.cardContent} style={{ minHeight: '200px' }}>
+              <div className={styles.cardContentScroll} style={{ minHeight: '140px', maxHeight: '180px' }}>
                 {eventosProximos.length === 0 ? (
                   <div className={styles.emptyState}>
-                    <Calendar className={styles.emptyIcon} />
-                    <p className={styles.emptyText}>Agenda Livre</p>
+                    <p className={styles.emptyText}>Nenhum compromisso nos próximos 7 dias.</p>
                   </div>
                 ) : (
                   <div>
                     {eventosProximos.map(e => (
-                      <div key={e.id} className={styles.listItem}>
+                      <div key={e.id} className={styles.listRow}>
                         <div className={styles.itemMain}>
                           <span className={styles.itemTitle}>{e.title}</span>
                           <span className={styles.itemMeta}>{formatDateForDisplay(e.date)}</span>
                         </div>
-                        {e.value && <span className={styles.itemValue} style={{ color: '#ec4899' }}>R$ {e.value.toLocaleString('pt-BR')}</span>}
+                        {e.value && (
+                          <span className={styles.itemValue}>R$ {e.value.toLocaleString('pt-BR')}</span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -798,61 +842,67 @@ const Inicio = ({ user }) => {
               </div>
               
               <div className={styles.cardFooter}>
-                <button className={styles.btnPrimary} style={{ backgroundColor: '#ec4899' }} onClick={() => setIsEventoModalOpen(true)}>
-                  <Plus size={14} /> Agendar Agora
+                <button className={styles.btnOutline} onClick={() => setIsEventoModalOpen(true)}>
+                  <Plus size={13} /> Novo Evento
                 </button>
               </div>
             </div>
 
-            {/* WIDGET METAS */}
-            <div className={styles.premiumCard}>
+            {/* METAS ATIVAS */}
+            <div className={styles.card}>
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitleArea}>
-                  <div className={`${styles.iconBox} ${styles.iconBoxPurple}`}>
-                    <Target size={16} />
-                  </div>
-                  <h3 className={styles.cardTitle}>Metas Ativas</h3>
+                  <span className={styles.cardIcon}><Target size={16} /></span>
+                  <h2 className={styles.cardTitle}>Metas Ativas</h2>
                 </div>
-                <button onClick={() => navigate('/goals')} className={styles.btnAction}>
-                   <Edit size={14} />
+                <button onClick={() => navigate('/goals')} className={styles.btnIcon} title="Ver todas as metas">
+                  <Edit size={13} />
                 </button>
               </div>
 
-              <div className={styles.metaContainer}>
-                <div className={styles.metaGrid}>
-                  <div className={styles.metaBlock}>
-                    <p className={styles.metaLabel}>Objetivo Final</p>
-                    <p className={styles.metaValTarget}>R$ {valorTotalMetas.toLocaleString('pt-BR')}</p>
+              <div className={styles.cardContent}>
+                <div className={styles.metaStatsGrid}>
+                  <div className={styles.metaStatBox}>
+                    <p className={styles.metaStatLabel}>Objetivo Total</p>
+                    <p className={styles.metaStatVal}>R$ {valorTotalMetas.toLocaleString('pt-BR')}</p>
                   </div>
-                  <div className={`${styles.metaBlock} ${styles.metaBlockRight}`}>
-                    <p className={styles.metaLabel}>Já Acumulado</p>
-                    <p className={styles.metaValCurrent}>R$ {valorAcumuladoMetas.toLocaleString('pt-BR')}</p>
+                  <div className={styles.metaStatBox}>
+                    <p className={styles.metaStatLabel}>Acumulado</p>
+                    <p className={cn(styles.metaStatVal, 'text-emerald-600 dark:text-emerald-400')}>
+                      R$ {valorAcumuladoMetas.toLocaleString('pt-BR')}
+                    </p>
                   </div>
                 </div>
 
-                <div className={styles.progressContainer}>
-                  <div className={styles.progressHeader}>
-                    <span className={styles.progressLabel}>Progresso Global</span>
-                    <span className={styles.progressPercent}>
-                      {valorTotalMetas > 0 ? ((valorAcumuladoMetas / valorTotalMetas) * 100).toFixed(1) : 0}%
-                    </span>
+                <div>
+                  <div className="flex justify-between items-center text-xs text-muted-foreground font-mono">
+                    <span>Progresso global</span>
+                    <span>{valorTotalMetas > 0 ? ((valorAcumuladoMetas / valorTotalMetas) * 100).toFixed(1) : 0}%</span>
                   </div>
                   <div className={styles.progressBarBg}>
-                    <div className={styles.progressBarFill} style={{ width: `${valorTotalMetas > 0 ? Math.min((valorAcumuladoMetas / valorTotalMetas) * 100, 100) : 0}%` }}></div>
+                    <div 
+                      className={styles.progressBarFill} 
+                      style={{ width: `${valorTotalMetas > 0 ? Math.min((valorAcumuladoMetas / valorTotalMetas) * 100, 100) : 0}%` }}
+                    />
                   </div>
-                  <p className={styles.progressFooter}>Faltam R$ {Math.max(valorRestanteMetas, 0).toLocaleString('pt-BR')} para o objetivo</p>
+                  <p className="text-[11px] text-muted-foreground text-center mt-1">
+                    Faltam R$ {Math.max(valorRestanteMetas, 0).toLocaleString('pt-BR')} para atingir
+                  </p>
                 </div>
               </div>
 
               <div className={styles.cardFooter}>
-                <button className={styles.btnPrimary} style={{ backgroundColor: '#8b5cf6' }} onClick={() => setIsAddValorMetaModalOpen(true)}>
-                  <DollarSign size={14} /> Injetar Capital
+                <button className={styles.btnOutline} onClick={() => setIsAddValorMetaModalOpen(true)}>
+                  <DollarSign size={13} /> Injetar Capital
                 </button>
               </div>
             </div>
 
           </div>
+
         </div>
+
+      </div>
 
       {/* MODAL DE AGENDAMENTO RÁPIDO (PRÓXIMOS EVENTOS) */}
         <Dialog open={isEventoModalOpen} onOpenChange={setIsEventoModalOpen}>
@@ -1042,7 +1092,6 @@ const Inicio = ({ user }) => {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
     </div>
   );
 };

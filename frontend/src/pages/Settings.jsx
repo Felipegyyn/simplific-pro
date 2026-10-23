@@ -119,10 +119,15 @@ const Settings = ({ user, onLogout }) => {
                   {feedback}
                 </span>
              )}
-             <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white font-bold shadow-lg shadow-cyan-900/20 px-6">
-                <Save className="w-4 h-4 mr-2" />
+             <button 
+                type="button"
+                onClick={handleSave} 
+                disabled={isSaving} 
+                className={styles.btnPrimaryDark}
+             >
+                <Save size={14} />
                 {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-             </Button>
+             </button>
         </div>
       </div>
 

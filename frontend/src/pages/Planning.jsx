@@ -652,44 +652,14 @@ useEffect(() => {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Header */}
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')}
-                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-500 hidden sm:block">
-                Bem-vindo, {user.name}
-              </span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </div>
+      
+      {/* 1. HEADER EXECUTIVO */}
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Planejamento Financeiro</h1>
+          <p className={styles.pageSubtitle}>Previsão orçamentária, acompanhamento de metas por categoria e conciliação.</p>
         </div>
       </header>
-
-      {/* Main Content */}
-      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.pageTitle}>
-              Planejamento Financeiro
-            </h2>
-            <p className={styles.pageSubtitle}>Gerencie seus planejamentos e orçamentos com precisão tecnológica</p>
-          </div>
-        </div>
 
         <Tabs
           value={abaAtiva}
@@ -705,13 +675,13 @@ useEffect(() => {
           {/* Visão Geral */}
           <TabsContent value="visao-geral" className="space-y-6">
             {/* Filtros Visão Geral */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6 glass-panel p-4 border-white/5">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6 p-3 bg-[var(--surface-main)] border border-[var(--color-border)] rounded-md">
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Ano</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Ano</label>
                 <select
                   value={filtroAnoVisaoGeral}
                   onChange={(e) => setFiltroAnoVisaoGeral(Number(e.target.value))}
-                  className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                  className="bg-[var(--surface-sub)] border border-[var(--color-border)] text-[var(--text-main)] rounded px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-slate-400 outline-none"
                 >
                   {[2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030].map((ano) => (
                     <option key={ano} value={ano}>{ano}</option>
@@ -720,11 +690,11 @@ useEffect(() => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Tipo</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1">Tipo</label>
                 <select
                   value={filtroTipoVisaoGeral}
                   onChange={(e) => setFiltroTipoVisaoGeral(e.target.value)}
-                  className="bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500/50 outline-none transition-all"
+                  className="bg-[var(--surface-sub)] border border-[var(--color-border)] text-[var(--text-main)] rounded px-2.5 py-1.5 text-xs focus:ring-1 focus:ring-slate-400 outline-none"
                 >
                   <option value="">Todos</option>
                   <option value="entrada">Entrada</option>
@@ -735,71 +705,43 @@ useEffect(() => {
 
             {/* Cards de Resumo */}
             <div className={styles.summaryGrid}>
-              <div className={styles.premiumCard}>
-                <div className={styles.cardContent}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
-                      <Target className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <p className={styles.summaryLabel}>Total Planejado</p>
-                  <p className={styles.summaryValue}>
-                    R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </p>
-                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-cyan-500 rounded-full" style={{ width: '100%' }} />
-                  </div>
+              <div className={styles.kpiCard}>
+                <span className={styles.summaryLabel}>Total Planejado</span>
+                <span className={styles.summaryValue}>
+                  R$ {resumo.totalPlanejado.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+                <div className="mt-2 h-1 w-full bg-[var(--color-border)] rounded-full overflow-hidden">
+                  <div className="h-full bg-slate-500 rounded-full" style={{ width: '100%' }} />
                 </div>
               </div>
 
-              <div className={styles.premiumCard}>
-                <div className={styles.cardContent}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
-                      <DollarSign className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <p className={styles.summaryLabel}>Total Realizado</p>
-                  <p className={styles.summaryValue}>
-                    R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </p>
-                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
-                  </div>
+              <div className={styles.kpiCard}>
+                <span className={styles.summaryLabel}>Total Realizado</span>
+                <span className={styles.summaryValue}>
+                  R$ {resumo.totalGasto.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+                <div className="mt-2 h-1 w-full bg-[var(--color-border)] rounded-full overflow-hidden">
+                  <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
                 </div>
               </div>
 
-              <div className={styles.premiumCard}>
-                <div className={styles.cardContent}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
-                      <TrendingUp className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <p className={styles.summaryLabel}>Total a realizar</p>
-                  <p className={styles.summaryValue}>
-                    R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </p>
-                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.max(0, 100 - resumo.progressoMedio)}%` }} />
-                  </div>
+              <div className={styles.kpiCard}>
+                <span className={styles.summaryLabel}>Total a Realizar</span>
+                <span className={styles.summaryValue}>
+                  R$ {resumo.disponivel.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+                <div className="mt-2 h-1 w-full bg-[var(--color-border)] rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.max(0, 100 - resumo.progressoMedio)}%` }} />
                 </div>
               </div>
 
-              <div className={styles.premiumCard}>
-                <div className={styles.cardContent}>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
-                      <BarChart3 className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <p className={styles.summaryLabel}>Progresso Médio</p>
-                  <p className={styles.summaryValue}>
-                    {resumo.progressoMedio.toFixed(1)}%
-                  </p>
-                  <div className="mt-2 h-1 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
-                  </div>
+              <div className={styles.kpiCard}>
+                <span className={styles.summaryLabel}>Progresso Médio</span>
+                <span className={styles.summaryValue}>
+                  {resumo.progressoMedio.toFixed(1)}%
+                </span>
+                <div className="mt-2 h-1 w-full bg-[var(--color-border)] rounded-full overflow-hidden">
+                  <div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(resumo.progressoMedio, 100)}%` }} />
                 </div>
               </div>
             </div>
@@ -1531,7 +1473,6 @@ useEffect(() => {
           </DialogContent>
           </Dialog>
         </div>
-      </div>
     );
   };
 

@@ -516,98 +516,65 @@ const Transactions = ({ user, onLogout }) => {
 
   return (
     <div className={styles.pageContainer}>
-      <header className="glass-panel rounded-none border-x-0 border-t-0 border-white/5 sticky top-0 z-10 print:hidden">
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => navigate('/dashboard')} 
-                className="mr-4 text-slate-500 hover:text-slate-900 dark:hover:text-white"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-slate-500 hidden sm:block">Bem-vindo, {user.name}</span>
-              <Button variant="outline" size="sm" onClick={onLogout} className="border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
-                <LogOut className="h-4 w-4 mr-2" /> Sair
-              </Button>
-            </div>
-          </div>
+      
+      {/* 1. HEADER EXECUTIVO */}
+      <header className={styles.header}>
+        <div>
+          <h1 className={styles.pageTitle}>Lançamentos Financeiros</h1>
+          <p className={styles.pageSubtitle}>Registro e conciliação de receitas, despesas e pendências operacionais.</p>
         </div>
       </header>
 
-      <div className="max-w-[100%] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className={styles.header}>
-          <div>
-            <h2 className={styles.pageTitle}>
-              Lançamentos Financeiros
-            </h2>
-            <p className={styles.pageSubtitle}>Gerencie suas receitas e despesas com precisão tecnológica</p>
-          </div>
+      {/* 2. KPI STRIP (Taste Skill §5: One container split by 1px hairlines) */}
+      <section className={styles.summaryGrid}>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Total Receitas
+            <TrendingUp size={14} className="text-emerald-600 dark:text-emerald-500" />
+          </p>
+          <p className={cn(styles.summaryValue, 'text-emerald-600 dark:text-emerald-500')}>
+            R$ {totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        <div className={styles.summaryGrid}>
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Total Receitas</p>
-              <p className={styles.summaryValue}>R$ {totalReceitas.toLocaleString()}</p>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
-                  <TrendingDown className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Total Despesas</p>
-              <p className={styles.summaryValue}>R$ {totalDespesas.toLocaleString()}</p>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
-                  <DollarSign className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Saldo Líquido</p>
-              <p className={cn(styles.summaryValue, saldoLiquido >= 0 ? styles.textSuccess : styles.textDanger)}>
-                R$ {saldoLiquido.toLocaleString()}
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.premiumCard}>
-            <div className={styles.cardContent}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={styles.iconBox + ' ' + styles.iconBoxWarning}>
-                  <Clock className="h-6 w-6" />
-                </div>
-              </div>
-              <p className={styles.summaryLabel}>Pendentes</p>
-              <p className={styles.summaryValue}>{totalPendentes}</p>
-            </div>
-          </div>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Total Despesas
+            <TrendingDown size={14} className="text-muted-foreground" />
+          </p>
+          <p className={styles.summaryValue}>
+            R$ {totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
         </div>
 
-        <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-6">
-          <TabsList className={styles.tabsList + " mb-6"}>
-              <TabsTrigger value="todas" className={styles.tabsTrigger}>Todas</TabsTrigger>
-              <TabsTrigger value="receita" className={styles.tabsTrigger}>Receitas</TabsTrigger>
-              <TabsTrigger value="despesa" className={styles.tabsTrigger}>Despesas</TabsTrigger>
-              <TabsTrigger value="pendentes" className={styles.tabsTrigger}>Pendentes</TabsTrigger>
-          </TabsList>
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Saldo Líquido
+            <DollarSign size={14} className="text-muted-foreground" />
+          </p>
+          <p className={cn(styles.summaryValue, saldoLiquido < 0 && 'text-rose-600 dark:text-rose-400')}>
+            R$ {saldoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className={styles.kpiCard}>
+          <p className={styles.summaryLabel}>
+            Pendentes
+            <Clock size={14} className="text-amber-500" />
+          </p>
+          <p className={cn(styles.summaryValue, totalPendentes > 0 && 'text-amber-600 dark:text-amber-400')}>
+            {totalPendentes} {totalPendentes === 1 ? 'item' : 'itens'}
+          </p>
+        </div>
+      </section>
+
+      <Tabs value={filtroAtivo} onValueChange={setFiltroAtivo} className="space-y-4">
+        <TabsList className={styles.tabsList}>
+          <TabsTrigger value="todas" className={styles.tabsTrigger}>Todas</TabsTrigger>
+          <TabsTrigger value="receita" className={styles.tabsTrigger}>Receitas</TabsTrigger>
+          <TabsTrigger value="despesa" className={styles.tabsTrigger}>Despesas</TabsTrigger>
+          <TabsTrigger value="pendentes" className={styles.tabsTrigger}>Pendentes</TabsTrigger>
+        </TabsList>
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass-panel p-4 border-white/5">
             <div className="flex gap-2 items-center">
@@ -1065,7 +1032,6 @@ const Transactions = ({ user, onLogout }) => {
             </form>
           </DialogContent>
           </Dialog>
-        </div>
       </div>
     );
   };

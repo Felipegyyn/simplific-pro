@@ -267,68 +267,41 @@ useEffect(() => {
         <div ref={reportRef}></div>
 
           {/* Resumo Executivo */}
-          <div className={styles.summaryGrid}>
-            <div className={styles.premiumCard}>
-              <div className={`${styles.cardTopAccent} ${styles.accentGreen}`}></div>
-              <div className={styles.cardHeaderPlain}>
-                <div className={styles.iconBox + ' ' + styles.iconBoxSuccess}>
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-              </div>
-              <div className={styles.cardContent}>
-                <p className={styles.summaryLabel}>Total Receitas</p>
-                <h3 className={styles.summaryValue}>{formatCurrency(reportData.summary.totalReceitas)}</h3>
-              </div>
+          <section className={styles.summaryGrid}>
+            <div className={styles.kpiCard}>
+              <p className={styles.summaryLabel}>
+                Total Receitas
+                <TrendingUp size={14} className="text-muted-foreground" />
+              </p>
+              <p className={styles.summaryValue}>{formatCurrency(reportData.summary.totalReceitas)}</p>
             </div>
 
-            <div className={styles.premiumCard}>
-              <div className={`${styles.cardTopAccent} ${styles.accentRed}`}></div>
-              <div className={styles.cardHeaderPlain}>
-                <div className={styles.iconBox + ' ' + styles.iconBoxDanger}>
-                  <TrendingDown className="h-5 w-5" />
-                </div>
-              </div>
-              <div className={styles.cardContent}>
-                <p className={styles.summaryLabel}>Total Despesas</p>
-                <h3 className={styles.summaryValue}>{formatCurrency(reportData.summary.totalDespesas)}</h3>
-              </div>
+            <div className={styles.kpiCard}>
+              <p className={styles.summaryLabel}>
+                Total Despesas
+                <TrendingDown size={14} className="text-muted-foreground" />
+              </p>
+              <p className={styles.summaryValue}>{formatCurrency(reportData.summary.totalDespesas)}</p>
             </div>
 
-            <div className={styles.premiumCard}>
-              <div className={`${styles.cardTopAccent} ${styles.accentBlue}`}></div>
-              <div className={styles.cardHeaderPlain}>
-                <div className={styles.iconBox + ' ' + styles.iconBoxPrimary}>
-                  <DollarSign className="h-5 w-5" />
-                </div>
-              </div>
-              <div className={styles.cardContent}>
-                <p className={styles.summaryLabel}>Saldo Líquido</p>
-                <h3 className={cn(styles.summaryValue, reportData.summary.saldoLiquido >= 0 ? 'text-emerald-500' : 'text-red-500')}>
-                  {formatCurrency(reportData.summary.saldoLiquido)}
-                </h3>
-              </div>
+            <div className={styles.kpiCard}>
+              <p className={styles.summaryLabel}>
+                Saldo Líquido
+                <DollarSign size={14} className="text-muted-foreground" />
+              </p>
+              <p className={cn(styles.summaryValue, reportData.summary.saldoLiquido >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400')}>
+                {formatCurrency(reportData.summary.saldoLiquido)}
+              </p>
             </div>
 
-            <div className={styles.premiumCard}>
-              <div className={`${styles.cardTopAccent} ${styles.accentPurple}`}></div>
-              <div className={styles.cardHeaderPlain}>
-                <div className={styles.iconBox + ' ' + styles.iconBoxPurple}>
-                  <Activity className="h-5 w-5" />
-                </div>
-                <span className={cn("text-[10px] font-bold px-2 py-1 rounded-full border", 
-                  (reportData.summary.averageGrowth || 0) >= 0 
-                    ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/10" 
-                    : "text-red-500 bg-red-500/10 border-red-500/10"
-                )}>
-                  {(reportData.summary.averageGrowth || 0) >= 0 ? '+' : ''}{(reportData.summary.averageGrowth || 0).toFixed(1)}%
-                </span>
-              </div>
-              <div className={styles.cardContent}>
-                <p className={styles.summaryLabel}>Crescimento Médio</p>
-                <h3 className={styles.summaryValue}>{formatPercentage(reportData.summary.averageGrowth || 0)}</h3>
-              </div>
+            <div className={styles.kpiCard}>
+              <p className={styles.summaryLabel}>
+                Crescimento Médio
+                <Activity size={14} className="text-muted-foreground" />
+              </p>
+              <p className={styles.summaryValue}>{formatPercentage(reportData.summary.averageGrowth || 0)}</p>
             </div>
-          </div>
+          </section>
 
           {/* Tabs de Relatórios */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>

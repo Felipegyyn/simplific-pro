@@ -85,9 +85,9 @@ const Contacts = () => {
           </h1>
           <p className={styles.pageSubtitle}>Gerencie as pessoas com quem você agenda reuniões.</p>
         </div>
-        <Button onClick={() => handleOpenModal()} className="bg-green-600 hover:bg-green-700 text-white">
-          <Plus className="mr-2 h-4 w-4" /> Novo Contato
-        </Button>
+        <button type="button" onClick={() => handleOpenModal()} className={styles.btnPrimaryDark}>
+          <Plus size={14} /> Novo Contato
+        </button>
       </div>
 
       {/* Barra de Busca */}

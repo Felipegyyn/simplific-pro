@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Send, Bot, User as UserIcon } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import apiService from '../services/api';
+import styles from './SimplificIA.module.css';
 
 const SimplificIA = () => {
   // Estado para guardar o histórico de mensagens
@@ -64,91 +65,77 @@ const SimplificIA = () => {
 // Em src/pages/SimplificIA.jsx
 
   return (
-    <div className="p-4 sm:p-6 h-full flex flex-col" style={{maxHeight: 'calc(100vh - 80px)'}}>
-      <div className="mb-6">
-          <h1 className="text-2xl font-bold">Simplific IA</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-              Converse com seu assistente para registrar despesas, consultar saldos e tirar dúvidas.
-          </p>
-      </div>
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
+        <h1 className={styles.pageTitle}>Simplific IA</h1>
+        <p className={styles.pageSubtitle}>Assistente financeiro institucional para lançamentos, consultas e orientações.</p>
+      </header>
       
-      <Card className="flex-1 flex flex-col">
-        <CardContent className="p-4 flex-1 flex flex-col">
-          {/* Área de exibição das mensagens */}
-          <div className="flex-1 space-y-4 overflow-y-auto pr-2">
-            {messages.map((message, index) => (
-              <div key={index} className={`flex items-start gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {/* Ícone da IA */}
-                {message.sender === 'ai' && (
-                  <div className="bg-slate-200 dark:bg-slate-700 p-2 rounded-full">
-                    <Bot className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-                  </div>
-                )}
-                
-                {/* Balão da Mensagem */}
-                <div className={`max-w-md p-3 rounded-lg ${
-                    message.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-gray-200 rounded-bl-none'
-                  }`}
-                >
-                  {/* ▼▼▼ COLE ESTE BLOCO NO LUGAR DA LINHA <p>...</p> ▼▼▼ */}
-{
-  message.sender === 'ai' ? (
-    // Se a mensagem for da IA, usa o ReactMarkdown para formatar
-    <ReactMarkdown className="prose dark:prose-invert text-sm">
-      {message.text}
-    </ReactMarkdown>
-  ) : (
-    // Se a mensagem for do usuário, continua usando um parágrafo normal
-    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-  )
-}
-{/* ▲▲▲ FIM DO BLOCO ▲▲▲ */}
+      <div className={styles.chatCard}>
+        {/* Área de exibição das mensagens */}
+        <div className={styles.messageArea}>
+          {messages.map((message, index) => (
+            <div key={index} className={`flex items-start gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {/* Ícone da IA */}
+              {message.sender === 'ai' && (
+                <div className={styles.avatarBox}>
+                  <Bot size={15} />
                 </div>
-
-                {/* Ícone do Usuário */}
-                {message.sender === 'user' && (
-                  <div className="bg-slate-200 dark:bg-slate-700 p-2 rounded-full">
-                    <UserIcon className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-                  </div>
+              )}
+              
+              {/* Balão da Mensagem */}
+              <div className={message.sender === 'user' ? styles.userBubble : styles.aiBubble}>
+                {message.sender === 'ai' ? (
+                  <ReactMarkdown className="prose dark:prose-invert text-sm max-w-none">
+                    {message.text}
+                  </ReactMarkdown>
+                ) : (
+                  <p className="text-sm whitespace-pre-wrap m-0">{message.text}</p>
                 )}
               </div>
-            ))}
-            {/* Indicador de "Digitando..." */}
-            {isLoading && (
-              <div className="flex items-start gap-3 justify-start">
-                  <div className="bg-slate-200 dark:bg-slate-700 p-2 rounded-full">
-                    <Bot className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-                  </div>
-                  <div className="max-w-md p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-800 dark:text-gray-200 rounded-bl-none">
-                     <div className="flex items-center justify-center space-x-1">
-                        <span className="h-2 w-2 bg-slate-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                        <span className="h-2 w-2 bg-slate-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                        <span className="h-2 w-2 bg-slate-500 rounded-full animate-bounce"></span>
-                     </div>
-                  </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* Área de digitação da mensagem */}
-          <form onSubmit={handleSendMessage} className="mt-4 flex items-center gap-2 border-t dark:border-slate-700 pt-4">
-            <Input
-              type="text"
-              placeholder="Digite sua mensagem aqui..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isLoading || !inputValue.trim()} size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              {/* Ícone do Usuário */}
+              {message.sender === 'user' && (
+                <div className={styles.avatarBox}>
+                  <UserIcon size={15} />
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Indicador de "Digitando..." */}
+          {isLoading && (
+            <div className="flex items-start gap-3 justify-start">
+              <div className={styles.avatarBox}>
+                <Bot size={15} />
+              </div>
+              <div className={styles.aiBubble}>
+                <div className="flex items-center space-x-1.5 py-1">
+                  <span className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="h-1.5 w-1.5 bg-zinc-400 rounded-full animate-bounce"></span>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Área de digitação da mensagem */}
+        <form onSubmit={handleSendMessage} className={styles.inputArea}>
+          <input
+            type="text"
+            placeholder="Pergunte ao assistente ou registre uma despesa..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            disabled={isLoading}
+            className={styles.chatInput}
+          />
+          <button type="submit" disabled={isLoading || !inputValue.trim()} className={styles.sendBtn} title="Enviar">
+            <Send size={14} />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
