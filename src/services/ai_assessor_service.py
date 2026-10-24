@@ -7,6 +7,7 @@ from datetime import datetime
 
 # --- Importando TODOS os nossos serviços de resumo ---
 from src.services.gemini_service import construir_prompt_assessor, model
+from src.services.ai_gateway import generate_agent_response, generate_simple_completion
 from src.services.reports_service import get_financial_summary_for_ai
 from src.services.credit_card_service import get_credit_card_summary_for_ai
 from src.services.goals_service import get_goals_summary_for_ai
@@ -27,7 +28,7 @@ from src.models.financial import Category
 def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     """
     Função principal que orquestra a conversa com o assessor Simplific.
-    AGORA USANDO FUNCTION CALLING NATIVO (Roteador Multitarefas).
+    ROTEAMENTO INTELIGENTE: FreeLLMAPI (Custo Zero) -> Groq -> Gemini (Fallback Oficial).
     """
     usuario = User.query.get(user_id)
     if not usuario:
@@ -49,7 +50,6 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     ultima_mensagem = historico_chat[-1]['content'] if historico_chat else ""
     memorias_recuperadas = buscar_memorias_relevantes(user_id, ultima_mensagem)
 
-
     contexto_financeiro_completo = (
         f"{resumo_planejamento}\n"
         f"{resumo_transacoes}\n"
@@ -61,105 +61,18 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         f"{memorias_recuperadas}" # <--- A MEMÓRIA ENTRA AQUI
     )
 
-    # --- PASSO 2: Construir o Prompt e Chamar o Gemini ---
+    # --- PASSO 2: Construir o Prompt e Chamar o AI Gateway (FreeLLMAPI -> Groq -> Gemini) ---
     prompt = construir_prompt_assessor(nome_final, contexto_financeiro_completo, historico_chat)
     
     try:
-        mensagens_bumerangue = [{"role": "user", "parts": [prompt]}]
-        response = model.generate_content(mensagens_bumerangue)
-
-        if not response.parts:
-            return "Não consegui processar sua solicitação devido às políticas de segurança.", []
-
-        # 2. O LOOP DO BUMERANGUE (Nível 3 - Execução Simulada)
-        max_turnos = 5
-        acoes_a_executar = [] # Guardaremos TODAS as ferramentas finais aqui
-        
-        for _ in range(max_turnos):
-            precisa_continuar = False
-            respostas_das_ferramentas = []
-
-            for part in response.candidates[0].content.parts:
-                if part.function_call:
-                    precisa_continuar = True
-                    nome_funcao = part.function_call.name
-                    argumentos = {key: value for key, value in part.function_call.args.items()}
-                    
-                    if nome_funcao == "pesquisar_na_internet":
-                        query_busca = argumentos.get("query", "")
-                        print(f"🔄 [LOOP AGENTE] Resolvendo pesquisa: '{query_busca}'")
-                        resultado_web = realizar_pesquisa_web(query_busca)
-                        
-                        resultado_turbinado = (
-                            f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
-                            "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."
-                        )
-                        
-                        respostas_das_ferramentas.append({
-                            "function_response": {
-                                "name": "pesquisar_na_internet",
-                                "response": {"resultado": resultado_turbinado}
-                            }
-                        })
-
-                    # ▼▼▼ O BLOCO NOVO ENTRA AQUI ▼▼▼
-                    elif nome_funcao == "vincular_conta_ultima_transacao":
-                        digitos = argumentos.get("digitos_conta", "")
-                        from src.services.transacoes_service import vincular_conta_ultima_transacao
-                        resultado_vinculo = vincular_conta_ultima_transacao(user_id, digitos)
-                        
-                        respostas_das_ferramentas.append({
-                            "function_response": {
-                                "name": "vincular_conta_ultima_transacao",
-                                "response": resultado_vinculo
-                            }
-                        })
-                    # ▲▲▲ FIM DO BLOCO NOVO ▲▲▲
-
-                    else:
-                        # É uma ferramenta de banco de dados (agenda, meta, lançamentos)
-                        print(f"🔧 [LOOP AGENTE] Interceptando ação final: {nome_funcao}")
-                        
-                        acao_atual = {"type": nome_funcao, "data": argumentos}
-                        if acao_atual not in acoes_a_executar: # Evita duplicar ações
-                            acoes_a_executar.append(acao_atual)
-                        
-                        # A MÁGICA: Devolvemos um "Falso Sucesso" com a LEI DO SILÊNCIO
-                        respostas_das_ferramentas.append({
-                            "function_response": {
-                                "name": nome_funcao,
-                                "response": {
-                                    "status": "sucesso", 
-                                    "mensagem": "Ação salva no banco de dados. REGRA DE RESPOSTA: Foque o seu texto final APENAS nos resultados da pesquisa (links, dicas, preços). NÃO escreva que você criou metas ou agendou lembretes, pois o próprio sistema adicionará as confirmações verdes (✅) automaticamente no final da sua mensagem. Apenas entregue a pesquisa."
-                                }
-                            }
-                        })
-
-            if precisa_continuar and respostas_das_ferramentas:
-                # O Gemini chamou ferramentas, então entregamos as respostas e o fazemos pensar novamente
-                mensagens_bumerangue.append(response.candidates[0].content)
-                mensagens_bumerangue.append({
-                    "role": "user",
-                    "parts": respostas_das_ferramentas
-                })
-                response = model.generate_content(mensagens_bumerangue)
-            else:
-                # Se ele NÃO chamou mais ferramentas, significa que ele finalmente gerou o texto!
-                break 
-
+        texto_para_usuario, acoes_a_executar = generate_agent_response(user_id=usuario.id, prompt=prompt)
     except Exception as e:
-        print(f"ERRO: Falha na chamada ao Gemini: {e}")
+        print(f"ERRO CRÍTICO no AI Gateway: {e}")
         return "Tive um problema para me conectar com minha inteligência. Tente novamente.", []
-
-    # --- PASSO 3: Extrair o texto final gerado pelo Gemini ---
-    texto_para_usuario = ""
-    for part in response.candidates[0].content.parts:
-        if part.text:
-            texto_para_usuario += part.text + " "
 
     # Trava de Segurança
     if not texto_para_usuario.strip() and acoes_a_executar:
-        texto_para_usuario = "Pronto! Fui à internet, cruzei os dados e já executei todas as ações que você pediu."
+        texto_para_usuario = "Pronto! Cruzei os dados e já executei todas as ações que você pediu."
 
     return texto_para_usuario.strip(), acoes_a_executar
 
@@ -187,11 +100,11 @@ def categorizar_descricao_transacao(user_id, descricao):
     )
 
     try:
-        response = model.generate_content(prompt)
-        if not response.parts:
+        response_text = generate_simple_completion(prompt, temperature=0.1)
+        if not response_text:
             return 'Outros'
         
-        categoria_sugerida = response.text.strip().replace("'", "").replace('"', '')
+        categoria_sugerida = response_text.replace("'", "").replace('"', '').strip()
 
         if categoria_sugerida in nomes_categorias:
             return categoria_sugerida
@@ -204,9 +117,7 @@ def categorizar_descricao_transacao(user_id, descricao):
 
 def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     """
-    Usa o Gemini para analisar um bloco de texto de um extrato ou comprovante
-    e retornar uma lista estruturada de transações em formato JSON.
-    AGORA COM IDENTIFICAÇÃO DE INSTITUIÇÃO FINANCEIRA (CONTA DE ORIGEM).
+    Usa o AI Gateway (FreeLLMAPI -> Groq -> Gemini) para extrair dados estruturados em JSON.
     """
     ano_atual = datetime.now().year
 
@@ -233,11 +144,11 @@ def extrair_transacoes_de_texto_com_ia(texto_do_extrato):
     """
 
     try:
-        response = model.generate_content(prompt)
-        if not response.parts:
+        response_text = generate_simple_completion(prompt, temperature=0.1)
+        if not response_text:
             return []
         
-        json_str = response.text.strip().replace('```json', '').replace('```', '')
+        json_str = response_text.replace('```json', '').replace('```', '').strip()
         transacoes_extraidas = json.loads(json_str)
 
         if isinstance(transacoes_extraidas, list):

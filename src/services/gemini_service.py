@@ -101,8 +101,12 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
 def categorize_transaction(description, categories_list):
     """
     Usa IA para escolher a categoria de uma transação importada (via extrato).
+    Com fallback inteligente (FreeLLMAPI -> Groq -> Gemini).
     """
     try:
+        from src.services.ai_gateway import generate_simple_completion
+        import re
+
         options_text = "\n".join([f"ID {c['id']}: {c['name']}" for c in categories_list])
 
         prompt = f"""
@@ -116,11 +120,13 @@ def categorize_transaction(description, categories_list):
         Se não souber, responda o ID da categoria 'Outros' ou similar.
         """
         
-        # Como é uma tarefa muito simples, podemos usar o modelo sem as tools aqui
-        model_simples = genai.GenerativeModel('gemini-1.5-flash', generation_config={"temperature": 0.1})
-        response = model_simples.generate_content(prompt)
-        
-        return int(response.text.strip())
+        response_text = generate_simple_completion(prompt, temperature=0.1)
+        if response_text:
+            digits = re.findall(r'\d+', response_text)
+            if digits:
+                return int(digits[0])
+            return int(response_text.strip())
+        return None
 
     except Exception as e:
         print(f"Erro IA na transação '{description}': {e}")

@@ -260,3 +260,66 @@ simplific_tools = [
         ]
     }
 ]
+
+# ==============================================================================
+# CONVERSOR PARA FORMATO OPENAI / FREELLMAPI / GROQ
+# ==============================================================================
+
+def _convert_gemini_schema(prop):
+    """Converte recursivamente o schema de parâmetros do Gemini para JSON Schema do OpenAI."""
+    if not isinstance(prop, dict):
+        return {"type": "string"}
+    
+    result = {}
+    p_type = prop.get("type", "STRING").lower()
+    
+    if p_type == "object":
+        result["type"] = "object"
+        if "properties" in prop:
+            result["properties"] = {
+                k: _convert_gemini_schema(v) for k, v in prop["properties"].items()
+            }
+        if "required" in prop:
+            result["required"] = prop["required"]
+    elif p_type in ["number", "float"]:
+        result["type"] = "number"
+    elif p_type == "integer":
+        result["type"] = "integer"
+    elif p_type == "boolean":
+        result["type"] = "boolean"
+    else:
+        result["type"] = "string"
+
+    if "description" in prop:
+        result["description"] = prop["description"]
+    if "enum" in prop:
+        result["enum"] = prop["enum"]
+
+    return result
+
+def get_openai_tools():
+    """Gera a lista de ferramentas compatível com OpenAI / FreeLLMAPI."""
+    openai_tools = []
+    for group in simplific_tools:
+        for decl in group.get("function_declarations", []):
+            name = decl["name"]
+            description = decl.get("description", "")
+            raw_params = decl.get("parameters", {})
+            converted_params = _convert_gemini_schema(raw_params)
+            
+            if "type" not in converted_params:
+                converted_params["type"] = "object"
+            if "properties" not in converted_params:
+                converted_params["properties"] = {}
+
+            openai_tools.append({
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "description": description,
+                    "parameters": converted_params
+                }
+            })
+    return openai_tools
+
+openai_simplific_tools = get_openai_tools()
