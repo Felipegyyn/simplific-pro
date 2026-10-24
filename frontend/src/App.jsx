@@ -21,6 +21,7 @@ import Analysis from './pages/Analysis';
 import SimplificIA from './pages/SimplificIA';
 import AdvisorFeatures from './pages/AdvisorFeatures';
 import Inicio from './pages/Inicio'; // <--- IMPORT DA NOVA PÁGINA AQUI
+import Vision from './pages/Vision';
 import MainLayout from './components/MainLayout'; 
 import { Outlet } from 'react-router-dom';
 import PersonalBankAccounts from './pages/BankAccounts'; // Mudamos o nome aqui
@@ -197,6 +198,7 @@ const App = () => {
                 <Route path="/bank-accounts" element={<PersonalBankAccounts user={user} onLogout={handleLogout} />} />
                 <Route path="/dashboard" element={<Dashboard user={user} onLogout={handleLogout} />} />
                 <Route path="/inicio" element={<Inicio user={user} />} /> {/* <--- NOVA ROTA AQUI */}
+                <Route path="/vision" element={<Vision user={user} onLogout={handleLogout} />} />
                 <Route path="/planning" element={<Planning user={user} onLogout={handleLogout} />} />
                 <Route path="/transactions" element={<Transactions user={user} onLogout={handleLogout} />} />
                 <Route path="/credit-cards" element={<CreditCards user={user} onLogout={handleLogout} />} />

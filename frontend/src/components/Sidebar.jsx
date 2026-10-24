@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Target, DollarSign, CreditCard, TrendingUp, 
   Calendar, FileText, Users, LogOut, ChevronLeft, ChevronRight, 
   Settings, BarChart3, Bot, Award, Megaphone, ChevronDown, 
-  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark, Home
+  MessageCircle, Tags, Sparkles, Building2, Briefcase, Landmark, Home, Eye
 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
 import { cn } from "@/lib/utils";
@@ -25,6 +25,7 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
       color: 'var(--primary-accent)',
       items: [
         { name: 'Início', path: '/inicio', icon: Home },
+        { name: 'Vision', path: '/vision', icon: Eye },
       ]
     },
     {
@@ -106,6 +107,15 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
     ...group,
     items: group.items.filter(item => !item.adminOnly || user?.profile === 'admin')
   })).filter(group => group.items.length > 0);
+
+  useEffect(() => {
+    const activeGroup = visibleMenu.find(group =>
+      group.items.some(item => !item.isExternal && location.pathname === item.path)
+    );
+    if (activeGroup) {
+      setOpenMenus(prev => ({ ...prev, [activeGroup.title]: true }));
+    }
+  }, [location.pathname]);
 
   const toggleMenu = (title) => {
     if (!isDesktopOpen) {
