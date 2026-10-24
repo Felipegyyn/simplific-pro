@@ -145,7 +145,10 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
             if func_name == "pesquisar_na_internet":
                 query_busca = func_args.get("query", "")
                 print(f"🔄 [AI GATEWAY] Resolvendo pesquisa: '{query_busca}'")
-                resultado_web = realizar_pesquisa_web(query_busca)
+                resultado_web = realizar_pesquisa_web(query_busca, user_id=user_id)
+                acao_pesquisa = {"type": "pesquisar_na_internet", "data": {"query": query_busca}}
+                if acao_pesquisa not in acoes_a_executar:
+                    acoes_a_executar.append(acao_pesquisa)
                 resultado_turbinado = (
                     f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
                     "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."
@@ -223,7 +226,10 @@ def _run_gemini_agent(user_id, prompt):
                 if nome_funcao == "pesquisar_na_internet":
                     query_busca = argumentos.get("query", "")
                     print(f"🔄 [GEMINI FALLBACK] Resolvendo pesquisa: '{query_busca}'")
-                    resultado_web = realizar_pesquisa_web(query_busca)
+                    resultado_web = realizar_pesquisa_web(query_busca, user_id=user_id)
+                    acao_pesquisa = {"type": "pesquisar_na_internet", "data": {"query": query_busca}}
+                    if acao_pesquisa not in acoes_a_executar:
+                        acoes_a_executar.append(acao_pesquisa)
                     resultado_turbinado = (
                         f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
                         "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."

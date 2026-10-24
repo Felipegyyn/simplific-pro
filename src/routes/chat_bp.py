@@ -2,41 +2,42 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import User
 
-# Importa a função principal de interação da IA que já usamos no WhatsApp
+# Importa o orquestrador visual do Vision e o fallback do WhatsApp
+from src.services.vision_orchestrator_service import processar_interacao_vision
 from src.routes.routes_whatsapp import tratar_nova_interacao
 
-# Cria o nosso novo "Blueprint" para as rotas de chat
 chat_bp = Blueprint('chat', __name__)
 
 @chat_bp.route('/chat', methods=['POST'])
-@jwt_required() # Protege a rota, apenas usuários logados podem acessar
+@jwt_required()
 def handle_chat_message():
     """
-    Recebe uma mensagem do chat da plataforma web, processa com a IA 
-    e retorna a resposta.
+    Recebe a mensagem do chat Vision, processa pelo orquestrador e retorna
+    o texto humanizado acompanhado de dados visuais (gráficos, recibos, cartões e imagens).
     """
     user_id = get_jwt_identity()
-    data = request.get_json()
+    data = request.get_json() or {}
 
     user_message = data.get('message')
     if not user_message:
         return jsonify({"error": "A mensagem não pode estar vazia."}), 400
 
-    # Busca o objeto do usuário para passar para a função de IA
     usuario = User.query.get(user_id)
     if not usuario:
         return jsonify({"error": "Usuário não encontrado."}), 404
 
-    # AQUI ESTÁ A MÁGICA:
-    # Reutilizamos 100% da lógica do WhatsApp.
-    # A função 'tratar_nova_interacao' espera (mensagem, media_url, from_number, usuario).
-    # Passamos 'None' para media_url e um ID de sessão único para from_number.
-    
-    # Usar o ID do usuário garante que o histórico da conversa na plataforma
-    # seja separado do histórico do WhatsApp.
-    session_key = f"platform_user_{user_id}" 
-    
-    ai_response = tratar_nova_interacao(user_message, None, session_key, usuario)
-    
-    # Retornamos a resposta da IA em um formato JSON para o frontend
-    return jsonify({"reply": ai_response})
+    try:
+        # Orquestrador com suporte a gráficos, recibos, agenda, metas e cards com imagem
+        resultado = processar_interacao_vision(user_id, user_message, usuario)
+        return jsonify({
+            "reply": resultado.get("reply", ""),
+            "visuals": resultado.get("visuals", [])
+        })
+    except Exception as e:
+        print(f"⚠️ [VISION CHAT] Falha no orquestrador ({e}). Usando fallback simples...")
+        session_key = f"platform_user_{user_id}"
+        ai_response = tratar_nova_interacao(user_message, None, session_key, usuario)
+        return jsonify({
+            "reply": ai_response,
+            "visuals": []
+        })

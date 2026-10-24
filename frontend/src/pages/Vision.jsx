@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import SimplificMascot from '../components/SimplificMascot';
+import VisionVisualRenderer from '../components/vision/VisionVisuals';
 import apiService from '../services/api';
 import styles from './Vision.module.css';
 
@@ -62,14 +63,17 @@ const Vision = ({ user, onLogout }) => {
       });
 
       const aiText = response?.reply || response?.data?.reply || 'Entendido. Estou processando sua análise financeira.';
-      setMessages(prev => [...prev, { sender: 'ai', text: aiText }]);
+      const visuals = response?.visuals || response?.data?.visuals || [];
+      
+      setMessages(prev => [...prev, { sender: 'ai', text: aiText, visuals }]);
     } catch (error) {
       console.error('Erro ao comunicar com a IA do Vision:', error);
       setMessages(prev => [
         ...prev, 
         { 
           sender: 'ai', 
-          text: 'Não consegui me conectar ao serviço no momento. Por favor, tente novamente em instantes.' 
+          text: 'Não consegui me conectar ao serviço no momento. Por favor, tente novamente em instantes.',
+          visuals: []
         }
       ]);
     } finally {
@@ -99,20 +103,24 @@ const Vision = ({ user, onLogout }) => {
       action: () => navigate('/planos') 
     },
     { 
-      label: 'E os meus gastos este mês?', 
-      prompt: 'Como estão meus gastos este mês?' 
+      label: '📊 Balanço e gastos deste mês', 
+      prompt: 'Como estão minhas finanças e meus gastos este mês?' 
     },
     { 
-      label: 'Meu saldo disponível', 
-      prompt: 'Qual o saldo total das minhas contas bancárias?' 
+      label: '💳 Status dos cartões e fatura', 
+      prompt: 'Como está a fatura e o limite dos meus cartões de crédito?' 
     },
     { 
-      label: 'Previsão de fatura', 
-      prompt: 'Como está o fechamento da fatura dos meus cartões de crédito?' 
+      label: '🎯 Progresso das metas', 
+      prompt: 'Como está o andamento das minhas metas financeiras?' 
     },
     { 
-      label: 'Simular investimento', 
-      prompt: 'Simule um investimento de R$ 1.000 com aportes mensais de R$ 200.' 
+      label: '📅 Agenda e reuniões', 
+      prompt: 'Quais são meus próximos compromissos e reuniões na agenda?' 
+    },
+    { 
+      label: '🏨 Pesquisar hotéis em Gramado', 
+      prompt: 'Pesquise opções de hotéis em Gramado com diárias e fotos' 
     }
   ];
 
@@ -184,8 +192,15 @@ const Vision = ({ user, onLogout }) => {
                 
                 <div className={msg.sender === 'user' ? styles.userBubble : styles.aiBubble}>
                   {msg.sender === 'ai' ? (
-                    <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
-                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    <div className="w-full">
+                      <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                      </div>
+
+                      {/* Renderizador de Gráficos e Widgets Explicativos */}
+                      {msg.visuals && msg.visuals.length > 0 && (
+                        <VisionVisualRenderer visuals={msg.visuals} />
+                      )}
                     </div>
                   ) : (
                     <p className="whitespace-pre-wrap m-0">{msg.text}</p>
