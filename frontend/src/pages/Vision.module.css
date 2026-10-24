@@ -1,0 +1,456 @@
+/* Container principal de tela inteira */
+.visionContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 4.5rem);
+  max-height: calc(100vh - 4.5rem);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Barra superior minimalista */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.brandPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.04);
+  color: inherit;
+}
+
+:global(.dark) .brandPill {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.topBarActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: inherit;
+}
+
+:global(.dark) .actionButton {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.actionButton:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global(.dark) .actionButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Área central de conteúdo */
+.contentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+  padding: 1rem;
+}
+
+/* Estado Inicial / Vazio (Estilo Pierre) */
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.greetingTitle {
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-top: 1.25rem;
+  margin-bottom: 0.25rem;
+  color: inherit;
+}
+
+.greetingSubtitle {
+  font-size: 0.9375rem;
+  color: #71717a;
+  margin: 0;
+}
+
+:global(.dark) .greetingSubtitle {
+  color: #a1a1aa;
+}
+
+/* Fluxo de Mensagens do Chat Ativo */
+.messagesStream {
+  max-width: 48rem;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem 0 3rem 0;
+}
+
+.messageRowUser {
+  display: flex;
+  justify-content: flex-end;
+  animation: slideUp 0.25s ease-out;
+}
+
+.messageRowAi {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  animation: slideUp 0.25s ease-out;
+}
+
+.userBubble {
+  background: #f4f4f5;
+  color: #18181b;
+  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+  padding: 0.75rem 1.125rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 85%;
+  word-break: break-word;
+}
+
+:global(.dark) .userBubble {
+  background: #27272a;
+  color: #fafafa;
+}
+
+.aiBubble {
+  background: transparent;
+  color: #18181b;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 90%;
+  word-break: break-word;
+}
+
+:global(.dark) .aiBubble {
+  color: #f4f4f5;
+}
+
+/* Barra Inferior (Sugestões + Input Box) */
+.bottomContainer {
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0 1rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 20;
+}
+
+/* Linha de pílulas / sugestões (Horizontal Pills) */
+.pillsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pillButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+  color: #3f3f46;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(.dark) .pillButton {
+  background: #18181b;
+  color: #d4d4d8;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+
+.pillButton:hover {
+  background: #f4f4f5;
+  color: #09090b;
+  transform: translateY(-1px);
+}
+
+:global(.dark) .pillButton:hover {
+  background: #27272a;
+  color: #ffffff;
+}
+
+/* Pílula especial "Seja Pro" com efeito de brilho suave (Shimmer) */
+.proPill {
+  position: relative;
+  overflow: hidden;
+  font-weight: 600;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+:global(.dark) .proPill {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.proPill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  animation: shimmerSweep 3.5s infinite;
+}
+
+:global(.dark) .proPill::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+}
+
+@keyframes shimmerSweep {
+  0% { left: -100%; }
+  30% { left: 150%; }
+  100% { left: 150%; }
+}
+
+/* Caixa de Input Arredondada (Estilo Pierre) */
+.chatInputBox {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 1.625rem;
+  padding: 0.875rem 1rem 0.625rem 1.125rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global(.dark) .chatInputBox {
+  background: #18191c;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.chatInputBox:focus-within {
+  border-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+:global(.dark) .chatInputBox:focus-within {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+}
+
+.textInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: inherit;
+  resize: none;
+  min-height: 1.5rem;
+  max-height: 8rem;
+  font-family: inherit;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.textInput::placeholder {
+  color: #a1a1aa;
+}
+
+:global(.dark) .textInput::placeholder {
+  color: #71717a;
+}
+
+/* Barra de Ações Interna do Input */
+.inputToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.plusButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #71717a;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.plusButton:hover {
+  background: #f4f4f5;
+  color: #18181b;
+}
+
+:global(.dark) .plusButton:hover {
+  background: #27272a;
+  color: #fafafa;
+}
+
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  font-weight: 500;
+  background: #f4f4f5;
+  color: #52525b;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+:global(.dark) .modeBadge {
+  background: #27272a;
+  color: #a1a1aa;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.modeBadge:hover {
+  background: #e4e4e7;
+  color: #18181b;
+}
+
+:global(.dark) .modeBadge:hover {
+  background: #3f3f46;
+  color: #fafafa;
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  background: #e4e4e7;
+  color: #a1a1aa;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(.dark) .sendButton {
+  background: #27272a;
+  color: #71717a;
+}
+
+.sendButtonActive {
+  background: #18181b !important;
+  color: #ffffff !important;
+}
+
+:global(.dark) .sendButtonActive {
+  background: #ffffff !important;
+  color: #09090b !important;
+}
+
+.sendButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Indicador de Digitação / Pensando */
+.typingIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.typingDot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: #a1a1aa;
+  animation: typingBounce 1.4s infinite ease-in-out both;
+}
+
+.typingDot:nth-child(1) { animation-delay: -0.32s; }
+.typingDot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
