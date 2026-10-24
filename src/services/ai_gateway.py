@@ -24,7 +24,8 @@ import google.generativeai as genai
 
 FREELLMAPI_URL = os.getenv('FREELLMAPI_URL', '').strip()
 FREELLMAPI_KEY = os.getenv('FREELLMAPI_KEY', '').strip() or os.getenv('FREELLMAPI_API_KEY', '').strip()
-FREELLMAPI_MODEL = os.getenv('FREELLMAPI_MODEL', 'groq/llama-3.3-70b-versatile').strip()
+_raw_model = os.getenv('FREELLMAPI_MODEL', 'auto').strip()
+FREELLMAPI_MODEL = 'auto' if (not _raw_model or _raw_model == 'groq/llama-3.3-70b-versatile') else _raw_model
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '').strip()
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile').strip()
@@ -99,6 +100,11 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
         }
 
         response = requests.post(endpoint, headers=headers, json=payload, timeout=25)
+        if response.status_code == 404 and ("not in the catalog" in response.text or "Use 'auto'" in response.text):
+            print("🔄 [AI GATEWAY] Modelo não encontrado no catálogo do FreeLLMAPI. Reenviando automaticamente com 'auto'...")
+            payload["model"] = "auto"
+            response = requests.post(endpoint, headers=headers, json=payload, timeout=25)
+
         if response.status_code != 200:
             raise RuntimeError(f"HTTP {response.status_code}: {response.text}")
 
@@ -348,6 +354,18 @@ def generate_simple_completion(prompt, temperature=0.1):
                 },
                 timeout=20
             )
+            if resp.status_code == 404 and ("not in the catalog" in resp.text or "Use 'auto'" in resp.text):
+                print("🔄 [AI GATEWAY Simple] Reenviando com 'auto'...")
+                resp = requests.post(
+                    freellmapi_endpoint,
+                    headers=headers,
+                    json={
+                        "model": "auto",
+                        "messages": [{"role": "user", "content": prompt}],
+                        "temperature": temperature
+                    },
+                    timeout=20
+                )
             if resp.status_code == 200:
                 data = resp.json()
                 content = data["choices"][0]["message"].get("content", "").strip()

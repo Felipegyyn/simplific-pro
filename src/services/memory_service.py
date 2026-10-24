@@ -47,8 +47,8 @@ def analisar_e_salvar_memoria(user_id, mensagem_usuario):
     """
     if not index: return
 
-    # Usamos o modelo rápido e barato para essa tarefa de extração
-    extrator = genai.GenerativeModel('gemini-flash-latest', generation_config={"temperature": 0.1})
+    # Usamos o AI Gateway (FreeLLMAPI -> Groq -> Gemini) para a extração
+    from src.services.ai_gateway import generate_simple_completion
     
     prompt = f"""
     Você é um extrator de memórias de longo prazo.
@@ -70,7 +70,7 @@ def analisar_e_salvar_memoria(user_id, mensagem_usuario):
     """
     
     try:
-        resposta = extrator.generate_content(prompt).text.strip()
+        resposta = generate_simple_completion(prompt, temperature=0.1)
         
         if resposta and "NENHUM" not in resposta.upper():
             # A IA achou um fato! Vamos vetorizar e salvar.
