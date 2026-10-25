@@ -8,6 +8,7 @@ Prioridade de Roteamento (Custo Zero com Fallback Automático):
 """
 
 import os
+import re
 import json
 import requests
 import builtins
