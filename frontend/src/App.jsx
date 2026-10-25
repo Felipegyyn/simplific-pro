@@ -64,8 +64,8 @@ const IS_MAINTENANCE_MODE = false; // Mude para 'false' para desativar
 // Componente Guardião para Rotas de Admin
 const AdminRoute = ({ user, children }) => {
   if (user?.profile !== 'admin') {
-    // Se não for admin, redireciona para o inicio
-    return <Navigate to="/inicio" replace />;
+    // Se não for admin, redireciona para o vision
+    return <Navigate to="/vision" replace />;
   }
   // Se for admin, permite o acesso
   return children;
@@ -172,7 +172,7 @@ const App = () => {
             <Route path="/home" element={<HomePage />} />
             <Route 
                 path="/login" 
-                element={user ? <Navigate to="/inicio" replace /> : <Login onLogin={handleLogin} />} 
+                element={user ? <Navigate to="/vision" replace /> : <Login onLogin={handleLogin} />} 
             />
 
             <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -307,7 +307,7 @@ const App = () => {
 
             <Route 
                 path="/" 
-                element={user ? <Navigate to="/inicio" replace /> : <HomePage />}  
+                element={user ? <Navigate to="/vision" replace /> : <HomePage />}  
             />
         </Routes>
         

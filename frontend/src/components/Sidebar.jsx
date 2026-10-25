@@ -21,10 +21,9 @@ const Sidebar = ({ user, onLogout, isMobileOpen, closeMobileMenu }) => {
   const menuStructure = [
     {
       title: 'Início',
-      icon: Home,
+      icon: Eye,
       color: 'var(--primary-accent)',
       items: [
-        { name: 'Início', path: '/inicio', icon: Home },
         { name: 'Vision', path: '/vision', icon: Eye },
       ]
     },

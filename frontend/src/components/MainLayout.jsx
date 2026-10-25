@@ -4,7 +4,6 @@ import Sidebar from './Sidebar';
 import SidebarBusiness from './SidebarBusiness';
 import { Menu, AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import logo from '../assets/LOGO.png';
-import ChatWidget from './ChatWidget';
 
 // Importação do CSS Modular
 import styles from './MainLayout.module.css';
@@ -12,7 +11,6 @@ import styles from './MainLayout.module.css';
 const MainLayout = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
   
   const location = useLocation();
   const isBusinessRoute = location.pathname.startsWith('/business');
@@ -130,32 +128,6 @@ const MainLayout = ({ user, onLogout }) => {
             <Outlet /> 
           )}
         </main>
-
-        {/* Componente de Mini Chat */}
-        <ChatWidget isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-
-        {/* Botão Flutuante Simplific IA */}
-        <button
-          onClick={() => setIsChatOpen(!isChatOpen)}
-          className={styles.floatingButton}
-          title="Falar com Simplific IA"
-        >
-          <div className={styles.floatingGlow}></div>
-          
-          <div className={styles.floatingCircle}>
-            <img 
-                src="/favicon.ico" 
-                alt="IA" 
-                className={styles.floatingAvatar}
-                onError={(e) => { e.target.src = logo }} 
-            />
-          </div>
-
-          <div className={styles.floatingTooltip}>
-              Falar com Simplific IA
-              <div className={styles.tooltipArrow}></div>
-          </div>
-        </button>
       </div>
     </div>
   );
