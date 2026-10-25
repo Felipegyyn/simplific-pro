@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { 
   ArrowUp, Plus, Sun, Moon, RotateCcw, 
-  Terminal, Sparkles, Check
+  Terminal, Sparkles, Check, FileText, ExternalLink
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import SimplificMascot from '../components/SimplificMascot';
@@ -22,10 +22,12 @@ const Vision = ({ user, onLogout }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Processando...');
   const [selectedMode, setSelectedMode] = useState('Computer'); // '>_ Computer'
 
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Auto-scroll para a última mensagem
   useEffect(() => {
@@ -43,7 +45,86 @@ const Vision = ({ user, onLogout }) => {
     }
   };
 
-  // Enviar mensagem
+  // Upload e registro de comprovantes financeiros (Imagem ou PDF)
+  const handleReceiptUpload = async (file) => {
+    if (!file || isLoading) return;
+
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    if (!isImage && !isPdf) {
+      alert('Por favor, selecione um comprovante em formato de imagem (PNG, JPG, WebP) ou PDF.');
+      return;
+    }
+
+    const previewUrl = isImage ? URL.createObjectURL(file) : null;
+    const userMessage = {
+      sender: 'user',
+      text: `🧾 Enviou um comprovante para registro: ${file.name}`,
+      attachment: {
+        name: file.name,
+        size: (file.size / 1024).toFixed(1) + ' KB',
+        previewUrl,
+        isPdf
+      }
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    setLoadingText('Lendo comprovante com IA e registrando lançamento...');
+
+    try {
+      const formData = new FormData();
+      formData.append('comprovante', file);
+
+      const response = await apiService.upload('/api/chat/upload-comprovante', formData);
+      const aiText = response?.reply || response?.mensagem || 'Comprovante processado com sucesso.';
+      const visuals = response?.visuals || [];
+
+      setMessages(prev => [...prev, { sender: 'ai', text: aiText, visuals }]);
+    } catch (error) {
+      console.error('Erro ao enviar comprovante no Vision:', error);
+      setMessages(prev => [
+        ...prev,
+        {
+          sender: 'ai',
+          text: error?.message || 'Não consegui processar seu comprovante. Tente uma foto mais nítida ou em PDF.',
+          visuals: []
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+      setLoadingText('Processando...');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleReceiptUpload(file);
+    }
+  };
+
+  // Suporte a Colar imagem direto do Clipboard (Ctrl + V)
+  const handlePaste = (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
+        if (file) {
+          e.preventDefault();
+          handleReceiptUpload(file);
+          break;
+        }
+      }
+    }
+  };
+
+  // Enviar mensagem de texto normal
   const handleSendMessage = async (textToSend) => {
     const text = (typeof textToSend === 'string' ? textToSend : inputValue).trim();
     if (!text || isLoading) return;
@@ -56,6 +137,7 @@ const Vision = ({ user, onLogout }) => {
       textareaRef.current.style.height = 'auto';
     }
     setIsLoading(true);
+    setLoadingText('Pensando...');
 
     try {
       const response = await apiService.post('/api/chat', {
@@ -78,6 +160,7 @@ const Vision = ({ user, onLogout }) => {
       ]);
     } finally {
       setIsLoading(false);
+      setLoadingText('Processando...');
     }
   };
 
@@ -203,7 +286,28 @@ const Vision = ({ user, onLogout }) => {
                       )}
                     </div>
                   ) : (
-                    <p className="whitespace-pre-wrap m-0">{msg.text}</p>
+                    <div>
+                      <p className="whitespace-pre-wrap m-0">{msg.text}</p>
+                      {msg.attachment && (
+                        <div className="mt-2.5 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700/60 bg-zinc-50 dark:bg-zinc-900/60 p-2 max-w-xs shadow-sm">
+                          {msg.attachment.previewUrl ? (
+                            <img 
+                              src={msg.attachment.previewUrl} 
+                              alt={msg.attachment.name} 
+                              className="w-full h-auto object-cover rounded max-h-48 mb-1.5 border border-zinc-200 dark:border-zinc-800" 
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 py-1.5 px-1">
+                              <FileText size={24} className="text-emerald-500 flex-shrink-0" />
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">{msg.attachment.name}</span>
+                                <span className="text-[10px] text-zinc-500 font-mono">{msg.attachment.size}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -219,6 +323,7 @@ const Vision = ({ user, onLogout }) => {
                   <div className={styles.typingDot}></div>
                   <div className={styles.typingDot}></div>
                   <div className={styles.typingDot}></div>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400 ml-2 font-medium animate-pulse">{loadingText}</span>
                 </div>
               </div>
             )}
@@ -260,19 +365,30 @@ const Vision = ({ user, onLogout }) => {
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Envie uma mensagem..."
+            onPaste={handlePaste}
+            placeholder="Envie uma mensagem ou cole um comprovante (Ctrl + V)..."
             className={styles.textInput}
           />
 
           {/* Barra de Ações Interna */}
           <div className={styles.inputToolbar}>
             <div className={styles.toolbarLeft}>
-              {/* Botão + */}
+              {/* Input Invisível para Upload de Comprovantes */}
+              <input 
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileInputChange}
+                accept="image/*,application/pdf"
+                style={{ display: 'none' }}
+              />
+
+              {/* Botão + para Envio de Comprovantes de Pagamento */}
               <button 
                 type="button" 
                 className={styles.plusButton}
-                title="Adicionar anexo ou comando"
-                onClick={() => setInputValue(prev => prev ? `${prev} + ` : '+ ')}
+                title="Enviar comprovante de pagamento (Foto ou PDF)"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
               >
                 <Plus size={18} />
               </button>

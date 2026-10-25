@@ -483,3 +483,231 @@ def vincular_conta_ultima_transacao(user_id, opcao_usuario):
     except Exception as e:
         db.session.rollback()
         return {"status": "erro", "mensagem": "Erro interno ao atualizar a conta."}
+
+
+def processar_comprovante_bytes(user_id, file_bytes, filename=None, content_type=None):
+    """
+    Processa um comprovante enviado diretamente via bytes/upload no Vision Web.
+    1. Faz upload para o Cloudinary (ou salva localmente na pasta static/comprovantes).
+    2. Extrai texto via OCR (PyMuPDF para PDF, Google Vision / Gemini Multimodal para imagem).
+    3. Extrai dados financeiros estruturados com IA (FreeLLMAPI -> Groq -> Gemini).
+    4. Categoriza e vincula conta bancária.
+    5. Registra no banco de dados e retorna o recibo digital formatado.
+    """
+    import os
+    print(f"🧾 [VISION OCR] Processando comprovante para user_id={user_id}, filename={filename}, bytes={len(file_bytes)}")
+    permanent_url = None
+
+    try:
+        # 1. Salvar no Cloudinary (ou armazenamento local)
+        if os.getenv("CLOUDINARY_CLOUD_NAME"):
+            try:
+                import cloudinary.uploader
+                upload_res = cloudinary.uploader.upload(
+                    file_bytes,
+                    folder="comprovantes",
+                    resource_type="auto"
+                )
+                permanent_url = upload_res.get('secure_url')
+            except Exception as e:
+                print(f"⚠️ Aviso Cloudinary: {e}")
+
+        if not permanent_url:
+            try:
+                import uuid
+                ext = "jpg"
+                if filename and '.' in filename:
+                    ext = filename.rsplit('.', 1)[-1].lower()
+                elif content_type and 'pdf' in str(content_type).lower():
+                    ext = "pdf"
+                local_name = f"comp_{user_id}_{uuid.uuid4().hex[:8]}.{ext}"
+                dir_path = os.path.join(os.getcwd(), "src", "static", "comprovantes")
+                os.makedirs(dir_path, exist_ok=True)
+                with open(os.path.join(dir_path, local_name), "wb") as f:
+                    f.write(file_bytes)
+                permanent_url = f"/static/comprovantes/{local_name}"
+            except Exception as e:
+                print(f"⚠️ Aviso ao salvar arquivo local: {e}")
+
+        # 2. Leitura OCR (PDF vs Imagem)
+        is_pdf = (filename and filename.lower().endswith('.pdf')) or (content_type and 'pdf' in str(content_type).lower())
+        raw_text = ""
+
+        if is_pdf:
+            try:
+                doc = fitz.open(stream=file_bytes, filetype="pdf")
+                raw_text = "\n".join(pagina.get_text() for pagina in doc).strip()
+            except Exception as e:
+                print(f"⚠️ Erro ao ler PDF com PyMuPDF: {e}")
+
+        if not raw_text and not is_pdf:
+            # Tentativa 1: Google Cloud Vision
+            try:
+                from google.cloud import vision
+                client = vision.ImageAnnotatorClient()
+                image = vision.Image(content=file_bytes)
+                response_vision = client.text_detection(image=image)
+                if response_vision.full_text_annotation:
+                    raw_text = response_vision.full_text_annotation.text.strip()
+            except Exception as e:
+                print(f"⚠️ Google Vision OCR indisponível ou falhou: {e}")
+
+            # Tentativa 2: Gemini Vision multimodal
+            if not raw_text:
+                try:
+                    import google.generativeai as genai
+                    from PIL import Image
+                    import io
+                    pil_img = Image.open(io.BytesIO(file_bytes))
+                    model_gem = genai.GenerativeModel('gemini-flash-latest')
+                    res_gem = model_gem.generate_content([
+                        pil_img,
+                        "Transcreva fielmente todo o texto presente neste comprovante financeiro brasileiro (valores, datas, destinatário, pagador, banco):"
+                    ])
+                    if res_gem and res_gem.text:
+                        raw_text = res_gem.text.strip()
+                except Exception as e:
+                    print(f"⚠️ Gemini Vision OCR falhou: {e}")
+
+        if not raw_text:
+            return {
+                "status": "erro",
+                "mensagem": "Não consegui ler o texto deste comprovante. 🧾 Tente enviar uma foto mais nítida ou em formato PDF/imagem."
+            }
+
+        # 3. Extrair dados da transação com IA
+        transacoes_extraidas = extrair_transacoes_de_texto_com_ia(raw_text)
+        if not transacoes_extraidas:
+            return {
+                "status": "info",
+                "mensagem": "Recebi seu comprovante, mas não consegui identificar um lançamento claro nele. Pode me informar o valor e descrição por mensagem?"
+            }
+
+        transacao_ia = transacoes_extraidas[0]
+        valor = float(transacao_ia.get('valor', 0))
+        descricao = transacao_ia.get('descricao', 'Comprovante')
+        data_str = transacao_ia.get('data') or datetime.now().strftime('%Y-%m-%d')
+        conta_origem_ia = transacao_ia.get('conta_origem')
+
+        if valor == 0:
+            return {
+                "status": "info",
+                "mensagem": "Entendi o comprovante, mas o valor identificado foi R$ 0,00. Pode me dizer o valor correto?"
+            }
+
+        # 4. Categorizar
+        tipo_transacao = 'entrada' if valor > 0 else 'saida'
+        nome_categoria_ia = categorizar_descricao_transacao(user_id, descricao)
+
+        categoria_final = Category.query.filter(
+            Category.user_id == user_id,
+            Category.name.ilike(nome_categoria_ia),
+            Category.type == tipo_transacao
+        ).first()
+
+        if not categoria_final:
+            categoria_final = Category.query.filter_by(user_id=user_id, name='Outros', type=tipo_transacao).first()
+            if not categoria_final:
+                categoria_final = Category(user_id=user_id, name='Outros', type=tipo_transacao)
+                db.session.add(categoria_final)
+                db.session.flush()
+
+        # 5. Vinculação de Conta Bancária
+        bank_account_id_final = None
+        nome_banco_encontrado = ""
+        conta_banco_exata = None
+        precisa_perguntar = False
+        opcoes_contas_str = ""
+
+        if conta_origem_ia:
+            contas_banco = BankAccount.query.filter(
+                BankAccount.user_id == user_id,
+                BankAccount.bank_name.ilike(f"%{conta_origem_ia}%")
+            ).all()
+
+            if len(contas_banco) == 1:
+                conta_banco_exata = contas_banco[0]
+                bank_account_id_final = conta_banco_exata.id
+                nome_banco_encontrado = conta_banco_exata.bank_name
+            elif len(contas_banco) > 1:
+                precisa_perguntar = True
+                lista_opcoes = []
+                for i, c in enumerate(contas_banco, 1):
+                    final_conta = c.account_number[-4:] if c.account_number else 'XXXX'
+                    lista_opcoes.append(f"*{i}* - {c.bank_name} (final {final_conta})")
+                opcoes_contas_str = "\n".join(lista_opcoes)
+
+        status_transacao = 'aguardando_conta' if precisa_perguntar else 'confirmada'
+        descricao_salvar = f"[Comprovante] {descricao}"
+        if precisa_perguntar:
+            descricao_salvar += f" | AI_BANK:{conta_origem_ia}"
+
+        try:
+            data_parsed = datetime.strptime(data_str, '%Y-%m-%d').date()
+        except Exception:
+            data_parsed = date.today()
+
+        novo_lancamento = Transaction(
+            user_id=user_id,
+            date=data_parsed,
+            type=tipo_transacao,
+            category_id=categoria_final.id,
+            value=abs(valor),
+            description=descricao_salvar,
+            status=status_transacao,
+            format='variavel',
+            payment_form='a_vista',
+            receipt_image_url=permanent_url,
+            bank_account_id=bank_account_id_final
+        )
+        db.session.add(novo_lancamento)
+
+        if not precisa_perguntar and bank_account_id_final and conta_banco_exata:
+            if tipo_transacao == 'entrada':
+                conta_banco_exata.current_balance += float(abs(valor))
+            elif tipo_transacao == 'saida':
+                conta_banco_exata.current_balance -= float(abs(valor))
+
+        db.session.commit()
+        valor_formatado = format_currency_brl(abs(valor))
+
+        recibo_visual = {
+            "title": "Comprovante Registrado",
+            "description": descricao,
+            "value": abs(valor),
+            "type_trans": tipo_transacao,
+            "category": categoria_final.name,
+            "bank_account": nome_banco_encontrado or None,
+            "timestamp": datetime.now().strftime("%d/%m/%Y às %H:%M"),
+            "receipt_image_url": permanent_url
+        }
+
+        if precisa_perguntar:
+            msg = (
+                f"🧾 Identifiquei seu comprovante de **{valor_formatado}** ({descricao}).\n\n"
+                f"🤔 Notei que você possui mais de uma conta para esse banco:\n\n{opcoes_contas_str}\n\n"
+                "Responda apenas com o *número da opção* para eu finalizar o vínculo com sua conta bancária!"
+            )
+            return {
+                "status": "sucesso",
+                "mensagem": msg,
+                "transacao": recibo_visual,
+                "precisa_perguntar": True
+            }
+        else:
+            msg_conta = f" no banco **{nome_banco_encontrado}**" if bank_account_id_final else ""
+            msg = f"Legal! 🧾 Comprovante processado. O lançamento de **{valor_formatado}** ({descricao}){msg_conta} já está **confirmado** na sua plataforma."
+            return {
+                "status": "sucesso",
+                "mensagem": msg,
+                "transacao": recibo_visual,
+                "precisa_perguntar": False
+            }
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERRO CRÍTICO ao processar comprovante de arquivo: {e}")
+        return {
+            "status": "erro",
+            "mensagem": f"Ocorreu um erro inesperado ao processar seu comprovante: {e}"
+        }

@@ -108,11 +108,18 @@ class ApiService {
     return headers;
   }
 
-async request(endpoint, options = {}) {
+  async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+    const headers = {
+      ...this.getHeaders(),
+      ...(options.headers || {})
+    };
+    if (options.body instanceof FormData) {
+      delete headers['Content-Type'];
+    }
     const config = {
-      headers: this.getHeaders(),
       ...options,
+      headers,
     };
 
     try {
@@ -142,6 +149,9 @@ async request(endpoint, options = {}) {
         try {
           await this.silentRefreshToken();
           const newConfig = { ...config, headers: this.getHeaders() };
+          if (options.body instanceof FormData) {
+            delete newConfig.headers['Content-Type'];
+          }
           return this.request(endpoint, { ...newConfig, _retry: true });
         } catch (refreshError) {
           this.logout();
@@ -173,6 +183,13 @@ async request(endpoint, options = {}) {
     return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  async upload(endpoint, formData) {
+    return this.request(endpoint, {
+      method: 'POST',
+      body: formData,
     });
   }
 

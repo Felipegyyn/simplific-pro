@@ -554,6 +554,21 @@ export const VisionReceiptCard = ({ data }) => {
           <span className={styles.receiptRowLabel}>Data e Hora</span>
           <span className={styles.receiptRowValue}>{data.timestamp || 'Hoje'}</span>
         </div>
+
+        {data.receipt_image_url && (
+          <div className={styles.receiptRow}>
+            <span className={styles.receiptRowLabel}>Comprovante</span>
+            <a 
+              href={data.receipt_image_url} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-xs text-emerald-500 hover:text-emerald-400 flex items-center gap-1 font-medium underline"
+            >
+              <span>Ver anexo</span>
+              <ExternalLink size={11} />
+            </a>
+          </div>
+        )}
       </div>
 
       <div className={styles.receiptFooter}>
