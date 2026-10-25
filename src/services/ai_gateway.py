@@ -10,9 +10,19 @@ Prioridade de Roteamento (Custo Zero com Fallback Automático):
 import os
 import json
 import requests
+import builtins
 from dotenv import load_dotenv
 
 load_dotenv()
+
+_orig_print = builtins.print
+def safe_print(*args, **kwargs):
+    try:
+        _orig_print(*args, **kwargs)
+    except (UnicodeEncodeError, UnicodeError):
+        safe_args = [str(a).encode('ascii', errors='replace').decode('ascii') for a in args]
+        _orig_print(*safe_args, **kwargs)
+print = safe_print
 
 from src.services.ai_tools_service import simplific_tools, openai_simplific_tools
 from src.services.search_service import realizar_pesquisa_web
@@ -22,7 +32,7 @@ import google.generativeai as genai
 # CONFIGURAÇÕES DE AMBIENTE
 # ==============================================================================
 
-FREELLMAPI_URL = os.getenv('FREELLMAPI_URL', '').strip()
+FREELLMAPI_URL = os.getenv('FREELLMAPI_URL', 'https://freellmapi-3lm4.onrender.com').strip()
 FREELLMAPI_KEY = os.getenv('FREELLMAPI_KEY', '').strip() or os.getenv('FREELLMAPI_API_KEY', '').strip()
 _raw_model = os.getenv('FREELLMAPI_MODEL', 'auto').strip().lower()
 FREELLMAPI_MODEL = 'auto' if (not _raw_model or 'auto' in _raw_model or '/' in _raw_model or 'llama' in _raw_model) else _raw_model
@@ -84,6 +94,16 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
         headers["Authorization"] = f"Bearer {api_key}"
 
     messages = [
+        {
+            "role": "system",
+            "content": (
+                "Você é o VISION, o assistente inteligente e consultor oficial do Simplific Pro. "
+                "Responda sempre em português brasileiro de forma direta, cortês, elegante e objetiva. "
+                "Ao consultar dados (como cotações de moedas/ações, extrato, agenda, planejamento ou internet), "
+                "analise os dados retornados pelas ferramentas e formule uma resposta agradável e natural para o usuário. "
+                "NUNCA exiba respostas brutas em JSON nem instruções técnicas de sistema na sua resposta final."
+            )
+        },
         {"role": "user", "content": prompt}
     ]
 
@@ -118,9 +138,9 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
         tool_calls = message.get("tool_calls") or []
 
         if not tool_calls:
-            # Modelo gerou texto final sem chamar novas ferramentas
             texto_para_usuario = message.get("content") or ""
-            return texto_para_usuario.strip(), acoes_a_executar
+            texto_limpo = re.sub(r'\{"status":\s*"sucesso"[^}]*\}', '', texto_para_usuario).strip()
+            return texto_limpo or texto_para_usuario.strip(), acoes_a_executar
 
         # Registra a mensagem do assistente com as intenções de tool call
         messages.append(message)
@@ -142,16 +162,14 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
             else:
                 func_args = {}
 
-            if func_name == "pesquisar_na_internet":
+            # --- 1. PESQUISA NA INTERNET ---
+            if func_name in ["pesquisar_na_internet", "pesificar_na_internet"]:
                 query_busca = func_args.get("query", "")
                 print(f"🔄 [AI GATEWAY] Resolvendo pesquisa: '{query_busca}'")
                 resultado_web = realizar_pesquisa_web(query_busca, user_id=user_id)
-                acao_pesquisa = {"type": "pesquisar_na_internet", "data": {"query": query_busca}}
-                if acao_pesquisa not in acoes_a_executar:
-                    acoes_a_executar.append(acao_pesquisa)
                 resultado_turbinado = (
                     f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
-                    "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."
+                    "DICA: Repasse os links de compra/fontes no seu texto final para facilitar a vida do usuário."
                 )
                 messages.append({
                     "role": "tool",
@@ -160,6 +178,127 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
                     "content": resultado_turbinado
                 })
 
+            # --- 2. CONSULTAR PREÇO DE ATIVO / MOEDA ---
+            elif func_name == "consultar_preco_ativo":
+                ativo = func_args.get("ativo", "")
+                from src.services.investments_service import buscar_dados_ativo
+                resultado = buscar_dados_ativo(ativo)
+                if resultado.get("status") == "sucesso":
+                    info = resultado.get("data", {})
+                    content_cotacao = (
+                        f"Cotação em tempo real de {info.get('nome')} ({info.get('ticker')}):\n"
+                        f"- Preço Atual: R$ {info.get('preco'):.2f}\n"
+                        f"- Variação no dia: {info.get('variacao_percentual'):+.2f}%"
+                    )
+                    if info.get("noticia"):
+                        content_cotacao += f"\n- Notícia recente: {info['noticia'].get('title')}"
+                else:
+                    content_cotacao = f"Não foram encontrados dados de mercado em tempo real para o ativo '{ativo}'."
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_cotacao
+                })
+
+            # --- 3. CONSULTAR EXTRATO / TRANSAÇÕES ---
+            elif func_name == "consultar_transacoes":
+                from src.services.transacoes_service import buscar_transacoes_por_status
+                from src.services.financial_service import calcular_intervalo_datas, format_currency_brl
+                status = func_args.get("status", "confirmada")
+                tipo = func_args.get("tipo", "ambos")
+                periodo = func_args.get("periodo", "este mês")
+                try:
+                    d_ini, d_fim = calcular_intervalo_datas(periodo)
+                    trans = buscar_transacoes_por_status(user_id, status, d_ini, d_fim, tipo)
+                    if trans:
+                        linhas = [f"- {t['description']}: {format_currency_brl(t['value'])} ({t['type']})" for t in trans[:10]]
+                        content_trans = f"Lançamentos ({status}) para {periodo}:\n" + "\n".join(linhas)
+                    else:
+                        content_trans = f"Nenhum lançamento com status '{status}' encontrado para {periodo}."
+                except Exception as e:
+                    content_trans = f"Consulta de transações: {e}"
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_trans
+                })
+
+            # --- 4. CONSULTAR ORÇAMENTO / PLANEJAMENTO ---
+            elif func_name == "consultar_planejamento":
+                from src.services.financial_service import calcular_intervalo_datas, buscar_resumo_planejamento
+                periodo = func_args.get("periodo", "este mês")
+                try:
+                    d_ini, d_fim = calcular_intervalo_datas(periodo)
+                    resumo = buscar_resumo_planejamento(user_id, d_ini, d_fim)
+                    content_plan = f"Resumo do orçamento para {periodo}: {json.dumps(resumo, ensure_ascii=False)}"
+                except Exception as e:
+                    content_plan = f"Consulta de orçamento: {e}"
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_plan
+                })
+
+            # --- 5. CONSULTAR AGENDA ---
+            elif func_name == "consultar_agenda":
+                from src.services.agenda_service import get_agenda_summary
+                try:
+                    resumo_agenda = get_agenda_summary(user_id)
+                    content_agenda = f"Agenda do usuário:\n{json.dumps(resumo_agenda, ensure_ascii=False)}"
+                except Exception as e:
+                    content_agenda = f"Nenhum compromisso pendente na agenda ({e})."
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_agenda
+                })
+
+            # --- 6. CONSULTAR CONTATO ---
+            elif func_name == "consultar_contato":
+                from src.models.contact import Contact
+                nome = func_args.get("nome", "")
+                try:
+                    contatos = Contact.query.filter(Contact.user_id == user_id, Contact.name.ilike(f'%{nome}%')).all()
+                    if contatos:
+                        linhas = [f"- {c.name}: Tel: {c.whatsapp or 'N/I'}, Email: {c.email or 'N/I'}" for c in contatos]
+                        content_contato = "Contatos encontrados:\n" + "\n".join(linhas)
+                    else:
+                        content_contato = f"Nenhum contato encontrado com o nome '{nome}'."
+                except Exception as e:
+                    content_contato = f"Não foi possível buscar contatos: {e}"
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_contato
+                })
+
+            # --- 7. SIMULAR CENÁRIO FINANCEIRO ---
+            elif func_name == "simular_cenario_financeiro":
+                from src.services.simulation_service import run_financial_simulation, formatar_resultado_simulacao
+                try:
+                    res_sim = run_financial_simulation(user_id, func_args)
+                    content_sim = formatar_resultado_simulacao(res_sim)
+                except Exception as e:
+                    content_sim = f"Erro na simulação: {e}"
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_sim
+                })
+
+            # --- 8. VINCULAR CONTA BANCÁRIA ---
             elif func_name == "vincular_conta_ultima_transacao":
                 digitos = func_args.get("digitos_conta") or func_args.get("opcao_usuario", "")
                 from src.services.transacoes_service import vincular_conta_ultima_transacao
@@ -171,9 +310,9 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
                     "content": json.dumps(resultado_vinculo, ensure_ascii=False)
                 })
 
+            # --- 9. MUTAÇÕES DE BANCO (Lançamentos, Cartão, Metas, Agenda, etc) ---
             else:
-                # Ferramenta de banco de dados (lançamento, cartão, agenda, meta)
-                print(f"🔧 [AI GATEWAY] Interceptando ação final: {func_name}")
+                print(f"🔧 [AI GATEWAY] Registrando ação de banco: {func_name}")
                 acao_atual = {"type": func_name, "data": func_args}
                 if acao_atual not in acoes_a_executar:
                     acoes_a_executar.append(acao_atual)
@@ -184,13 +323,14 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
                     "name": func_name,
                     "content": json.dumps({
                         "status": "sucesso",
-                        "mensagem": "Ação salva no banco de dados. REGRA DE RESPOSTA: Foque o seu texto final APENAS nos resultados da pesquisa (links, dicas, preços). NÃO escreva que você criou metas ou agendou lembretes, pois o próprio sistema adicionará as confirmações verdes (✅) automaticamente no final da sua mensagem. Apenas entregue a pesquisa."
+                        "mensagem": f"Operação '{func_name}' registrada com sucesso."
                     }, ensure_ascii=False)
                 })
 
     # Caso atinja o número máximo de turnos
     ultimo_conteudo = messages[-1].get("content") or ""
-    return ultimo_conteudo.strip(), acoes_a_executar
+    texto_limpo = re.sub(r'\{"status":\s*"sucesso"[^}]*\}', '', ultimo_conteudo).strip()
+    return texto_limpo or ultimo_conteudo.strip(), acoes_a_executar
 
 
 # ==============================================================================
@@ -223,21 +363,34 @@ def _run_gemini_agent(user_id, prompt):
                 nome_funcao = part.function_call.name
                 argumentos = {key: value for key, value in part.function_call.args.items()}
 
-                if nome_funcao == "pesquisar_na_internet":
+                if nome_funcao in ["pesquisar_na_internet", "pesificar_na_internet"]:
                     query_busca = argumentos.get("query", "")
                     print(f"🔄 [GEMINI FALLBACK] Resolvendo pesquisa: '{query_busca}'")
                     resultado_web = realizar_pesquisa_web(query_busca, user_id=user_id)
-                    acao_pesquisa = {"type": "pesquisar_na_internet", "data": {"query": query_busca}}
-                    if acao_pesquisa not in acoes_a_executar:
-                        acoes_a_executar.append(acao_pesquisa)
                     resultado_turbinado = (
                         f"RESULTADOS DA PESQUISA NA WEB:\n{resultado_web}\n\n"
-                        "ATENÇÃO: Lembre-se de repassar os links de compra/fontes no seu relatório final."
+                        "DICA: Repasse os links de compra/fontes no seu texto final para facilitar a vida do usuário."
                     )
                     respostas_das_ferramentas.append({
                         "function_response": {
-                            "name": "pesquisar_na_internet",
+                            "name": nome_funcao,
                             "response": {"resultado": resultado_turbinado}
+                        }
+                    })
+
+                elif nome_funcao == "consultar_preco_ativo":
+                    ativo = argumentos.get("ativo", "")
+                    from src.services.investments_service import buscar_dados_ativo
+                    resultado = buscar_dados_ativo(ativo)
+                    if resultado.get("status") == "sucesso":
+                        info = resultado.get("data", {})
+                        texto_res = f"Preço de {info.get('nome')}: R$ {info.get('preco'):.2f} (Variação: {info.get('variacao_percentual'):+.2f}%)"
+                    else:
+                        texto_res = f"Ativo '{ativo}' não encontrado."
+                    respostas_das_ferramentas.append({
+                        "function_response": {
+                            "name": nome_funcao,
+                            "response": {"resultado": texto_res}
                         }
                     })
 
@@ -263,7 +416,7 @@ def _run_gemini_agent(user_id, prompt):
                             "name": nome_funcao,
                             "response": {
                                 "status": "sucesso",
-                                "mensagem": "Ação salva no banco de dados. REGRA DE RESPOSTA: Foque o seu texto final APENAS nos resultados da pesquisa (links, dicas, preços). NÃO escreva que você criou metas ou agendou lembretes, pois o próprio sistema adicionará as confirmações verdes (✅) automaticamente no final da sua mensagem. Apenas entregue a pesquisa."
+                                "mensagem": f"Operação '{nome_funcao}' registrada com sucesso."
                             }
                         }
                     })
@@ -331,7 +484,7 @@ def generate_agent_response(user_id, prompt):
             print(f"⚠️ [AI GATEWAY] Groq falhou ({e}). Acionando fallback oficial...")
 
     # 3. Provedor 3: Google Gemini Oficial (Garantia de Uptime)
-    print("💎 [AI GATEWAY] Executando chamada via Google Gemini Oficial")
+    print(">> [AI GATEWAY] Executando chamada via Google Gemini Oficial")
     return _run_gemini_agent(user_id=user_id, prompt=prompt)
 
 

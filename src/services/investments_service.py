@@ -161,21 +161,38 @@ def buscar_dados_ativo(nome_ativo):
     """
     Busca os dados de mercado (preço, variação, notícia) para um ativo específico.
     """
-    # Dicionário para "traduzir" nomes comuns para os tickers oficiais do Yahoo Finance
+    import re
+
+    # Dicionário robusto para traduzir nomes comuns e moedas para os tickers oficiais
     mapa_de_ativos = {
         "dolar": "BRL=X",
         "dólar": "BRL=X",
+        "usd": "BRL=X",
         "euro": "EURBRL=X",
+        "eur": "EURBRL=X",
         "ibovespa": "^BVSP",
         "ibov": "^BVSP",
+        "bitcoin": "BTC-BRL",
+        "btc": "BTC-BRL",
+        "ethereum": "ETH-BRL",
+        "eth": "ETH-BRL",
+        "solana": "SOL-BRL",
+        "sol": "SOL-BRL",
+        "usdt": "USDT-BRL",
+        "sp500": "^GSPC",
+        "s&p500": "^GSPC",
+        "nasdaq": "^IXIC",
     }
     
-    # Limpa e verifica se o nome do ativo está no nosso mapa
-    ticker_limpo = nome_ativo.lower().strip()
+    # Limpa pontuações (ex: 'dolar?', 'petr4!', 'R$')
+    ticker_limpo = re.sub(r'[^\w\s\^\=\-\.]', '', str(nome_ativo).replace('R$', '').replace('r$', '')).lower().strip()
     ticker = mapa_de_ativos.get(ticker_limpo, ticker_limpo)
 
-    # Adiciona o sufixo .SA para ativos brasileiros que não são moedas ou índices
-    if not ticker.startswith('^') and not ticker.endswith('=X') and not '.' in ticker:
+    # Ações americanas populares negociadas na NYSE/NASDAQ (sem .SA)
+    us_stocks = {'AAPL', 'NVDA', 'TSLA', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'NFLX', 'AMD', 'INTC', 'DIS'}
+    if ticker.upper() in us_stocks:
+        ticker = ticker.upper()
+    elif not ticker.startswith('^') and not ticker.endswith('=X') and not '-' in ticker and not '.' in ticker:
         ticker = f"{ticker.upper()}.SA"
     
     try:
@@ -183,17 +200,39 @@ def buscar_dados_ativo(nome_ativo):
         ativo_yf = yf.Ticker(ticker)
         info = ativo_yf.info
         
-        # Tenta obter o preço. Se falhar, o ativo provavelmente não existe.
-        preco_atual = info.get('regularMarketPrice') or info.get('currentPrice')
+        # Tenta obter o preço. Se falhar, tenta regularMarketPrice, currentPrice, ask ou previousClose
+        preco_atual = info.get('regularMarketPrice') or info.get('currentPrice') or info.get('ask') or info.get('bid')
         if not preco_atual:
             return {"status": "nao_encontrado", "ativo": nome_ativo}
 
-        preco_anterior = info.get('previousClose', 0)
+        preco_anterior = info.get('previousClose') or preco_atual
         
         # Calcula a variação do dia
-        variacao = ((preco_atual / preco_anterior) - 1) * 100 if preco_anterior > 0 else 0
+        variacao = ((preco_atual / preco_anterior) - 1) * 100 if preco_anterior > 0 else 0.0
     
-        # Busca, traduz e resume a notícia mais recente
+        # Nome amigável de exibição
+        nome_exibicao = info.get('shortName') or info.get('longName')
+        if ticker == "BRL=X":
+            nome_exibicao = "Dólar Comercial (USD/BRL)"
+            ticker_exibicao = "USD/BRL"
+        elif ticker == "EURBRL=X":
+            nome_exibicao = "Euro Comercial (EUR/BRL)"
+            ticker_exibicao = "EUR/BRL"
+        elif ticker == "BTC-BRL":
+            nome_exibicao = "Bitcoin (BTC/BRL)"
+            ticker_exibicao = "BTC/BRL"
+        elif ticker == "ETH-BRL":
+            nome_exibicao = "Ethereum (ETH/BRL)"
+            ticker_exibicao = "ETH/BRL"
+        elif ticker == "^BVSP":
+            nome_exibicao = "Índice Bovespa (IBOV)"
+            ticker_exibicao = "IBOV"
+        else:
+            ticker_exibicao = ticker.replace('.SA', '')
+            if not nome_exibicao:
+                nome_exibicao = ticker_exibicao
+
+        # Notícia mais recente
         noticias = ativo_yf.news
         noticia_recente = None
         if noticias:
@@ -203,24 +242,19 @@ def buscar_dados_ativo(nome_ativo):
                 link = primeira_noticia.get('content', {}).get('canonicalUrl', {}).get('url')
                 
                 if titulo_original and link:
-                    # ▼▼▼ A MÁGICA ACONTECE AQUI ▼▼▼
                     titulo_traduzido = _traduzir_e_resumir_noticia(titulo_original)
                     noticia_recente = {'title': titulo_traduzido, 'link': link}
-
-            except (IndexError, AttributeError):
+            except Exception:
                 noticia_recente = None
-
-
-        print(f"--- DEBUG: Notícias recebidas para {ticker}: {noticias}")
         
         return {
             "status": "sucesso",
             "data": {
-                "nome": info.get('shortName', nome_ativo),
-                "ticker": ticker.replace('.SA', ''),
+                "nome": nome_exibicao,
+                "ticker": ticker_exibicao,
                 "preco": float(preco_atual),
                 "variacao_percentual": float(variacao),
-                "noticia": noticia_recente # Pode ser None se não houver notícias
+                "noticia": noticia_recente
             }
         }
 

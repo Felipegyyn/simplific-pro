@@ -3,7 +3,17 @@
 import os
 import requests
 import re
+import builtins
 from urllib.parse import urlparse
+
+_orig_print = builtins.print
+def safe_print(*args, **kwargs):
+    try:
+        _orig_print(*args, **kwargs)
+    except (UnicodeEncodeError, UnicodeError):
+        safe_args = [str(a).encode('ascii', errors='replace').decode('ascii') for a in args]
+        _orig_print(*safe_args, **kwargs)
+print = safe_print
 
 TAVILY_API_KEY = os.getenv('TAVILY_API_KEY')
 

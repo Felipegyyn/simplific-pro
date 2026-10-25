@@ -36,8 +36,11 @@ PALETTE_COLORS = [
 def coletar_dados_financeiros(user_id):
     """Gera dados agregados para os gráficos Recharts de receitas, despesas e categorias."""
     try:
+        import calendar
         hoje = date.today()
         inicio_mes = hoje.replace(day=1)
+        _, ultimo_dia = calendar.monthrange(hoje.year, hoje.month)
+        fim_mes = hoje.replace(day=ultimo_dia)
 
         # 1. Totais do mês
         totals = db.session.query(
@@ -45,8 +48,7 @@ def coletar_dados_financeiros(user_id):
             func.sum(case((Transaction.type == 'saida', Transaction.value), else_=0)).label('total_expense')
         ).filter(
             Transaction.user_id == user_id,
-            Transaction.date.between(inicio_mes, hoje),
-            Transaction.status == 'confirmada'
+            Transaction.date.between(inicio_mes, fim_mes)
         ).one()
 
         receitas = float(totals.total_revenue or 0)
@@ -60,9 +62,8 @@ def coletar_dados_financeiros(user_id):
             func.sum(Transaction.value).label('total')
         ).join(Category, Transaction.category_id == Category.id).filter(
             Transaction.user_id == user_id,
-            Transaction.date.between(inicio_mes, hoje),
-            Transaction.type == 'saida',
-            Transaction.status == 'confirmada'
+            Transaction.date.between(inicio_mes, fim_mes),
+            Transaction.type == 'saida'
         ).group_by(Category.name).order_by(func.sum(Transaction.value).desc()).limit(6).all()
 
         categorias = [
@@ -97,22 +98,25 @@ def coletar_dados_financeiros(user_id):
 def coletar_dados_cartoes(user_id):
     """Coleta o status dos cartões de crédito para o widget."""
     try:
-        cards = CreditCard.query.filter_by(user_id=user_id).all()
+        cards = CreditCard.query.filter_by(user_id=user_id, is_active=True).all()
+        if not cards:
+            cards = CreditCard.query.filter_by(user_id=user_id).all()
         if not cards:
             return None
 
         result = []
         for c in cards:
-            limit = float(c.credit_limit or 0)
-            fatura_aberta = Fatura.query.filter_by(credit_card_id=c.id, status='aberta').first()
+            limite = float(c.limit or 0)
+            fatura_aberta = Fatura.query.filter_by(cartao_id=c.id, status='em_aberto').first()
             fatura_val = float(fatura_aberta.valor_total) if fatura_aberta else 0.0
+            disp = float(c.available_limit) if c.available_limit is not None else max(0.0, limite - fatura_val)
 
             result.append({
                 "id": c.id,
                 "name": c.name,
-                "limit_total": limit,
+                "limit_total": limite,
                 "invoice_current": fatura_val,
-                "limit_available": max(0.0, limit - fatura_val),
+                "limit_available": disp,
                 "due_day": c.due_day or 10,
                 "closing_day": c.closing_day or 3
             })
@@ -125,14 +129,16 @@ def coletar_dados_cartoes(user_id):
 def coletar_dados_metas(user_id):
     """Coleta as metas financeiras com barra de progresso."""
     try:
-        goals = Goal.query.filter_by(user_id=user_id).all()
+        goals = Goal.query.filter_by(user_id=user_id, is_active=True).all()
+        if not goals:
+            goals = Goal.query.filter_by(user_id=user_id).all()
         if not goals:
             return None
 
         result = []
         for g in goals:
-            target = float(g.target_amount or 0)
-            current = float(g.current_amount or 0)
+            target = float(g.target_value or 0)
+            current = float(g.current_value or 0)
             pct = round((current / target * 100), 1) if target > 0 else 0
             result.append({
                 "id": g.id,
@@ -155,21 +161,31 @@ def coletar_dados_agenda(user_id):
         hoje = date.today()
         events = ScheduleEvent.query.filter(
             ScheduleEvent.user_id == user_id,
-            ScheduleEvent.event_date >= hoje
-        ).order_by(ScheduleEvent.event_date.asc()).limit(4).all()
+            ScheduleEvent.date >= hoje
+        ).order_by(ScheduleEvent.date.asc()).limit(5).all()
+
+        if not events:
+            events = ScheduleEvent.query.filter_by(user_id=user_id).order_by(ScheduleEvent.date.desc()).limit(3).all()
 
         if not events:
             return None
 
         result = []
         for e in events:
+            meet_link = None
+            if e.description and ("meet.google.com" in e.description or "http" in e.description):
+                for word in e.description.split():
+                    if "meet.google.com" in word or word.startswith("http"):
+                        meet_link = word
+                        break
+
             result.append({
                 "id": e.id,
                 "title": e.title,
-                "date": e.event_date.strftime("%d/%m/%Y") if e.event_date else "",
-                "time": str(e.event_time)[:5] if e.event_time else "",
-                "meet_link": e.meet_link,
-                "attendee": e.attendee_email
+                "date": e.date.strftime("%d/%m/%Y") if e.date else "",
+                "time": str(e.time)[:5] if e.time else "",
+                "meet_link": meet_link,
+                "attendee": None
             })
         return result
     except Exception as e:
@@ -177,32 +193,47 @@ def coletar_dados_agenda(user_id):
         return None
 
 
-def coletar_cotacao_ativo(query_ou_ticker):
+def coletar_cotacao_ativo(query_ou_ticker, ticker_sugerido=None):
     """Busca cotação em tempo real de um ativo ou moeda."""
     try:
-        # Extrai ticker provável (ex: 'cotação petr4' -> 'PETR4')
-        tokens = query_ou_ticker.upper().replace('R$', '').split()
-        ticker_candidato = None
-        for tok in tokens:
-            if re.match(r'^[A-Z]{4}\d{1,2}$', tok) or tok in ['USD', 'EUR', 'BTC', 'ETH', 'AAPL', 'NVDA', 'TSLA']:
-                ticker_candidato = tok
-                break
-        
-        if not ticker_candidato and tokens:
-            ticker_candidato = tokens[-1]
+        candidato = None
+        if ticker_sugerido:
+            candidato = str(ticker_sugerido)
+        else:
+            texto_limpo = re.sub(r'[^\w\s]', '', str(query_ou_ticker)).strip()
+            palavras = texto_limpo.lower().split()
 
-        if not ticker_candidato:
+            termos_conhecidos = [
+                'dolar', 'dólar', 'usd', 'euro', 'eur', 'bitcoin', 'btc', 
+                'ethereum', 'eth', 'solana', 'sol', 'usdt', 'ibovespa', 'ibov',
+                'sp500', 's&p500', 'nasdaq'
+            ]
+            for termo in termos_conhecidos:
+                if termo in palavras:
+                    candidato = termo
+                    break
+
+            if not candidato:
+                for tok in texto_limpo.upper().split():
+                    if re.match(r'^[A-Z]{4}\d{1,2}$', tok) or tok in ['USD', 'EUR', 'BTC', 'ETH', 'AAPL', 'NVDA', 'TSLA', 'MSFT', 'AMZN', 'GOOGL', 'META']:
+                        candidato = tok
+                        break
+
+            if not candidato and palavras:
+                candidato = palavras[-1]
+
+        if not candidato:
             return None
 
-        dados = buscar_dados_ativo(ticker_candidato)
-        if dados and not dados.get('erro'):
+        resultado = buscar_dados_ativo(candidato)
+        if resultado and resultado.get('status') == 'sucesso':
+            data = resultado.get('data', {})
             return {
-                "ticker": dados.get('ticker', ticker_candidato),
-                "name": dados.get('nome', ticker_candidato),
-                "price": dados.get('preco_atual', 0.0),
-                "change": dados.get('variacao_dia', '0.0%'),
-                "high": dados.get('maxima_dia'),
-                "low": dados.get('minima_dia')
+                "ticker": data.get('ticker') or candidato.upper(),
+                "name": data.get('nome') or candidato.upper(),
+                "price": float(data.get('preco', 0.0)),
+                "change": f"{float(data.get('variacao_percentual', 0.0)):+.2f}%",
+                "news": data.get('noticia')
             }
         return None
     except Exception as e:
@@ -231,7 +262,7 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
         nome_usuario_personalizado=usuario.name
     )
 
-    resposta_final = texto_para_usuario
+    resposta_final = texto_para_usuario or ""
     visuals = []
 
     # 1. Executa as ações acionadas pelo assistente
@@ -269,22 +300,29 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
                     "timestamp": datetime.now().strftime("%d/%m/%Y às %H:%M")
                 })
 
-            # Executa a ação no banco de dados
-            resultado_acao = executar_acao_simplific(user_id, acao, session_key)
-            if resultado_acao:
-                resultados_acoes.append(resultado_acao)
+            # Executa a ação no banco de dados (ignora ações puramente de leitura)
+            if tipo not in ['pesquisar_na_internet', 'pesificar_na_internet', 'consultar_preco_ativo', 'consultar_transacoes', 'consultar_planejamento', 'consultar_agenda', 'consultar_contato']:
+                resultado_acao = executar_acao_simplific(user_id, acao, session_key)
+                if resultado_acao:
+                    resultados_acoes.append(resultado_acao)
 
         if resultados_acoes:
-            if len(resultados_acoes) == 1:
-                resposta_final = resultados_acoes[0]
+            if not resposta_final or len(resposta_final.strip()) < 10:
+                resposta_final = "\n\n".join(resultados_acoes)
             else:
-                resposta_final += "\n\n" + "\n".join(resultados_acoes)
+                for res in resultados_acoes:
+                    if res and res not in resposta_final:
+                        resposta_final += f"\n\n{res}"
+
+    # Limpeza de segurança contra resíduos de JSON ou mensagens internas
+    resposta_final = re.sub(r'\{"status":\s*"sucesso"[^}]*\}', '', resposta_final)
+    resposta_final = re.sub(r"Ação do tipo '.*?' não reconhecida\.?", '', resposta_final)
+    resposta_final = resposta_final.strip()
 
     # 2. Anexa Recibos Visuais
     if recibos_gerados:
         for rec in recibos_gerados:
             visuals.append(rec)
-        # Sempre que houver lançamento, anexa também o gráfico atualizado das finanças
         fin_data = coletar_dados_financeiros(user_id)
         if fin_data:
             visuals.append({"type": "finance_chart", "data": fin_data})
@@ -302,13 +340,13 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
     texto_busca = (mensagem_usuario + " " + resposta_final).lower()
 
     # --- Se perguntou ou mexeu com Metas ---
-    if any(t in ['criar_meta', 'add_value_to_goal'] for t in tipos_acoes) or any(k in texto_busca for k in ['meta', 'metas', 'quanto guardei', 'poupança']):
+    if any(t in ['criar_meta', 'add_value_to_goal'] for t in tipos_acoes) or any(k in texto_busca for k in ['meta', 'metas', 'quanto guardei', 'poupança', 'poupanca']):
         metas = coletar_dados_metas(user_id)
         if metas and not any(v['type'] == 'goals' for v in visuals):
             visuals.append({"type": "goals", "data": metas})
 
     # --- Se perguntou ou mexeu com Cartões ---
-    if any(t in ['lancar_gasto_cartao', 'pay_credit_card_bill'] for t in tipos_acoes) or any(k in texto_busca for k in ['cartao', 'cartão', 'fatura', 'limite']):
+    if any(t in ['lancar_gasto_cartao', 'pay_credit_card_bill'] for t in tipos_acoes) or any(k in texto_busca for k in ['cartao', 'cartão', 'fatura', 'limite', 'cartões']):
         cartoes = coletar_dados_cartoes(user_id)
         if cartoes and not any(v['type'] == 'credit_cards' for v in visuals):
             visuals.append({"type": "credit_cards", "data": cartoes})
@@ -320,14 +358,23 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
             visuals.append({"type": "schedule", "data": agenda})
 
     # --- Se perguntou por Ativo / Cotação ---
-    if 'consultar_preco_ativo' in tipos_acoes or any(k in texto_busca for k in ['cotação', 'cotacao', 'quanto tá', 'quanto ta', 'preço da ação', 'preco da acao']):
-        cotacao = coletar_cotacao_ativo(mensagem_usuario)
+    if 'consultar_preco_ativo' in tipos_acoes or any(k in texto_busca for k in [
+        'cotação', 'cotacao', 'quanto tá', 'quanto ta', 'preço', 'preco', 
+        'dolar', 'dólar', 'usd', 'euro', 'eur', 'bitcoin', 'btc', 'ações', 'acoes', 'ibov', 'ibovespa'
+    ]):
+        ativo_param = None
+        for a in acoes_a_executar:
+            if a.get('type') == 'consultar_preco_ativo':
+                ativo_param = a.get('data', {}).get('ativo')
+                break
+
+        cotacao = coletar_cotacao_ativo(mensagem_usuario, ticker_sugerido=ativo_param)
         if cotacao and not any(v['type'] == 'asset_quote' for v in visuals):
             visuals.append({"type": "asset_quote", "data": cotacao})
 
     # --- Se perguntou por Finanças / Gastos / Saldo / Orçamento (Gráficos) ---
     if any(t in ['consultar_planejamento', 'consultar_transacoes', 'gerar_resumo_visual'] for t in tipos_acoes) or \
-       any(k in texto_busca for k in ['gasto', 'despesa', 'receita', 'saldo', 'como estao minhas financas', 'como estão minhas finanças', 'orçamento', 'planejamento', 'extrato']):
+       any(k in texto_busca for k in ['gasto', 'despesa', 'receita', 'saldo', 'como estao minhas financas', 'como estão minhas finanças', 'orçamento', 'orcamento', 'planejamento', 'extrato']):
         if not any(v['type'] == 'finance_chart' for v in visuals):
             fin_data = coletar_dados_financeiros(user_id)
             if fin_data:

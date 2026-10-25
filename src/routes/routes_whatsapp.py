@@ -669,24 +669,36 @@ def executar_acao_simplific(user_id, acao, from_number):
             return formatar_resumo_planejamento(resumo_planejamento, periodo_descritivo)
    
         elif tipo_acao == 'consultar_preco_ativo':
-            # A indentação correta começa aqui
             nome_ativo = dados_acao.get('ativo')
             if not nome_ativo:
                 return "Não foi possível identificar o ativo para consulta."
             
             resultado = buscar_dados_ativo(nome_ativo)
-            
             if resultado.get('status') == 'sucesso':
                 return formatar_resposta_ativo(resultado.get('data'))
             else:
                 return resultado.get('mensagem', 'Não foi possível encontrar os dados do ativo.')
-            
+
+        elif tipo_acao == 'consultar_contato':
+            from src.models.contact import Contact
+            nome = dados_acao.get('nome', '')
+            contatos = Contact.query.filter(Contact.user_id == user_id, Contact.name.ilike(f'%{nome}%')).all()
+            if contatos:
+                linhas = [f"👤 *{c.name}* | WhatsApp: {c.whatsapp or 'N/I'} | Email: {c.email or 'N/I'}" for c in contatos]
+                return "Contatos encontrados:\n" + "\n".join(linhas)
+            return f"Não encontrei nenhum contato com o nome '{nome}'."
+
+        elif tipo_acao in ['pesquisar_na_internet', 'pesificar_na_internet', 'vincular_conta_ultima_transacao']:
+            # Ações de leitura/pesquisa já resolvidas durante o loop de IA
+            return None
+
         else:
-            return f"Ação do tipo '{tipo_acao}' não reconhecida."
+            print(f"⚠️ [AVISO] Ação '{tipo_acao}' não requer execução adicional no banco.")
+            return None
 
     except Exception as e:
         print(f"ERRO ao executar ação '{tipo_acao}': {e}")
-        return "Ocorreu um erro ao processar sua solicitação."
+        return None
         
 
 

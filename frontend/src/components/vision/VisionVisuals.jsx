@@ -1,5 +1,5 @@
 // frontend/src/components/vision/VisionVisuals.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip,
   BarChart, Bar, XAxis, YAxis
@@ -8,7 +8,7 @@ import {
   TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, 
   CheckCircle2, Landmark, CreditCard as CardIcon, 
   Calendar, Clock, Video, Target, ExternalLink,
-  Wallet, Sparkles, Building2
+  Wallet, Sparkles, Building2, ChevronDown, ChevronUp
 } from 'lucide-react';
 import styles from './VisionVisuals.module.css';
 
@@ -213,12 +213,14 @@ export const VisionReceiptCard = ({ data }) => {
 // 3. CARTÃO DE CRÉDITO COM BARRA DE LIMITE (VisionCreditCardWidget)
 // ==============================================================================
 export const VisionCreditCardWidget = ({ data }) => {
+  const [showAll, setShowAll] = useState(false);
   if (!data) return null;
   const cards = Array.isArray(data) ? data : [data];
+  const displayedCards = showAll ? cards : cards.slice(0, 2);
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      {cards.map((card, idx) => {
+      {displayedCards.map((card, idx) => {
         const percentUsed = card.limit_total > 0 
           ? Math.min(100, Math.round((card.invoice_current / card.limit_total) * 100)) 
           : 0;
@@ -248,6 +250,24 @@ export const VisionCreditCardWidget = ({ data }) => {
           </div>
         );
       })}
+
+      {cards.length > 2 && (
+        <button 
+          type="button" 
+          onClick={() => setShowAll(!showAll)}
+          className={styles.expandButton}
+        >
+          {showAll ? (
+            <span className="flex items-center justify-center gap-1">
+              <ChevronUp size={14} /> Mostrar menos cartões
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-1">
+              <ChevronDown size={14} /> Ver todos os {cards.length} cartões
+            </span>
+          )}
+        </button>
+      )}
     </div>
   );
 };
@@ -299,8 +319,10 @@ export const VisionGoalWidget = ({ data }) => {
 // 5. AGENDA & REUNIÕES GOOGLE MEET (VisionScheduleCard)
 // ==============================================================================
 export const VisionScheduleCard = ({ data }) => {
+  const [showAll, setShowAll] = useState(false);
   if (!data) return null;
   const events = Array.isArray(data) ? data : [data];
+  const displayedEvents = showAll ? events : events.slice(0, 3);
 
   return (
     <div className={styles.glassCard}>
@@ -311,7 +333,7 @@ export const VisionScheduleCard = ({ data }) => {
         </div>
       </div>
 
-      {events.map((ev, idx) => (
+      {displayedEvents.map((ev, idx) => (
         <div key={idx} className={styles.scheduleItem}>
           <div className={styles.scheduleTop}>
             <div className={styles.scheduleTitle}>{ev.title}</div>
@@ -340,6 +362,24 @@ export const VisionScheduleCard = ({ data }) => {
           )}
         </div>
       ))}
+
+      {events.length > 3 && (
+        <button 
+          type="button" 
+          onClick={() => setShowAll(!showAll)}
+          className={styles.expandButton}
+        >
+          {showAll ? (
+            <span className="flex items-center justify-center gap-1">
+              <ChevronUp size={14} /> Mostrar menos compromissos
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-1">
+              <ChevronDown size={14} /> Ver todos os {events.length} compromissos
+            </span>
+          )}
+        </button>
+      )}
     </div>
   );
 };
@@ -351,20 +391,47 @@ export const VisionAssetCard = ({ data }) => {
   if (!data) return null;
   const isPositivo = !String(data.change).startsWith('-');
 
+  // Exibe cotação cambial (USD/BRL, EUR/BRL) com 4 casas decimais quando relevante
+  const precoFormatado = typeof data.price === 'number'
+    ? (data.ticker === 'USD/BRL' || data.ticker === 'EUR/BRL'
+        ? `R$ ${data.price.toFixed(4).replace('.', ',')}`
+        : formatBRL(data.price))
+    : data.price;
+
   return (
     <div className={`${styles.glassCard} ${styles.assetCard}`}>
-      <div className={styles.assetLeft}>
-        <span className={styles.assetTicker}>{data.ticker}</span>
-        <span className={styles.assetName}>{data.name}</span>
+      <div className={styles.assetTopRow}>
+        <div className={styles.assetLeft}>
+          <span className={styles.assetTicker}>{data.ticker}</span>
+          <span className={styles.assetName}>{data.name}</span>
+        </div>
+
+        <div className={styles.assetRight}>
+          <span className={styles.assetPrice}>{precoFormatado}</span>
+          <span className={`${styles.assetChange} ${isPositivo ? 'text-emerald-500' : 'text-rose-500'}`}>
+            {isPositivo ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+            {data.change}
+          </span>
+        </div>
       </div>
 
-      <div className={styles.assetRight}>
-        <span className={styles.assetPrice}>{formatBRL(data.price)}</span>
-        <span className={`${styles.assetChange} ${isPositivo ? 'text-emerald-500' : 'text-rose-500'}`}>
-          {isPositivo ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-          {data.change}
-        </span>
-      </div>
+      {data.news && data.news.title && (
+        <div className={styles.assetNewsRow}>
+          <span className={styles.assetNewsLabel}>Última notícia relevante:</span>
+          {data.news.link ? (
+            <a 
+              href={data.news.link} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={styles.assetNewsLink}
+            >
+              {data.news.title}
+            </a>
+          ) : (
+            <span className={styles.assetNewsLink}>{data.news.title}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
