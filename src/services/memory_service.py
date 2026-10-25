@@ -25,17 +25,19 @@ if PINECONE_API_KEY:
 def gerar_vetor(texto):
     """
     Transforma um texto em um vetor numérico.
-    ATUALIZADO: Forçando a saída para 768 dimensões para bater com o Pinecone.
+    Captura 429 de quota silenciosamente quando a conta pré-paga estiver zerada.
     """
     try:
         result = genai.embed_content(
             model="models/gemini-embedding-001", 
             content=texto,
             task_type="retrieval_document",
-            output_dimensionality=768  # <--- A SOLUÇÃO ESTÁ AQUI
+            output_dimensionality=768
         )
         return result['embedding']
     except Exception as e:
+        if "429" in str(e) or "depleted" in str(e):
+            return None
         print(f"Erro ao gerar vetor: {e}")
         return None
 

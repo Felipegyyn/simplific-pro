@@ -49,7 +49,8 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
     Cria o Master Prompt para o Assessor Financeiro "Simplific".
     VERSÃO AGENTE: Regras de negócio mantidas, mas a execução de código (JSON) foi delegada às Tools.
     """
-    historico_formatado = "\n".join([f"{msg['role']}: {msg['content']}" for msg in historico_chat])
+    ultimas_msgs = historico_chat[-4:] if historico_chat else []
+    historico_formatado = "\n".join([f"{msg['role']}: {msg['content']}" for msg in ultimas_msgs])
     
     prompt = f"""
     # PERSONA E DIRETRIZES MESTRAS (SIMPLIFIC)

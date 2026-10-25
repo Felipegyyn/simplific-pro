@@ -132,17 +132,17 @@ def realizar_pesquisa_web(query, user_id=None):
         if user_id:
             _ultimas_pesquisas_cache[str(user_id)] = cards_estruturados
 
-        # Monta o resumo em texto para o LLM responder
-        resumo = "\n\n".join([
-            f"Título: {c['title']}\nPreço identificado: {c['price'] or 'Consultar no link'}\nConteúdo: {c['snippet']}\nLink da Fonte: {c['url']}"
-            for c in cards_estruturados
+        # Monta o resumo em texto super enxuto para o LLM não estourar o limite de tokens do provedor gratuito
+        resumo = "\n".join([
+            f"- {c['title']} | Preço: {c['price'] or 'Sob consulta'} | Link: {c['url']}"
+            for c in cards_estruturados[:3]
         ])
 
         resposta_direta = data.get('answer', '')
         if resposta_direta:
-            return f"Resposta Direta:\n{resposta_direta}\n\nOpções Encontradas:\n{resumo}"
+            return f"{resposta_direta[:180]}\n\nPrincipais opções:\n{resumo}"
 
-        return resumo if resumo else "Não encontrei resultados relevantes sobre isso na internet."
+        return resumo if resumo else "Encontrei opções na internet e anexei nos cards visuais."
 
     except Exception as e:
         print(f"❌ Erro na pesquisa Tavily: {e}")

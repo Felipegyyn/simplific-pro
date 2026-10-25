@@ -24,8 +24,8 @@ import google.generativeai as genai
 
 FREELLMAPI_URL = os.getenv('FREELLMAPI_URL', '').strip()
 FREELLMAPI_KEY = os.getenv('FREELLMAPI_KEY', '').strip() or os.getenv('FREELLMAPI_API_KEY', '').strip()
-_raw_model = os.getenv('FREELLMAPI_MODEL', 'auto').strip()
-FREELLMAPI_MODEL = 'auto' if (not _raw_model or _raw_model == 'groq/llama-3.3-70b-versatile') else _raw_model
+_raw_model = os.getenv('FREELLMAPI_MODEL', 'auto').strip().lower()
+FREELLMAPI_MODEL = 'auto' if (not _raw_model or 'auto' in _raw_model or '/' in _raw_model or 'llama' in _raw_model) else _raw_model
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '').strip()
 GROQ_MODEL = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile').strip()
