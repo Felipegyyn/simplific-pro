@@ -8,7 +8,8 @@ import {
   TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, 
   CheckCircle2, Landmark, CreditCard as CardIcon, 
   Calendar, Clock, Video, Target, ExternalLink,
-  Wallet, Sparkles, Building2, ChevronDown, ChevronUp
+  Wallet, Sparkles, Building2, ChevronDown, ChevronUp,
+  X, Filter, Flame, Info
 } from 'lucide-react';
 import styles from './VisionVisuals.module.css';
 
@@ -21,17 +22,61 @@ export const formatBRL = (val) => {
 };
 
 // ==============================================================================
-// 1. GRÁFICO FINANCEIRO EXPLICATIVO (VisionFinanceChart)
+// 1. GRÁFICO FINANCEIRO EXPLICATIVO INTERATIVO (VisionFinanceChart)
 // ==============================================================================
 export const VisionFinanceChart = ({ data }) => {
   if (!data) return null;
 
-  const { periodo, receitas = 0, despesas = 0, saldo = 0, taxa_poupanca = 0, categorias = [] } = data;
+  const { 
+    periodo, 
+    receitas = 0, 
+    despesas = 0, 
+    saldo = 0, 
+    taxa_poupanca = 0, 
+    categorias = [],
+    detalhes_receitas = [],
+    detalhes_despesas = [],
+    detalhes_saldo = {}
+  } = data;
+
+  const [activeKpi, setActiveKpi] = useState(null); // 'receitas' | 'despesas' | 'saldo' | null
+  const [selectedCategory, setSelectedCategory] = useState(null); // Para filtrar despesas por categoria
+  const [showAllTxs, setShowAllTxs] = useState(false);
+
+  const handleKpiToggle = (kpi) => {
+    if (activeKpi === kpi) {
+      setActiveKpi(null);
+      setSelectedCategory(null);
+      setShowAllTxs(false);
+    } else {
+      setActiveKpi(kpi);
+      setSelectedCategory(null);
+      setShowAllTxs(false);
+    }
+  };
+
+  const handleCategoryDrilldown = (catName) => {
+    setActiveKpi('despesas');
+    setSelectedCategory(catName);
+    setShowAllTxs(false);
+  };
+
+  // Filtragem de despesas por categoria (se houver seleção)
+  const filteredDespesas = selectedCategory
+    ? detalhes_despesas.filter(t => (t.category || '').toLowerCase() === selectedCategory.toLowerCase())
+    : detalhes_despesas;
+
+  const displayedDespesas = showAllTxs ? filteredDespesas : filteredDespesas.slice(0, 5);
 
   const barData = [
     { name: 'Receitas', valor: receitas, fill: '#10b981' },
     { name: 'Despesas', valor: despesas, fill: '#f43f5e' }
   ];
+
+  // Cálculo da proporção para a barra de fluxo
+  const totalVolume = (receitas || 0) + (despesas || 0);
+  const receitasPct = totalVolume > 0 ? Math.round((receitas / totalVolume) * 100) : 50;
+  const despesasPct = 100 - receitasPct;
 
   return (
     <div className={styles.glassCard}>
@@ -43,9 +88,16 @@ export const VisionFinanceChart = ({ data }) => {
         <span className={styles.periodPill}>{periodo || 'Mês Atual'}</span>
       </div>
 
-      {/* Grid de Métricas Chave */}
+      {/* Grid de Métricas Chave Interativas (Estilo Pierre) */}
       <div className={styles.metricsGrid}>
-        <div className={styles.metricBox}>
+        {/* KPI 1: RECEITAS */}
+        <div 
+          className={`${styles.metricBox} ${styles.metricBoxInteractive} ${activeKpi === 'receitas' ? styles.metricActiveReceitas : ''}`}
+          onClick={() => handleKpiToggle('receitas')}
+          role="button"
+          tabIndex={0}
+          title="Clique para ver o detalhamento de receitas"
+        >
           <div className={styles.metricLabel}>
             <ArrowDownLeft size={13} className="text-emerald-500" />
             <span>Receitas</span>
@@ -53,9 +105,23 @@ export const VisionFinanceChart = ({ data }) => {
           <div className={`${styles.metricValue} ${styles.metricPositive}`}>
             {formatBRL(receitas)}
           </div>
+          <div className={styles.kpiActionHint}>
+            {activeKpi === 'receitas' ? (
+              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+            ) : (
+              <span>Ver entradas ▼</span>
+            )}
+          </div>
         </div>
 
-        <div className={styles.metricBox}>
+        {/* KPI 2: DESPESAS */}
+        <div 
+          className={`${styles.metricBox} ${styles.metricBoxInteractive} ${activeKpi === 'despesas' ? styles.metricActiveDespesas : ''}`}
+          onClick={() => handleKpiToggle('despesas')}
+          role="button"
+          tabIndex={0}
+          title="Clique para ver o detalhamento de despesas"
+        >
           <div className={styles.metricLabel}>
             <ArrowUpRight size={13} className="text-rose-500" />
             <span>Despesas</span>
@@ -63,15 +129,36 @@ export const VisionFinanceChart = ({ data }) => {
           <div className={`${styles.metricValue} ${styles.metricNegative}`}>
             {formatBRL(despesas)}
           </div>
+          <div className={styles.kpiActionHint}>
+            {activeKpi === 'despesas' ? (
+              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+            ) : (
+              <span>Ver saídas ▼</span>
+            )}
+          </div>
         </div>
 
-        <div className={styles.metricBox}>
+        {/* KPI 3: SALDO LÍQUIDO */}
+        <div 
+          className={`${styles.metricBox} ${styles.metricBoxInteractive} ${activeKpi === 'saldo' ? styles.metricActiveSaldo : ''}`}
+          onClick={() => handleKpiToggle('saldo')}
+          role="button"
+          tabIndex={0}
+          title="Clique para ver o raio-x do fluxo de caixa"
+        >
           <div className={styles.metricLabel}>
             <Wallet size={13} />
             <span>Saldo Líquido</span>
           </div>
           <div className={`${styles.metricValue} ${saldo >= 0 ? styles.metricPositive : styles.metricNegative}`}>
             {formatBRL(saldo)}
+          </div>
+          <div className={styles.kpiActionHint}>
+            {activeKpi === 'saldo' ? (
+              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+            ) : (
+              <span>Raio-X de caixa ▼</span>
+            )}
           </div>
         </div>
 
@@ -88,65 +175,332 @@ export const VisionFinanceChart = ({ data }) => {
         )}
       </div>
 
-      {/* Gráfico Recharts Donut de Categorias ou Barras */}
-      {categorias && categorias.length > 0 ? (
-        <div className={styles.chartContainer}>
-          <div style={{ width: '160px', height: '160px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={categorias}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={45}
-                  outerRadius={70}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {categorias.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color || '#10b981'} />
-                  ))}
-                </Pie>
-                <RechartsTooltip 
-                  formatter={(value) => [formatBRL(value), 'Gasto']}
-                  contentStyle={{
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    backgroundColor: '#18181b',
-                    color: '#ffffff',
-                    fontSize: '12px'
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+      {/* PAINEL DINÂMICO DE SUBINFORMAÇÕES (ESTILO PIERRE) OU DONUT PADRÃO */}
+      {activeKpi === 'receitas' && (
+        <div className={styles.subDetailsWrapper}>
+          <div className={styles.subDetailsHeader}>
+            <div className={styles.subDetailsTitleWrap}>
+              <div className={styles.subDetailsTitle}>
+                <ArrowDownLeft size={16} className="text-emerald-500" />
+                <span>Origem das Receitas</span>
+              </div>
+              <span className={styles.subDetailsBadge}>
+                {detalhes_receitas.length} {detalhes_receitas.length === 1 ? 'entrada' : 'entradas'}
+              </span>
+            </div>
+            <button 
+              className={styles.subDetailsCloseBtn} 
+              onClick={() => setActiveKpi(null)}
+              title="Voltar ao gráfico"
+            >
+              <span>Voltar ao Gráfico</span>
+              <X size={13} />
+            </button>
           </div>
 
-          <div className={styles.categoriesList}>
-            {categorias.slice(0, 5).map((cat, idx) => (
-              <div key={idx} className={styles.categoryItem}>
-                <div className={styles.categoryDotName}>
-                  <div className={styles.colorDot} style={{ backgroundColor: cat.color || '#10b981' }} />
-                  <span>{cat.name}</span>
+          {/* Cards resumo */}
+          <div className={styles.kpiSummaryStrip}>
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Maior Entrada</div>
+              <div className={`${styles.kpiSummaryCardValue} text-emerald-500`}>
+                {formatBRL(detalhes_saldo?.maior_receita?.value || receitas)}
+              </div>
+              <div className={styles.kpiSummaryCardSub} title={detalhes_saldo?.maior_receita?.description}>
+                {detalhes_saldo?.maior_receita?.description || 'Receita principal'}
+              </div>
+            </div>
+
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Média por Entrada</div>
+              <div className={styles.kpiSummaryCardValue}>
+                {formatBRL(detalhes_receitas.length > 0 ? (receitas / detalhes_receitas.length) : receitas)}
+              </div>
+              <div className={styles.kpiSummaryCardSub}>
+                Em {detalhes_receitas.length || 1} lançamento(s)
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de Entradas */}
+          <div className={styles.transactionsList}>
+            {detalhes_receitas.map((tx, idx) => (
+              <div key={tx.id || idx} className={styles.transactionRow}>
+                <div className={styles.txLeft}>
+                  <div className={`${styles.txIconCircle} ${styles.txIconReceita}`}>
+                    <ArrowDownLeft size={13} />
+                  </div>
+                  <div className={styles.txDescWrap}>
+                    <span className={styles.txDesc} title={tx.description}>{tx.description}</span>
+                    <div className={styles.txMeta}>
+                      <span className={styles.txCategoryTag}>{tx.category || 'Receita'}</span>
+                      {tx.date && <span className={styles.txDate}>{tx.date}</span>}
+                    </div>
+                  </div>
                 </div>
-                <span className={styles.categoryValue}>{formatBRL(cat.value)}</span>
+                <div className={styles.txRight}>
+                  <span className={`${styles.txValue} ${styles.metricPositive}`}>
+                    + {formatBRL(tx.value)}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      ) : (
-        <div style={{ width: '100%', height: '140px' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-              <XAxis type="number" hide />
-              <YAxis dataKey="name" type="category" stroke="#71717a" fontSize={12} width={70} />
-              <RechartsTooltip 
-                formatter={(val) => [formatBRL(val), 'Total']} 
-                contentStyle={{ borderRadius: '8px', backgroundColor: '#18181b', color: '#fff', fontSize: '12px' }} 
-              />
-              <Bar dataKey="valor" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      )}
+
+      {activeKpi === 'despesas' && (
+        <div className={styles.subDetailsWrapper}>
+          <div className={styles.subDetailsHeader}>
+            <div className={styles.subDetailsTitleWrap}>
+              <div className={styles.subDetailsTitle}>
+                <ArrowUpRight size={16} className="text-rose-500" />
+                <span>Detalhamento de Despesas</span>
+              </div>
+              <span className={styles.subDetailsBadge}>
+                {filteredDespesas.length} {filteredDespesas.length === 1 ? 'saída' : 'saídas'}
+              </span>
+            </div>
+            <button 
+              className={styles.subDetailsCloseBtn} 
+              onClick={() => { setActiveKpi(null); setSelectedCategory(null); }}
+              title="Voltar ao gráfico"
+            >
+              <span>Voltar ao Gráfico</span>
+              <X size={13} />
+            </button>
+          </div>
+
+          {/* Chips para Filtrar por Categoria */}
+          {categorias && categorias.length > 0 && (
+            <div className={styles.categoryFilterBar}>
+              <button
+                className={`${styles.categoryFilterPill} ${!selectedCategory ? styles.categoryFilterPillActive : ''}`}
+                onClick={() => setSelectedCategory(null)}
+              >
+                Todas ({detalhes_despesas.length})
+              </button>
+              {categorias.map((cat, idx) => (
+                <button
+                  key={idx}
+                  className={`${styles.categoryFilterPill} ${selectedCategory === cat.name ? styles.categoryFilterPillActive : ''}`}
+                  onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+                >
+                  <span 
+                    style={{ 
+                      width: '6px', 
+                      height: '6px', 
+                      borderRadius: '50%', 
+                      backgroundColor: cat.color || '#f43f5e',
+                      display: 'inline-block' 
+                    }} 
+                  />
+                  <span>{cat.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Lista de Saídas */}
+          <div className={styles.transactionsList}>
+            {displayedDespesas.map((tx, idx) => (
+              <div key={tx.id || idx} className={styles.transactionRow}>
+                <div className={styles.txLeft}>
+                  <div className={`${styles.txIconCircle} ${styles.txIconDespesa}`}>
+                    <ArrowUpRight size={13} />
+                  </div>
+                  <div className={styles.txDescWrap}>
+                    <span className={styles.txDesc} title={tx.description}>{tx.description}</span>
+                    <div className={styles.txMeta}>
+                      <span className={styles.txCategoryTag}>{tx.category || 'Despesa'}</span>
+                      {tx.date && <span className={styles.txDate}>{tx.date}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.txRight}>
+                  <span className={`${styles.txValue} ${styles.metricNegative}`}>
+                    - {formatBRL(tx.value)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Botão Ver Mais / Ver Menos */}
+          {filteredDespesas.length > 5 && (
+            <button
+              className={styles.txExpandBtn}
+              onClick={() => setShowAllTxs(!showAllTxs)}
+            >
+              {showAllTxs ? (
+                <><span>Ver menos</span> <ChevronUp size={13} /></>
+              ) : (
+                <><span>Ver todas as {filteredDespesas.length} despesas</span> <ChevronDown size={13} /></>
+              )}
+            </button>
+          )}
         </div>
+      )}
+
+      {activeKpi === 'saldo' && (
+        <div className={styles.subDetailsWrapper}>
+          <div className={styles.subDetailsHeader}>
+            <div className={styles.subDetailsTitleWrap}>
+              <div className={styles.subDetailsTitle}>
+                <Wallet size={16} className="text-blue-500" />
+                <span>Raio-X do Fluxo de Caixa</span>
+              </div>
+              <span className={`${styles.subDetailsBadge} ${saldo >= 0 ? 'text-emerald-500 font-semibold' : 'text-rose-500 font-semibold'}`}>
+                {saldo >= 0 ? `Superávit de ${formatBRL(saldo)}` : `Déficit de ${formatBRL(Math.abs(saldo))}`}
+              </span>
+            </div>
+            <button 
+              className={styles.subDetailsCloseBtn} 
+              onClick={() => setActiveKpi(null)}
+              title="Voltar ao gráfico"
+            >
+              <span>Voltar ao Gráfico</span>
+              <X size={13} />
+            </button>
+          </div>
+
+          {/* Barra de Proporção Receitas vs Despesas */}
+          <div className={styles.ratioBarContainer}>
+            <div className={styles.ratioBarHeader}>
+              <span>Receitas: {receitasPct}% ({formatBRL(receitas)})</span>
+              <span>Despesas: {despesasPct}% ({formatBRL(despesas)})</span>
+            </div>
+            <div className={styles.ratioBarTrack}>
+              <div 
+                className={styles.ratioSegmentReceitas} 
+                style={{ width: `${receitasPct}%` }} 
+                title={`Receitas: ${formatBRL(receitas)} (${receitasPct}%)`} 
+              />
+              <div 
+                className={styles.ratioSegmentDespesas} 
+                style={{ width: `${despesasPct}%` }} 
+                title={`Despesas: ${formatBRL(despesas)} (${despesasPct}%)`} 
+              />
+            </div>
+          </div>
+
+          {/* 4 KPI tiles Pierre */}
+          <div className={styles.kpiSummaryStrip}>
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Comprometimento</div>
+              <div className={`${styles.kpiSummaryCardValue} ${detalhes_saldo?.comprometimento_renda > 100 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                {detalhes_saldo?.comprometimento_renda || 0}%
+              </div>
+              <div className={styles.kpiSummaryCardSub}>
+                {detalhes_saldo?.comprometimento_renda > 100 ? 'Despesas superam receita' : 'Margem de caixa saudável'}
+              </div>
+            </div>
+
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Burn Rate Diário</div>
+              <div className={styles.kpiSummaryCardValue}>
+                {formatBRL(detalhes_saldo?.gasto_diario_medio || 0)}
+              </div>
+              <div className={styles.kpiSummaryCardSub}>
+                Média em {detalhes_saldo?.dias_decorridos || 1} dias
+              </div>
+            </div>
+
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Maior Despesa</div>
+              <div className={`${styles.kpiSummaryCardValue} text-rose-500`}>
+                {formatBRL(detalhes_saldo?.maior_despesa?.value || 0)}
+              </div>
+              <div className={styles.kpiSummaryCardSub} title={detalhes_saldo?.maior_despesa?.description}>
+                {detalhes_saldo?.maior_despesa?.description || 'Nenhuma'}
+              </div>
+            </div>
+
+            <div className={styles.kpiSummaryCard}>
+              <div className={styles.kpiSummaryCardLabel}>Projeção Mês</div>
+              <div className={`${styles.kpiSummaryCardValue} ${detalhes_saldo?.projecao_fechamento >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {formatBRL(detalhes_saldo?.projecao_fechamento || saldo)}
+              </div>
+              <div className={styles.kpiSummaryCardSub}>
+                {detalhes_saldo?.dias_restantes || 0} dias restantes
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODO PADRÃO: GRÁFICO RECHARTS DONUT COM CATEGORIAS CLICÁVEIS */}
+      {!activeKpi && (
+        <>
+          {categorias && categorias.length > 0 ? (
+            <div className={styles.chartContainer}>
+              <div style={{ width: '160px', height: '160px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categorias}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={45}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {categorias.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color || '#10b981'} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      formatter={(value) => [formatBRL(value), 'Gasto']}
+                      contentStyle={{
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backgroundColor: '#18181b',
+                        color: '#ffffff',
+                        fontSize: '12px'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className={styles.categoriesList}>
+                {categorias.slice(0, 6).map((cat, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`${styles.categoryItem} ${styles.categoryItemClickable}`}
+                    onClick={() => handleCategoryDrilldown(cat.name)}
+                    title={`Clique para filtrar lançamentos de ${cat.name}`}
+                  >
+                    <div className={styles.categoryDotName}>
+                      <div className={styles.colorDot} style={{ backgroundColor: cat.color || '#10b981' }} />
+                      <span>{cat.name}</span>
+                    </div>
+                    <span className={styles.categoryValue}>{formatBRL(cat.value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{ width: '100%', height: '140px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" stroke="#71717a" fontSize={12} width={70} />
+                  <RechartsTooltip 
+                    formatter={(val) => [formatBRL(val), 'Total']} 
+                    contentStyle={{ borderRadius: '8px', backgroundColor: '#18181b', color: '#fff', fontSize: '12px' }} 
+                  />
+                  <Bar dataKey="valor" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          <div className={styles.interactiveHintFooter}>
+            <Sparkles size={12} className="text-emerald-500" />
+            <span>Toque nos cards acima ou nas categorias para ver as subinformações</span>
+          </div>
+        </>
       )}
     </div>
   );

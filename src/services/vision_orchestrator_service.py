@@ -75,6 +75,71 @@ def coletar_dados_financeiros(user_id):
             for i, (cat, val) in enumerate(expenses_by_cat)
         ]
 
+        # 3. Detalhes de Receitas e Despesas para os cards interativos (estilo Pierre)
+        rec_txs = Transaction.query.filter(
+            Transaction.user_id == user_id,
+            Transaction.date.between(inicio_mes, fim_mes),
+            Transaction.type == 'entrada'
+        ).order_by(Transaction.value.desc()).all()
+
+        desp_txs = Transaction.query.filter(
+            Transaction.user_id == user_id,
+            Transaction.date.between(inicio_mes, fim_mes),
+            Transaction.type == 'saida'
+        ).order_by(Transaction.value.desc()).all()
+
+        detalhes_receitas = [
+            {
+                "id": t.id,
+                "description": t.description,
+                "value": float(t.value),
+                "date": t.date.strftime('%d/%m/%Y') if t.date else "",
+                "category": t.category.name if t.category else "Receita",
+                "status": t.status or "confirmada"
+            }
+            for t in rec_txs
+        ]
+
+        detalhes_despesas = [
+            {
+                "id": t.id,
+                "description": t.description,
+                "value": float(t.value),
+                "date": t.date.strftime('%d/%m/%Y') if t.date else "",
+                "category": t.category.name if t.category else "Outros",
+                "status": t.status or "confirmada"
+            }
+            for t in desp_txs
+        ]
+
+        # 4. Métricas de fluxo de caixa e diagnóstico de saldo
+        dias_decorridos = max(1, hoje.day)
+        dias_restantes = max(0, ultimo_dia - hoje.day)
+        gasto_diario_medio = round(despesas / dias_decorridos, 2) if despesas > 0 else 0
+        comprometimento_renda = round((despesas / receitas * 100), 1) if receitas > 0 else (100.0 if despesas > 0 else 0.0)
+        projecao_fechamento = round(saldo - (gasto_diario_medio * dias_restantes), 2)
+
+        detalhes_saldo = {
+            "comprometimento_renda": comprometimento_renda,
+            "gasto_diario_medio": gasto_diario_medio,
+            "dias_decorridos": dias_decorridos,
+            "dias_restantes": dias_restantes,
+            "total_dias_mes": ultimo_dia,
+            "projecao_fechamento": projecao_fechamento,
+            "total_receitas_qtd": len(rec_txs),
+            "total_despesas_qtd": len(desp_txs),
+            "maior_despesa": {
+                "description": detalhes_despesas[0]["description"] if detalhes_despesas else "Nenhuma",
+                "value": detalhes_despesas[0]["value"] if detalhes_despesas else 0,
+                "category": detalhes_despesas[0]["category"] if detalhes_despesas else ""
+            } if detalhes_despesas else None,
+            "maior_receita": {
+                "description": detalhes_receitas[0]["description"] if detalhes_receitas else "Nenhuma",
+                "value": detalhes_receitas[0]["value"] if detalhes_receitas else 0,
+                "category": detalhes_receitas[0]["category"] if detalhes_receitas else ""
+            } if detalhes_receitas else None
+        }
+
         nomes_meses = [
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
@@ -88,6 +153,9 @@ def coletar_dados_financeiros(user_id):
             "saldo": saldo,
             "taxa_poupanca": taxa_poupanca,
             "categorias": categorias,
+            "detalhes_receitas": detalhes_receitas,
+            "detalhes_despesas": detalhes_despesas,
+            "detalhes_saldo": detalhes_saldo,
             "tem_dados": (receitas > 0 or despesas > 0)
         }
     except Exception as e:
