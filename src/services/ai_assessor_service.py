@@ -25,6 +25,25 @@ from src.services.investments_service import processar_investimento_whatsapp
 from src.services.schedule_service import criar_evento_agenda
 from src.models.financial import Category
 
+def get_contacts_summary_for_ai(user_id):
+    """
+    Retorna os contatos cadastrados pelo usuário para reconhecimento imediato pelo assistente,
+    permitindo agendar reuniões sem ter que solicitar e-mail/WhatsApp repetidamente.
+    """
+    try:
+        from src.models.contact import Contact
+        contatos = Contact.query.filter_by(user_id=user_id).order_by(Contact.name.asc()).limit(100).all()
+        if not contatos:
+            return "\n[CONTATOS SALVOS NA AGENDA DO USUÁRIO]: Nenhum contato salvo ainda."
+        linhas = [
+            f"- {c.name}: Email: {c.email or 'N/I'}, WhatsApp: {c.whatsapp or 'N/I'}"
+            for c in contatos
+        ]
+        return "\n[CONTATOS SALVOS NA AGENDA DO USUÁRIO]:\n" + "\n".join(linhas)
+    except Exception as e:
+        print(f"Erro ao obter contatos para IA: {e}")
+        return ""
+
 def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     """
     Função principal que orquestra a conversa com o assessor Simplific.
@@ -45,6 +64,7 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     resumo_investimentos = get_investments_summary_for_ai(user_id)
     resumo_agenda = get_schedule_summary_for_ai(user_id)
     resumo_categorias = get_categories_for_ai(user_id)
+    resumo_contatos = get_contacts_summary_for_ai(user_id)
 
     # ▼▼▼ BUSCA AS MEMÓRIAS NO PINECONE ▼▼▼
     ultima_mensagem = historico_chat[-1]['content'] if historico_chat else ""
@@ -57,7 +77,8 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         f"{resumo_metas}\n"
         f"{resumo_investimentos}\n"
         f"{resumo_agenda}\n"
-        f"{resumo_categorias}"
+        f"{resumo_categorias}\n"
+        f"{resumo_contatos}\n"
         f"{memorias_recuperadas}" # <--- A MEMÓRIA ENTRA AQUI
     )
 

@@ -374,6 +374,33 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
                 if resultado_acao:
                     resultados_acoes.append(resultado_acao)
 
+            # Reunião ou Compromisso recém-criado -> Adiciona card EXCLUSIVO deste evento
+            if tipo in ['cadastrar_evento_agenda', 'create_agenda_item']:
+                recem_criado = ScheduleEvent.query.filter_by(user_id=user_id).order_by(ScheduleEvent.id.desc()).first()
+                if recem_criado:
+                    meet_link = None
+                    if recem_criado.description and ("meet.google.com" in recem_criado.description or "http" in recem_criado.description):
+                        for word in recem_criado.description.split():
+                            if "meet.google.com" in word or word.startswith("http"):
+                                meet_link = word
+                                break
+
+                    data_card_fmt = recem_criado.date.strftime("%d/%m/%Y") if recem_criado.date else ""
+                    time_card_fmt = str(recem_criado.time)[:5] if recem_criado.time else str(dados.get('time', ''))[:5]
+                    
+                    if not any(v.get('type') == 'schedule' for v in visuals):
+                        visuals.append({
+                            "type": "schedule",
+                            "data": [{
+                                "id": recem_criado.id,
+                                "title": recem_criado.title or dados.get('title', 'Reunião'),
+                                "date": data_card_fmt,
+                                "time": time_card_fmt,
+                                "meet_link": meet_link,
+                                "attendee": dados.get('attendee_email')
+                            }]
+                        })
+
         if resultados_acoes:
             if not resposta_final or len(resposta_final.strip()) < 10:
                 resposta_final = "\n\n".join(resultados_acoes)
@@ -419,11 +446,21 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
         if cartoes and not any(v['type'] == 'credit_cards' for v in visuals):
             visuals.append({"type": "credit_cards", "data": cartoes})
 
-    # --- Se perguntou ou mexeu com Agenda ---
-    if any(t in ['cadastrar_evento_agenda', 'consultar_agenda', 'create_agenda_item'] for t in tipos_acoes) or any(k in texto_busca for k in ['agenda', 'compromisso', 'reuniao', 'reunião', 'meet']):
-        agenda = coletar_dados_agenda(user_id)
-        if agenda and not any(v['type'] == 'schedule' for v in visuals):
-            visuals.append({"type": "schedule", "data": agenda})
+    # --- Se consultou a Agenda (Apenas quando explicitamente solicitado ou pela tool consultar_agenda) ---
+    if not any(v.get('type') == 'schedule' for v in visuals):
+        consultou_agenda = (
+            'consultar_agenda' in tipos_acoes or
+            any(termo in mensagem_usuario.lower() for termo in [
+                'minha agenda', 'ver agenda', 'como está minha agenda', 'como esta minha agenda',
+                'quais meus compromissos', 'quais são meus compromissos', 'o que tenho agendado',
+                'o que tenho hoje', 'compromissos de hoje', 'compromissos da semana', 'consultar agenda',
+                'próximos compromissos', 'proximos compromissos'
+            ])
+        )
+        if consultou_agenda:
+            agenda = coletar_dados_agenda(user_id)
+            if agenda:
+                visuals.append({"type": "schedule", "data": agenda})
 
     # --- Se perguntou por Ativo / Cotação ---
     if 'consultar_preco_ativo' in tipos_acoes or any(k in texto_busca for k in [

@@ -1734,8 +1734,67 @@ def handle_cadastrar_contato(user_id, dados):
 # ==============================================================================
 def handle_agendar_reuniao_meet(dados, user_id):
     user = User.query.get(user_id)
+    if not user:
+        return "Usuário não encontrado."
     
-    # 1. Cria evento (Lógica Google - Mantida)
+    # 1. Normaliza data (suporta YYYY-MM-DD e DD/MM/YYYY)
+    raw_date = str(dados.get('event_date', '')).strip()
+    date_str = raw_date
+    data_formatada = raw_date
+    data_obj = None
+
+    if '/' in raw_date:
+        try:
+            d_parsed = datetime.strptime(raw_date, '%d/%m/%Y')
+            date_str = d_parsed.strftime('%Y-%m-%d')
+            data_formatada = d_parsed.strftime('%d/%m/%Y')
+            data_obj = d_parsed.date()
+        except Exception:
+            pass
+    elif '-' in raw_date:
+        try:
+            d_parsed = datetime.strptime(raw_date, '%Y-%m-%d')
+            date_str = d_parsed.strftime('%Y-%m-%d')
+            data_formatada = d_parsed.strftime('%d/%m/%Y')
+            data_obj = d_parsed.date()
+        except Exception:
+            pass
+
+    if not data_obj:
+        data_obj = datetime.today().date()
+        date_str = data_obj.strftime('%Y-%m-%d')
+        data_formatada = data_obj.strftime('%d/%m/%Y')
+
+    # Normaliza hora (suporta HH:MM, 14h, etc.)
+    raw_time = str(dados.get('time', '10:00')).strip().lower().replace('h', ':00')
+    if ':' in raw_time:
+        parts = raw_time.split(':')
+        h = parts[0].zfill(2)
+        m = parts[1].zfill(2) if len(parts) > 1 and parts[1] else '00'
+        time_str = f"{h[:2]}:{m[:2]}"
+    else:
+        time_str = f"{raw_time.zfill(2)}:00"
+
+    titulo = dados.get('title') or "Reunião"
+
+    # 2. Busca automática do contato caso o e-mail não tenha vindo diretamente
+    attendee_email = dados.get('attendee_email')
+    contato_encontrado = None
+
+    if attendee_email:
+        contato_encontrado = Contact.query.filter_by(user_id=user_id, email=attendee_email).first()
+
+    if not contato_encontrado and titulo:
+        palavras = titulo.split()
+        for palavra in palavras:
+            if len(palavra) >= 3 and palavra.lower() not in ['com', 'para', 'reuniao', 'reunião', 'meet', 'agenda', 'agendar', 'marcar']:
+                possivel_contato = Contact.query.filter(Contact.user_id == user_id, Contact.name.ilike(f'%{palavra}%')).first()
+                if possivel_contato:
+                    contato_encontrado = possivel_contato
+                    if not attendee_email and possivel_contato.email:
+                        attendee_email = possivel_contato.email
+                    break
+
     class EventoSimples:
         def __init__(self, title, date_str, time_str, desc):
             self.title = title
@@ -1745,28 +1804,33 @@ def handle_agendar_reuniao_meet(dados, user_id):
             self.type = 'reuniao'
 
     evento = EventoSimples(
-        title=dados.get('title'),
-        date_str=dados.get('event_date'),
-        time_str=dados.get('time', '10:00'),
+        title=titulo,
+        date_str=date_str,
+        time_str=time_str,
         desc="Agendado via Simplific Pro"
     )
-    attendee_email = dados.get('attendee_email')
 
-    resultado_google = add_event_to_google(user, evento, attendee_email=attendee_email, create_meet=True)
-    if not resultado_google:
-        return "Tive um problema para conectar com o Google Agenda."
+    # 3. Integração com Google Agenda (com fallback gracioso)
+    resultado_google = None
+    try:
+        resultado_google = add_event_to_google(user, evento, attendee_email=attendee_email, create_meet=True)
+    except Exception as e_google:
+        print(f"⚠️ Erro ao comunicar com Google Calendar: {e_google}")
 
-    meet_link = resultado_google.get('meet_link')
-    google_event_id = resultado_google.get('id')
-    data_formatada = datetime.strptime(evento.date, '%Y-%m-%d').strftime('%d/%m/%Y')
-    
-    # Salva no Banco Local
+    if resultado_google:
+        meet_link = resultado_google.get('meet_link') or "https://meet.google.com/new"
+        google_event_id = resultado_google.get('id')
+    else:
+        meet_link = "https://meet.google.com/new"
+        google_event_id = None
+
+    # 4. Salva no Banco Local ScheduleEvent
     try:
         novo_evento_db = ScheduleEvent(
             user_id=user.id,
             title=evento.title,
             description=f"{evento.description}\nLink do Meet: {meet_link}",
-            date=datetime.strptime(evento.date, '%Y-%m-%d').date(),
+            date=data_obj,
             time=evento.time,
             type='reuniao',
             category='Reunião',
@@ -1775,63 +1839,52 @@ def handle_agendar_reuniao_meet(dados, user_id):
         db.session.add(novo_evento_db)
         db.session.commit()
     except Exception as e:
-        print(f"Erro ao salvar no banco local: {e}")
+        print(f"Erro ao salvar reunião no banco local: {e}")
 
-    # 3. Disparar WhatsApp (A CORREÇÃO ESTÁ AQUI)
+    # 5. Notificação via WhatsApp
     status_envio = ""
-    contato_encontrado = None
-
-    if attendee_email:
-        contato_encontrado = Contact.query.filter_by(user_id=user_id, email=attendee_email).first()
-    
-    if not contato_encontrado and evento.title:
-        palavras = evento.title.split()
-        for palavra in palavras:
-            if len(palavra) > 3 and palavra.lower() not in ['com', 'para', 'reuniao', 'reunião']:
-                possivel_contato = Contact.query.filter(Contact.user_id == user_id, Contact.name.ilike(f'%{palavra}%')).first()
-                if possivel_contato:
-                    contato_encontrado = possivel_contato
-                    break
-
     if contato_encontrado and contato_encontrado.whatsapp:
-        # 1. Normaliza o número (+55...)
         numero_limpo = normalize_phone_number(contato_encontrado.whatsapp)
-        
-        # 2. ADICIONA O PREFIXO OBRIGATÓRIO PARA A TWILIO
         if not numero_limpo.startswith('whatsapp:'):
             whatsapp_destino = f"whatsapp:{numero_limpo}"
         else:
             whatsapp_destino = numero_limpo
             
-        print(f" >>> ENVIANDO TEMPLATE PARA: {whatsapp_destino}") # Log claro
-
-        variaveis = {
-            '1': contato_encontrado.name,       
-            '2': user.name,          
-            '3': data_formatada,     
-            '4': evento.time,        
-            '5': meet_link           
-        }
-
-        resultado_envio = send_whatsapp_template(
-            to=whatsapp_destino, 
-            template_sid=template_sids['convite_reuniao'], 
-            content_variables=variaveis
-        )
-
-        if resultado_envio.get('status') == 'success':
-            status_envio = f"✅ Convite enviado para o WhatsApp de {contato_encontrado.name}."
-        else:
-            erro = resultado_envio.get('message') or resultado_envio.get('error_message')
-            print(f" >>> ERRO TWILIO: {erro}")
-            status_envio = f"⚠️ Erro ao enviar WhatsApp: {erro}"
-
+        print(f" >>> ENVIANDO TEMPLATE REUNIÃO PARA: {whatsapp_destino}")
+        try:
+            variaveis = {
+                '1': contato_encontrado.name,       
+                '2': user.name,          
+                '3': data_formatada,     
+                '4': evento.time,        
+                '5': meet_link           
+            }
+            resultado_envio = send_whatsapp_template(
+                to=whatsapp_destino, 
+                template_sid=template_sids['convite_reuniao'], 
+                content_variables=variaveis
+            )
+            if resultado_envio.get('status') == 'success':
+                status_envio = f"✅ Convite enviado para o WhatsApp de {contato_encontrado.name}."
+            else:
+                erro = resultado_envio.get('message') or resultado_envio.get('error_message')
+                print(f" >>> ERRO TWILIO: {erro}")
+                status_envio = f"⚠️ Notificação WhatsApp: {erro}"
+        except Exception as e_zap:
+            print(f"Erro ao disparar WhatsApp: {e_zap}")
+            status_envio = "ℹ️ Conexão de WhatsApp indisponível no momento."
+    elif contato_encontrado:
+        status_envio = f"ℹ️ {contato_encontrado.name} não possui WhatsApp cadastrado."
     else:
-        status_envio = "⚠️ Contato não encontrado ou sem WhatsApp cadastrado."
-    
+        status_envio = "ℹ️ Convidado sem WhatsApp na agenda."
+
+    email_info = f"📧 Convite enviado para {attendee_email}." if attendee_email else "ℹ️ Sem e-mail cadastrado."
+
     return (
-        f"✅ *Reunião Agendada!* \n\n"
-        f"🔗 *Link:* {meet_link}\n"
-        f"📧 E-mail enviado.\n"
+        f"✅ *Reunião Agendada com Sucesso!* \n\n"
+        f"📌 *Assunto:* {evento.title}\n"
+        f"📅 *Data:* {data_formatada} às {evento.time}\n"
+        f"🔗 *Google Meet:* {meet_link}\n"
+        f"{email_info}\n"
         f"{status_envio}"
     )

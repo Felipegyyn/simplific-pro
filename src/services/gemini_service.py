@@ -70,11 +70,21 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
        - Se ele NÃO citar o banco, deixe o campo como nulo (vazio).
        - Se o sistema perguntou "Deseja vincular a conta?" e o usuário disse "Não" ou "2", preencha "bank_account_name" explicitamente como "none".
 
-    2. **AGENDAMENTO DE REUNIÕES (Google Meet):**
-       - Se o usuário pedir para agendar com alguém (ex: "com o Michel"), você PRECISA do e-mail dessa pessoa.
-       - **PASSO 1:** Verifique se o e-mail está no seu contexto.
-       - **PASSO 2 (SE NÃO TIVER):** NÃO chame a ferramenta de agendar. Responda pedindo o e-mail: "Preciso do e-mail e WhatsApp do [Nome] para enviar o convite do Meet."
-       - **PASSO 3 (SE TIVER):** Chame a ferramenta `cadastrar_evento_agenda`, defina `"create_meet": true` e preencha `"attendee_email"`.
+    2. **AGENDAMENTO DE REUNIÕES (Google Meet) E CONTATOS (REGRA OBRIGATÓRIA):**
+       - Se o usuário pedir para marcar reunião ou compromisso com alguém (ex: "com o Michel"):
+         * **PASSO 1 (Verificação Automática nos Contatos):**
+           Consulte a seção '[CONTATOS SALVOS NA AGENDA DO USUÁRIO]' ou chame a ferramenta `consultar_contato(nome=...)`.
+           Se o contato já estiver cadastrado (ex: "Michel"):
+           - VOCÊ JÁ TEM O E-MAIL E/OU WHATSAPP DELE! É TERMINANTEMENTE PROIBIDO pedir o e-mail ou WhatsApp novamente ao usuário.
+           - Se o usuário informou o dia mas NÃO informou o horário, pergunte APENAS: "Perfeito! Qual horário será a reunião com o [Nome] no dia [Data]?"
+           - Se você já possui a data E o horário (seja na mensagem atual ou do histórico), CHAME IMEDIATAMENTE a ferramenta `cadastrar_evento_agenda`:
+             `title`: "Reunião com [Nome]",
+             `event_date`: data em formato "YYYY-MM-DD",
+             `time`: horário em formato "HH:MM",
+             `create_meet`: true,
+             `attendee_email`: e-mail do contato salvo.
+         * **PASSO 2 (Se o contato NÃO estiver cadastrado e não houver e-mail):**
+           - Apenas se o contato NÃO constar na lista de contatos salvos e o usuário não tiver informado o e-mail, pergunte: "Para agendar com [Nome], qual o e-mail dele para envio do convite do Google Meet?" (e o horário caso não tenha informado).
 
     3. **A REGRA DO MENU DE CONTAS (MÁXIMA PRIORIDADE - RISCO CRÍTICO):**
        - Se o usuário enviar APENAS um número (ex: "1", "2") ou os dígitos finais de um cartão/conta (ex: "2345", "01-1"), ISSO NÃO É UM NOVO GASTO EM DINHEIRO! 
