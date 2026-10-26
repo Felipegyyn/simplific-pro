@@ -711,3 +711,140 @@ def processar_comprovante_bytes(user_id, file_bytes, filename=None, content_type
             "status": "erro",
             "mensagem": f"Ocorreu um erro inesperado ao processar seu comprovante: {e}"
         }
+
+
+# ==============================================================================
+# FUNÇÕES DE GESTÃO DO ASSISTENTE VISION (EDIÇÃO, EXCLUSÃO E ESTORNO)
+# ==============================================================================
+
+def localizar_transacao_usuario(user_id, termo_busca=None, transacao_id=None):
+    """
+    Localiza uma transação do usuário pelo ID ou por busca textual / semântica / último lançamento.
+    """
+    if transacao_id:
+        return Transaction.query.filter_by(id=transacao_id, user_id=user_id).first()
+
+    query = Transaction.query.filter_by(user_id=user_id)
+
+    if not termo_busca:
+        return query.order_by(Transaction.id.desc()).first()
+
+    termo = str(termo_busca).strip().lower()
+
+    if any(k in termo for k in ['ultimo', 'último', 'ultima', 'última', 'recente']):
+        termo_limpo = re.sub(r'\b(o|a|os|as|meu|minha|ultimo|último|ultima|última|lancamento|lançamento|gasto|despesa|receita)\b', '', termo, flags=re.IGNORECASE).strip()
+        if termo_limpo:
+            tx = query.filter(Transaction.description.ilike(f'%{termo_limpo}%')).order_by(Transaction.id.desc()).first()
+            if tx:
+                return tx
+        return query.order_by(Transaction.id.desc()).first()
+
+    # Tenta achar por valor numérico exato
+    try:
+        val_str = termo.replace('r$', '').replace('R$', '').replace(' ', '').replace(',', '.')
+        val_num = float(val_str)
+        tx = query.filter(Transaction.value == val_num).order_by(Transaction.id.desc()).first()
+        if tx:
+            return tx
+    except ValueError:
+        pass
+
+    # Busca por descrição parcial
+    tx = query.filter(Transaction.description.ilike(f'%{termo}%')).order_by(Transaction.id.desc()).first()
+    if tx:
+        return tx
+
+    return query.order_by(Transaction.id.desc()).first()
+
+
+def editar_transacao_assistente(user_id, termo_busca=None, novo_valor=None, nova_descricao=None, nova_categoria=None, nova_data=None):
+    """
+    Edita uma transação existente via linguagem natural.
+    Reajusta saldo bancário se a transação estiver confirmada e o valor tiver sido alterado.
+    """
+    tx = localizar_transacao_usuario(user_id, termo_busca)
+    if not tx:
+        return {"status": "erro", "mensagem": "Não encontrei nenhum lançamento recente para editar."}
+
+    val_antigo = tx.value
+
+    if nova_descricao:
+        tx.description = nova_descricao
+
+    if nova_data:
+        try:
+            tx.date = datetime.strptime(nova_data, '%Y-%m-%d').date()
+        except:
+            pass
+
+    if nova_categoria:
+        from src.models.financial import Category
+        cat = Category.query.filter(Category.user_id == user_id, Category.name.ilike(f'%{nova_categoria}%')).first()
+        if cat:
+            tx.category_id = cat.id
+
+    if novo_valor is not None:
+        try:
+            val_novo = abs(float(novo_valor))
+            dif = val_novo - val_antigo
+
+            if tx.status == 'confirmada' and tx.bank_account_id:
+                conta = BankAccount.query.filter_by(id=tx.bank_account_id, user_id=user_id).first()
+                if conta:
+                    if tx.type == 'saida':
+                        conta.current_balance -= dif
+                    elif tx.type == 'entrada':
+                        conta.current_balance += dif
+
+            tx.value = val_novo
+        except Exception as e:
+            print(f"Erro ao converter novo valor: {e}")
+
+    try:
+        db.session.commit()
+        val_fmt = format_currency_brl(tx.value)
+        return {
+            "status": "sucesso",
+            "mensagem": f"Transação atualizada com sucesso! *{tx.description}* agora está em *{val_fmt}* ({tx.category.name if tx.category else 'Geral'}).",
+            "transacao": tx.to_dict()
+        }
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao salvar alterações no banco: {e}"}
+
+
+def excluir_transacao_assistente(user_id, termo_busca=None):
+    """
+    Exclui ou estorna uma transação via linguagem natural.
+    Estorna o saldo da conta bancária se o lançamento já estava confirmado!
+    """
+    tx = localizar_transacao_usuario(user_id, termo_busca)
+    if not tx:
+        return {"status": "erro", "mensagem": "Não encontrei nenhum lançamento compatível para excluir."}
+
+    desc = tx.description
+    val = tx.value
+    tipo = tx.type
+    val_fmt = format_currency_brl(val)
+
+    msg_estorno = ""
+    if tx.status == 'confirmada' and tx.bank_account_id:
+        conta = BankAccount.query.filter_by(id=tx.bank_account_id, user_id=user_id).first()
+        if conta:
+            if tipo == 'saida':
+                conta.current_balance += val
+                msg_estorno = f" e o valor de *{val_fmt}* foi estornado de volta para o saldo de *{conta.bank_name}*"
+            elif tipo == 'entrada':
+                conta.current_balance -= val
+                msg_estorno = f" e a entrada de *{val_fmt}* foi estornada da conta *{conta.bank_name}*"
+
+    try:
+        db.session.delete(tx)
+        db.session.commit()
+        return {
+            "status": "sucesso",
+            "mensagem": f"🗑️ Lançamento *{desc}* de *{val_fmt}* excluído com sucesso{msg_estorno}."
+        }
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao excluir lançamento: {e}"}

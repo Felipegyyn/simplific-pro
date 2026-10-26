@@ -91,6 +91,28 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
        - Isso significa que ele está respondendo à sua própria pergunta anterior sobre "Qual conta devo usar?".
        - **O QUE VOCÊ DEVE FAZER:** Olhe o histórico da conversa, identifique qual conta corresponde à opção escolhida pelo usuário, pegue os 4 DÍGITOS FINAIS daquela conta e CHAME IMEDIATAMENTE a ferramenta `vincular_conta_ultima_transacao`.
        - **É ESTRITAMENTE PROIBIDO** responder dizendo "Não entendi", "Como posso ajudar com esse número?" ou tentar registrar um gasto com esse número. Chame a ferramenta na hora.
+
+    4. **EDITAR, EXCLUIR OU ESTORNAR TRANSAÇÕES (FINANÇAS):**
+       - Se o usuário pedir para cancelar, estornar, apagar ou editar um lançamento (ex: "cancele o último almoço", "mude o valor do ifood para 40"):
+       - Para exclusão/estorno: chame `excluir_transacao(identificador="almoço")` ou com `posicao_relativa="ultima"`.
+       - Para edição: chame `editar_transacao(identificador="ifood", novo_valor=40)`.
+
+    5. **CARTÕES DE CRÉDITO:**
+       - Para cadastrar novo cartão via chat: chame `cadastrar_cartao_credito(name="Inter", limit=5000, closing_day=20, due_day=28)`.
+       - Para reajustar limite: chame `alterar_limite_cartao(card_name="Nubank", novo_limite=8000)`.
+
+    6. **METAS PESSOAIS:**
+       - Para pausar, reativar, excluir ou renegociar prazo/valor da meta: chame `gerenciar_meta(meta_nome="Viagem", acao="pausar"|"reativar"|"excluir"|"alterar_prazo"|"alterar_valor", novo_prazo=..., novo_valor_alvo=...)`.
+
+    7. **INVESTIMENTOS (RESGATE E RENTABILIDADE):**
+       - Para vender ou resgatar ativos: chame `resgatar_investimento(nome_ou_ticker="PETR4", quantidade=10)`.
+       - Para consultar rentabilidade consolidada da carteira: chame `consultar_rentabilidade_carteira()`.
+
+    8. **AGENDA (CANCELAMENTO):**
+       - Para desmarcar ou cancelar reunião/compromisso: chame `cancelar_evento_agenda(identificador="Reunião com Michel")`.
+
+    9. **CONTATOS (ATUALIZAÇÃO):**
+       - Para atualizar e-mail ou WhatsApp de contato existente: chame `atualizar_contato(nome="Michel", email="...", whatsapp="...")`.
     
     # SOBRE O CONTEXTO FINANCEIRO DO USUÁRIO
     - Use os dados abaixo apenas para responder o que foi perguntado.

@@ -346,3 +346,135 @@ def get_investments_summary_for_ai(user_id):
         f"com um resultado (lucro/prejuízo) de {format_currency_brl(lucro_prejuizo)} ({rentabilidade:+.2f}%)."
     )
     return resumo
+
+
+# ==============================================================================
+# FUNÇÕES DE GESTÃO DE INVESTIMENTOS PARA O ASSISTENTE VISION
+# ==============================================================================
+
+def resgatar_investimento_assistente(user_id, ticker_ou_nome, valor_resgate=None, quantidade_cotas=None):
+    """
+    Processa resgate ou venda de investimento via linguagem natural.
+    """
+    from src.models.extended import InvestmentTransaction
+    if not ticker_ou_nome:
+        return {"status": "erro", "mensagem": "Informe o nome ou ticker do investimento a resgatar."}
+
+    termo = str(ticker_ou_nome).strip().upper()
+    investimento = Investment.query.filter(
+        Investment.user_id == user_id,
+        Investment.is_active == True,
+        (Investment.ticker.ilike(f'%{termo}%') | Investment.name.ilike(f'%{termo}%'))
+    ).first()
+
+    if not investimento:
+        return {"status": "erro", "mensagem": f"Não encontrei nenhum investimento ativo com o nome ou ticker '{ticker_ou_nome}'."}
+
+    try:
+        if investimento.type in ['Ações', 'Fundo Imobiliário', 'FII']:
+            preco_atual = _get_stock_price(investimento.ticker)
+            if not preco_atual or preco_atual == 0:
+                preco_atual = investimento.current_value / investimento.quantity if investimento.quantity > 0 else 0
+
+            if not preco_atual or preco_atual == 0:
+                return {"status": "erro", "mensagem": f"Não foi possível obter a cotação de {investimento.ticker} para calcular o resgate."}
+
+            if quantidade_cotas is not None and float(quantidade_cotas) > 0:
+                shares_to_sell = float(quantidade_cotas)
+                total_resgate = shares_to_sell * preco_atual
+            elif valor_resgate is not None and float(valor_resgate) > 0:
+                total_resgate = float(valor_resgate)
+                shares_to_sell = total_resgate / preco_atual
+            else:
+                return {"status": "erro", "mensagem": "Informe o valor em R$ ou a quantidade de cotas para o resgate."}
+
+            if shares_to_sell > investimento.quantity:
+                return {"status": "erro", "mensagem": f"Quantidade insuficiente. Você possui {investimento.quantity:.2f} cotas de {investimento.ticker}."}
+
+            proporcao_inicial = (shares_to_sell / investimento.quantity) * investimento.initial_value if investimento.quantity > 0 else 0
+            investimento.quantity -= shares_to_sell
+            investimento.initial_value = max(0, investimento.initial_value - proporcao_inicial)
+            investimento.current_value = investimento.quantity * preco_atual
+
+            if investimento.quantity <= 0.001:
+                investimento.is_active = False
+
+        else:
+            # Renda Fixa e outros
+            if valor_resgate is None or float(valor_resgate) <= 0:
+                return {"status": "erro", "mensagem": "Informe o valor em R$ para o resgate."}
+
+            total_resgate = float(valor_resgate)
+            if total_resgate > investimento.current_value:
+                return {"status": "erro", "mensagem": f"Valor solicitado de {format_currency_brl(total_resgate)} é maior que o saldo atual de {format_currency_brl(investimento.current_value)}."}
+
+            razao = total_resgate / investimento.current_value if investimento.current_value > 0 else 1
+            investimento.initial_value = max(0, investimento.initial_value - (investimento.initial_value * razao))
+            investimento.current_value = max(0, investimento.current_value - total_resgate)
+
+            if investimento.current_value <= 0.01:
+                investimento.is_active = False
+
+        # Registra a transação de resgate
+        transacao_resgate = InvestmentTransaction(
+            investment_id=investimento.id,
+            user_id=user_id,
+            transaction_type='resgate',
+            date=datetime.now().date(),
+            value=total_resgate,
+            notes='Resgate registrado via assistente VISION'
+        )
+        db.session.add(transacao_resgate)
+        db.session.commit()
+
+        val_fmt = format_currency_brl(total_resgate)
+        saldo_fmt = format_currency_brl(investimento.current_value)
+        return {
+            "status": "sucesso",
+            "mensagem": f"📈 Resgate de *{val_fmt}* realizado com sucesso em *{investimento.name}*! Novo saldo no ativo: *{saldo_fmt}*.",
+            "investimento": investimento.to_dict()
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao processar resgate: {e}"}
+
+
+def consultar_rentabilidade_carteira_assistente(user_id):
+    """
+    Retorna um relatório detalhado e humanizado da rentabilidade consolidada da carteira.
+    """
+    resumo_carteira = gerar_resumo_carteira(user_id)
+    if not resumo_carteira or not resumo_carteira.get('resumo_geral'):
+        return {"status": "sucesso", "mensagem": "Você ainda não possui investimentos cadastrados na sua carteira."}
+
+    geral = resumo_carteira['resumo_geral']
+    ativos = resumo_carteira.get('ativos', [])
+
+    tot_inv = format_currency_brl(geral.get('total_investido', 0))
+    tot_atual = format_currency_brl(geral.get('total_atual', 0))
+    lucro = geral.get('lucro_prejuizo', 0)
+    lucro_fmt = format_currency_brl(lucro)
+    rent = geral.get('rentabilidade', 0)
+
+    emoji_resultado = "🚀 Lucro" if lucro >= 0 else "🔻 Prejuízo"
+
+    linhas_ativos = []
+    for at in ativos[:5]:
+        r_at = at.get('rentabilidade', 0)
+        linhas_ativos.append(f"• *{at['nome']}*: {format_currency_brl(at['valor_atual'])} ({r_at:+.2f}%)")
+
+    msg = (
+        f"📊 *Performance Consolidada da Carteira:*\n\n"
+        f"• *Total Investido:* {tot_inv}\n"
+        f"• *Patrimônio Atual:* {tot_atual}\n"
+        f"• *{emoji_resultado}:* {lucro_fmt} ({rent:+.2f}%)\n\n"
+        f"*Destaques dos Ativos:*\n" + "\n".join(linhas_ativos)
+    )
+
+    return {
+        "status": "sucesso",
+        "mensagem": msg,
+        "dados": resumo_carteira
+    }
+

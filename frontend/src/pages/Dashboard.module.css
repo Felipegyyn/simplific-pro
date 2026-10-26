@@ -344,3 +344,52 @@
   color: var(--text-muted);
   margin: 0;
 }
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .pageContainer {
+    gap: 1rem;
+  }
+
+  .header {
+    gap: 0.75rem;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+
+  .actionPanel {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .filterPanel {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .summaryLabel {
+    font-size: 0.75rem;
+  }
+
+  .summaryValue {
+    font-size: 1.125rem;
+  }
+
+  .cardHeader, .cardHeaderPlain {
+    padding: 0.75rem 1rem;
+  }
+
+  .cardContent {
+    padding: 0.75rem;
+  }
+}

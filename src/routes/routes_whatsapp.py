@@ -688,6 +688,86 @@ def executar_acao_simplific(user_id, acao, from_number):
                 return "Contatos encontrados:\n" + "\n".join(linhas)
             return f"Não encontrei nenhum contato com o nome '{nome}'."
 
+        # ▼▼▼ NOVAS AÇÕES (100% COBERTURA DO SISTEMA) ▼▼▼
+        elif tipo_acao == 'editar_transacao':
+            from src.services.transacoes_service import editar_transacao_assistente
+            res = editar_transacao_assistente(
+                user_id=user_id,
+                termo_busca=dados_acao.get('termo_busca'),
+                novo_valor=dados_acao.get('novo_valor'),
+                nova_descricao=dados_acao.get('nova_descricao'),
+                nova_categoria=dados_acao.get('nova_categoria'),
+                nova_data=dados_acao.get('nova_data')
+            )
+            return res.get('mensagem', 'Transação atualizada.')
+
+        elif tipo_acao == 'excluir_transacao':
+            from src.services.transacoes_service import excluir_transacao_assistente
+            res = excluir_transacao_assistente(
+                user_id=user_id,
+                termo_busca=dados_acao.get('termo_busca')
+            )
+            return res.get('mensagem', 'Transação excluída.')
+
+        elif tipo_acao == 'cadastrar_cartao_credito':
+            from src.services.credit_card_service import cadastrar_cartao_assistente
+            res = cadastrar_cartao_assistente(
+                user_id=user_id,
+                name=dados_acao.get('name'),
+                limit=dados_acao.get('limit'),
+                due_day=dados_acao.get('due_day'),
+                closing_day=dados_acao.get('closing_day'),
+                brand=dados_acao.get('brand')
+            )
+            return res.get('mensagem', 'Cartão cadastrado.')
+
+        elif tipo_acao == 'alterar_limite_cartao':
+            from src.services.credit_card_service import alterar_limite_cartao_assistente
+            res = alterar_limite_cartao_assistente(
+                user_id=user_id,
+                card_name=dados_acao.get('card_name'),
+                novo_limite=dados_acao.get('novo_limite')
+            )
+            return res.get('mensagem', 'Limite do cartão atualizado.')
+
+        elif tipo_acao == 'gerenciar_meta':
+            from src.services.goals_service import gerenciar_meta_assistente
+            res = gerenciar_meta_assistente(
+                user_id=user_id,
+                goal_name=dados_acao.get('goal_name'),
+                action=dados_acao.get('action'),
+                new_target_date=dados_acao.get('new_target_date'),
+                new_target_amount=dados_acao.get('new_target_amount')
+            )
+            return res.get('mensagem', 'Ação na meta executada.')
+
+        elif tipo_acao == 'resgatar_investimento':
+            from src.services.investments_service import resgatar_investimento_assistente
+            res = resgatar_investimento_assistente(
+                user_id=user_id,
+                ticker_ou_nome=dados_acao.get('ticker_ou_nome'),
+                valor_resgate=dados_acao.get('valor_resgate'),
+                quantidade_cotas=dados_acao.get('quantidade_cotas')
+            )
+            return res.get('mensagem', 'Resgate efetuado.')
+
+        elif tipo_acao == 'consultar_rentabilidade_carteira':
+            from src.services.investments_service import consultar_rentabilidade_carteira_assistente
+            res = consultar_rentabilidade_carteira_assistente(user_id)
+            return res.get('mensagem', 'Rentabilidade consultada.')
+
+        elif tipo_acao == 'cancelar_evento_agenda':
+            from src.services.schedule_service import cancelar_evento_agenda_assistente
+            res = cancelar_evento_agenda_assistente(
+                user_id=user_id,
+                termo_busca=dados_acao.get('termo_busca'),
+                data_evento=dados_acao.get('data_evento')
+            )
+            return res.get('mensagem', 'Evento cancelado.')
+
+        elif tipo_acao == 'atualizar_contato':
+            return handle_atualizar_contato(user_id, dados_acao)
+
         elif tipo_acao in ['pesquisar_na_internet', 'pesificar_na_internet', 'vincular_conta_ultima_transacao']:
             # Ações de leitura/pesquisa já resolvidas durante o loop de IA
             return None
@@ -1728,6 +1808,37 @@ def handle_cadastrar_contato(user_id, dados):
     db.session.commit()
 
     return f"Contato '{nome}' cadastrado com sucesso! Agora posso agendar a reunião."
+
+def handle_atualizar_contato(user_id, dados):
+    """
+    Atualiza dados (e-mail, WhatsApp ou nome) de um contato existente.
+    """
+    nome = dados.get('name')
+    if not nome:
+        return "Informe o nome do contato que deseja atualizar."
+
+    contato = Contact.query.filter(Contact.user_id == user_id, Contact.name.ilike(f'%{nome}%')).first()
+    if not contato:
+        return f"Não encontrei nenhum contato chamado '{nome}'. Deseja que eu cadastre ele?"
+
+    email = dados.get('email')
+    whatsapp = dados.get('whatsapp')
+
+    alterado = False
+    if email:
+        contato.email = email
+        alterado = True
+    if whatsapp:
+        contato.whatsapp = normalize_phone_number(whatsapp)
+        alterado = True
+
+    if alterado:
+        db.session.commit()
+        return f"👤 Contato *{contato.name}* atualizado com sucesso! E-mail: {contato.email or 'N/I'}, WhatsApp: {contato.whatsapp or 'N/I'}."
+    else:
+        return f"Nenhum dado novo fornecido para atualizar o contato *{contato.name}*."
+
+
 
 # ==============================================================================
 # CORREÇÃO 2: Função de Agendamento com Prefixo 'whatsapp:'

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import SidebarBusiness from './SidebarBusiness';
-import { Menu, AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import MobileBottomNav from './MobileBottomNav';
+import { Menu, AlertTriangle, ArrowRight, CheckCircle2, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import logo from '../assets/LOGO.png';
 
 // Importação do CSS Modular
@@ -11,6 +13,7 @@ import styles from './MainLayout.module.css';
 const MainLayout = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   
   const location = useLocation();
   const isBusinessRoute = location.pathname.startsWith('/business');
@@ -60,24 +63,31 @@ const MainLayout = ({ user, onLogout }) => {
       {/* Conteúdo Principal */}
       <div className={styles.mainContentWrapper}>
         
-        {/* Header Mobile */}
+        {/* Header Mobile Otimizado para App */}
         <header className={styles.mobileHeader}>
-          <button 
-            className={styles.menuButton}
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Abrir Menu"
-          >
-            <Menu size={24} />
-          </button>
-          
           <div className={styles.logoContainer}>
             <img src={logo} alt="Simplific Pro" className={styles.logoIcon} />
             <h1 className={styles.logoText}>
-                {isBusinessRoute ? 'Simplific Empresas' : 'Simplific Pro'}
+              {isBusinessRoute ? 'Simplific Empresas' : 'Simplific Pro'}
             </h1>
           </div>
-          
-          <div style={{ width: '24px' }}></div> 
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors touch-manipulation"
+              aria-label="Alternar tema"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button 
+              className={styles.menuButton}
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Abrir Menu Completo"
+            >
+              <Menu size={20} />
+            </button>
+          </div>
         </header>
 
         <main className={styles.mainArea}>
@@ -128,6 +138,9 @@ const MainLayout = ({ user, onLogout }) => {
             <Outlet /> 
           )}
         </main>
+
+        {/* Barra de Navegação Inferior Nativa Exclusiva para Mobile */}
+        <MobileBottomNav onOpenMenu={() => setIsMobileMenuOpen(true)} />
       </div>
     </div>
   );

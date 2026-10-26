@@ -295,3 +295,66 @@
   background-color: var(--surface-elevated);
   border-color: var(--color-border-hover);
 }
+
+/* ==========================================================================
+   RESPONSIVIDADE MOBILE (< 768px)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .pageContainer {
+    gap: 1rem;
+    padding: 0 0.25rem;
+  }
+
+  .header {
+    gap: 0.75rem;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+
+  .actionPanel {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .kpiCard {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .summaryLabel {
+    font-size: 0.75rem;
+  }
+
+  .summaryValue {
+    font-size: 1.125rem;
+  }
+
+  .cardHeader {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .tabsList {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .tabsTrigger {
+    text-align: center;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.7rem;
+  }
+
+  .transactionRow {
+    padding: 0.75rem 0.875rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

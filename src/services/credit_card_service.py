@@ -214,3 +214,82 @@ def get_credit_card_summary_for_ai(user_id):
         )
     
     return "Cartões de Crédito: " + " | ".join(resumos)
+
+
+# ==============================================================================
+# FUNÇÕES DE GESTÃO DE CARTÕES PARA O ASSISTENTE VISION
+# ==============================================================================
+
+def cadastrar_cartao_assistente(user_id, name, limit, due_day, closing_day=None, brand=None):
+    """
+    Cadastra um novo cartão de crédito para o usuário pelo assistente.
+    """
+    if not name or limit is None or due_day is None:
+        return {"status": "erro", "mensagem": "Nome do cartão, limite e dia de vencimento são obrigatórios."}
+
+    try:
+        limite_val = abs(float(limit))
+        dia_venc = int(due_day)
+        if dia_venc < 1 or dia_venc > 31:
+            return {"status": "erro", "mensagem": "Dia de vencimento deve ser entre 1 e 31."}
+
+        dia_fech = int(closing_day) if closing_day else max(1, (dia_venc - 7 if dia_venc > 7 else dia_venc + 23))
+
+        existente = CreditCard.query.filter_by(user_id=user_id, name=name, is_active=True).first()
+        if existente:
+            return {"status": "erro", "mensagem": f"Você já tem um cartão cadastrado com o nome '{name}'."}
+
+        novo_cartao = CreditCard(
+            user_id=user_id,
+            name=name,
+            brand=brand or "Outros",
+            limit=limite_val,
+            available_limit=limite_val,
+            closing_day=dia_fech,
+            due_day=dia_venc,
+            is_active=True
+        )
+        db.session.add(novo_cartao)
+        db.session.commit()
+        lim_fmt = format_currency_brl(limite_val)
+        return {
+            "status": "sucesso",
+            "mensagem": f"💳 Cartão *{name}* cadastrado com sucesso! Limite: *{lim_fmt}*, Vencimento todo dia *{dia_venc}* (fechamento dia {dia_fech}).",
+            "cartao": novo_cartao.to_dict()
+        }
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao cadastrar cartão: {e}"}
+
+
+def alterar_limite_cartao_assistente(user_id, card_name, novo_limite):
+    """
+    Altera o limite de um cartão existente via linguagem natural.
+    """
+    if not card_name or novo_limite is None:
+        return {"status": "erro", "mensagem": "Informe o nome do cartão e o novo limite."}
+
+    cartao = CreditCard.query.filter(CreditCard.user_id == user_id, CreditCard.name.ilike(f'%{card_name}%'), CreditCard.is_active == True).first()
+    if not cartao:
+        return {"status": "erro", "mensagem": f"Cartão '{card_name}' não encontrado."}
+
+    try:
+        novo_lim = abs(float(novo_limite))
+        limite_anterior = cartao.limit or 0
+        disp_anterior = cartao.available_limit if cartao.available_limit is not None else limite_anterior
+
+        fatura_utilizada = max(0, limite_anterior - disp_anterior)
+        cartao.limit = novo_lim
+        cartao.available_limit = max(0, novo_lim - fatura_utilizada)
+
+        db.session.commit()
+        novo_lim_fmt = format_currency_brl(novo_lim)
+        disp_fmt = format_currency_brl(cartao.available_limit)
+        return {
+            "status": "sucesso",
+            "mensagem": f"💳 Limite do cartão *{cartao.name}* atualizado para *{novo_lim_fmt}* (disponível atual: {disp_fmt}).",
+            "cartao": cartao.to_dict()
+        }
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao atualizar limite: {e}"}

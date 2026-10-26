@@ -78,3 +78,65 @@ def get_goals_summary_for_ai(user_id):
         )
     
     return "Metas: " + ", ".join(resumos) + "."
+
+
+# ==============================================================================
+# FUNÇÕES DE GESTÃO DE METAS PARA O ASSISTENTE VISION
+# ==============================================================================
+
+def gerenciar_meta_assistente(user_id, goal_name, action, new_target_date=None, new_target_amount=None):
+    """
+    Permite pausar, reativar, excluir ou renegociar prazo/valor da meta pelo assistente.
+    Ações: 'pausar', 'reativar', 'excluir', 'alterar_prazo', 'alterar_valor'
+    """
+    if not goal_name:
+        return {"status": "erro", "mensagem": "Informe o nome da meta a ser gerenciada."}
+
+    action_norm = str(action).strip().lower()
+    meta = Goal.query.filter(Goal.user_id == user_id, Goal.name.ilike(f'%{goal_name}%')).first()
+    if not meta:
+        return {"status": "erro", "mensagem": f"Meta '{goal_name}' não encontrada."}
+
+    try:
+        if action_norm in ['pausar', 'pause', 'desativar']:
+            meta.is_active = False
+            db.session.commit()
+            return {"status": "sucesso", "mensagem": f"⏸️ Meta *'{meta.name}'* foi pausada com sucesso. Você pode reativá-la quando quiser!"}
+
+        elif action_norm in ['reativar', 'retomar', 'ativar']:
+            meta.is_active = True
+            db.session.commit()
+            return {"status": "sucesso", "mensagem": f"▶️ Meta *'{meta.name}'* foi reativada com sucesso!"}
+
+        elif action_norm in ['excluir', 'apagar', 'remover', 'cancelar']:
+            nome_meta = meta.name
+            db.session.delete(meta)
+            db.session.commit()
+            return {"status": "sucesso", "mensagem": f"🗑️ Meta *'{nome_meta}'* foi excluída permanentemente."}
+
+        elif action_norm in ['alterar_prazo', 'mudar_prazo', 'prazo', 'renegociar_prazo']:
+            if not new_target_date:
+                return {"status": "erro", "mensagem": "Por favor, informe a nova data limite (AAAA-MM-DD)."}
+            from datetime import datetime
+            data_limite = datetime.strptime(new_target_date, '%Y-%m-%d').date()
+            meta.target_date = data_limite
+            db.session.commit()
+            data_fmt = data_limite.strftime('%d/%m/%Y')
+            return {"status": "sucesso", "mensagem": f"📅 Prazo da meta *'{meta.name}'* atualizado para *{data_fmt}*."}
+
+        elif action_norm in ['alterar_valor', 'mudar_valor', 'valor']:
+            if not new_target_amount:
+                return {"status": "erro", "mensagem": "Por favor, informe o novo valor alvo da meta."}
+            val_novo = abs(float(new_target_amount))
+            meta.target_value = val_novo
+            db.session.commit()
+            val_fmt = format_currency_brl(val_novo)
+            return {"status": "sucesso", "mensagem": f"🎯 Valor alvo da meta *'{meta.name}'* atualizado para *{val_fmt}*."}
+
+        else:
+            return {"status": "erro", "mensagem": f"Ação '{action}' não suportada para metas."}
+
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao gerenciar meta: {e}"}
+

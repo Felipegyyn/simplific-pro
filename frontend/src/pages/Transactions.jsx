@@ -668,7 +668,7 @@ const Transactions = ({ user, onLogout }) => {
                         <Input id="description" value={formData.description} onChange={(e) => handleInputChange('description', e.target.value)} placeholder="Ex: Supermercado, Salário..." required className="glass-panel border-white/10" />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="type" className="text-slate-600 dark:text-slate-300">Tipo *</Label>
                           <Select value={formData.type} onValueChange={(value) => handleInputChange('type', value)}>
@@ -757,7 +757,7 @@ const Transactions = ({ user, onLogout }) => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="transaction_date" className="text-slate-600 dark:text-slate-300">Data</Label>
                           <Input id="transaction_date" type="date" value={formData.transaction_date} onChange={(e) => handleInputChange('transaction_date', e.target.value)} className="glass-panel border-white/10" />
@@ -774,9 +774,9 @@ const Transactions = ({ user, onLogout }) => {
                         </div>
                       </div>
 
-                      <div className="flex justify-end space-x-2 pt-4">
-                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
-                        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Criar Transação</Button>
+                      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4 w-full">
+                        <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
+                        <Button type="submit" className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white">Criar Transação</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -964,7 +964,7 @@ const Transactions = ({ user, onLogout }) => {
                 <Label htmlFor="edit_description" className="text-slate-600 dark:text-slate-300">Descrição *</Label>
                 <Input id="edit_description" value={editFormData.description} onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))} required className="glass-panel border-white/10" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit_amount" className="text-slate-600 dark:text-slate-300">Valor *</Label>
                   <Input id="edit_amount" type="number" step="0.01" value={editFormData.amount} onChange={(e) => setEditFormData(prev => ({...prev, amount: e.target.value}))} required className="glass-panel border-white/10" />
@@ -1009,7 +1009,7 @@ const Transactions = ({ user, onLogout }) => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit_transaction_date" className="text-slate-600 dark:text-slate-300">Data</Label>
                   <Input id="edit_transaction_date" type="date" value={editFormData.transaction_date} onChange={(e) => setEditFormData(prev => ({...prev, transaction_date: e.target.value}))} className="glass-panel border-white/10" />
@@ -1025,9 +1025,9 @@ const Transactions = ({ user, onLogout }) => {
                   </Select>
                 </div>
               </div>
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
-                <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-4 w-full">
+                <Button type="button" variant="ghost" onClick={() => setIsEditModalOpen(false)} className="w-full sm:w-auto text-slate-500 dark:text-slate-400 hover:text-white">Cancelar</Button>
+                <Button type="submit" className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700 text-white">Salvar Alterações</Button>
               </div>
             </form>
           </DialogContent>

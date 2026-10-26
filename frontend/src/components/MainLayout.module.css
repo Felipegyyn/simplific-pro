@@ -1,6 +1,8 @@
 .layoutContainer {
   display: flex;
   height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
   background-color: var(--bg-base);
   color: var(--text-main);
   overflow: hidden;
@@ -52,12 +54,14 @@
   z-index: 30;
   background-color: var(--surface-glass);
   backdrop-filter: blur(var(--glass-blur-amount));
+  -webkit-backdrop-filter: blur(var(--glass-blur-amount));
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 4rem;
+  height: 3.5rem;
   padding: 0 1rem;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 @media (min-width: 768px) {
@@ -74,6 +78,9 @@
   padding: 0.5rem;
   border-radius: var(--radius-md);
   transition: background-color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .menuButton:hover {
@@ -102,12 +109,14 @@
   flex: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
-  padding: 1rem;
+  padding: 0.875rem;
+  padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 768px) {
   .mainArea {
     padding: 1.5rem 2rem;
+    padding-bottom: 2rem;
   }
 }
 

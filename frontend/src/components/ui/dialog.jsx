@@ -45,54 +45,66 @@ function DialogOverlay({
 }
 
 function DialogContent({
-  className,
-  children,
-  ...props
+  className,
+  children,
+  ...props
 }) {
-  return (
-    <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          // Adicionada cor da borda para o modo escuro
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border dark:border-slate-800 p-6 shadow-lg duration-200 sm:max-w-lg",
-          className
-        )}
-        {...props}>
-        {children}
-        <DialogPrimitive.Close
-          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-          <XIcon />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
-      </DialogPrimitive.Content>
-    </DialogPortal>
-  );
+  return (
+    <DialogPortal data-slot="dialog-portal">
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          "bg-background text-foreground fixed z-50 flex flex-col w-full shadow-2xl transition-all duration-300 outline-none",
+          // MOBILE-FIRST (Bottom-Sheet nativo no celular):
+          "bottom-0 left-0 right-0 top-auto rounded-t-[1.75rem] rounded-b-none border-t border-border/80 max-h-[92dvh] p-5 pb-safe",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          // DESKTOP (Centralizado elegante em telas a partir de sm):
+          "sm:bottom-auto sm:top-[50%] sm:left-[50%] sm:right-auto sm:translate-x-[-50%] sm:translate-y-[-50%] sm:max-w-lg sm:rounded-2xl sm:border sm:border-border sm:max-h-[85vh] sm:p-6",
+          "sm:data-[state=closed]:slide-out-to-bottom-0 sm:data-[state=open]:slide-in-from-bottom-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
+          className
+        )}
+        {...props}>
+        {/* Handle bar exclusivo do mobile para fechar / puxar */}
+        <div className="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700/80 rounded-full mx-auto mb-3 shrink-0 sm:hidden" />
+        
+        <div className="flex-1 overflow-y-auto overscroll-contain pr-1 -mr-1">
+          {children}
+        </div>
+
+        <DialogPrimitive.Close
+          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-full p-2 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none touch-target flex items-center justify-center [&_svg]:size-5 sm:[&_svg]:size-4">
+          <XIcon />
+          <span className="sr-only">Fechar</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  );
 }
 
 function DialogHeader({
-  className,
-  ...props
+  className,
+  ...props
 }) {
-  return (
-    <div
-      data-slot="dialog-header"
-      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
-      {...props} />
-  );
+  return (
+    <div
+      data-slot="dialog-header"
+      className={cn("flex flex-col gap-1.5 text-left mb-3", className)}
+      {...props} />
+  );
 }
 
 function DialogFooter({
-  className,
-  ...props
+  className,
+  ...props
 }) {
-  return (
-    <div
-      data-slot="dialog-footer"
-      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
-      {...props} />
-  );
+  return (
+    <div
+      data-slot="dialog-footer"
+      className={cn("flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end mt-4 pt-3 border-t border-border/40 w-full", className)}
+      {...props} />
+  );
 }
 
 function DialogTitle({

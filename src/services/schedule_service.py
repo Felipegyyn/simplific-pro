@@ -212,3 +212,71 @@ def create_agenda_event_from_whatsapp(user_id, data):
         db.session.rollback()
         print(f"ERRO ao criar evento na agenda: {e}")
         return False, "Ocorreu um erro ao tentar agendar seu lembrete."
+
+
+# ==============================================================================
+# FUNÇÃO DE CANCELAMENTO DE EVENTOS / REUNIÕES PARA O ASSISTENTE VISION
+# ==============================================================================
+
+def cancelar_evento_agenda_assistente(user_id, termo_busca, data_evento=None):
+    """
+    Localiza e cancela um compromisso ou reunião na agenda, removendo também do Google Calendar se aplicável.
+    """
+    from src.models.user import User
+    from src.services.google_calendar_service import delete_event_from_google
+    import re
+
+    if not termo_busca:
+        return {"status": "erro", "mensagem": "Informe o título ou a pessoa da reunião/compromisso que deseja cancelar."}
+
+    termo_limpo = re.sub(r'\b(o|a|os|as|minha|meu|reuniao|reunião|compromisso|evento|com)\b', '', str(termo_busca), flags=re.IGNORECASE).strip()
+    termo_filtro = termo_limpo if termo_limpo else str(termo_busca).strip()
+
+    query = ScheduleEvent.query.filter(
+        ScheduleEvent.user_id == user_id,
+        ScheduleEvent.title.ilike(f'%{termo_filtro}%')
+    )
+
+    if data_evento:
+        try:
+            d_obj = datetime.strptime(data_evento, '%Y-%m-%d').date()
+            query = query.filter(ScheduleEvent.date == d_obj)
+        except:
+            pass
+
+    # Pega preferencialmente eventos futuros ou o mais recente
+    hoje = date.today()
+    evento = query.filter(ScheduleEvent.date >= hoje).order_by(ScheduleEvent.date.asc(), ScheduleEvent.id.asc()).first()
+    if not evento:
+        evento = query.order_by(ScheduleEvent.id.desc()).first()
+
+    if not evento:
+        return {"status": "erro", "mensagem": f"Não encontrei nenhum compromisso compatível com '{termo_busca}' na sua agenda."}
+
+    titulo = evento.title
+    data_fmt = evento.date.strftime('%d/%m/%Y') if evento.date else 'data agendada'
+    hora_fmt = f" às {evento.time}" if evento.time else ""
+    google_id = evento.google_event_id
+
+    try:
+        # Se estiver integrado com Google Calendar, deleta na nuvem do Google
+        if google_id:
+            try:
+                usuario = User.query.get(user_id)
+                if usuario and usuario.google_calendar_token:
+                    delete_event_from_google(usuario, google_id)
+            except Exception as eg:
+                print(f"Aviso ao deletar evento do Google Calendar: {eg}")
+
+        db.session.delete(evento)
+        db.session.commit()
+
+        return {
+            "status": "sucesso",
+            "mensagem": f"🗑️ O compromisso/reunião *'{titulo}'* marcado para *{data_fmt}{hora_fmt}* foi cancelado com sucesso (e removido do Google Calendar e Google Meet)!"
+        }
+
+    except Exception as e:
+        db.session.rollback()
+        return {"status": "erro", "mensagem": f"Erro ao cancelar evento na agenda: {e}"}
+

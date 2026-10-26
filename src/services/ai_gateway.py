@@ -100,13 +100,21 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
             "content": (
                 "Você é o VISION, o assistente inteligente e consultor oficial do Simplific Pro. "
                 "Responda sempre em português brasileiro de forma direta, cortês, elegante e objetiva. "
-                "Ao consultar dados (como cotações de moedas/ações, extrato, agenda, contatos, planejamento ou internet), "
-                "analise os dados retornados pelas ferramentas ou contidos no contexto e formule uma resposta agradável e natural. "
-                "REGRAS DE CONTATOS E REUNIÕES: Ao agendar reuniões com uma pessoa (ex: 'reunião com o Michel'), "
+                "Ao consultar dados (como cotações de moedas/ações, extrato, agenda, contatos, planejamento, rentabilidade ou internet), "
+                "analise os dados retornados pelas ferramentas ou contidos no contexto e formule uma resposta agradável e natural.\n\n"
+                "DIRETRIZES DE FERRAMENTAS ESPECÍFICAS:\n"
+                "1. EDITAR / EXCLUIR GASTOS: Se o usuário pedir para corrigir, alterar valor/categoria ou cancelar/excluir um lançamento "
+                "(ex: 'mude o almoço para 40', 'cancele o último almoço', 'apague o gasto de 100'), use 'editar_transacao' ou 'excluir_transacao'.\n"
+                "2. CARTÕES: Use 'cadastrar_cartao_credito' para novos cartões e 'alterar_limite_cartao' para reajustes de limite.\n"
+                "3. METAS: Use 'gerenciar_meta' para pausar, reativar, excluir ou renegociar prazo/valor de metas existentes.\n"
+                "4. INVESTIMENTOS: Use 'resgatar_investimento' para vendas/resgates e 'consultar_rentabilidade_carteira' para panorama consolidado da carteira.\n"
+                "5. AGENDA: Use 'cancelar_evento_agenda' para desmarcar compromissos ou reuniões (isso remove da agenda e do Google Calendar/Meet).\n"
+                "6. CONTATOS E REUNIÕES: Ao agendar reuniões com uma pessoa (ex: 'reunião com o Michel'), "
                 "consulte primeiro a lista de contatos salvos ou a ferramenta 'consultar_contato'. Se o contato já tiver e-mail ou WhatsApp cadastrado, "
                 "USE esses dados automaticamente e NÃO pergunte e-mail nem WhatsApp ao usuário. "
                 "Se faltar apenas o horário, pergunte unicamente o horário. "
                 "Com data e horário definidos, chame 'cadastrar_evento_agenda' com create_meet: true e attendee_email. "
+                "Para alterar e-mail ou telefone de quem já é contato, use 'atualizar_contato'.\n\n"
                 "NUNCA exiba respostas brutas em JSON nem instruções técnicas de sistema na sua resposta final."
             )
         },
@@ -316,6 +324,22 @@ def _run_openai_agent(endpoint, api_key, model_name, user_id, prompt):
                     "content": json.dumps(resultado_vinculo, ensure_ascii=False)
                 })
 
+            # --- 8.5. CONSULTAR RENTABILIDADE CONSOLIDADA DA CARTEIRA ---
+            elif func_name == "consultar_rentabilidade_carteira":
+                from src.services.investments_service import consultar_rentabilidade_carteira_assistente
+                try:
+                    resultado_rent = consultar_rentabilidade_carteira_assistente(user_id)
+                    content_rent = resultado_rent.get("mensagem", "Rentabilidade consultada.")
+                except Exception as e:
+                    content_rent = f"Erro ao consultar rentabilidade da carteira: {e}"
+
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc_id,
+                    "name": func_name,
+                    "content": content_rent
+                })
+
             # --- 9. MUTAÇÕES DE BANCO (Lançamentos, Cartão, Metas, Agenda, etc) ---
             else:
                 print(f"🔧 [AI GATEWAY] Registrando ação de banco: {func_name}")
@@ -408,6 +432,21 @@ def _run_gemini_agent(user_id, prompt):
                         "function_response": {
                             "name": "vincular_conta_ultima_transacao",
                             "response": resultado_vinculo
+                        }
+                    })
+
+                elif nome_funcao == "consultar_rentabilidade_carteira":
+                    from src.services.investments_service import consultar_rentabilidade_carteira_assistente
+                    try:
+                        resultado_rent = consultar_rentabilidade_carteira_assistente(user_id)
+                        texto_res = resultado_rent.get("mensagem", "Rentabilidade consultada.")
+                    except Exception as e:
+                        texto_res = f"Erro ao consultar rentabilidade: {e}"
+
+                    respostas_das_ferramentas.append({
+                        "function_response": {
+                            "name": nome_funcao,
+                            "response": {"resultado": texto_res}
                         }
                     })
 

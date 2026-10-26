@@ -244,7 +244,7 @@ simplific_tools = [
                 }
             },
 
-            # 15. Metas
+            # 16. Metas
             {
                 "name": "add_value_to_goal",
                 "description": "Adiciona dinheiro guardado a uma Meta Financeira existente.",
@@ -255,6 +255,139 @@ simplific_tools = [
                         "value": {"type": "NUMBER", "description": "Valor a ser guardado/adicionado."}
                     },
                     "required": ["goal_name", "value"]
+                }
+            },
+
+            # 17. Editar Transação
+            {
+                "name": "editar_transacao",
+                "description": "Edita ou altera dados de uma transação financeira existente (ex: mudar valor, descrição, data ou categoria de um gasto).",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "termo_busca": {"type": "STRING", "description": "Nome, descrição ou termo do gasto a alterar (ex: 'almoço', 'ifood', 'último lançamento')."},
+                        "novo_valor": {"type": "NUMBER", "description": "Novo valor da transação.", "nullable": True},
+                        "nova_descricao": {"type": "STRING", "description": "Nova descrição para o lançamento.", "nullable": True},
+                        "nova_categoria": {"type": "STRING", "description": "Nova categoria sugerida.", "nullable": True},
+                        "nova_data": {"type": "STRING", "description": "Nova data no formato YYYY-MM-DD.", "nullable": True}
+                    },
+                    "required": ["termo_busca"]
+                }
+            },
+
+            # 18. Excluir / Estornar Transação
+            {
+                "name": "excluir_transacao",
+                "description": "Exclui, cancela ou estorna uma transação financeira lançada (ex: 'cancele o almoço', 'apague o último gasto de 50').",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "termo_busca": {"type": "STRING", "description": "Descrição, valor ou termo do gasto a excluir (ex: 'almoço', 'ifood de 45', 'último gasto')."}
+                    },
+                    "required": ["termo_busca"]
+                }
+            },
+
+            # 19. Cadastrar Novo Cartão de Crédito
+            {
+                "name": "cadastrar_cartao_credito",
+                "description": "Cadastra um novo cartão de crédito para o usuário no sistema.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "name": {"type": "STRING", "description": "Nome do cartão de crédito (ex: 'Nubank Ultravioleta', 'Inter Black')."},
+                        "limit": {"type": "NUMBER", "description": "Limite total do cartão de crédito."},
+                        "due_day": {"type": "INTEGER", "description": "Dia do mês em que a fatura vence (1 a 31)."},
+                        "closing_day": {"type": "INTEGER", "description": "Dia do mês do fechamento da fatura (opcional).", "nullable": True},
+                        "brand": {"type": "STRING", "description": "Bandeira do cartão (ex: 'Mastercard', 'Visa', 'Elo').", "nullable": True}
+                    },
+                    "required": ["name", "limit", "due_day"]
+                }
+            },
+
+            # 20. Alterar Limite de Cartão de Crédito
+            {
+                "name": "alterar_limite_cartao",
+                "description": "Altera ou ajusta o limite de crédito de um cartão existente (ex: 'aumente o limite do Nubank para 8000').",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "card_name": {"type": "STRING", "description": "Nome do cartão de crédito a ter o limite alterado (ex: 'Nubank', 'Inter')."},
+                        "novo_limite": {"type": "NUMBER", "description": "Novo valor total do limite de crédito."}
+                    },
+                    "required": ["card_name", "novo_limite"]
+                }
+            },
+
+            # 21. Gerenciar Meta (Pausar, Excluir, Renegociar Prazo ou Valor)
+            {
+                "name": "gerenciar_meta",
+                "description": "Gerencia uma meta financeira existente: pausar, reativar, excluir ou renegociar prazo/valor.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "goal_name": {"type": "STRING", "description": "Nome da meta a ser gerenciada (ex: 'Viagem', 'Carro Novo')."},
+                        "action": {"type": "STRING", "description": "Ação a executar.", "enum": ["pausar", "reativar", "excluir", "alterar_prazo", "alterar_valor"]},
+                        "new_target_date": {"type": "STRING", "description": "Nova data limite no formato YYYY-MM-DD (usado se action='alterar_prazo').", "nullable": True},
+                        "new_target_amount": {"type": "NUMBER", "description": "Novo valor alvo financeiro (usado se action='alterar_valor').", "nullable": True}
+                    },
+                    "required": ["goal_name", "action"]
+                }
+            },
+
+            # 22. Resgatar ou Vender Investimento
+            {
+                "name": "resgatar_investimento",
+                "description": "Realiza o resgate ou venda de cotas/ações ou valor aplicado em um investimento existente.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "ticker_ou_nome": {"type": "STRING", "description": "Ticker ou nome do investimento (ex: 'PETR4', 'MXRF11', 'Reserva', 'Tesouro Selic')."},
+                        "valor_resgate": {"type": "NUMBER", "description": "Valor monetário em R$ a ser resgatado.", "nullable": True},
+                        "quantidade_cotas": {"type": "NUMBER", "description": "Quantidade de cotas/ações a serem vendidas.", "nullable": True}
+                    },
+                    "required": ["ticker_ou_nome"]
+                }
+            },
+
+            # 23. Consultar Rentabilidade Consolidada da Carteira
+            {
+                "name": "consultar_rentabilidade_carteira",
+                "description": "Consulta o panorama consolidado de rentabilidade, lucro/prejuízo e desempenho geral da carteira de investimentos do usuário.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "dummy": {"type": "STRING", "description": "Parâmetro auxiliar opcional.", "nullable": True}
+                    }
+                }
+            },
+
+            # 24. Cancelar Compromisso ou Reunião da Agenda
+            {
+                "name": "cancelar_evento_agenda",
+                "description": "Cancela ou desmarca um compromisso ou reunião da agenda interna e do Google Calendar/Google Meet.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "termo_busca": {"type": "STRING", "description": "Título, pessoa ou assunto da reunião/compromisso (ex: 'reunião com o Michel', 'dentista')."},
+                        "data_evento": {"type": "STRING", "description": "Data do evento no formato YYYY-MM-DD se mencionada.", "nullable": True}
+                    },
+                    "required": ["termo_busca"]
+                }
+            },
+
+            # 25. Atualizar Contato Existente
+            {
+                "name": "atualizar_contato",
+                "description": "Atualiza dados de e-mail ou WhatsApp de um contato que já está cadastrado na agenda.",
+                "parameters": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "name": {"type": "STRING", "description": "Nome do contato a ser atualizado."},
+                        "email": {"type": "STRING", "description": "Novo e-mail do contato (opcional).", "nullable": True},
+                        "whatsapp": {"type": "STRING", "description": "Novo número de WhatsApp com DDD (opcional).", "nullable": True}
+                    },
+                    "required": ["name"]
                 }
             }
         ]

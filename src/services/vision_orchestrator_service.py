@@ -435,26 +435,26 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
     texto_busca = (mensagem_usuario + " " + resposta_final).lower()
 
     # --- Se perguntou ou mexeu com Metas ---
-    if any(t in ['criar_meta', 'add_value_to_goal'] for t in tipos_acoes) or any(k in texto_busca for k in ['meta', 'metas', 'quanto guardei', 'poupança', 'poupanca']):
+    if any(t in ['criar_meta', 'add_value_to_goal', 'gerenciar_meta'] for t in tipos_acoes) or any(k in texto_busca for k in ['meta', 'metas', 'quanto guardei', 'poupança', 'poupanca']):
         metas = coletar_dados_metas(user_id)
         if metas and not any(v['type'] == 'goals' for v in visuals):
             visuals.append({"type": "goals", "data": metas})
 
     # --- Se perguntou ou mexeu com Cartões ---
-    if any(t in ['lancar_gasto_cartao', 'pay_credit_card_bill'] for t in tipos_acoes) or any(k in texto_busca for k in ['cartao', 'cartão', 'fatura', 'limite', 'cartões']):
+    if any(t in ['lancar_gasto_cartao', 'pay_credit_card_bill', 'cadastrar_cartao_credito', 'alterar_limite_cartao'] for t in tipos_acoes) or any(k in texto_busca for k in ['cartao', 'cartão', 'fatura', 'limite', 'cartões']):
         cartoes = coletar_dados_cartoes(user_id)
         if cartoes and not any(v['type'] == 'credit_cards' for v in visuals):
             visuals.append({"type": "credit_cards", "data": cartoes})
 
-    # --- Se consultou a Agenda (Apenas quando explicitamente solicitado ou pela tool consultar_agenda) ---
+    # --- Se consultou a Agenda ou cancelou evento (Mostra agenda atualizada) ---
     if not any(v.get('type') == 'schedule' for v in visuals):
         consultou_agenda = (
-            'consultar_agenda' in tipos_acoes or
+            any(t in ['consultar_agenda', 'cancelar_evento_agenda'] for t in tipos_acoes) or
             any(termo in mensagem_usuario.lower() for termo in [
                 'minha agenda', 'ver agenda', 'como está minha agenda', 'como esta minha agenda',
                 'quais meus compromissos', 'quais são meus compromissos', 'o que tenho agendado',
                 'o que tenho hoje', 'compromissos de hoje', 'compromissos da semana', 'consultar agenda',
-                'próximos compromissos', 'proximos compromissos'
+                'próximos compromissos', 'proximos compromissos', 'desmarcar', 'cancelar reunião'
             ])
         )
         if consultou_agenda:
@@ -477,8 +477,8 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
         if cotacao and not any(v['type'] == 'asset_quote' for v in visuals):
             visuals.append({"type": "asset_quote", "data": cotacao})
 
-    # --- Se perguntou por Finanças / Gastos / Saldo / Orçamento (Gráficos) ---
-    if any(t in ['consultar_planejamento', 'consultar_transacoes', 'gerar_resumo_visual'] for t in tipos_acoes) or \
+    # --- Se perguntou por Finanças / Gastos / Saldo / Orçamento (Gráficos) ou alterou lançamentos ---
+    if any(t in ['consultar_planejamento', 'consultar_transacoes', 'gerar_resumo_visual', 'editar_transacao', 'excluir_transacao', 'resgatar_investimento'] for t in tipos_acoes) or \
        any(k in texto_busca for k in ['gasto', 'despesa', 'receita', 'saldo', 'como estao minhas financas', 'como estão minhas finanças', 'orçamento', 'orcamento', 'planejamento', 'extrato']):
         if not any(v['type'] == 'finance_chart' for v in visuals):
             fin_data = coletar_dados_financeiros(user_id)
