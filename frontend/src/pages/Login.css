@@ -1,0 +1,788 @@
+/* Meridian-inspired Simplific Pro Scoped Styles */
+.meridian-login {
+  --bg: #07060a;
+  --pane-bg: #0b0a0e;
+  --ink: #f4efe8;
+  --ink-2: #c3bbb2;
+  --ink-3: #a8a097;
+  --line: #4a4550;
+  --line-soft: #232029;
+  
+  /* Simplific Emerald Palette */
+  --green: #10b981;
+  --green-hi: #34d399;
+  --green-dark: #059669;
+  --green-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --amber: #10b981;
+  --amber-hi: #34d399;
+  --amber-ink: #6ee7b7;
+  --on-amber: #022c22;
+  --danger: #ff6b6b;
+
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 6px;
+  --pad: clamp(16px, 4vw, 48px);
+  --pane: clamp(30rem, 38vw, 38rem);
+
+  position: relative;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.5 var(--sans);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+.meridian-login *,
+.meridian-login *::before,
+.meridian-login *::after {
+  box-sizing: border-box;
+}
+
+.meridian-login button,
+.meridian-login input {
+  font: inherit;
+  color: inherit;
+}
+
+.meridian-login button {
+  cursor: pointer;
+}
+
+.meridian-login .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.meridian-login :focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+.meridian-login .mono {
+  font: 500 0.75rem/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ==============================================================================
+   Mascot Sky Canvas & Ambient Stage
+   ============================================================================== */
+.meridian-login .sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.meridian-login .sky canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.meridian-login .mascot-stage {
+  position: fixed;
+  inset: 0 0 0 var(--pane);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.meridian-login .mascot-aura {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meridian-login .mascot-glow-bg {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.07) 45%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  animation: auraBreathe 6s ease-in-out infinite;
+}
+
+@keyframes auraBreathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.meridian-login .mascot-ripple {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
+  pointer-events: none;
+  animation: rippleExpand 1.6s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+}
+
+.meridian-login .mascot-interactive {
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+  filter: drop-shadow(0 0 28px rgba(16, 185, 129, 0.28));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.meridian-login .mascot-interactive.reactive {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 42px rgba(52, 211, 153, 0.55));
+}
+
+.meridian-login .mascot-stage svg path[class*="stroke-zinc-900"] {
+  stroke: #f8fafc !important;
+}
+
+.meridian-login .mascot-stage svg path[fill="#121316"] {
+  fill: #0b0f17 !important;
+}
+
+@keyframes rippleExpand {
+  0% {
+    width: 200px;
+    height: 200px;
+    opacity: 0.8;
+    transform: scale(0.6);
+  }
+  100% {
+    width: 650px;
+    height: 650px;
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+.meridian-login .mascot-hero-card {
+  margin-top: 32px;
+  text-align: center;
+  pointer-events: auto;
+  max-width: 320px;
+}
+
+.meridian-login .mascot-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--amber-ink);
+  font: 500 0.75rem var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.meridian-login .mascot-hero-title {
+  font: 500 1.25rem/1.3 var(--sans);
+  color: var(--ink);
+  margin: 10px 0 4px;
+}
+
+.meridian-login .mascot-hero-desc {
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.meridian-login .veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(7, 6, 10, 0.55) 0%,
+    rgba(7, 6, 10, 0) 18%,
+    rgba(7, 6, 10, 0) 80%,
+    rgba(7, 6, 10, 0.7) 100%
+  );
+}
+
+/* ==============================================================================
+   Shell & Solid Side Pane
+   ============================================================================== */
+.meridian-login .shell {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.meridian-login .pane {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--pane);
+  z-index: -1;
+  background: var(--pane-bg);
+  border-right: 1px solid var(--line-soft);
+}
+
+.meridian-login .bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: max(20px, env(safe-area-inset-top)) max(var(--pad), env(safe-area-inset-right)) 16px max(var(--pad), env(safe-area-inset-left));
+}
+
+.meridian-login .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.meridian-login .brand-logo-img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.meridian-login .brand b {
+  font: 600 1.25rem/1 var(--sans);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.meridian-login .brand b span {
+  color: var(--green);
+}
+
+.meridian-login .main {
+  display: flex;
+  align-items: center;
+  padding: 24px max(var(--pad), env(safe-area-inset-right)) 32px max(var(--pad), env(safe-area-inset-left));
+}
+
+.meridian-login .card {
+  position: relative;
+  width: 100%;
+  max-width: 25rem;
+}
+
+/* ==============================================================================
+   2-Step Track: 01 ENTRAR | 02 CADASTRAR
+   ============================================================================== */
+.meridian-login .track {
+  list-style: none;
+  margin: 0 0 36px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.meridian-login .track-item {
+  position: relative;
+  padding-top: 14px;
+  font: 600 0.8125rem/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+  width: 100%;
+}
+
+.meridian-login .track-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--line-soft);
+  transition: background-color 0.2s;
+}
+
+.meridian-login .track-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  width: 0;
+  background: var(--green);
+  transition: width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.meridian-login .track-item:hover {
+  color: var(--ink);
+}
+
+.meridian-login .track-item.active {
+  color: var(--ink);
+}
+
+.meridian-login .track-item.active::after {
+  width: 100%;
+}
+
+/* Headings */
+.meridian-login h1 {
+  font: 500 clamp(2rem, 1.6rem + 1.1vw, 2.5rem)/1.08 var(--sans);
+  letter-spacing: -0.04em;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+
+.meridian-login h1:focus {
+  outline: none;
+}
+
+.meridian-login h1 em {
+  font-style: normal;
+  color: var(--green);
+}
+
+.meridian-login .lede {
+  color: var(--ink-2);
+  margin: 0 0 28px;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+/* Panels */
+.meridian-login .panel {
+  display: block;
+}
+
+.meridian-login .panel.enter {
+  animation: meridianEnter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes meridianEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Fields & Underline inputs */
+.meridian-login .field {
+  margin-bottom: 20px;
+}
+
+.meridian-login .field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.meridian-login .field > label,
+.meridian-login .field-header > label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-2);
+  font: 500 0.75rem/1 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meridian-login .input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.meridian-login .input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.meridian-login .input-with-action {
+  padding-right: 36px;
+}
+
+.meridian-login .input::placeholder {
+  color: #635d68;
+}
+
+.meridian-login .input:hover {
+  border-bottom-color: #7d7584;
+}
+
+.meridian-login .input:focus-visible {
+  outline: none;
+  border-bottom-color: var(--green);
+  box-shadow: 0 1px 0 var(--green);
+}
+
+.meridian-login .input[aria-invalid="true"] {
+  border-bottom-color: var(--danger);
+  box-shadow: 0 1px 0 var(--danger);
+}
+
+.meridian-login .input-toggle-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  color: var(--ink-3);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.meridian-login .input-toggle-btn:hover {
+  color: var(--ink);
+}
+
+.meridian-login .msg {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 8px 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.meridian-login .msg:empty {
+  display: none;
+}
+
+.meridian-login .err {
+  color: var(--danger);
+}
+
+.meridian-login .err-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: var(--r);
+  color: #ff9999;
+  font-size: 0.875rem;
+  margin-bottom: 18px;
+  animation: meridianEnter 0.25s ease;
+}
+
+/* Buttons */
+.meridian-login .btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--r);
+  background: none;
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.2;
+  text-align: left;
+  transition: background-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.meridian-login .btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.meridian-login .btn .lbl {
+  flex: 1;
+}
+
+.meridian-login .btn-primary {
+  background: var(--green-gradient);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.28);
+}
+
+.meridian-login .btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.4);
+}
+
+.meridian-login .btn-primary:active {
+  transform: translateY(1px);
+}
+
+.meridian-login .btn-primary .go {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.meridian-login .btn-primary:hover .go {
+  transform: translateX(3px);
+}
+
+.meridian-login .btn[disabled] {
+  cursor: default;
+  opacity: 0.65;
+  filter: grayscale(0.2);
+}
+
+.meridian-login .btn .dots {
+  display: inline-flex;
+  gap: 2px;
+  font-family: var(--mono);
+}
+
+.meridian-login .btn .dots i {
+  font-style: normal;
+  animation: meridianBlink 1s infinite;
+}
+
+.meridian-login .btn .dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.meridian-login .btn .dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes meridianBlink {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* SSO Area */
+.meridian-login .alts {
+  margin-top: 28px;
+}
+
+.meridian-login .alts h2 {
+  margin: 0 0 10px;
+  color: var(--ink-3);
+}
+
+.meridian-login .alt {
+  padding: 0 2px;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0;
+  min-height: 52px;
+}
+
+.meridian-login .alt .chev {
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+  transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.15s;
+}
+
+.meridian-login .alt:hover {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+}
+
+.meridian-login .alt:hover .chev {
+  transform: translateX(3px);
+  color: var(--amber-ink);
+}
+
+.meridian-login .alt .ico {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.meridian-login .badge-soon {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-family: var(--mono);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink-3);
+  margin-left: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meridian-login .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--amber-ink);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(110, 231, 183, 0.5);
+}
+
+.meridian-login .link:hover {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
+
+.meridian-login .legal {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  margin: 24px 0 0;
+}
+
+.meridian-login .legal a {
+  color: var(--ink-2);
+  text-underline-offset: 3px;
+}
+
+.meridian-login .legal a:hover {
+  color: var(--ink);
+}
+
+/* Success Card for Registration */
+.meridian-login .success-box {
+  padding: 24px;
+  border-radius: var(--r);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.meridian-login .success-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--green);
+  margin: 0 auto 12px;
+}
+
+.meridian-login .success-title {
+  font: 500 1.25rem var(--sans);
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.meridian-login .success-desc {
+  font-size: 0.9375rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.meridian-login .success-desc strong {
+  color: var(--amber-ink);
+}
+
+/* Footer clean */
+.meridian-login .foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 0 max(var(--pad), env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(var(--pad), env(safe-area-inset-left));
+}
+
+/* ==============================================================================
+   Responsiveness
+   ============================================================================== */
+@media (max-width: 60rem) {
+  .meridian-login .pane {
+    display: none;
+  }
+  
+  .meridian-login .mascot-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    padding: 32px 16px 12px;
+  }
+
+  .meridian-login .mascot-glow-bg {
+    width: 320px;
+    height: 320px;
+  }
+
+  .meridian-login .mascot-hero-card {
+    display: none; /* Em telas menores, deixa o foco no formulário */
+  }
+
+  .meridian-login .main {
+    align-items: flex-end;
+    padding-top: 16px;
+    padding-bottom: 0;
+  }
+
+  .meridian-login .card {
+    max-width: none;
+    width: auto;
+    flex: 1 1 auto;
+    margin: 0 calc(-1 * max(var(--pad), env(safe-area-inset-right))) 0 calc(-1 * max(var(--pad), env(safe-area-inset-left)));
+    padding: 28px max(var(--pad), env(safe-area-inset-left)) 16px;
+    background: var(--pane-bg);
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .meridian-login .card > * {
+    max-width: 30rem;
+  }
+
+  .meridian-login .foot {
+    background: var(--pane-bg);
+    padding-top: 10px;
+  }
+}

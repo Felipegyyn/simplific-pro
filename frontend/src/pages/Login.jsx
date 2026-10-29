@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Eye, EyeOff, Lock, Mail, ArrowRight, User, Phone, CheckCircle2 } from 'lucide-react'; 
 import logo from '../assets/LOGO.png';
+import SimplificMascot from '../components/SimplificMascot';
 import apiService from '../services/api';
+import './Login.css';
 
 const Login = ({ onLogin }) => {
-  // Controle de Tabs (Login vs Register)
-  const [isRegistering, setIsRegistering] = useState(false);
+  // Controle de Tabs: 'login' (01 ENTRAR) ou 'register' (02 CADASTRAR)
+  const [activeTab, setActiveTab] = useState('login');
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
   // Estados Form Login
-  const [formData, setFormData] = useState({
+  const [loginData, setLoginData] = useState({
     email: '',
     password: ''
   });
 
-  // Estados Form Register
+  // Estados Form Register (7 dias grátis)
   const [registerData, setRegisterData] = useState({
     name: '',
     whatsapp: '',
@@ -29,9 +29,16 @@ const Login = ({ onLogin }) => {
     password: ''
   });
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleNotice, setGoogleNotice] = useState(false);
+
+  // Efeito reativo do Mascote na digitação
+  const [ripples, setRipples] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
 
   // Estados para troca de senha no 1º acesso
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
@@ -40,10 +47,70 @@ const Login = ({ onLogin }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changePasswordError, setChangePasswordError] = useState('');
 
+  // Canvas de fundo com poeira estelar sutil
+  const starsCanvasRef = useRef(null);
+
+  // Trigger para a reação do mascote na digitação
+  const triggerMascotReaction = () => {
+    setIsTyping(true);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => setIsTyping(false), 350);
+
+    const newRipple = { id: Date.now() + Math.random() };
+    setRipples((prev) => [...prev.slice(-2), newRipple]);
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+    }, 1600);
+  };
+
+  // Efeito sutil de estrelas no fundo (substituindo o antigo sky do planeta com elegância)
+  useEffect(() => {
+    const canvas = starsCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const stars = Array.from({ length: 60 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      radius: Math.random() * 1.2 + 0.3,
+      alpha: Math.random() * 0.6 + 0.2,
+      speed: Math.random() * 0.008 + 0.003
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach((star) => {
+        star.alpha += Math.sin(Date.now() * star.speed) * 0.01;
+        const boundedAlpha = Math.max(0.1, Math.min(0.85, star.alpha));
+        ctx.fillStyle = `rgba(240, 245, 255, ${boundedAlpha})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      animId = requestAnimationFrame(render);
+    };
+    render();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animId);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    };
+  }, []);
+
   // Handlers Login
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleLoginChange = (e) => {
+    setLoginData({ ...loginData, [e.target.name]: e.target.value });
     setError('');
+    triggerMascotReaction();
   };
 
   const handleSubmitLogin = async (e) => {
@@ -52,35 +119,38 @@ const Login = ({ onLogin }) => {
     setError('');
 
     try {
-      const data = await apiService.login(formData.email, formData.password);
+      const data = await apiService.login(loginData.email, loginData.password);
 
       if (data.user && data.user.first_login) {
-        setTempPassword(formData.password);
+        setTempPassword(loginData.password);
         setIsChangePasswordModalOpen(true);
-      } else {
+      } else if (onLogin) {
         onLogin(data.user);
       }
-    } catch (error) {
-      console.error('Erro ao fazer login:', error);
-      if (error.response && error.response.status === 403) {
-        setError(error.response.data.error);
+    } catch (err) {
+      console.error('Erro ao fazer login:', err);
+      if (err.response && err.response.status === 403) {
+        setError(err.response.data.error || 'Acesso suspenso ou não autorizado.');
       } else {
-        setError('Acesso negado. Verifique suas credenciais ou contate o suporte: contato@simplificpro.com');
+        setError(
+          err.response?.data?.error ||
+          'Acesso negado. Verifique suas credenciais ou contate o suporte: contato@simplificpro.com'
+        );
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Handlers Register
+  // Handlers Register (7 dias grátis)
   const handleRegisterChange = (e) => {
     let value = e.target.value;
-    // Máscara ultra simples para WhatsApp
     if (e.target.name === 'whatsapp') {
       value = value.replace(/\D/g, '');
     }
     setRegisterData({ ...registerData, [e.target.name]: value });
     setError('');
+    triggerMascotReaction();
   };
 
   const handleSubmitRegister = async (e) => {
@@ -91,14 +161,15 @@ const Login = ({ onLogin }) => {
     try {
       await apiService.post('/api/auth/register', registerData);
       setRegisterSuccess(true);
-    } catch (error) {
-      console.error('Erro ao cadastrar:', error);
-      setError(error.response?.data?.error || 'Erro ao realizar o cadastro. Tente novamente.');
+    } catch (err) {
+      console.error('Erro ao cadastrar:', err);
+      setError(err.response?.data?.error || 'Erro ao realizar o cadastro. Verifique os dados e tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Troca de senha no 1º acesso
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -118,7 +189,7 @@ const Login = ({ onLogin }) => {
         current_password: tempPassword,
         new_password: newPassword
       });
-      alert('Senha alterada com sucesso! Faça login novamente.');
+      alert('Senha alterada com sucesso! Faça login novamente com sua nova senha.');
       apiService.logout();
       window.location.reload();
     } catch (err) {
@@ -129,312 +200,488 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <>
-      <div className="min-h-screen w-full flex font-sans bg-slate-950">
-        
-        {/* LADO ESQUERDO: Formulários */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center relative overflow-hidden p-4 sm:p-8">
-          
-          {/* Efeitos de Luz de Fundo (Glow) */}
-          <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
-          
-          {/* Grid Sutil no Fundo */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+    <div className="meridian-login">
+      {/* Fundo dinâmico com estrelas sutis */}
+      <div className="sky" aria-hidden="true">
+        <canvas ref={starsCanvasRef} />
+      </div>
+      <div className="veil" aria-hidden="true" />
 
-          <Card className="relative z-10 w-full max-w-md border-0 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
-          
-            {/* Barra superior colorida */}
-            <div className="h-2 w-full bg-gradient-to-r from-green-500 to-emerald-600"></div>
+      {/* Mascote Simplific Pro reagindo na lateral direita */}
+      <div className="mascot-stage">
+        <div className="mascot-aura">
+          {/* Brilho esmeralda de fundo */}
+          <div className="mascot-glow-bg" />
 
-            <CardHeader className="text-center pb-2 pt-8">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 bg-green-50 rounded-2xl shadow-inner">
-                  <img src={logo} alt="Simplific Pro" className="h-10 w-auto" />
-                </div>
-              </div>
-              
-              {!registerSuccess && (
-                <div className="flex bg-gray-100 p-1 rounded-xl mx-auto w-full max-w-[280px] mb-4">
-                  <button 
-                    type="button"
-                    onClick={() => { setIsRegistering(false); setError(''); }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${!isRegistering ? 'bg-white shadow text-green-700' : 'text-gray-500 hover:text-gray-700'}`}
-                  >
-                    Entrar
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => { setIsRegistering(true); setError(''); }}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${isRegistering ? 'bg-white shadow text-green-700' : 'text-gray-500 hover:text-gray-700'}`}
-                  >
-                    Cadastrar
-                  </button>
-                </div>
-              )}
+          {/* Ondas expansivas na digitação */}
+          {ripples.map((ripple) => (
+            <div key={ripple.id} className="mascot-ripple" />
+          ))}
 
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
-                {registerSuccess ? 'Quase lá!' : isRegistering ? 'Comece seus 7 Dias Grátis' : 'Bem-vindo de volta'}
-              </CardTitle>
-              <p className="text-gray-500 text-sm mt-2">
-                {registerSuccess 
-                  ? 'Verifique sua caixa de entrada' 
-                  : isRegistering 
-                    ? 'O Simplific IA fará o trabalho duro por você.' 
-                    : 'Acesse seu painel financeiro inteligente'}
-              </p>
-            </CardHeader>
-          
-            <CardContent className="px-8 pb-8 pt-2">
-
-              {registerSuccess ? (
-                <div className="flex flex-col items-center justify-center space-y-4 py-4 text-center">
-                  <CheckCircle2 className="h-16 w-16 text-green-500 mb-2" />
-                  <p className="text-gray-700 font-medium">
-                    Enviamos um link de confirmação para <strong className="text-green-700">{registerData.email}</strong>.
-                  </p>
-                  <p className="text-sm text-gray-500 mb-6">
-                    Por favor, acesse seu e-mail e clique no link para ativar seus 7 dias gratuitos.
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => { setRegisterSuccess(false); setIsRegistering(false); }}
-                    className="w-full h-12 text-base rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100"
-                  >
-                    Voltar para o Login
-                  </Button>
-                </div>
-              ) : isRegistering ? (
-                // FORMULÁRIO DE CADASTRO
-                <form onSubmit={handleSubmitRegister} className="space-y-4">
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-name" className="text-gray-700 font-medium ml-1 text-xs">Nome Completo</Label>
-                    <div className="relative group">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="reg-name"
-                        name="name"
-                        type="text"
-                        value={registerData.name}
-                        onChange={handleRegisterChange}
-                        required
-                        className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all text-sm"
-                        placeholder="Seu nome"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-whatsapp" className="text-gray-700 font-medium ml-1 text-xs">WhatsApp (com DDD)</Label>
-                    <div className="relative group">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="reg-whatsapp"
-                        name="whatsapp"
-                        type="text"
-                        value={registerData.whatsapp}
-                        onChange={handleRegisterChange}
-                        required
-                        className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all text-sm"
-                        placeholder="Ex: 11999999999"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-email" className="text-gray-700 font-medium ml-1 text-xs">E-mail</Label>
-                    <div className="relative group">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="reg-email"
-                        name="email"
-                        type="email"
-                        value={registerData.email}
-                        onChange={handleRegisterChange}
-                        required
-                        className="pl-9 h-11 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all text-sm"
-                        placeholder="exemplo@simplific.com"
-                      />
-                    </div>
-                  </div>
-                
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-password" className="text-gray-700 font-medium ml-1 text-xs">Senha</Label>
-                    <div className="relative group">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="reg-password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={registerData.password}
-                        onChange={handleRegisterChange}
-                        required
-                        className="pl-9 pr-10 h-11 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all text-sm"
-                        placeholder="Mínimo 6 caracteres"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <Alert className="border-red-200 bg-red-50/50 text-red-800 text-xs py-2 rounded-lg mt-2">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 mt-2 text-sm bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-500/30 rounded-xl transition-all duration-300 transform hover:-translate-y-0.5"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                        <div className="flex items-center gap-2">
-                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Processando...
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2 font-semibold">
-                            Garantir 7 Dias Grátis <ArrowRight size={16} />
-                        </div>
-                    )}
-                  </Button>
-                </form>
-              ) : (
-                // FORMULÁRIO DE LOGIN ORIGINAL
-                <form onSubmit={handleSubmitLogin} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 font-medium ml-1">Email</Label>
-                    <div className="relative group">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="pl-10 h-12 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all"
-                        placeholder="exemplo@simplific.com"
-                      />
-                    </div>
-                  </div>
-                
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                        <Label htmlFor="password" classname="text-gray-700 font-medium ml-1">Senha</Label>
-                        <Link to="/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-semibold hover:underline">
-                            Esqueceu a senha?
-                        </Link>
-                    </div>
-                    <div className="relative group">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 group-focus-within:text-green-600 transition-colors" />
-                      <Input
-                        id="password"
-                        name="password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        className="pl-10 pr-10 h-12 bg-gray-50 border-gray-200 focus:bg-white text-gray-900 transition-all"
-                        placeholder="••••••••"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <Alert className="border-red-200 bg-red-50/50 text-red-800 text-sm py-2 rounded-xl animate-in slide-in-from-top-2">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-500/30 rounded-xl transition-all duration-300 transform hover:-translate-y-1"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                        <div className="flex items-center gap-2">
-                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            Acessando...
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2 font-semibold">
-                            Entrar na Plataforma <ArrowRight size={18} />
-                        </div>
-                    )}
-                  </Button>
-                </form>
-              )}
-            </CardContent>
-            
-            <div className="bg-gray-50 p-4 text-center border-t border-gray-100">
-              <p className="text-xs text-gray-500">
-                  Protegido por criptografia de ponta a ponta.
-              </p>
-            </div>
-          </Card>
+          {/* Mascote Pierre com reflexo animado e reação */}
+          <div className={`mascot-interactive ${isTyping ? 'reactive' : ''}`}>
+            <SimplificMascot size={290} />
+          </div>
         </div>
 
-        {/* LADO DIREITO: Imagem */}
-        <div 
-          className="hidden lg:block lg:w-1/2 bg-cover bg-center relative"
-          style={{ backgroundImage: "url('/novo simplific/Login.jpg')" }}
-        >
-          {/* Selo de 7 dias grátis (Novo!) */}
-          <div className="absolute top-12 right-12 bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-3xl max-w-sm shadow-2xl shadow-black/50">
-            <div className="inline-block bg-lime-300 text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
-              Oferta Especial
-            </div>
-            <h3 className="text-white text-3xl font-bold mb-2">7 Dias Grátis</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Crie sua conta agora e libere a Inteligência Artificial para organizar sua vida financeira. 
-              Você só decide se quer continuar depois de ver os resultados.
-            </p>
-          </div>
-
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none"></div>
+        {/* Card informativo abaixo do mascote */}
+        <div className="mascot-hero-card">
+          <span className="mascot-hero-badge">✦ Inteligência Artificial</span>
+          <h2 className="mascot-hero-title">Simplific Pro</h2>
+          <p className="mascot-hero-desc">
+            Controle financeiro inteligente, relatórios automáticos e assistência em tempo real.
+          </p>
         </div>
       </div>
 
-      {/* Modal de Primeiro Acesso (Mantido igual) */}
+      <div className="shell">
+        {/* Painel lateral sólido escuro */}
+        <div className="pane" aria-hidden="true" />
+
+        {/* Barra Superior com Logo Oficial Simplific Pro */}
+        <header className="bar">
+          <a className="brand" href="#/" aria-label="Simplific Pro">
+            <img src={logo} alt="Simplific Pro" className="brand-logo-img" />
+            <b>
+              Simplific <span>Pro</span>
+            </b>
+          </a>
+        </header>
+
+        {/* Área Central com o Formulário */}
+        <main className="main" id="main">
+          <div className="card">
+            {/* Steps Progress Tracker: 01 ENTRAR e 02 CADASTRAR */}
+            <ol className="track" aria-label="Navegação de acesso">
+              <li>
+                <button
+                  type="button"
+                  id="tab-login"
+                  className={`track-item ${activeTab === 'login' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('login');
+                    setError('');
+                  }}
+                >
+                  01 Entrar
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  id="tab-register"
+                  className={`track-item ${activeTab === 'register' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('register');
+                    setError('');
+                  }}
+                >
+                  02 Cadastrar
+                </button>
+              </li>
+            </ol>
+
+            {/* Banner de Erro Geral */}
+            {error && (
+              <div className="err-banner" role="alert">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-400" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* ============================================================== */}
+            {/* ABA 01: ENTRAR                                                 */}
+            {/* ============================================================== */}
+            {activeTab === 'login' && (
+              <section className="panel enter" aria-labelledby="h-login">
+                <h1 id="h-login">
+                  Acesse sua <em>conta</em>.
+                </h1>
+                <p className="lede">
+                  Digite suas credenciais para gerenciar suas finanças na plataforma Simplific Pro.
+                </p>
+
+                <form onSubmit={handleSubmitLogin} noValidate>
+                  <div className="field">
+                    <label className="mono" htmlFor="login-email">
+                      E-mail
+                    </label>
+                    <input
+                      id="login-email"
+                      name="email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      autoCapitalize="off"
+                      spellCheck="false"
+                      placeholder="seu@email.com"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      required
+                      disabled={loading}
+                      className="input"
+                    />
+                  </div>
+
+                  <div className="field">
+                    <div className="field-header">
+                      <label className="mono" htmlFor="login-password">
+                        Senha
+                      </label>
+                      <Link to="/forgot-password" className="link text-xs">
+                        Esqueceu a senha?
+                      </Link>
+                    </div>
+                    <div className="input-wrapper">
+                      <input
+                        id="login-password"
+                        name="password"
+                        type={showLoginPassword ? 'text' : 'password'}
+                        autoComplete="current-password"
+                        placeholder="••••••••"
+                        value={loginData.password}
+                        onChange={handleLoginChange}
+                        required
+                        disabled={loading}
+                        className="input input-with-action"
+                      />
+                      <button
+                        type="button"
+                        className="input-toggle-btn"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        aria-label={showLoginPassword ? 'Ocultar senha' : 'Ver senha'}
+                      >
+                        {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button className="btn btn-primary" type="submit" disabled={loading}>
+                    <span className="lbl">
+                      {loading ? (
+                        <>
+                          Entrando na plataforma{' '}
+                          <span className="dots" aria-hidden="true">
+                            <i>.</i>
+                            <i>.</i>
+                            <i>.</i>
+                          </span>
+                        </>
+                      ) : (
+                        'Entrar na Plataforma'
+                      )}
+                    </span>
+                    <svg
+                      className="go"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="square"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 10h13M11 5l5 5-5 5" />
+                    </svg>
+                  </button>
+                </form>
+
+                {/* Opções de Acesso Alternativas (Google com 'Em breve') */}
+                <div className="alts" role="group" aria-label="Outras formas de acesso">
+                  <h2 className="mono">Outras formas de acesso</h2>
+                  <div className="sso">
+                    <button
+                      className="btn alt"
+                      type="button"
+                      onClick={() => setGoogleNotice(true)}
+                    >
+                      <span className="ico">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            fill="#4285F4"
+                            d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.880c2.27-2.09 3.58-5.17 3.58-8.81z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 24c3.24 0 5.96-1.070 7.94-2.9l-3.88-3.01c-1.07.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.72-4.95H1.27v3.11A12 12 0 0 0 12 24z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.28 14.29A7.2 7.2 0 0 1 4.9 12c0-.8.14-1.57.38-2.29V6.6H1.27A12 12 0 0 0 0 12c0 1.94.46 3.77 1.27 5.4l4.01-3.11z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.23 0 12 0A12 12 0 0 0 1.27 6.6l4.01 3.11C6.22 6.88 8.87 4.77 12 4.77z"
+                          />
+                        </svg>
+                      </span>
+                      <span className="lbl">
+                        Continuar com o Google <span className="badge-soon">Em breve</span>
+                      </span>
+                      <svg
+                        className="chev"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="square"
+                        aria-hidden="true"
+                      >
+                        <path d="M2 8h11M9 4l4 4-4 4" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {googleNotice && (
+                    <p className="msg" style={{ color: 'var(--amber-ink)', marginTop: '8px' }}>
+                      A autenticação via Google estará disponível em breve. Por enquanto, utilize seu e-mail e senha cadastrados.
+                    </p>
+                  )}
+                </div>
+
+                <p className="legal">
+                  ao acessar você concorda com os <a href="#/termos" target="_blank" rel="noopener noreferrer">termos de uso</a> e <a href="#/privacidade" target="_blank" rel="noopener noreferrer">privacidade</a>.
+                </p>
+              </section>
+            )}
+
+            {/* ============================================================== */}
+            {/* ABA 02: CADASTRAR (7 Dias Grátis)                             */}
+            {/* ============================================================== */}
+            {activeTab === 'register' && (
+              <section className="panel enter" aria-labelledby="h-register">
+                {registerSuccess ? (
+                  <div className="success-box">
+                    <CheckCircle2 className="success-icon" />
+                    <h2 className="success-title">Cadastro realizado com sucesso!</h2>
+                    <p className="success-desc">
+                      Enviamos as instruções de confirmação para o seu <strong>WhatsApp</strong>.
+                      Após confirmar, acesse a plataforma com seu e-mail e senha.
+                    </p>
+                    <button
+                      className="btn btn-primary"
+                      style={{ marginTop: '20px' }}
+                      type="button"
+                      onClick={() => {
+                        setRegisterSuccess(false);
+                        setActiveTab('login');
+                      }}
+                    >
+                      <span className="lbl">Ir para o Login</span>
+                      <svg
+                        className="go"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="square"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 10h13M11 5l5 5-5 5" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <h1 id="h-register">
+                      Garantir <em>7 dias grátis</em>.
+                    </h1>
+                    <p className="lede">
+                      Cadastre-se agora e libere a Inteligência Artificial para organizar e transformar sua vida financeira.
+                    </p>
+
+                    <form onSubmit={handleSubmitRegister} noValidate>
+                      <div className="field">
+                        <label className="mono" htmlFor="register-name">
+                          Nome Completo
+                        </label>
+                        <input
+                          id="register-name"
+                          name="name"
+                          type="text"
+                          autoComplete="name"
+                          placeholder="Seu nome ou da sua empresa"
+                          value={registerData.name}
+                          onChange={handleRegisterChange}
+                          required
+                          disabled={loading}
+                          className="input"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="mono" htmlFor="register-whatsapp">
+                          WhatsApp
+                        </label>
+                        <input
+                          id="register-whatsapp"
+                          name="whatsapp"
+                          type="tel"
+                          inputMode="numeric"
+                          autoComplete="tel"
+                          placeholder="DDD + Número (ex: 11999999999)"
+                          value={registerData.whatsapp}
+                          onChange={handleRegisterChange}
+                          required
+                          disabled={loading}
+                          className="input"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="mono" htmlFor="register-email">
+                          E-mail
+                        </label>
+                        <input
+                          id="register-email"
+                          name="email"
+                          type="email"
+                          inputMode="email"
+                          autoComplete="email"
+                          autoCapitalize="off"
+                          spellCheck="false"
+                          placeholder="seu@email.com"
+                          value={registerData.email}
+                          onChange={handleRegisterChange}
+                          required
+                          disabled={loading}
+                          className="input"
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label className="mono" htmlFor="register-password">
+                          Senha
+                        </label>
+                        <div className="input-wrapper">
+                          <input
+                            id="register-password"
+                            name="password"
+                            type={showRegisterPassword ? 'text' : 'password'}
+                            autoComplete="new-password"
+                            placeholder="Crie uma senha segura (mín. 6 caracteres)"
+                            value={registerData.password}
+                            onChange={handleRegisterChange}
+                            required
+                            disabled={loading}
+                            className="input input-with-action"
+                          />
+                          <button
+                            type="button"
+                            className="input-toggle-btn"
+                            onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                            aria-label={showRegisterPassword ? 'Ocultar senha' : 'Ver senha'}
+                          >
+                            {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button className="btn btn-primary" type="submit" disabled={loading}>
+                        <span className="lbl">
+                          {loading ? (
+                            <>
+                              Criando sua conta{' '}
+                              <span className="dots" aria-hidden="true">
+                                <i>.</i>
+                                <i>.</i>
+                                <i>.</i>
+                              </span>
+                            </>
+                          ) : (
+                            'Garantir 7 Dias Grátis'
+                          )}
+                        </span>
+                        <svg
+                          className="go"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="square"
+                          aria-hidden="true"
+                        >
+                          <path d="M3 10h13M11 5l5 5-5 5" />
+                        </svg>
+                      </button>
+                    </form>
+
+                    <p className="legal">
+                      ao acessar você concorda com os <a href="#/termos" target="_blank" rel="noopener noreferrer">termos de uso</a> e <a href="#/privacidade" target="_blank" rel="noopener noreferrer">privacidade</a>.
+                    </p>
+                  </>
+                )}
+              </section>
+            )}
+          </div>
+        </main>
+
+        {/* Rodapé Limpo (sem frase preview e sem info celestial) */}
+        <footer className="foot">
+          <p style={{ color: 'var(--ink-3)', fontSize: '0.8125rem', margin: 0 }}>
+            © {new Date().getFullYear()} Simplific Pro • Todos os direitos reservados
+          </p>
+        </footer>
+      </div>
+
+      {/* Modal de Primeiro Acesso: Definição de nova senha obrigatória */}
       <Dialog open={isChangePasswordModalOpen}>
-        <DialogContent className="rounded-2xl">
+        <DialogContent className="rounded-2xl max-w-md bg-slate-900 border border-slate-800 text-slate-100">
           <DialogHeader>
-            <DialogTitle className="text-green-700">🔒 Segurança em Primeiro Lugar</DialogTitle>
-            <DialogDescription>
-              Detectamos que este é seu primeiro acesso. Por favor, defina uma nova senha segura.
+            <DialogTitle className="text-emerald-400 flex items-center gap-2">
+              🔒 Segurança em Primeiro Lugar
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Detectamos que este é seu primeiro acesso. Por favor, defina uma nova senha segura para prosseguir.
             </DialogDescription>
           </DialogHeader>
+
           <form onSubmit={handleChangePassword} className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova Senha</Label>
-              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="rounded-xl" />
+              <Label htmlFor="newPassword" style={{ color: 'var(--ink-2)' }}>
+                Nova Senha
+              </Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                className="bg-slate-950 border-slate-700 text-white rounded-xl"
+                placeholder="Mínimo de 6 caracteres"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirme a Senha</Label>
-              <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="rounded-xl" />
+              <Label htmlFor="confirmPassword" style={{ color: 'var(--ink-2)' }}>
+                Confirme a Nova Senha
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="bg-slate-950 border-slate-700 text-white rounded-xl"
+                placeholder="Repita a nova senha"
+              />
             </div>
-            {changePasswordError && <p className="text-sm text-red-600 bg-red-50 p-2 rounded-lg">{changePasswordError}</p>}
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 rounded-xl" disabled={loading}>
+
+            {changePasswordError && (
+              <p className="text-sm text-red-400 bg-red-950/40 border border-red-800/50 p-2.5 rounded-lg">
+                {changePasswordError}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium"
+              disabled={loading}
+            >
               {loading ? 'Salvando...' : 'Definir Senha e Entrar'}
             </Button>
           </form>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };
 
