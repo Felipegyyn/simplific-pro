@@ -1,1 +1,105 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.43 12.03 136 136"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#bc85f8"/><stop offset="100%" stop-color="#e27bb7"/></linearGradient></defs><path fill-rule="evenodd" fill="url(#g)" d="m64.8 121.5c-6 2.8-11.8 5.5-17.6 8.2-5.1 2.4-10.2 4.8-15.3 7-7.2 3.2-14 2.4-19.7-3.1-5.8-5.6-7.6-12.7-4.3-20.2 4.7-10.9 9.8-21.6 14.9-32.3 8-17.3 16.3-34.4 24.3-51.7 2.6-5.8 6.5-8.5 12.9-8.1 4.5 0.2 9 0.2 13.5 0 5.9-0.2 9.6 2.3 12.1 7.6 9.5 20.3 19.2 40.4 28.8 60.6 3.6 7.6 7.3 15.2 10.8 23 4.2 9.5 0.3 20.3-8.8 24.6-4 1.9-8.5 2.3-12.4 0.7-11.9-5.1-23.6-10.7-35.6-16.2 2.2-4.8 4.1-9.1 6.1-13.4 1.7-3.6 3.4-7.2 5-10.8 0.4-0.8 0.7-2.1 0.3-2.8-4.3-9.4-8.7-18.8-13.4-28.6-2.5 5.3-4.9 10.1-7.2 15-1.9 4-3.9 8.1-5.5 12.3-0.5 1.2-0.5 2.9 0 4 3.2 7.3 6.6 14.4 10 21.6 0.3 0.8 0.7 1.6 1.1 2.6zm-12.8-86.9c-0.8 1.4-1.2 2.2-1.6 3q-15.2 32.1-30.3 64.1-3 6.3-6 12.7c-2.2 4.8-1.8 9.4 1.6 13.5 5 6.1 12 5.3 15.3-1.8 9.6-20.4 19.1-41 28.9-61.3 2.3-4.7 2.8-8.6 0.1-13.2-3-5.3-5.2-10.9-8-17zm46.5 36.9c-3.7 8.1-7.1 15.4-10.4 22.8-0.4 0.7-0.2 1.8 0.1 2.6 5.1 10.7 10.2 21.4 15.4 32.1 0.6 1.2 2.2 2.3 3.5 2.7 3 0.8 6 0.2 8.6-1.8 4.8-3.9 6-9.5 2.9-16.2-4.9-10.7-10-21.3-15.1-31.9-1.5-3.2-3.1-6.4-5-10.3zm-15 15.4q0.4 0 0.8 0.1c3.4-7.5 6.8-15 10.1-22.5 0.3-0.8-0.1-2-0.5-2.8-3.9-8.4-7.9-16.8-11.9-25.2-0.3-0.4-0.6-0.8-1.1-1.4-0.5 0.9-0.9 1.5-1.2 2.1-2.4 5-4.4 10.2-7.1 15-2.3 4-2.4 7.4-0.1 11.6 4 7.5 7.4 15.4 11 23.1zm-17-36.6c3.6-7.6 6.9-14.7 10.4-22.1-7.1 0-13.6 0-20.7 0 3.5 7.5 6.7 14.4 10.3 22.1zm-17.4 52.8c-3.8 8.2-7.3 15.6-11.1 23.7 6.4-3 12-5.7 18-8.5-2.2-5-4.4-9.7-6.9-15.2zm45 23.2q0.3-0.3 0.5-0.5c-3.4-7.3-6.8-14.6-10.5-22.5-2.3 5-4.4 9.3-6.2 13.6-0.2 0.5 0.5 1.7 1.1 2 5 2.5 10.1 4.9 15.1 7.4z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <defs>
+    <!-- Recorte para o squircle do ícone -->
+    <clipPath id="badge-clip">
+      <rect x="4" y="4" width="112" height="112" rx="26" />
+    </clipPath>
+
+    <!-- Recorte para as lentes do óculos -->
+    <clipPath id="glasses-clip">
+      <path d="M 33 49 L 55 49 C 56.5 61 53 67 44 67 C 36 67 33 61 33 49 Z" />
+      <path d="M 65 49 L 87 49 C 88.5 61 85 67 76 67 C 68 67 65 61 65 49 Z" />
+    </clipPath>
+
+    <!-- Gradiente do feixe de luz passando no óculos -->
+    <linearGradient id="glint-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.25" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Brilho esmeralda suave central -->
+    <radialGradient id="emerald-glow" cx="60" cy="52" r="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.32" />
+      <stop offset="65%" stop-color="#10b981" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+
+    <style>
+      .mascot-stroke {
+        stroke: #f8fafc;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .glint-bar {
+        animation: glintSweep 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        transform-origin: center;
+      }
+      @keyframes glintSweep {
+        0%, 15% { transform: translateX(-55px) skewX(-25deg); opacity: 0; }
+        25% { opacity: 0.95; }
+        55% { transform: translateX(55px) skewX(-25deg); opacity: 0.95; }
+        60%, 100% { transform: translateX(55px) skewX(-25deg); opacity: 0; }
+      }
+    </style>
+  </defs>
+
+  <!-- Fundo Sólido Escuro com Borda Neon Esmeralda -->
+  <rect x="4" y="4" width="112" height="112" rx="26" fill="#09090b" stroke="#10b981" stroke-width="3.5" />
+  <rect x="7" y="7" width="106" height="106" rx="23" fill="#0c0d12" />
+
+  <g clip-path="url(#badge-clip)">
+    <!-- Brilho Esmeralda Suave -->
+    <circle cx="60" cy="56" r="48" fill="url(#emerald-glow)" />
+
+    <!-- Mascote Pierre com Óculos (Traços Brancos e Óculos Pretos) -->
+    <g transform="translate(60, 60) scale(0.82) translate(-60, -62)">
+      <!-- 1. Cabelo Volumoso com Penteado Característico -->
+      <path d="M 35 44 C 24 35 22 21 34 14 C 44 8 57 7 68 9 C 80 11 92 18 92 30 C 96 34 97 40 93 45" class="mascot-stroke" stroke-width="3.8" fill="none" />
+      <path d="M 46 12 C 54 18 64 20 75 16" class="mascot-stroke" stroke-width="3" fill="none" />
+      <path d="M 38 24 C 48 26 62 25 72 23" class="mascot-stroke" stroke-width="2.8" fill="none" />
+      <path d="M 76 13 C 84 19 88 25 87 32" class="mascot-stroke" stroke-width="2.8" fill="none" />
+
+      <!-- 2. Orelhas -->
+      <path d="M 29 55 C 22 55 22 66 29 68" class="mascot-stroke" stroke-width="3.6" fill="none" />
+      <path d="M 91 55 C 98 55 98 66 91 68" class="mascot-stroke" stroke-width="3.6" fill="none" />
+
+      <!-- 3. Contorno do Rosto / Queixo Amigável -->
+      <path d="M 29 59 C 30 74 42 88 60 88 C 78 88 90 74 91 59" class="mascot-stroke" stroke-width="3.8" fill="none" />
+
+      <!-- 4. Nariz e Sorriso Confiante -->
+      <path d="M 59 72 L 61 74 L 59 75" class="mascot-stroke" stroke-width="2.8" fill="none" />
+      <path d="M 47 79 C 53 84 67 84 73 79" class="mascot-stroke" stroke-width="3.6" fill="none" />
+      <path d="M 45 78 L 47 80" class="mascot-stroke" stroke-width="2.6" />
+      <path d="M 75 78 L 73 80" class="mascot-stroke" stroke-width="2.6" />
+
+      <!-- 5. Pescoço e Gola da Camiseta -->
+      <path d="M 48 88 L 46 98" class="mascot-stroke" stroke-width="3.4" />
+      <path d="M 72 88 L 74 98" class="mascot-stroke" stroke-width="3.4" />
+      <path d="M 36 106 C 48 114 72 114 84 106" class="mascot-stroke" stroke-width="3.6" fill="none" />
+      <path d="M 36 106 C 26 110 18 117 14 121" class="mascot-stroke" stroke-width="3.4" />
+      <path d="M 84 106 C 94 110 102 117 106 121" class="mascot-stroke" stroke-width="3.4" />
+
+      <!-- 6. ÓCULOS ESCUROS COM REFLEXO -->
+      <!-- Lentes Preenchidas Escuras -->
+      <path d="M 33 49 L 55 49 C 56.5 61 53 67 44 67 C 36 67 33 61 33 49 Z" fill="#09090b" stroke="#000000" stroke-width="1.5" />
+      <path d="M 65 49 L 87 49 C 88.5 61 85 67 76 67 C 68 67 65 61 65 49 Z" fill="#09090b" stroke="#000000" stroke-width="1.5" />
+
+      <!-- Reflexo Oblíquo nas Lentes -->
+      <g clip-path="url(#glasses-clip)">
+        <polygon points="46,49 51,49 43,67 38,67" fill="#ffffff" opacity="0.65" />
+        <polygon points="78,49 83,49 75,67 70,67" fill="#ffffff" opacity="0.65" />
+        <rect x="0" y="35" width="45" height="40" fill="url(#glint-grad)" class="glint-bar" />
+      </g>
+
+      <!-- Armação e Hastes dos Óculos -->
+      <path d="M 54 53 L 66 53" class="mascot-stroke" stroke-width="4.2" />
+      <path d="M 27 52 L 34 52" class="mascot-stroke" stroke-width="3.6" />
+      <path d="M 86 52 L 93 52" class="mascot-stroke" stroke-width="3.6" />
+      <path d="M 33 49 L 55 49 C 56.5 61 53 67 44 67 C 36 67 33 61 33 49 Z" class="mascot-stroke" stroke-width="3.8" fill="none" />
+      <path d="M 65 49 L 87 49 C 88.5 61 85 67 76 67 C 68 67 65 61 65 49 Z" class="mascot-stroke" stroke-width="3.8" fill="none" />
+    </g>
+  </g>
+</svg>
