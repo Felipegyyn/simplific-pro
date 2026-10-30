@@ -1,25 +1,19 @@
-from src.database.database import execute_query
-from datetime import datetime, date, timedelta
-import fitz  # PyMuPDF 
-from src.services.ai_assessor_service import categorizar_descricao_transacao, extrair_transacoes_de_texto_com_ia # <-- Nova importação da IA
-from src.models.db import db
-from collections import defaultdict
+from datetime import datetime, date
 import re
+from src.database.database import execute_query
+import fitz  # PyMuPDF 
+from src.services.ai_assessor_service import categorizar_descricao_transacao, extrair_transacoes_de_texto_com_ia
+from src.models.db import db
 from src.models.financial import Transaction, Category
-from src.models.extended_modules import BankAccount
-from src.models.extended_modules import CreditCard, CreditCardTransaction, CreditCardCategory
-from sqlalchemy import func, case
-# ▼▼▼ ADICIONE ESTAS NOVAS IMPORTAÇÕES ▼▼▼
+from src.models.extended_modules import BankAccount, CreditCard, CreditCardTransaction, CreditCardCategory
 from src.services.ocr_service import extract_text_from_url
 from src.utils.storage import upload_image_from_url
-from src.utils.formatters import format_currency_brl # Importe seu formatador de moeda
-# ▲▲▲ FIM DAS NOVAS IMPORTAÇÕES ▲▲▲
+from src.utils.formatters import format_currency_brl
 
 def criar_fatura(numero_usuario, valor, descricao, cartao):
     """
     Grava o lançamento na tabela de transações do cartão de crédito
     """
-    # ... (O código desta função permanece o mesmo)
     cartao_obj = CreditCard.query.filter_by(
         user_id=numero_usuario,
         name=cartao['nome'],
@@ -39,11 +33,11 @@ def criar_fatura(numero_usuario, valor, descricao, cartao):
         category_id=categoria.id,
         description=descricao,
         value=float(valor),
-        date=datetime.utcnow().date(),
+        date=datetime.now().date(),
         installments=1,
         current_installment=1,
         is_recurring=False,
-        created_at=datetime.utcnow()
+        created_at=datetime.now()
     )
     db.session.add(nova_transacao)
 
@@ -57,7 +51,7 @@ def criar_fatura(numero_usuario, valor, descricao, cartao):
 
 # --- NOVAS FUNÇÕES ADICIONADAS ABAIXO ---
 
-def buscar_transacoes_pendentes(user_id):
+def buscar_transacoes_pendentes(user_id) -> list:
     """
     Busca todas as transações de um usuário com o status 'pendente'.
     """
@@ -77,7 +71,7 @@ def buscar_transacoes_pendentes(user_id):
     """
     params = {'user_id': user_id}
     resultado = execute_query(query, params)
-    return resultado
+    return resultado if isinstance(resultado, list) else []
 
 def confirmar_transacao_por_id(transaction_id, user_id):
     """
@@ -103,7 +97,7 @@ def confirmar_transacao_por_id(transaction_id, user_id):
         return False
 
 
-def buscar_transacoes_por_status(user_id, status, data_inicio, data_fim, tipo='ambos'):
+def buscar_transacoes_por_status(user_id, status, data_inicio, data_fim, tipo='ambos') -> list:
     """
     Busca transações de um usuário com um status específico e, opcionalmente,
     por tipo ('entrada', 'saida', ou 'ambos').
@@ -139,7 +133,8 @@ def buscar_transacoes_por_status(user_id, status, data_inicio, data_fim, tipo='a
 
     query += " ORDER BY t.date DESC"
     
-    return execute_query(query, params)
+    resultado = execute_query(query, params)
+    return resultado if isinstance(resultado, list) else []
 
 
 def processar_extrato_pdf(user_id, pdf_file_stream):
@@ -182,7 +177,8 @@ def processar_extrato_pdf(user_id, pdf_file_stream):
             if categoria_final:
                 categoria_id_final = categoria_final.id
             else:
-                categoria_id_final = categoria_outros_entrada.id if tipo_transacao == 'entrada' else categoria_outros_saida.id
+                cat_padrao = categoria_outros_entrada if tipo_transacao == 'entrada' else categoria_outros_saida
+                categoria_id_final = cat_padrao.id if cat_padrao else None
 
             novo_lancamento = Transaction(
                 user_id=user_id,
@@ -209,13 +205,6 @@ def processar_extrato_pdf(user_id, pdf_file_stream):
     except Exception as e:
         print(f"ERRO CRÍTICO ao processar o arquivo PDF com IA: {e}")
         return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar o extrato. Tente novamente."}
-
-# Em: src/services/transacoes_service.py
-
-# ... (função processar_extrato_pdf e outras) ...
-
-
-# ▼▼▼ COLE A NOVA FUNÇÃO ABAIXO ▼▼▼
 
 def processar_comprovante_imagem(user_id, image_url):
     """
@@ -258,19 +247,7 @@ def processar_comprovante_imagem(user_id, image_url):
         valor = float(transacao_ia.get('valor', 0))
         descricao = transacao_ia.get('descricao', 'Sem descrição')
         data_str = transacao_ia.get('data')
-
-        if valor == 0 or not data_str:
-            print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
-            return {"status": "info", "mensagem": "Entendi o comprovante, mas não achei o valor ou a data. Pode me dizer qual é?"}
-
-        # ... (código anterior da função processar_comprovante_imagem continua igual até a extração das variáveis) ...
-
-        # Pega a primeira transação (comprovantes geralmente são de 1 item)
-        transacao_ia = transacoes_extraidas[0]
-        valor = float(transacao_ia.get('valor', 0))
-        descricao = transacao_ia.get('descricao', 'Sem descrição')
-        data_str = transacao_ia.get('data')
-        conta_origem_ia = transacao_ia.get('conta_origem') # <-- NOVO: Pega o banco identificado pela IA
+        conta_origem_ia = transacao_ia.get('conta_origem')
 
         if valor == 0 or not data_str:
             print("FALHA: IA extraiu dados inválidos (valor R$ 0 ou sem data).")
@@ -357,132 +334,120 @@ def processar_comprovante_imagem(user_id, image_url):
         print(f"ERRO CRÍTICO ao processar comprovante de imagem: {e}")
         return {"status": "erro", "mensagem": "Ocorreu um erro inesperado ao processar seu comprovante. A equipe já foi notificada."}
 
-# ▼▼▼ ADICIONE NO FINAL DO ARQUIVO ▼▼▼
-def vincular_conta_ultima_transacao(user_id, identificador_conta):
-    from src.models.financial import Transaction
-    from src.models.extended_modules import BankAccount
-    from src.models.db import db
-    import re
-
+def vincular_conta_ultima_transacao(user_id, identificador_ou_opcao):
+    """
+    Vincula uma conta bancária à transação recente que ficou sem vínculo ou pendente de seleção.
+    Suporta:
+    - Transações com status 'aguardando_conta' (comprovantes onde múltiplos bancos coincidiam).
+    - Transações com status 'confirmada' mas bank_account_id=None.
+    - Seleção por número de opção (ex: '1', '2'), dígitos finais da conta (ex: '2345'),
+      número da conta, ou nome do banco (ex: 'Nubank', 'Inter').
+    Atualiza o saldo bancário correspondente (débito para saída, crédito para entrada).
+    """
     try:
-        # 1. Pega a ÚLTIMA transação confirmada, mas que está sem conta vinculada
-        ultima_transacao = Transaction.query.filter_by(
-            user_id=user_id, 
-            bank_account_id=None,
-            status='confirmada'
+        identificador_str = str(identificador_ou_opcao).strip() if identificador_ou_opcao is not None else ""
+        if not identificador_str:
+            return {"status": "erro", "mensagem": "Por favor, informe o número da opção ou os dígitos da conta bancária."}
+
+        # 1. Busca transação que necessita de vínculo (prioridade para 'aguardando_conta', depois confirmada sem conta)
+        transacao = Transaction.query.filter_by(
+            user_id=user_id,
+            status='aguardando_conta'
         ).order_by(Transaction.created_at.desc()).first()
 
-        if not ultima_transacao:
+        if not transacao:
+            transacao = Transaction.query.filter_by(
+                user_id=user_id,
+                bank_account_id=None,
+                status='confirmada'
+            ).order_by(Transaction.created_at.desc()).first()
+
+        if not transacao:
             return {"status": "erro", "mensagem": "Não encontrei nenhuma transação recente aguardando vínculo de conta."}
 
-        # 2. Busca todas as contas do usuário para tentarmos o match
-        contas_usuario = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
-        conta_escolhida = None
-        
-        # Limpa o texto do usuário (tira a palavra 'final', 'conta', etc)
-        identificador_limpo = identificador_conta.lower().replace("final", "").replace("conta", "").strip()
-        # Se for só números, pega só os números
-        numeros_na_fala = re.sub(r'[^0-9]', '', identificador_limpo)
-
-        for conta in contas_usuario:
-            # Tenta casar pelo número da conta (se o usuário mandou números)
-            if numeros_na_fala and conta.account_number and numeros_na_fala in conta.account_number:
-                conta_escolhida = conta
-                break
-            # Tenta casar pelo nome da conta
-            elif identificador_limpo and identificador_limpo in conta.bank_name.lower():
-                conta_escolhida = conta
-                break
-
-        if not conta_escolhida:
-            return {"status": "erro", "mensagem": f"Não consegui identificar a conta a partir de '{identificador_conta}'. Pode me dizer os 4 últimos números exatos dela?"}
-
-        # 3. Faz o vínculo!
-        ultima_transacao.bank_account_id = conta_escolhida.id
-        
-        # 4. Atualiza o Saldo!
-        if ultima_transacao.type == 'entrada':
-            conta_escolhida.current_balance += float(ultima_transacao.value)
-        elif ultima_transacao.type == 'saida':
-            conta_escolhida.current_balance -= float(ultima_transacao.value)
-        
-        db.session.commit()
-
-        # Resposta que o Gemini vai ler para montar a mensagem final
-        return {
-            "status": "sucesso", 
-            "mensagem": f"Pronto! Vinculei os R$ {ultima_transacao.value} na conta '{conta_escolhida.bank_name}' e já atualizei o saldo lá."
-        }
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Erro CRÍTICO ao vincular conta: {e}")
-        return {"status": "erro", "mensagem": "Deu um erro interno ao tentar atualizar a conta e o saldo."}
-
-def vincular_conta_ultima_transacao(user_id, opcao_usuario):
-    from src.models.financial import Transaction
-    from src.models.extended_modules import BankAccount
-    from src.models.db import db
-
-    try:
-        # 1. Pega o comprovante congelado
-        transacao_pendente = Transaction.query.filter_by(
-            user_id=user_id, status='aguardando_conta'
-        ).order_by(Transaction.created_at.desc()).first()
-
-        if not transacao_pendente:
-            return {"status": "erro", "mensagem": "Não encontrei nenhum comprovante aguardando vinculação de conta."}
-
         conta_escolhida = None
 
-        # 2. Lê a "memória oculta" que deixamos na descrição
-        if " | AI_BANK:" in transacao_pendente.description:
-            partes = transacao_pendente.description.split(" | AI_BANK:")
+        # 2. Se houver metadado oculto AI_BANK na descrição, processa primeiro
+        banco_ia = None
+        if transacao.description and " | AI_BANK:" in transacao.description:
+            partes = transacao.description.split(" | AI_BANK:")
             descricao_limpa = partes[0]
             banco_ia = partes[1].strip()
+            transacao.description = descricao_limpa
 
-            # Refaz a mesma lista de contas na mesma ordem do menu
+            # Tenta filtrar contas que coincidem com a sugestão da IA
             contas_banco = BankAccount.query.filter(
-                BankAccount.user_id == user_id, BankAccount.bank_name.ilike(f"%{banco_ia}%")
+                BankAccount.user_id == user_id,
+                BankAccount.bank_name.ilike(f"%{banco_ia}%")
             ).all()
 
             try:
-                # Transforma a opção digitada (ex: "2") no índice da lista
-                indice = int(opcao_usuario.strip()) - 1
+                indice = int(identificador_str) - 1
                 if 0 <= indice < len(contas_banco):
                     conta_escolhida = contas_banco[indice]
             except ValueError:
                 pass
 
-            # Limpa a sujeira que deixamos na descrição
-            transacao_pendente.description = descricao_limpa
-
-        # Fallback: Se o usuário teimar em mandar os 4 dígitos ao invés do "2"
-        if not conta_escolhida:
-            todas_contas = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
-            for c in todas_contas:
-                if c.account_number and c.account_number.endswith(opcao_usuario.strip()):
-                    conta_escolhida = c
-                    break
+        # 3. Se ainda não encontrou, busca em todas as contas ativas do usuário
+        todas_contas = BankAccount.query.filter_by(user_id=user_id, is_active=True).all()
+        if not todas_contas:
+            todas_contas = BankAccount.query.filter_by(user_id=user_id).all()
 
         if not conta_escolhida:
-            return {"status": "erro", "mensagem": f"Não consegui identificar a opção '{opcao_usuario}'. Por favor, confira o número e tente novamente."}
+            # 3a. Tenta match por índice direto na lista de contas ativas (se o usuário mandou só número de opção 1, 2, etc.)
+            try:
+                idx = int(identificador_str) - 1
+                if 0 <= idx < len(todas_contas) and len(identificador_str) <= 2:
+                    conta_escolhida = todas_contas[idx]
+            except ValueError:
+                pass
 
-        # 3. Descongela, Vincula e Abate o Saldo
-        transacao_pendente.bank_account_id = conta_escolhida.id
-        transacao_pendente.status = 'confirmada'
-        
-        if transacao_pendente.type == 'entrada':
-            conta_escolhida.current_balance += float(transacao_pendente.value)
-        elif transacao_pendente.type == 'saida':
-            conta_escolhida.current_balance -= float(transacao_pendente.value)
-        
+        if not conta_escolhida:
+            # 3b. Tenta match por dígitos finais da conta (ex: '2345')
+            numeros = re.sub(r'[^0-9]', '', identificador_str)
+            if numeros:
+                for c in todas_contas:
+                    if c.account_number and (c.account_number.endswith(numeros) or numeros in c.account_number):
+                        conta_escolhida = c
+                        break
+
+        if not conta_escolhida:
+            # 3c. Tenta match por nome do banco (ex: "Nubank", "Inter", "Bradesco")
+            termo_limpo = identificador_str.lower().replace("final", "").replace("conta", "").replace("banco", "").strip()
+            if termo_limpo:
+                for c in todas_contas:
+                    if termo_limpo in c.bank_name.lower():
+                        conta_escolhida = c
+                        break
+
+        if not conta_escolhida:
+            return {
+                "status": "erro",
+                "mensagem": f"Não consegui identificar a conta a partir de '{identificador_str}'. Pode me informar o número da opção ou os 4 últimos dígitos dela?"
+            }
+
+        # 4. Vincula, confirma e atualiza saldo
+        transacao.bank_account_id = conta_escolhida.id
+        transacao.status = 'confirmada'
+
+        valor_float = float(transacao.value)
+        if transacao.type == 'entrada':
+            conta_escolhida.current_balance += valor_float
+        elif transacao.type == 'saida':
+            conta_escolhida.current_balance -= valor_float
+
         db.session.commit()
-        return {"status": "sucesso", "mensagem": f"Pronto! Vinculei na conta '{conta_escolhida.bank_name}' e o saldo já foi atualizado. ✅"}
+
+        val_fmt = format_currency_brl(valor_float)
+        return {
+            "status": "sucesso",
+            "mensagem": f"Pronto! Vinculei o lançamento de {val_fmt} na conta '{conta_escolhida.bank_name}' e já atualizei o saldo lá. ✅"
+        }
 
     except Exception as e:
         db.session.rollback()
-        return {"status": "erro", "mensagem": "Erro interno ao atualizar a conta."}
+        print(f"Erro CRÍTICO ao vincular conta: {e}")
+        return {"status": "erro", "mensagem": f"Erro interno ao vincular conta: {e}"}
 
 
 def processar_comprovante_bytes(user_id, file_bytes, filename=None, content_type=None):
@@ -502,6 +467,7 @@ def processar_comprovante_bytes(user_id, file_bytes, filename=None, content_type
         # 1. Salvar no Cloudinary (ou armazenamento local)
         if os.getenv("CLOUDINARY_CLOUD_NAME"):
             try:
+                import cloudinary
                 import cloudinary.uploader
                 upload_res = cloudinary.uploader.upload(
                     file_bytes,
@@ -546,7 +512,7 @@ def processar_comprovante_bytes(user_id, file_bytes, filename=None, content_type
                 from google.cloud import vision
                 client = vision.ImageAnnotatorClient()
                 image = vision.Image(content=file_bytes)
-                response_vision = client.text_detection(image=image)
+                response_vision = client.text_detection(image=image)  # pyrefly: ignore[missing-attribute]
                 if response_vision.full_text_annotation:
                     raw_text = response_vision.full_text_annotation.text.strip()
             except Exception as e:
@@ -774,11 +740,10 @@ def editar_transacao_assistente(user_id, termo_busca=None, novo_valor=None, nova
     if nova_data:
         try:
             tx.date = datetime.strptime(nova_data, '%Y-%m-%d').date()
-        except:
+        except (ValueError, TypeError):
             pass
 
     if nova_categoria:
-        from src.models.financial import Category
         cat = Category.query.filter(Category.user_id == user_id, Category.name.ilike(f'%{nova_categoria}%')).first()
         if cat:
             tx.category_id = cat.id

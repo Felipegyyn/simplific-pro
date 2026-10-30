@@ -1,0 +1,5 @@
+search-path = ["."]
+
+[errors]
+unexpected-keyword = "ignore"
+untyped-import = "ignore"

@@ -1,8 +1,8 @@
-# routes_whatsapp.py
 from flask import Blueprint, request, current_app
-import os # <-- ADICIONE
-import dateparser # <-- ADICIONE AQUI
-import calendar   # <-- ADICIONE AQUI
+import os
+from datetime import datetime, date
+import dateparser
+import calendar
 from src.models.user import User
 import threading
 import traceback
@@ -12,8 +12,11 @@ from src.services.whatsapp_service import (
     send_whatsapp_template,
     template_sids,
     user_sessions, 
+    salvar_sessao,
+    buscar_sessao,
     remover_sessao
 )
+from src.services.transacoes_service import confirmar_transacao_por_id
 from src.services.schedule_service import criar_evento_agenda, buscar_resumo_agenda
 from src.services.visual_report_service import generate_visual_report
 from src.services.whatsapp_service import send_whatsapp_media # Precisaremos desta nova função
@@ -223,7 +226,7 @@ def receive_message():
     # --- A GRANDE MUDANÇA (COM INDENTAÇÃO CORRIGIDA) ---
     
     # 5. Pega o objeto 'app' real de dentro do proxy
-    app_context = current_app._get_current_object()
+    app_context = getattr(current_app, '_get_current_object')()
 
     # ▼▼▼ ESTA É A MUDANÇA CRÍTICA NOS ARGUMENTOS DO THREAD ▼▼▼
     
@@ -370,25 +373,6 @@ def executar_acao_simplific(user_id, acao, from_number):
             else:
                 return f"✅ Lançado: *{dados.get('description')}* (R$ {dados.get('value')}) em {categoria_encontrada['name']}."
 
-            # Cenário C: Temos a conta OU o usuário disse "Não" (none)
-            # Se for 'none', bank_account_id será None
-            id_conta_final = conta_encontrada.id if conta_encontrada else None
-
-            criar_lancamento(
-                user_id=user_id,
-                tipo=dados.get('type'),
-                categoria_id=categoria_encontrada['id'],
-                valor=dados.get('value'),
-                descricao=dados.get('description'),
-                bank_account_id=id_conta_final
-            )
-            
-            # Mensagem de sucesso personalizada
-            if id_conta_final:
-                return f"Feito! 🏦 Lançamento registrado na conta *{conta_encontrada.bank_name}* e saldo atualizado."
-            else:
-                return f"Feito! ✅ Lançamento registrado em *{category_name}* (sem vínculo bancário)."
-
         elif tipo_acao == 'consultar_agenda':
             resumo = get_agenda_summary(user_id)
             return formatar_resumo_agenda(resumo) # Precisaremos criar esta função de formatação
@@ -410,31 +394,29 @@ def executar_acao_simplific(user_id, acao, from_number):
                 if success:
                     try:
                         data_br = datetime.strptime(dados_acao.get('event_date'), '%d/%m/%Y').strftime('%d/%m/%Y')
-                    except:
+                    except (ValueError, TypeError):
                         data_br = dados_acao.get('event_date')
                         
                     return f"✅ Lembrete '{dados_acao.get('title')}' anotado na sua agenda para {data_br} às {dados_acao.get('time')}!"
                 else:
                     return f"❌ Ops! {message}"
-        # ▲▲▲ FIM DO BLOCO CORRIGIDO ▲▲▲
 
-        # ▼▼▼ NOVA AÇÃO: CRIAR META (TURBINADA) ▼▼▼
-        elif tipo_acao == 'criar_meta': # <--- Verifique se este elif está alinhado com o elif de cima
+        # CRIAR META (TURBINADA)
+        elif tipo_acao == 'criar_meta':
             from src.models.db import db
             from src.models.extended import Goal
-            from datetime import datetime
             
             nome_meta = dados_acao.get('name')
             try:
                 valor_alvo = float(dados_acao.get('target_amount', 0))
-            except:
+            except (ValueError, TypeError):
                 valor_alvo = 0.0
                 
             data_str = dados_acao.get('target_date')
             if data_str:
                 try:
                     data_final = datetime.strptime(data_str, '%Y-%m-%d').date()
-                except:
+                except (ValueError, TypeError):
                     data_final = datetime(datetime.now().year, 12, 31).date()
             else:
                 data_final = datetime(datetime.now().year, 12, 31).date()
@@ -499,7 +481,10 @@ def executar_acao_simplific(user_id, acao, from_number):
                     return error # Retorna a mensagem de erro para o usuário
 
                 # Envia a imagem diretamente pelo WhatsApp
-                numero_destino = f'whatsapp:{User.query.get(user_id).whatsapp}'
+                user_obj = User.query.get(user_id)
+                if not user_obj or not user_obj.whatsapp:
+                    return "Erro: Usuário não possui WhatsApp configurado."
+                numero_destino = f'whatsapp:{user_obj.whatsapp}'
                 send_whatsapp_media(numero_destino, image_url, f"Prontinho! Aqui está seu resumo visual de {periodo_texto}. ✨")
 
                 # Retorna None para que a IA não envie uma mensagem de texto duplicada
@@ -614,19 +599,19 @@ def executar_acao_simplific(user_id, acao, from_number):
             status = resultado.get('status')
 
             if status == 'sucesso_acao_fii':
-                dados_sucesso = resultado.get('data', {})
-                ticker = dados_sucesso.get('ticker')
-                # Retorna None para que a resposta original do Simplific seja usada
+                dados_sucesso = resultado.get('data') if isinstance(resultado, dict) else {}
+                if isinstance(dados_sucesso, dict):
+                    ticker = dados_sucesso.get('ticker')
                 return None
 
             elif status == 'ativo_nao_encontrado':
                 # Inicia o fluxo interativo para Renda Fixa
+                dados_sessao = resultado.get('data_sessao') if isinstance(resultado, dict) else {}
                 user_sessions[from_number] = {
                     'contexto': 'cadastrar_renda_fixa',
-                    'dados_investimento': resultado.get('data_sessao')
+                    'dados_investimento': dados_sessao
                 }
-                ticker_nome = resultado.get('data_sessao', {}).get('ticker', 'Ativo')
-                # Retorna a pergunta para o usuário     
+                ticker_nome = dados_sessao.get('ticker', 'Ativo') if isinstance(dados_sessao, dict) else 'Ativo'
                 return f"Não encontrei o ativo '{ticker_nome}' na bolsa. Ele é um investimento de Renda Fixa (CDB, LCI, etc)?\n\n1. Sim\n2. Não"
 
             else: # Se for 'erro'
@@ -899,10 +884,10 @@ def handle_cadastrar_investimento(data, from_number, usuario):
     status = resultado.get('status')
     
     if status == 'sucesso_acao_fii':
-        dados_sucesso = resultado.get('data', {})
-        ticker = dados_sucesso.get('ticker')
-        quantity = dados_sucesso.get('quantity', 0)
-        initial_value = dados_sucesso.get('initial_value', 0)
+        dados_sucesso = resultado.get('data') if isinstance(resultado, dict) else {}
+        ticker = dados_sucesso.get('ticker') if isinstance(dados_sucesso, dict) else 'Ativo'
+        quantity = dados_sucesso.get('quantity', 0) if isinstance(dados_sucesso, dict) else 0
+        initial_value = dados_sucesso.get('initial_value', 0) if isinstance(dados_sucesso, dict) else 0
 
         # Formata os números para o padrão brasileiro
         # Para a quantidade, trocamos o ponto decimal por vírgula
@@ -919,11 +904,12 @@ def handle_cadastrar_investimento(data, from_number, usuario):
         
     elif status == 'ativo_nao_encontrado':
         # Inicia o fluxo de Renda Fixa
+        dados_sessao = resultado.get('data_sessao') if isinstance(resultado, dict) else {}
         user_sessions[from_number] = {
             'contexto': 'cadastrar_renda_fixa',
-            'dados_investimento': resultado.get('data_sessao')
+            'dados_investimento': dados_sessao
         }
-        ticker_nome = resultado.get('data_sessao', {}).get('ticker', 'Ativo')
+        ticker_nome = dados_sessao.get('ticker', 'Ativo') if isinstance(dados_sessao, dict) else 'Ativo'
         return f"Não encontrei o ativo '{ticker_nome}' na bolsa. Ele é um investimento de Renda Fixa (CDB, LCI, etc)?\n\n1. Sim\n2. Não"
         
     else: # Se for 'erro'
@@ -1472,14 +1458,13 @@ def tratar_resposta_numerica(mensagem, from_number, user_id):
 
 
     elif contexto == 'confirmar_lancamento_lembrete':
-        sessao = buscar_sessao(from_number) # Importar buscar_sessao
+        sessao = buscar_sessao(from_number)
+        if not sessao:
+            return 'Sessão expirada. Por favor, tente novamente.'
         transaction_id = sessao.get('transaction_id')
         resposta_usuario = mensagem.strip().lower()
 
         if resposta_usuario in ['sim', 's']:
-            # Importar a função de confirmar
-            from src.services.transacoes_service import confirmar_transacao_por_id
-
             sucesso = confirmar_transacao_por_id(transaction_id, user_id)
             if sucesso:
                 remover_sessao(from_number)
@@ -1956,10 +1941,10 @@ def handle_agendar_reuniao_meet(dados, user_id):
     status_envio = ""
     if contato_encontrado and contato_encontrado.whatsapp:
         numero_limpo = normalize_phone_number(contato_encontrado.whatsapp)
-        if not numero_limpo.startswith('whatsapp:'):
-            whatsapp_destino = f"whatsapp:{numero_limpo}"
+        if numero_limpo:
+            whatsapp_destino = f"whatsapp:{numero_limpo}" if not numero_limpo.startswith('whatsapp:') else numero_limpo
         else:
-            whatsapp_destino = numero_limpo
+            whatsapp_destino = f"whatsapp:{contato_encontrado.whatsapp}"
             
         print(f" >>> ENVIANDO TEMPLATE REUNIÃO PARA: {whatsapp_destino}")
         try:

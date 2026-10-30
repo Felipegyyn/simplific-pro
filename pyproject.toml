@@ -1,0 +1,7 @@
+[tool.pyrefly]
+project-includes = ["src"]
+search-path = ["."]
+
+[tool.pyrefly.errors]
+unexpected-keyword = "ignore"
+untyped-import = "ignore"

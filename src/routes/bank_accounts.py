@@ -21,14 +21,14 @@ def get_accounts():
 @active_user_required
 def create_account():
     user_id = get_jwt_identity()
-    data = request.json
+    data = request.json or {}
     
     if not data.get('bank_name') or not data.get('account_number'):
         return jsonify({'error': 'Banco e Conta são obrigatórios'}), 400
 
     try:
         saldo_inicial = float(data.get('balance', 0.0))
-    except:
+    except (ValueError, TypeError):
         saldo_inicial = 0.0
 
     new_account = BankAccount(
@@ -74,7 +74,7 @@ def update_account(account_id):
     if not account:
         return jsonify({'error': 'Conta não encontrada'}), 404
 
-    data = request.json
+    data = request.json or {}
 
     if 'bank_name' in data:
         account.bank_name = data['bank_name']

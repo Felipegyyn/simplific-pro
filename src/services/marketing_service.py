@@ -1,6 +1,7 @@
 import os
 import time
 from datetime import datetime, timedelta
+from typing import Any
 from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.campaign import Campaign
@@ -34,7 +35,7 @@ class MetaAdsService:
         try:
             # 1. DADOS FINANCEIROS
             account = AdAccount(self.ad_account_id)
-            account_data = account.api_get(fields=['balance', 'currency', 'spend_cap', 'amount_spent'])
+            account_data: Any = account.api_get(fields=['balance', 'currency', 'spend_cap', 'amount_spent'])
             
             balance = float(account_data.get('balance', 0)) / 100
             spend_cap = float(account_data.get('spend_cap', 0)) / 100
@@ -68,7 +69,7 @@ class MetaAdsService:
             }
             fields = ['spend', 'actions', 'clicks', 'date_start']
             
-            insights = account.get_insights(fields=fields, params=params)
+            insights: Any = account.get_insights(fields=fields, params=params)
             
             chart_data = []
             for day in insights:
@@ -98,10 +99,10 @@ class MetaAdsService:
         try:
             account = AdAccount(self.ad_account_id)
             fields = [Campaign.Field.name, Campaign.Field.status, Campaign.Field.daily_budget, Campaign.Field.id]
-            campaigns = account.get_campaigns(fields=fields, params={'limit': 50, 'effective_status': ['ACTIVE', 'PAUSED']})
+            campaigns: Any = account.get_campaigns(fields=fields, params={'limit': 50, 'effective_status': ['ACTIVE', 'PAUSED']})
             results = []
             for camp in campaigns:
-                insights = camp.get_insights(fields=['spend', 'cpc', 'actions', 'clicks'], params={'date_preset': 'maximum'})
+                insights: Any = camp.get_insights(fields=['spend', 'cpc', 'actions', 'clicks'], params={'date_preset': 'maximum'})
                 spend, clicks, cpc, leads, purchases = 0.0, 0, 0.0, 0, 0
                 if insights:
                     d = insights[0]
@@ -123,15 +124,16 @@ class MetaAdsService:
             print(f"❌ Erro: {e}")
             return []
 
-    # ... (MANTENHA TOGGLE E UPDATE_BUDGET IGUAIS) ...
     def toggle_campaign_status(self, campaign_id, new_status):
         try:
             Campaign(campaign_id).api_update(params={Campaign.Field.status: new_status})
             return True
-        except: return False
+        except Exception:
+            return False
 
     def update_budget(self, campaign_id, new_budget):
         try:
             Campaign(campaign_id).api_update(params={Campaign.Field.daily_budget: int(float(new_budget)*100)})
             return True
-        except: return False
+        except Exception:
+            return False

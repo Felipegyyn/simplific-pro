@@ -46,7 +46,7 @@ def get_or_create_fatura(user_id, card, transaction_date):
             data_vencimento = datetime(ano_ref, mes_ref, last_day).date()
 
         # 3. Lógica do Status
-        hoje = datetime.utcnow().date()
+        hoje = datetime.now().date()
         if (ano_ref < hoje.year) or (ano_ref == hoje.year and mes_ref < hoje.month):
             status_inicial = 'paga'
         else:
@@ -59,7 +59,7 @@ def get_or_create_fatura(user_id, card, transaction_date):
             mes=mes_ref,
             ano=ano_ref,
             status=status_inicial,
-            created_at=datetime.utcnow()
+            created_at=datetime.now()
         )
         db.session.add(fatura)
         db.session.commit()
@@ -96,7 +96,7 @@ def sync_data():
         try:
             item_details = pluggy_service.fetch_item(item_id)
             bank_name = item_details.get('connector', {}).get('name', '')
-        except:
+        except Exception:
             bank_name = ""
 
         accounts = pluggy_service.fetch_accounts(item_id)

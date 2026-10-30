@@ -1,4 +1,5 @@
 from src.models.db import db
+from src.models.user import User
 from src.models.extended import ScheduleEvent
 from src.models.extended_modules import Fatura, CreditCard
 from src.services.whatsapp_service import send_whatsapp_message
@@ -142,7 +143,7 @@ def get_schedule_summary_for_ai(user_id):
     # Se não existir, teríamos que criá-la. Por enquanto, vamos simular.
     eventos = ScheduleEvent.query.filter(
         ScheduleEvent.user_id == user_id,
-        ScheduleEvent.date >= datetime.utcnow().date()
+        ScheduleEvent.date >= datetime.now().date()
     ).order_by(ScheduleEvent.date).limit(3).all()
 
     if not eventos:
@@ -154,13 +155,11 @@ def get_schedule_summary_for_ai(user_id):
 
     return "Agenda: Próximos compromissos: " + ", ".join(resumos) + "."
 
-# Adicione estas duas novas funções ao final de schedule_service.py
-
 def get_agenda_summary(user_id):
     """
     Busca e categoriza os eventos da agenda em Atrasados, Hoje e Próximos.
     """
-    hoje = datetime.utcnow().date()
+    hoje = datetime.now().date()
     
     eventos = ScheduleEvent.query.filter(
         ScheduleEvent.user_id == user_id,
@@ -241,7 +240,7 @@ def cancelar_evento_agenda_assistente(user_id, termo_busca, data_evento=None):
         try:
             d_obj = datetime.strptime(data_evento, '%Y-%m-%d').date()
             query = query.filter(ScheduleEvent.date == d_obj)
-        except:
+        except (ValueError, TypeError):
             pass
 
     # Pega preferencialmente eventos futuros ou o mais recente

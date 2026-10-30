@@ -38,19 +38,7 @@ def send_whatsapp_template(to, template_sid, content_variables):
         return {'status': 'success', 'sid': message.sid}
 
     except Exception as e:
-        print(f"CRITICAL TWILIO ERROR: {str(e)}") # <--- ISSO VAI MOSTRAR O ERRO REAL NO LOG
-        return {'status': 'error', 'message': str(e)}
-
-        if hasattr(message, 'error_code') and message.error_code is not None:
-            return {
-                'status': 'error',
-                'error_code': message.error_code,
-                'error_message': message.error_message
-            }
-
-        return {'status': 'success', 'sid': message.sid}
-
-    except Exception as e:
+        print(f"CRITICAL TWILIO ERROR: {str(e)}")
         return {'status': 'error', 'message': str(e)}
 
 

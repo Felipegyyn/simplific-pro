@@ -17,7 +17,7 @@ def process_subscription_route():
     try:
         data = request.get_json()
         if not data: return jsonify({"error": "Dados vazios"}), 400
-    except: return jsonify({"error": "JSON inválido"}), 400
+    except Exception: return jsonify({"error": "JSON inválido"}), 400
 
     # 1. Dados
     payer_data = data.get('payer', {})
@@ -107,11 +107,14 @@ def process_subscription_route():
             else:
                 return jsonify({"error": "Pago, mas erro ao criar usuário."}), 500
 
+        if not user:
+            return jsonify({"error": "Usuário não localizado no sistema."}), 500
+
         user.status = 'ativo'
         user.profile = 'usuario'
         user.subscription_id = transaction_id
         user.subscription_plan = 'anual' if plan_type == 'yearly' else 'mensal'
-        user.subscription_valid_until = datetime.utcnow() + timedelta(days=days_access)
+        user.subscription_valid_until = datetime.now() + timedelta(days=days_access)
         
         db.session.commit()
 
@@ -198,7 +201,7 @@ def cancel_subscription_route():
         
         if response.status_code == 200 or response.status_code == 204:
             # Sucesso no Asaas
-            user.subscription_valid_until = datetime.utcnow().date() # Define validade para hoje (ou mantem até o fim do ciclo se preferir logica complexa)
+            user.subscription_valid_until = datetime.now().date() # Define validade para hoje
             # Geralmente deixamos o valid_until como está (fim do mês) e apenas marcamos que não renova.
             # Mas para simplificar:
             user.status = 'cancelado' 

@@ -1,6 +1,6 @@
 from src.database.database import execute_query
 
-def buscar_categorias(user_id):
+def buscar_categorias(user_id) -> list:
     """
     Busca TODAS as categorias (com id, nome e tipo) de um usuário específico.
     Esta função é essencial para a personalização do Gemini.
@@ -15,7 +15,7 @@ def buscar_categorias(user_id):
     resultado = execute_query(query, params)
 
     # Retorna a lista de dicionários, que é mais útil para o resto do código
-    return resultado
+    return resultado if isinstance(resultado, list) else []
 
 def buscar_cartoes():
     """
