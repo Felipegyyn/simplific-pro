@@ -1,72 +1,101 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/LOGO.png';
+import SimplificMascot from '../SimplificMascot';
 
 const Footer = () => {
   return (
-    <><footer className="site-footer bg-black text-white border-t border-white/10" data-header="escuro">
-        <div className="footer-inner relative z-10">
-            <div className="footer-top">
+    <footer className="site-footer bg-black text-white border-t border-white/10 pt-16 pb-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
 
-                <div className="footer-brand">
-                    <Link to="/" className="footer-logo-link">
-                        
-                        <img src={logo} alt="Simplific Pro" className="footer-logo" />
-                    </Link>
-                    <p className="footer-about">Um escritório de assessores de inteligência artificial dentro do seu WhatsApp. Dinheiro, agenda, tarefas e documentos entram organizados, numa conversa só.</p>
-                    <div className="footer-social">
-                        <a href="https://www.instagram.com/meuassessor.ia/" target="_blank" rel="noopener" aria-label="Instagram do Simplific Pro">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.2"/>
-                                <circle cx="12" cy="12" r="4.1"/>
-                                <circle cx="17.1" cy="6.9" r="1.15" className="is-solid"/>
-                            </svg>
-                        </a>
-                        <a href="https://web.facebook.com/p/Meu-Assessor-61574060255535" target="_blank" rel="noopener" aria-label="Facebook do Simplific Pro">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M13.6 21v-8.2h2.7l.4-3.1h-3.1V7.6c0-.9.25-1.5 1.55-1.5h1.65V3.3c-.3-.04-1.3-.13-2.45-.13-2.4 0-4.05 1.47-4.05 4.16V9.7H7.6v3.1h2.7V21Z"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/10">
 
-                <nav className="footer-col footer-links" aria-labelledby="footerColEscritorio">
-                    <h3 className="footer-col-title" id="footerColEscritorio">Simplific Pro</h3>
-                    <Link to="/beneficios">Benefícios</Link>
-                    <Link to="/inteligencia">Inteligência</Link>
-                    <Link to="/seguranca">Segurança</Link>
-                    <Link to="/contato">Contato</Link>
-                </nav>
+          {/* Coluna 1: Marca & Pierre */}
+          <div className="md:col-span-5 flex flex-col items-start">
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <img src={logo} alt="Simplific Pro" className="h-8 w-auto" />
+            </Link>
 
-                <nav className="footer-col footer-links" aria-labelledby="footerColConta">
-                    <h3 className="footer-col-title" id="footerColConta">Conta</h3>
-                    <Link to="/login">Login</Link>
-                    
-                    <Link to="/planos">Começar agora</Link>
-                </nav>
+            <p className="text-zinc-400 text-sm leading-relaxed max-w-sm mb-6">
+              Sua vida financeira e sua rotina organizadas numa conversa de WhatsApp. Gastos, cartões, investimentos B3 e agenda no piloto automático com inteligência artificial.
+            </p>
 
-                <div className="footer-col footer-support" aria-labelledby="footerColSuporte">
-                    <h3 className="footer-col-title" id="footerColSuporte">Suporte humano</h3>
-                    
-                    <a href="mailto:contato@simplific.pro" className="footer-mail">contato@simplific.pro</a>
-                    <p className="footer-support-text">Plano, cobrança e acesso à conta são com o nosso time, não com os assessores.</p>
-                    <a href="https://wa.me/5547992921005" target="_blank" rel="noopener" className="footer-wa">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.548 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
-                        <span>Falar com o suporte</span>
-                    </a>
-                </div>
-
+            <div className="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-900/80 border border-white/10">
+              <SimplificMascot size={40} />
+              <div className="text-xs">
+                <span className="font-semibold text-white block">Pierre • Assistente Oficial</span>
+                <span className="text-emerald-400">Online 24h via WhatsApp</span>
+              </div>
             </div>
+          </div>
 
-            <div className="footer-bottom">
-                <p className="footer-legal">© 2026 Simplific Pro LTDA. Empresa do grupo Tittanium. Todos os direitos reservados.</p>
-                <nav className="footer-terms">
-                    <Link to="/privacidade">Política de privacidade</Link>
-                    <Link to="/termos">Termos de uso</Link>
-                </nav>
-            </div>
+          {/* Coluna 2: Navegação */}
+          <div className="md:col-span-2">
+            <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-4">
+              Simplific Pro
+            </h4>
+            <ul className="space-y-2.5 text-sm text-zinc-400">
+              <li><Link to="/beneficios" className="hover:text-emerald-400 transition-colors">Benefícios</Link></li>
+              <li><Link to="/inteligencia" className="hover:text-emerald-400 transition-colors">Inteligência</Link></li>
+              <li><Link to="/planos" className="hover:text-emerald-400 transition-colors">Planos & Preços</Link></li>
+              <li><Link to="/seguranca" className="hover:text-emerald-400 transition-colors">Segurança LGPD</Link></li>
+              <li><Link to="/contato" className="hover:text-emerald-400 transition-colors">Fale Conosco</Link></li>
+            </ul>
+          </div>
+
+          {/* Coluna 3: Conta & Acesso */}
+          <div className="md:col-span-2">
+            <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-4">
+              Sua Conta
+            </h4>
+            <ul className="space-y-2.5 text-sm text-zinc-400">
+              <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Acessar Painel</Link></li>
+              <li><Link to="/checkout?plan=annual" className="hover:text-emerald-400 transition-colors">Começar no Anual</Link></li>
+              <li><Link to="/checkout" className="hover:text-emerald-400 transition-colors">Plano Mensal</Link></li>
+            </ul>
+          </div>
+
+          {/* Coluna 4: Suporte Humano */}
+          <div className="md:col-span-3">
+            <h4 className="text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-4">
+              Suporte & Atendimento
+            </h4>
+            <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
+              Dúvidas sobre pagamentos, planos ou acesso? Fale diretamente com nosso time:
+            </p>
+            <a
+              href="mailto:contato@simplificpro.com"
+              className="text-xs text-emerald-400 hover:underline block mb-2 font-mono"
+            >
+              contato@simplificpro.com
+            </a>
+            <a
+              href="https://wa.me/5547992921005"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium hover:bg-emerald-500/20 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.05 2C6.49 2 2 6.49 2 12.05c0 1.95.56 3.77 1.53 5.32L2 22l4.79-1.5a10.02 10.02 0 005.26 1.48c5.56 0 10.05-4.49 10.05-10.05S17.61 2 12.05 2z" />
+              </svg>
+              <span>Suporte via WhatsApp</span>
+            </a>
+          </div>
+
         </div>
-    </footer></>
+
+        {/* Rodapé Inferior: Copyright & Legal */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+          <p>© 2026 Simplific Pro LTDA. Todos os direitos reservados.</p>
+          <div className="flex items-center gap-6">
+            <Link to="/privacidade" className="hover:text-zinc-300 transition-colors">Política de Privacidade</Link>
+            <Link to="/termos" className="hover:text-zinc-300 transition-colors">Termos de Uso</Link>
+            <Link to="/seguranca" className="hover:text-zinc-300 transition-colors">Segurança</Link>
+          </div>
+        </div>
+
+      </div>
+    </footer>
   );
 };
 

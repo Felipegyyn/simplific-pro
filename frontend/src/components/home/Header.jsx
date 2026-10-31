@@ -29,24 +29,24 @@ const Header = () => {
       </nav>
 
       <div className="flex items-center gap-3">
-        <Link 
-          to="/login" 
+        <Link
+          to="/login"
           className="hidden md:inline-flex items-center text-sm font-medium text-zinc-300 hover:text-white px-3 py-1.5 transition-colors"
         >
           Entrar
         </Link>
-        <Link 
-          to="/checkout?plan=annual" 
+        <Link
+          to="/checkout?plan=annual"
           className="header-cta shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20"
         >
           Começar agora &rarr;
         </Link>
 
-        <button 
-          className="header-menu" 
-          type="button" 
-          aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"} 
-          aria-expanded={isMenuOpen} 
+        <button
+          className="header-menu"
+          type="button"
+          aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={isMenuOpen}
           aria-controls="menu-do-celular"
           onClick={toggleMenu}
         >
@@ -56,9 +56,9 @@ const Header = () => {
         </button>
       </div>
 
-      <nav 
-        className={`menu-movel ${isMenuOpen ? 'is-aberto' : ''}`} 
-        id="menu-do-celular" 
+      <nav
+        className={`menu-movel ${isMenuOpen ? 'is-aberto' : ''}`}
+        id="menu-do-celular"
         aria-label="Menu do site"
       >
         <Link to="/beneficios" onClick={closeMenu}>Benefícios</Link>
@@ -66,7 +66,7 @@ const Header = () => {
         <Link to="/planos" onClick={closeMenu}>Planos</Link>
         <Link to="/seguranca" onClick={closeMenu}>Segurança</Link>
         <Link to="/contato" onClick={closeMenu}>Contato</Link>
-        
+
         <Link to="/checkout?plan=annual" className="mm-acao" onClick={closeMenu}>Começar agora &rarr;</Link>
         <Link to="/login" className="mm-login" onClick={closeMenu}>Fazer login</Link>
       </nav>

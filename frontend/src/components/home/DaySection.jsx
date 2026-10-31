@@ -1,151 +1,161 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
+const daySteps = [
+  {
+    id: 1,
+    time: '07:40',
+    title: 'O aviso da fatura chega antes de você terminar o café.',
+    desc: 'O Pierre monitora os fechamentos dos seus cartões e te avisa com antecedência o valor consolidado, limites disponíveis e vencimento.',
+    badge: 'Cartão de Crédito',
+    previewTitle: 'Fatura fechando',
+    previewText: 'Pierre: Sua fatura do Nubank fecha em 3 dias! Total acumulado: R$ 1.840,00. Quer ver os maiores gastos?'
+  },
+  {
+    id: 2,
+    time: '09:15',
+    title: 'Um áudio no caminho, e a reunião com Meet entra na agenda.',
+    desc: 'Basta enviar um áudio rápido: o Pierre entende datas, horários e participantes, cria o evento no Google Agenda e gera o link do Google Meet.',
+    badge: 'Google Agenda & Meet',
+    previewTitle: 'Reunião Agendada',
+    previewText: 'Pierre: Call com investidores agendada para quinta às 15:00. Link do Google Meet pronto no seu calendário!'
+  },
+  {
+    id: 3,
+    time: '12:30',
+    title: 'Pagou o almoço? Foto do cupom ou áudio e já está registrado.',
+    desc: 'O Vision AI analisa o cupom fiscal ou interpreta seu áudio na hora, categorizando a despesa em Alimentação sem você precisar digitar.',
+    badge: 'Vision AI OCR',
+    previewTitle: 'Despesa Registrada',
+    previewText: 'Pierre: R$ 142,00 registrado em Alimentação via comprovante fotográfico. Saldo do mês atualizado.'
+  },
+  {
+    id: 4,
+    time: '15:30',
+    title: 'Curioso com o mercado? Uma pergunta e a B3 responde.',
+    desc: 'Pergunte cotações de ações, fundos imobiliários e índices brasileiros em tempo real, diretamente pelo WhatsApp.',
+    badge: 'Cotações B3 ao Vivo',
+    previewTitle: 'Mercado B3',
+    previewText: 'Pierre: PETR4 está a R$ 38,42 (+1,8%) e MXRF11 a R$ 10,25. Sua carteira valorizou 0,94% hoje.'
+  },
+  {
+    id: 5,
+    time: '22:00',
+    title: 'Antes de dormir, o resumo do dia chega organizado.',
+    desc: 'Um resumo claro com tudo o que foi gasto hoje, o saldo disponível até o fim do mês e seus primeiros compromissos de amanhã.',
+    badge: 'Fechamento do Dia',
+    previewTitle: 'Resumo Diário',
+    previewText: 'Pierre: Hoje você realizou 3 lançamentos (total R$ 264,00). Amanhã você tem 2 reuniões no Google Agenda.'
+  }
+];
 
 const DaySection = () => {
+  const [activeId, setActiveId] = useState(1);
+
+  // Troca automática a cada 6 segundos
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveId(prev => (prev % daySteps.length) + 1);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const current = daySteps.find(s => s.id === activeId) || daySteps[0];
+
   return (
-    <><section className="dia2-section" id="diaSection">
-        <div className="dia2-grade">
-            <div className="dia2-texto">
-                <header className="dia2-topo">
-                    <h2 className="dia2-headline">Um dia normal. Só que alguém cuidou de tudo.</h2>
-                    <p className="dia2-sub">Cinco momentos de um dia comum, e o que a sua equipe resolve em cada um deles pelo WhatsApp.</p>
-                </header>
-                <ol className="dia2-lista" id="dia2Lista">
-                    <li className="dia2-item is-ativo" data-ato="1" aria-current="true">
-                        <button type="button" className="dia2-botao"><span className="dia2-hora">07:40</span><span className="dia2-titulo">O aviso da fatura chega antes de você terminar o café.</span></button>
-                        <div className="dia2-corpo"><p>Seus assessores acompanham contas, compromissos e documentos. Eles enviam avisos, trazem atualizações e sugerem análises pelo WhatsApp, sem esperar você pedir.</p></div>
-                        <i className="dia2-barra" aria-hidden="true"></i>
-                    </li>
-                    <li className="dia2-item" data-ato="2" aria-current="false">
-                        <button type="button" className="dia2-botao"><span className="dia2-hora">09:15</span><span className="dia2-titulo">Um áudio no caminho, e a consulta entra na agenda.</span></button>
-                        <div className="dia2-corpo"><p>A Sofi cria compromissos no Google Agenda a partir de mensagens ou áudios enviados pelo WhatsApp, com data, horário e lembrete. A agenda também pode ser consultada pela conversa.</p></div>
-                        <i className="dia2-barra" aria-hidden="true"></i>
-                    </li>
-                    <li className="dia2-item" data-ato="3" aria-current="false">
-                        <button type="button" className="dia2-botao"><span className="dia2-hora">12:30</span><span className="dia2-titulo">Pagou o almoço? Já está registrado.</span></button>
-                        <div className="dia2-corpo"><p>Com o banco conectado pelo Open Finance, o Martin importa as movimentações e organiza os gastos por categoria. Você também pode registrar despesas por mensagem, áudio ou foto.</p></div>
-                        <i className="dia2-barra" aria-hidden="true"></i>
-                    </li>
-                    <li className="dia2-item" data-ato="4" aria-current="false">
-                        <button type="button" className="dia2-botao"><span className="dia2-hora">15:30</span><span className="dia2-titulo">Não encontra um documento? É só mandar uma mensagem.</span></button>
-                        <div className="dia2-corpo"><p>A Luna organiza os arquivos enviados pelo WhatsApp em pastas. Você pode buscar um documento descrevendo o que precisa e recebê-lo na própria conversa.</p></div>
-                        <i className="dia2-barra" aria-hidden="true"></i>
-                    </li>
-                    <li className="dia2-item" data-ato="5" aria-current="false">
-                        <button type="button" className="dia2-botao"><span className="dia2-hora">22:00</span><span className="dia2-titulo">Antes de dormir, o resumo do dia já está pronto.</span></button>
-                        <div className="dia2-corpo"><p>Sua equipe reúne as atividades realizadas em um resumo enviado pelo WhatsApp. A Sofi também envia os compromissos, as prioridades e os prazos da agenda a cada manhã.</p></div>
-                        <i className="dia2-barra" aria-hidden="true"></i>
-                    </li>
-                </ol>
-            </div>
-            <div className="dia2-palco">
-                <div className="dia2-quadro" id="dia2Quadro" aria-hidden="true">
-                    <div className="dia2-cena is-ativa" data-ato="1">
-                        <div className="dia-foto">
-                        <span className="dia-agua" aria-hidden="true">07:40</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/7-40.webp\')'}} aria-hidden="true"></div>
-                        <div className="dia-noti">
-                        <span className="dia-noti-icone is-nubank"><img src="/meuassessor/images/bancos/nubank.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
-                        <span className="dia-noti-corpo">
-                        <span className="dia-noti-linha">
-                        <strong className="dia-noti-titulo">Fatura de cartão</strong>
-                        <span className="dia-noti-hora">7:40</span>
-                        </span>
-                        <span className="dia-noti-sub">Simplific: Sua fatura do Nubank vence hoje!<span className="dia-noti-pergunta">Quer que eu gere o relatório dos gastos?</span></span>
-                        </span>
-                        </div>
-                        </div>
+    <section className="py-20 px-4 md:px-8 max-w-7xl mx-auto relative z-10" id="diaSection">
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+        {/* Coluna da Esquerda: Lista de Horários */}
+        <div className="lg:col-span-7">
+          <div className="mb-8">
+            <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
+              Rotina Real Sem Esforço
+            </span>
+            <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tight mb-3">
+              Um dia normal. Só que alguém cuidou de tudo.
+            </h2>
+            <p className="text-zinc-400 text-sm md:text-base">
+              Cinco momentos de um dia comum, e o que o Simplific Pro resolve em cada um deles direto pelo WhatsApp.
+            </p>
+          </div>
+
+          <ol className="space-y-3">
+            {daySteps.map((step) => {
+              const isActive = step.id === activeId;
+              return (
+                <li key={step.id}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveId(step.id)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all duration-300 relative overflow-hidden ${isActive
+                        ? 'bg-zinc-900/90 border-emerald-500/50 shadow-[0_0_25px_rgba(16,185,129,0.15)]'
+                        : 'bg-zinc-950/40 border-white/5 hover:border-white/15 text-zinc-400'
+                      }`}
+                  >
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${isActive ? 'bg-emerald-500 text-black' : 'bg-white/10 text-zinc-400'
+                        }`}>
+                        {step.time}
+                      </span>
+                      <span className={`text-sm md:text-base font-semibold ${isActive ? 'text-white' : 'text-zinc-300'
+                        }`}>
+                        {step.title}
+                      </span>
                     </div>
-                    <div className="dia2-cena" data-ato="2">
-                        <div className="dia-foto">
-                        <span className="dia-agua" aria-hidden="true">09:15</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/9-15.webp\')'}} aria-hidden="true"></div>
-                        <div className="dia-zap" aria-hidden="true">
-                        <div className="dia-zap-audio">
-                        <div className="dia-zap-linha">
-                        <span className="dia-zap-play"><svg viewBox="0 0 12 14" focusable="false"><path d="M2.2 1.5 10.6 7 2.2 12.5Z"/></svg></span>
-                        <span className="dia-zap-onda"><i style={{'--h': '22%'}}></i><i style={{'--h': '30%'}}></i><i style={{'--h': '40%'}}></i><i style={{'--h': '54%'}}></i><i style={{'--h': '68%'}}></i><i style={{'--h': '82%'}}></i><i style={{'--h': '94%'}}></i><i style={{'--h': '88%'}}></i><i style={{'--h': '74%'}}></i><i style={{'--h': '60%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '26%'}}></i><i style={{'--h': '36%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '66%'}}></i><i style={{'--h': '80%'}}></i><i style={{'--h': '92%'}}></i><i style={{'--h': '100%'}}></i><i style={{'--h': '90%'}}></i><i style={{'--h': '76%'}}></i><i style={{'--h': '62%'}}></i><i style={{'--h': '50%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '28%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '72%'}}></i><i style={{'--h': '86%'}}></i><i style={{'--h': '96%'}}></i><i style={{'--h': '84%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '56%'}}></i><i style={{'--h': '44%'}}></i><i style={{'--h': '32%'}}></i><i style={{'--h': '26%'}}></i><i style={{'--h': '38%'}}></i><i style={{'--h': '52%'}}></i><i style={{'--h': '64%'}}></i><i style={{'--h': '78%'}}></i><i style={{'--h': '70%'}}></i><i style={{'--h': '58%'}}></i><i style={{'--h': '46%'}}></i><i style={{'--h': '34%'}}></i><i style={{'--h': '24%'}}></i></span>
-                        <span className="dia-zap-dur">0:08</span>
-                        </div>
-                        <div className="dia-zap-fio"></div>
-                        <p className="dia-zap-tr">Marca o pediatra da Alice na quinta 10 horas.</p>
-                        <p className="dia-zap-meta">9:15<svg className="dia-zap-visto" viewBox="0 0 17 11" focusable="false"><path d="M1.2 6.4 4.1 9.2 9.9 2.1"/><path d="M7.4 9.2 13.2 2.1"/></svg></p>
-                        </div>
-                        <div className="dia-zap-resp">
-                        <p className="dia-zap-quem"><span className="dia-zap-nome"><b>Sofi</b> &middot; Secretária executiva</span></p>
-                        <p className="dia-zap-txt">Marcado ✅ Já está no seu Google Agenda.</p>
-                        <p className="dia-zap-meta">9:15</p>
-                        </div>
-                        </div>
-                        </div>
-                    </div>
-                    <div className="dia2-cena" data-ato="3">
-                        <div className="dia-foto">
-                        <span className="dia-agua" aria-hidden="true">12:30</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/12-30.webp\')'}} aria-hidden="true"></div>
-                        <div className="dia-noti">
-                        <span className="dia-noti-icone is-ifood"><img src="/meuassessor/images/bancos/ifood.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
-                        <span className="dia-noti-corpo">
-                        <span className="dia-noti-linha">
-                        <strong className="dia-noti-titulo">Gasto registrado</strong>
-                        <span className="dia-noti-hora">12:30</span>
-                        </span>
-                        <span className="dia-noti-sub">Simplific: Registrei seu almoço no iFood: R$38 em Alimentação.</span>
-                        </span>
-                        </div>
-                        </div>
-                    </div>
-                    <div className="dia2-cena" data-ato="4">
-                        <div className="dia-foto">
-                        <span className="dia-agua" aria-hidden="true">15:30</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/15-30.webp\')'}} aria-hidden="true"></div>
-                        <div className="zap4-fio" aria-hidden="true">
-                        <div className="zap4-bolha is-voce">
-                        <span className="zap4-txt">Preciso do contrato assinado do Rodrigo.</span>
-                        <span className="zap4-meta">15:30<svg className="zap4-visto" viewBox="0 0 17 11" focusable="false"><path d="M1.2 6.4 4.1 9.2 9.9 2.1"/><path d="M7.4 9.2 13.2 2.1"/></svg></span>
-                        </div>
-                        <div className="zap4-bolha is-luna">
-                        <span className="zap4-quem"><span className="zap4-nome">Simplific</span><span className="zap4-cargo">Organização &amp; Docs</span></span>
-                        <span className="zap4-txt">Achei! 📄 <span className="zap4-arq">contrato-rodrigo.pdf</span> estava na pasta de Contratos<span className="zap4-envio-desktop"> — acabei de te enviar</span>.</span>
-                        <span className="zap4-meta">15:30</span>
-                        </div>
-                        </div>
-                        </div>
-                    </div>
-                    <div className="dia2-cena" data-ato="5">
-                        <div className="dia-foto">
-                        <span className="dia-agua" aria-hidden="true">22:00</span>
-                        <div className="dia-arte" style={{'--dia-arte': 'url(\'/meuassessor/images/22-00.webp\')'}} aria-hidden="true"></div>
-                        <div className="dia-noti is-equipe">
-                        <span className="dia-noti-icone is-equipe"><img src="favicon.svg" alt="" aria-hidden="true" loading="lazy" decoding="async" /></span>
-                        <span className="dia-noti-corpo">
-                        <span className="dia-noti-linha">
-                        <strong className="dia-noti-titulo">Sua equipe fechou o dia</strong>
-                        <span className="dia-noti-hora">22:00</span>
-                        </span>
-                        <span className="dia-noti-sub">1 fatura avisada, 1 consulta marcada, 1 gasto registrado e 1 documento encontrado.</span>
-                        </span>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <ol className="dia2-trilho" id="dia2Trilho" aria-hidden="true">
-                    <li><button type="button" className="dia2-marco is-ativo" data-ato="1">07:40</button></li>
-                    <li><button type="button" className="dia2-marco" data-ato="2">09:15</button></li>
-                    <li><button type="button" className="dia2-marco" data-ato="3">12:30</button></li>
-                    <li><button type="button" className="dia2-marco" data-ato="4">15:30</button></li>
-                    <li><button type="button" className="dia2-marco" data-ato="5">22:00</button></li>
-                </ol>
-                <div className="dia2-legenda" id="dia2Legenda" aria-hidden="true">
-                    <div className="dia2-legenda-item is-ativo" data-ato="1"><h3>O aviso da fatura chega antes de você terminar o café.</h3><p>Receba avisos de contas e compromissos sem precisar pedir.</p></div>
-                    <div className="dia2-legenda-item" data-ato="2"><h3>Um áudio no caminho, e a consulta entra na agenda.</h3><p>Mande um áudio e a Sofi agenda, com data, horário e lembrete.</p></div>
-                    <div className="dia2-legenda-item" data-ato="3"><h3>Pagou o almoço? Já está registrado.</h3><p>O Martin importa os gastos do banco e organiza por categoria.</p></div>
-                    <div className="dia2-legenda-item" data-ato="4"><h3>Não encontra um documento? É só mandar uma mensagem.</h3><p>Descreva o arquivo que precisa. A Luna encontra e envia no WhatsApp.</p></div>
-                    <div className="dia2-legenda-item" data-ato="5"><h3>Antes de dormir, o resumo do dia já está pronto.</h3><p>Receba o resumo do dia e os próximos compromissos pelo WhatsApp.</p></div>
-                </div>
-            </div>
-            <a className="hero-btn dia2-btn cta-forte" href="#planos"><span>Contratar minha equipe</span></a>
+                    {isActive && (
+                      <p className="text-xs md:text-sm text-zinc-400 pl-1 mt-1 leading-relaxed">
+                        {step.desc}
+                      </p>
+                    )}
+                    {isActive && (
+                      <div className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-400 w-full animate-[shrink_6s_linear]" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
         </div>
-    </section></>
+
+        {/* Coluna da Direita: Palco Visual com Mockup */}
+        <div className="lg:col-span-5 flex flex-col items-center">
+          <div className="w-full max-w-md rounded-3xl bg-zinc-950 border border-white/10 p-6 shadow-2xl relative overflow-hidden">
+            {/* Glow */}
+            <div className="absolute top-0 right-0 w-60 h-60 bg-emerald-500/10 blur-[80px] pointer-events-none rounded-full" />
+
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+              <span className="text-2xl font-bold text-white tracking-wider font-mono">
+                {current.time}
+              </span>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                {current.badge}
+              </span>
+            </div>
+
+            {/* Simulação da Notificação / Conversa */}
+            <div className="bg-zinc-900/90 rounded-2xl border border-white/10 p-5 shadow-lg mb-4">
+              <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-zinc-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>WhatsApp • {current.previewTitle}</span>
+              </div>
+              <p className="text-sm text-zinc-200 leading-relaxed">
+                {current.previewText}
+              </p>
+              <div className="text-[10px] text-zinc-500 text-right mt-2">Recebido às {current.time}</div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-xs text-zinc-400 flex items-center justify-between">
+              <span>Status da automação:</span>
+              <span className="text-emerald-400 font-medium">Executado automaticamente</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </section>
   );
 };
 

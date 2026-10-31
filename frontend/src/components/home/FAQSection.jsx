@@ -1,175 +1,98 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
+const faqs = [
+  {
+    question: 'Como o Simplific Pro funciona no meu WhatsApp?',
+    answer: 'Assim que sua assinatura é confirmada, você recebe uma mensagem de boas-vindas do Pierre no seu WhatsApp oficial. A partir daí, basta conversar naturalmente enviando áudios, mensagens de texto ou fotos de comprovantes. O Pierre processa e organiza tudo instantaneamente.'
+  },
+  {
+    question: 'Preciso instalar algum aplicativo no meu celular?',
+    answer: 'Não. Tudo funciona diretamente no WhatsApp que você já utiliza todos os dias no seu celular e computador. Você também tem acesso opcional a um painel Web no navegador para visualizar relatórios, gráficos detalhados e fluxo de caixa.'
+  },
+  {
+    question: 'Como registro meus gastos diários?',
+    answer: 'Você pode registrar do jeito que for mais confortável: mandar um áudio no trânsito ("Pierre, gastei 45 no almoço"), digitar no chat ("Uber 28,50 débito") ou tirar a foto do cupom fiscal. O leitor OCR do Pierre extrai o valor, a data e a categoria na hora.'
+  },
+  {
+    question: 'Meus dados financeiros estão seguros?',
+    answer: 'Sim, segurança é nossa prioridade absoluta. Todas as mensagens e dados são protegidos por criptografia de ponta a ponta AES-256 e TLS 1.3, em conformidade com a LGPD. Nenhuma informação é compartilhada ou vendida para terceiros.'
+  },
+  {
+    question: 'Como funciona o acompanhamento de investimentos da B3?',
+    answer: 'O Simplific Pro é integrado às cotações oficiais do mercado financeiro brasileiro. Você pode consultar cotações de ações (como PETR4, VALE3, ITUB4) e fundos imobiliários em tempo real, além de cadastrar seus ativos para ver a variação patrimonial da sua carteira.'
+  },
+  {
+    question: 'Posso usar a mesma conta com minha esposa ou parceiro(a)?',
+    answer: 'Sim! Você pode cadastrar o número de telefone da sua parceira ou parceiro para que ambos alimentem o mesmo orçamento familiar pelo WhatsApp. Os gastos de ambos são unificados no mesmo painel.'
+  },
+  {
+    question: 'Como funciona a garantia incondicional de 7 dias?',
+    answer: 'Se durante os primeiros 7 dias de uso você achar que o Simplific Pro não é para você, basta pedir o cancelamento no chat ou por e-mail. Nós devolvemos 100% do valor pago, sem perguntas, sem ressentimentos e sem letras miúdas.'
+  },
+  {
+    question: 'Posso cancelar minha assinatura a qualquer momento?',
+    answer: 'Sim. Você tem total controle. No plano mensal não existe qualquer fidelidade, e você pode cancelar com apenas um clique diretamente no painel de usuário ou solicitando ao suporte.'
+  }
+];
 
 const FAQSection = () => {
   return (
-    <><section className="faq-section" id="perguntas" data-header="claro">
+    <section className="py-20 px-4 md:px-8 max-w-5xl mx-auto relative z-10" id="perguntas">
 
-        <svg className="faq-defs" aria-hidden="true" focusable="false">
-            <symbol id="faq-seta" viewBox="0 0 16 16">
-                <path d="M3 6 8 11 13 6"/>
-            </symbol>
-        </svg>
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
+          Tire Suas Dúvidas
+        </span>
+        <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tight mb-3">
+          Perguntas Frequentes
+        </h2>
+        <p className="text-zinc-400 text-sm md:text-base">
+          Tem alguma dúvida que não está aqui? Fale diretamente com o nosso time de suporte via{' '}
+          <a
+            href="https://wa.me/5547992921005"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-400 hover:underline"
+          >
+            WhatsApp oficial
+          </a>.
+        </p>
+      </div>
 
-        <div className="faq-grade">
-
-            <header className="faq-topo">
-                <h2 className="faq-headline">Perguntas frequentes.</h2>
-                <p className="faq-sub">Não achou a sua? O suporte humano <a className="faq-link" href="https://wa.me/5547992921005" target="_blank" rel="noopener">responde no WhatsApp</a>.</p>
-            </header>
-
-            <div className="faq-colunas">
-
-                <div className="faq-coluna">
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Os clientes gostam do Simplific Pro?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Numa pesquisa respondida por 50 mil clientes dentro do WhatsApp, 98% disseram que estão satisfeitos e usam o produto. É a nossa medida mais honesta: quem responde é quem já convive com os assessores todo dia. Se não for para você, a garantia de 7 dias devolve o valor integral, sem fidelidade e sem multa.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq" open>
-                        <summary className="faq-pergunta">
-                            <span>O que acontece depois que eu assino?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Sua conversa com o Simplific Pro é criada no WhatsApp no mesmo dia, com os seus assessores dentro, e eles se apresentam. Dali em diante é só conversar. Conectar o banco e o Google Agenda é opcional e você faz quando quiser, ali mesmo. Não tem instalação, reunião de implantação nem manual para ler.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Preciso instalar algum aplicativo?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Não. Funciona no WhatsApp que você já usa, e a conversa com os seus assessores nasce no primeiro dia. Se você quiser ver tudo organizado em tela grande, existe um painel no navegador, mas ele é opção e não obrigação.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Como eu peço as coisas?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Você manda uma mensagem na conversa, como mandaria para qualquer pessoa. Pode ser texto, áudio ou foto: um 'gastei 62 na farmácia', um áudio pedindo para marcar o dentista, a foto da nota fiscal do almoço. Não existe comando nem formato certo. O assessor do assunto entende o pedido, executa e responde com o próprio nome.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Os assessores falam com outras pessoas por mim?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Falam, quando você pede. Cobrar um cliente todo dia 10, lembrar seu irmão de um aniversário, convidar os participantes de uma reunião e avisar todo mundo antes da hora. Você diz o que precisa e o assessor cuida da conversa.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Preciso conectar meu banco para usar?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Não. Dá para registrar tudo por mensagem, áudio e foto, e o Martin organiza do mesmo jeito. A conexão pelo Open Finance do Banco Central é um passo opcional que automatiza a entrada dos gastos, funciona com 114 bancos e instituições e é somente leitura: ninguém além de você movimenta a sua conta.</p>
-                        </div>
-                    </details>
-
-                </div>
-
-                <div className="faq-coluna">
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Meus dados estão seguros?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Sim, e vale saber o que isso quer dizer na prática. Seus dados são criptografados no caminho e onde ficam guardados, o tratamento segue a LGPD, e nada é vendido, alugado ou entregue para anunciante nenhum. Está tudo detalhado na <a className="faq-link" href="/seguranca">página de segurança</a> e na <a className="faq-link" href="/pages/politica-de-privacidade">política de privacidade</a>.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Eu fico no controle do que os assessores fazem?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Fica. Pedido importante volta para você confirmar antes de virar ação, e todo registro gera um recibo na conversa para você conferir. Se algo sair errado, corrigir é responder dizendo o certo, e o assessor ajusta na hora. Para o que a inteligência artificial não resolver, o suporte tem gente de verdade.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Posso usar com minha esposa, meu sócio ou minha equipe?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Sim, a conta é compartilhada. Você adiciona a sua esposa, os seus sócios ou a sua equipe, cada um fala com o Simplific Pro do próprio WhatsApp, e o que qualquer um pedir entra na mesma conta organizada.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>É pra mim se eu não tenho empresa?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>É. Dá pra usar só pra vida pessoal: os gastos da casa, o dentista de quinta, o boleto do IPTU, os documentos da família. Empresa só faz falta na hora de emitir nota fiscal; todo o resto funciona igual.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Serve pra uso pessoal e pro meu negócio ao mesmo tempo?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Serve. A vida e o trabalho ficam na mesma conversa: o Martin separa o gasto da farmácia do gasto da empresa nas categorias, e no painel cada um aparece no seu lugar.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Preciso de CNPJ pra emitir nota fiscal?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Para emitir nota fiscal de serviço, sim: a nota sai no nome de uma empresa. A Rita cuida do cadastro da empresa e da emissão, tudo pelo WhatsApp.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Tem limite de mensagens ou de pedidos?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Não. Tudo é ilimitado desde o primeiro dia: mensagens, lembretes, cobranças, notas fiscais, documentos e projetos. Não existe pacote de créditos nem cobrança extra por uso.</p>
-                        </div>
-                    </details>
-
-                    <details className="faq-item" name="faq">
-                        <summary className="faq-pergunta">
-                            <span>Posso cancelar quando quiser?</span>
-                            <span className="faq-circulo" aria-hidden="true"><svg className="faq-seta"><use href="#faq-seta"/></svg></span>
-                        </summary>
-                        <div className="faq-corpo">
-                            <p>Sim, e você mesmo cancela, em poucos passos no painel ou pedindo ao assessor no WhatsApp. Ninguém vai te segurar numa ligação de retenção. Nos primeiros 7 dias vale a garantia, com devolução integral do que você pagou.</p>
-                        </div>
-                    </details>
-
-                </div>
-
+      <div className="space-y-4">
+        {faqs.map((faq, index) => (
+          <details
+            key={index}
+            className="group rounded-2xl bg-zinc-950/80 border border-white/10 p-5 md:p-6 transition-all duration-200 hover:border-white/20 open:bg-zinc-900/60 open:border-emerald-500/30"
+          >
+            <summary className="flex items-center justify-between cursor-pointer list-none select-none text-base md:text-lg font-medium text-white">
+              <span>{faq.question}</span>
+              <span className="ml-4 flex-shrink-0 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform duration-200">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div className="mt-4 pt-4 border-t border-white/5 text-sm md:text-base text-zinc-400 leading-relaxed">
+              <p>{faq.answer}</p>
             </div>
-        </div>
-    </section></>
+          </details>
+        ))}
+      </div>
+
+      <div className="mt-12 text-center text-xs text-zinc-500">
+        Para detalhes completos sobre privacidade e termos legais, consulte nossa{' '}
+        <Link to="/privacidade" className="text-emerald-400 hover:underline">
+          Política de Privacidade
+        </Link>{' '}
+        e{' '}
+        <Link to="/seguranca" className="text-emerald-400 hover:underline">
+          Central de Segurança
+        </Link>.
+      </div>
+
+    </section>
   );
 };
 

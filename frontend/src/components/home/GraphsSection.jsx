@@ -5,7 +5,7 @@ const GraphsSection = () => {
     <><section className="gd-section" id="graficosSection">
 
         <header className="gd-topo">
-            <h2 className="gd-headline"><span className="hl-so-desktop">Quer ver apenas os números que importam para você? Peça ao Martin e ele monta um painel personalizado para você.</span><span className="hl-so-mobile">Crie painéis personalizados para ver apenas o que importa para você.</span></h2>
+            <h2 className="gd-headline"><span className="hl-so-desktop">Quer ver apenas os números que importam para você? Peça ao Pierre e acompanhe tudo no seu painel Web Vision.</span><span className="hl-so-mobile">Acompanhe apenas os números que importam para você no painel Web Vision.</span></h2>
         </header>
 
         <div className="gd-palco" id="gdPalco" data-fase="repouso" data-pilula="cheia" data-ciclo="1" aria-hidden="true">
@@ -16,7 +16,7 @@ const GraphsSection = () => {
                 <svg className="gd-balao" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                     <path d="M5.9 3.5H14.1A2.9 2.9 0 0 1 17 6.4V11A2.9 2.9 0 0 1 14.1 13.9H9.3L5.8 16.6 6.4 13.9H5.9A2.9 2.9 0 0 1 3 11V6.4A2.9 2.9 0 0 1 5.9 3.5Z"/>
                 </svg>
-                <span className="gd-campo"><span className="gd-texto" id="gdTexto">Monta uma visão do meu fluxo de caixa</span><i className="gd-cursor"></i></span>
+                <span className="gd-campo"><span className="gd-texto" id="gdTexto">Pierre, mostra meu fluxo de caixa do mês</span><i className="gd-cursor"></i></span>
                 <span className="gd-enviar">
                     <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                         <path d="M10 15.4V5.2"/>
@@ -28,7 +28,7 @@ const GraphsSection = () => {
             <div className="gd-janela">
                 <div className="gd-barra">
                     <span className="gd-pontos"><i></i><i></i><i></i></span>
-                    <span className="gd-endereco">meuassessor.com</span>
+                    <span className="gd-endereco">app.simplificpro.com.br</span>
                 </div>
 
                 <div className="gd-viewport">

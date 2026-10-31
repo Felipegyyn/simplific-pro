@@ -36,15 +36,15 @@ const PromiseSection = () => {
                   <div className="reg-chart" data-ato="1">
                     <span className="reg-chart-top">Alimentação · este mês</span>
                     <ul className="reg-rows">
-                      <li><em>jul</em><span className="reg-track"><i style={{'--w': '87%'}}></i></span><b>R$ 1.079</b></li>
-                      <li className="is-now"><em>ago</em><span className="reg-track"><i style={{'--w': '100%'}}></i></span><b>R$ 1.240</b></li>
+                      <li><em>jul</em><span className="reg-track"><i style={{ '--w': '87%' }}></i></span><b>R$ 1.079</b></li>
+                      <li className="is-now"><em>ago</em><span className="reg-track"><i style={{ '--w': '100%' }}></i></span><b>R$ 1.240</b></li>
                     </ul>
                   </div>
 
                   <div className="reg-insight" data-ato="1">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/>
-                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/>
+                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z" />
+                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z" />
                     </svg>
                     <p><b>Simplific Pro</b> · alimentação está <b>15% acima</b> de julho. No ritmo atual, seu mês fecha dentro do limite previsto.</p>
                   </div>
@@ -59,15 +59,15 @@ const PromiseSection = () => {
                     <span className="reg-chart-top">Já está agendado</span>
                     <ul className="reg-steps">
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Reunião no Google Agenda · 15:00 às 15:45</span>
                       </li>
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Sala do Google Meet gerada automaticamente</span>
                       </li>
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Lembrete no WhatsApp 15 min antes</span>
                       </li>
                     </ul>
@@ -75,8 +75,8 @@ const PromiseSection = () => {
 
                   <div className="reg-insight" data-ato="2">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/>
-                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/>
+                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z" />
+                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z" />
                     </svg>
                     <p><b>Pierre</b> · seu compromisso foi adicionado à sua agenda com link de videoconferência pronto para compartilhar.</p>
                   </div>
@@ -91,15 +91,15 @@ const PromiseSection = () => {
                     <span className="reg-chart-top">Controle de Cartão</span>
                     <ul className="reg-steps">
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Melhor dia de compra calculado</span>
                       </li>
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Fatura atual: R$ 1.840,00</span>
                       </li>
                       <li>
-                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4"/></svg>
+                        <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.3 5.8 10.1 11 4.4" /></svg>
                         <span>Aviso 3 dias antes do fechamento</span>
                       </li>
                     </ul>
@@ -107,8 +107,8 @@ const PromiseSection = () => {
 
                   <div className="reg-insight" data-ato="3">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/>
-                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/>
+                      <path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z" />
+                      <path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z" />
                     </svg>
                     <p><b>Pierre</b> · fatura sob controle! Você tem <b>64% de limite disponível</b> para o próximo ciclo.</p>
                   </div>

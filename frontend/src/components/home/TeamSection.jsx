@@ -1,366 +1,174 @@
-import React from 'react';
+import React, { useState } from 'react';
+import SimplificMascot from '../SimplificMascot';
+
+const specialities = [
+  {
+    id: 'financeiro',
+    title: 'Gestor Financeiro',
+    role: 'Fluxo de Caixa & Gastos',
+    desc: 'Registra qualquer gasto por áudio ou texto em segundos. Categoriza automaticamente, calcula saldo e prevê o fechamento do mês.',
+    badge: 'Despesas & Receitas',
+    exampleChat: {
+      user: 'Pierre, almoço R$ 89,90 no débito Itaú.',
+      reply: 'Lançado em Alimentação (Débito Itaú). Você já usou R$ 680 dos R$ 1.200 orçados para o mês.'
+    }
+  },
+  {
+    id: 'cartoes',
+    title: 'Controle de Cartões',
+    role: 'Faturas & Limites',
+    desc: 'Acompanha o fechamento de cada cartão, calcula seu limite disponível e avisa o melhor dia para comprar sem surpresas no fim do mês.',
+    badge: 'Cartões & Faturas',
+    exampleChat: {
+      user: 'Quanto já gastei no cartão esse mês?',
+      reply: 'Sua fatura atual está em R$ 1.840 de R$ 5.000 (36% do limite). O fechamento é em 6 dias!'
+    }
+  },
+  {
+    id: 'investimentos',
+    title: 'Analista B3',
+    role: 'Ações & FIIs ao Vivo',
+    desc: 'Conectado diretamente ao mercado financeiro para trazer cotações em tempo real, variação do dia e consolidação patrimonial.',
+    badge: 'Bolsa B3 & FIIs',
+    exampleChat: {
+      user: 'Como tá a cotação da PETR4 hoje?',
+      reply: 'PETR4 está em R$ 38,42 (+1,8% hoje). Sua posição total na carteira é de R$ 12.800.'
+    }
+  },
+  {
+    id: 'agenda',
+    title: 'Secretário de Agenda',
+    role: 'Google Agenda & Meet',
+    desc: 'Cria reuniões direto no seu Google Agenda através de um áudio, gera o link da sala no Google Meet e te avisa 15 minutos antes.',
+    badge: 'Agenda & Reuniões',
+    exampleChat: {
+      user: 'Marca call amanhã às 15h com Felipe sobre planejamento.',
+      reply: 'Feito! Evento agendado no Google Agenda e sala do Google Meet gerada. Convite enviado para Felipe.'
+    }
+  },
+  {
+    id: 'vision',
+    title: 'Auditor Vision AI',
+    role: 'Leitura OCR de Fotos e PDF',
+    desc: 'Basta enviar a foto do cupom fiscal da farmácia, da maquininha ou o PDF do comprovante. O OCR inteligente extrai os dados na hora.',
+    badge: 'OCR & Comprovantes',
+    exampleChat: {
+      user: '📸 [Foto do cupom da farmácia: R$ 62,50]',
+      reply: 'Comprovante lido com sucesso! R$ 62,50 adicionado em Saúde & Farmácia.'
+    }
+  }
+];
 
 const TeamSection = () => {
+  const [activeId, setActiveId] = useState('financeiro');
+  const current = specialities.find(s => s.id === activeId) || specialities[0];
+
   return (
-    <><section className="team-section" id="teamSection">
-        <div className="team-container">
-            
-            <div className="team-energy" aria-hidden="true">
-                <div className="team-energy-in">
-                    <canvas id="esferaEquipe" data-esfera="equipe"></canvas>
-                </div>
+    <section className="py-20 px-4 md:px-8 max-w-7xl mx-auto relative z-10" id="teamSection">
+
+      {/* Cabeçalho da Seção */}
+      <div className="text-center max-w-3xl mx-auto mb-14">
+        <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
+          Mascote Oficial & Especialidades
+        </span>
+        <h2 className="text-3xl md:text-5xl font-semibold text-white tracking-tight mb-4">
+          Uma inteligência artificial completa no seu WhatsApp.
+        </h2>
+        <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
+          O Pierre reúne as principais disciplinas da sua vida financeira e da sua rotina pessoal num só contato. Escolha uma especialidade para ver como ele age:
+        </p>
+      </div>
+
+      {/* Navegação de Abas / Especialidades */}
+      <div className="flex flex-wrap items-center justify-center gap-2.5 mb-12">
+        {specialities.map((item) => {
+          const isActive = item.id === activeId;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveId(item.id)}
+              className={`px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-2 border ${isActive
+                  ? 'bg-emerald-500 text-black border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+                  : 'bg-zinc-900/80 text-zinc-400 border-white/10 hover:text-white hover:border-white/20'
+                }`}
+            >
+              <span>{item.title}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Card Principal Interativo */}
+      <div className="max-w-4xl mx-auto rounded-3xl bg-zinc-950/90 border border-white/10 p-6 sm:p-10 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+
+        {/* Glow de fundo */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-[100px] pointer-events-none rounded-full" />
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+
+          {/* Lado Esquerdo: Pierre + Detalhes */}
+          <div className="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left">
+            <div className="relative mb-4 p-3 rounded-2xl bg-zinc-900 border border-white/10 shadow-inner">
+              <SimplificMascot size={110} />
+              <span className="absolute -bottom-2 right-2 bg-emerald-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow">
+                {current.badge}
+              </span>
             </div>
 
-            <div className="team-content-row">
-                
-                <div className="team-selector">
-                    
-                    <div className="team-selector-card active" data-assessor="theo" role="button" tabIndex="0" aria-pressed="true">
-                        <img src="/meuassessor/images/theo.jpg" alt="Theo" className="team-selector-avatar" />
-                    </div>
-                    <div className="team-selector-card" data-assessor="martin" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/favicon.svg" alt="Martin" className="team-selector-avatar" />
-                    </div>
-                    <div className="team-selector-card" data-assessor="sofi" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/meuassessor/images/sofi.jpg" alt="Sofi" className="team-selector-avatar" />
-                    </div>
-                    <div className="team-selector-card" data-assessor="luna" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/favicon.svg" alt="Luna" className="team-selector-avatar" />
-                    </div>
-                    <div className="team-selector-card" data-assessor="italo" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/meuassessor/images/italo_otim.jpg" alt="Ítalo" className="team-selector-avatar" />
-                    </div>
-                    <div className="team-selector-card" data-assessor="rita" role="button" tabIndex="0" aria-pressed="false">
-                        <img src="/meuassessor/images/rita.jpg" alt="Rita" className="team-selector-avatar" />
-                    </div>
-                </div>
+            <h3 className="text-2xl font-semibold text-white mb-1">
+              Pierre • {current.title}
+            </h3>
+            <span className="text-emerald-400 text-xs font-medium mb-3">
+              {current.role}
+            </span>
+            <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-6">
+              {current.desc}
+            </p>
 
-                <svg style={{width: '0', '--height': '0', position: 'absolute'}} aria-hidden="true" focusable="false">
-                    <linearGradient id="verifiedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#bc85f8" />
-                        <stop offset="100%" stop-color="#e27bb7" />
-                    </linearGradient>
-                </svg>
-
-                <div className="team-main-card-wrapper" id="teamCarouselWrapper">
-
-                    <div className="team-carousel-card pos-center" data-index="0" data-assessor="theo">
-                        <div className="team-main-portrait">
-                            <img src="/meuassessor/images/theo_large_otim.jpg" alt="Theo" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Theo</span>
-
-                            </div>
-                            <div className="team-main-role">Diretor de operações</div>
-                        </div>
-                    </div>
-
-                    <div className="team-carousel-card pos-right" data-index="1" data-assessor="martin">
-                        <div className="team-main-portrait">
-                            <img src="/favicon.svg" alt="Martin" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Simplific</span>
-
-                            </div>
-                            <div className="team-main-role">Gerente financeiro</div>
-                        </div>
-                    </div>
-
-                    <div className="team-carousel-card pos-back" data-index="2" data-assessor="sofi">
-                        <div className="team-main-portrait">
-                            <img src="/meuassessor/images/sofi_large_otim.jpg" alt="Sofi" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Sofi</span>
-
-                            </div>
-                            <div className="team-main-role">Secretária executiva</div>
-                        </div>
-                    </div>
-
-                    <div className="team-carousel-card pos-back" data-index="3" data-assessor="luna">
-                        <div className="team-main-portrait">
-                            <img src="/favicon.svg" alt="Luna" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Simplific</span>
-
-                            </div>
-                            <div className="team-main-role">Organização & Docs</div>
-                        </div>
-                    </div>
-
-                    <div className="team-carousel-card pos-back" data-index="4" data-assessor="italo">
-                        <div className="team-main-portrait">
-                            <img src="/meuassessor/images/italo_large_otim.jpg" alt="Ítalo" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Ítalo</span>
-
-                            </div>
-                            <div className="team-main-role">Estagiário de pesquisas</div>
-                        </div>
-                    </div>
-
-                    <div className="team-carousel-card pos-left" data-index="5" data-assessor="rita">
-                        <div className="team-main-portrait">
-                            <img src="/meuassessor/images/rita_large_otim.jpg" alt="Rita" className="team-portrait-img" loading="lazy" decoding="async" />
-                        </div>
-                        <div className="team-main-card-footer">
-                            <div className="team-main-name">
-                                <span>Rita</span>
-
-                            </div>
-                            <div className="team-main-role">Assistente fiscal</div>
-                        </div>
-                    </div>
-
-                    <div className="team-notification" id="teamNotification">
-                        <div className="team-notif-msg" id="notifMsg">Sua manhã foi organizada! Separei 3 prioridades.</div>
-                        <div className="team-notif-time">
-                            <span id="notifTime">09:41</span>
-                            <svg viewBox="0 0 16 11" width="16" height="11" fill="none" className="team-notif-checks"><path d="M1.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M7.5 5.5l2.5 2.5 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="team-sphere">
-                    
-                    <div className="dash-stack" id="teamDashboard">
-                      <div className="dash-orbit">
-
-                        <article className="dash-panel is-active" data-assessor="theo">
-                            <div className="dash-eyebrow"><span>O expediente</span><span className="dash-tag">agosto</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num" data-count="119">119</span>
-                                <span className="dash-cap">coisas resolvidas<br />sem você<b>+22% vs. julho</b></span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <ul className="dash-bars">
-                                    <li className="dash-bar is-top" style={{'--w': '100%'}}>
-                                        <span className="dash-bar-key">Luna <em>tarefas</em></span>
-                                        <span className="dash-bar-track"><i></i></span>
-                                        <span className="dash-bar-val" data-count="46">46</span>
-                                    </li>
-                                    <li className="dash-bar" style={{'--w': '74%'}}>
-                                        <span className="dash-bar-key">Martin <em>contas pagas</em></span>
-                                        <span className="dash-bar-track"><i></i></span>
-                                        <span className="dash-bar-val" data-count="34">34</span>
-                                    </li>
-                                    <li className="dash-bar" style={{'--w': '46%'}}>
-                                        <span className="dash-bar-key">Sofi <em>compromissos</em></span>
-                                        <span className="dash-bar-track"><i></i></span>
-                                        <span className="dash-bar-val" data-count="21">21</span>
-                                    </li>
-                                    <li className="dash-bar" style={{'--w': '39%'}}>
-                                        <span className="dash-bar-key">Theo <em>avisos</em></span>
-                                        <span className="dash-bar-track"><i></i></span>
-                                        <span className="dash-bar-val" data-count="18">18</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <ul className="dash-stats">
-                                <li><span>nesta semana</span><b>27</b></li>
-                                <li><span>hoje</span><b>4</b></li>
-                                <li><span>tempo poupado</span><b className="is-up">6h20</b></li>
-                                <li><span>nada esquecido</span><b>31 dias</b></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>a <b>Simplific</b> puxou o mês: 46 tarefas fechadas, 12 delas hoje.</p>
-                            </footer>
-                        </article>
-
-                        <article className="dash-panel" data-assessor="martin">
-                            <div className="dash-eyebrow"><span>Saldo do mês</span><span className="dash-tag">agosto</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num dash-num-money">
-                                    <em>R$</em><span data-count="1473" data-fmt="int">1.473</span><i>,20</i>
-                                </span>
-                                <span className="dash-cap">sobrando<b>fecha positivo</b></span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <div className="dash-spark">
-                                    <svg viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true">
-                                        <defs>
-                                            <linearGradient id="dashSparkFill" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stop-color="rgb(255,255,255)" stop-opacity="0.2"/>
-                                                <stop offset="100%" stop-color="rgb(255,255,255)" stop-opacity="0"/>
-                                            </linearGradient>
-                                        </defs>
-                                        <line className="dash-spark-grid" x1="0" y1="20" x2="300" y2="20"/>
-                                        <line className="dash-spark-grid" x1="0" y1="44" x2="300" y2="44"/>
-                                        <path className="dash-spark-area" d="M0,40 15,41 28,42 34,14 42,16 60,22 80,28 100,33 120,38 140,44 160,45 168,22 176,20 190,26 210,33 230,41 246,46 258,47 268,42 280,39 300,37 L300,64 L0,64 Z"/>
-                                        <path className="dash-spark-line" pathLength="1" fill="none" d="M0,40 15,41 28,42 34,14 42,16 60,22 80,28 100,33 120,38 140,44 160,45 168,22 176,20 190,26 210,33 230,41 246,46 258,47 268,42 280,39 300,37"/>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <ul className="dash-stats">
-                                <li><span>entrou</span><b>R$ 8.430</b></li>
-                                <li><span>saiu</span><b>R$ 6.957</b></li>
-                                <li><span>cartão</span><b>R$ 1.884</b></li>
-                                <li><span>guardado</span><b className="is-up">R$ 600</b></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>o <b>mercado</b> foi seu maior gasto: R$ 1.240 em 11 compras.</p>
-                            </footer>
-                        </article>
-
-                        <article className="dash-panel" data-assessor="sofi">
-                            <div className="dash-eyebrow"><span>Sua semana</span><span className="dash-tag">9 compromissos</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num dash-num-time">em 2h10</span>
-                                <span className="dash-cap"><b>Consulta no dentista</b>hoje · 15:30</span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <div className="dash-week">
-                                    <div className="dash-day is-today" style={{'--h': '66%'}}><b>2</b><span className="dash-day-col"><i></i></span><em>qui</em></div>
-                                    <div className="dash-day" style={{'--h': '33%'}}><b>1</b><span className="dash-day-col"><i></i></span><em>sex</em></div>
-                                    <div className="dash-day" style={{'--h': '100%'}}><b>3</b><span className="dash-day-col"><i></i></span><em>sáb</em></div>
-                                    <div className="dash-day" style={{'--h': '0'}}><b></b><span className="dash-day-col"><i></i></span><em>dom</em></div>
-                                    <div className="dash-day" style={{'--h': '66%'}}><b>2</b><span className="dash-day-col"><i></i></span><em>seg</em></div>
-                                    <div className="dash-day" style={{'--h': '33%'}}><b>1</b><span className="dash-day-col"><i></i></span><em>ter</em></div>
-                                    <div className="dash-day" style={{'--h': '0'}}><b></b><span className="dash-day-col"><i></i></span><em>qua</em></div>
-                                </div>
-                            </div>
-
-                            <ul className="dash-list">
-                                <li className="is-due"><i></i><span>Consulta no dentista</span><em>hoje 15:30</em></li>
-                                <li><i></i><span>Reunião de pais na escola</span><em>sex 19:00</em></li>
-                                <li><i></i><span>Aniversário da Helena</span><em>sáb 16:00</em></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p><b>sábado</b> é seu dia cheio: três compromissos seguidos.</p>
-                            </footer>
-                        </article>
-
-                        <article className="dash-panel" data-assessor="luna">
-                            <div className="dash-eyebrow"><span>Suas tarefas</span><span className="dash-tag">24 abertas</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num" data-count="24">24</span>
-                                <span className="dash-cap">na sua fila<br />agora<b>9 fechadas na semana</b></span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <div className="dash-seg">
-                                    <i className="s1" style={{'--w': '21%'}}></i>
-                                    <i className="s2" style={{'--w': '29%'}}></i>
-                                    <i className="s3" style={{'--w': '13%'}}></i>
-                                    <i className="s4" style={{'--w': '37%'}}></i>
-                                </div>
-                                <ul className="dash-legend">
-                                    <li className="s1"><i></i><span>Vencendo</span><b>5</b></li>
-                                    <li className="s2"><i></i><span>Pendentes</span><b>7</b></li>
-                                    <li className="s3"><i></i><span>Em andamento</span><b>3</b></li>
-                                    <li className="s4"><i></i><span>Concluídas</span><b>9</b></li>
-                                </ul>
-                            </div>
-
-                            <ul className="dash-list">
-                                <li className="is-due"><i></i><span>Pagar o IPTU (2ª parcela)</span><em>hoje</em></li>
-                                <li><i></i><span>Renovar o seguro do carro</span><em>em 3d</em></li>
-                                <li><i></i><span>Levar o carro na revisão</span><em>em 6d</em></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>o <b>IPTU</b> vence hoje: já deixei o boleto separado pra você.</p>
-                            </footer>
-                        </article>
-
-                        <article className="dash-panel" data-assessor="italo">
-                            <div className="dash-eyebrow"><span>Pesquisas</span><span className="dash-tag">agosto</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num" data-count="23">23</span>
-                                <span className="dash-cap">pesquisas<br />entregues<b>todas com fonte</b></span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <ul className="dash-list">
-                                    <li><i></i><span>Monitor LG 27&quot;</span><em>R$ 1.149 · menor de 3 lojas</em></li>
-                                    <li><i></i><span>Passagem GRU→FLN</span><em>R$ 412 ida e volta</em></li>
-                                    <li><i></i><span>Seguro do carro</span><em>4 cotações comparadas</em></li>
-                                </ul>
-                            </div>
-
-                            <ul className="dash-stats">
-                                <li><span>nesta semana</span><b>6</b></li>
-                                <li><span>hoje</span><b>1</b></li>
-                                <li><span>economia achada</span><b className="is-up">R$ 380</b></li>
-                                <li><span>fontes checadas</span><b>41</b></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>o monitor da <b>Kabum</b> caiu 8% desde ontem: boa hora de comprar.</p>
-                            </footer>
-                        </article>
-
-                        <article className="dash-panel" data-assessor="rita">
-                            <div className="dash-eyebrow"><span>Notas fiscais</span><span className="dash-tag">agosto</span></div>
-
-                            <div className="dash-hero">
-                                <span className="dash-num dash-num-money">
-                                    <em>R$</em><span data-count="4250" data-fmt="int">4.250</span>
-                                </span>
-                                <span className="dash-cap">faturados<br />em notas<b>5 notas no mês</b></span>
-                            </div>
-
-                            <div className="dash-chart">
-                                <ul className="dash-list">
-                                    <li><i></i><span>Nº 157 · Mentoria</span><em>R$ 1.450 · paga</em></li>
-                                    <li><i></i><span>Nº 156 · Consultoria</span><em>R$ 850 · paga</em></li>
-                                    <li><i></i><span>Nº 155 · Aula avulsa</span><em>R$ 350 · emitida</em></li>
-                                </ul>
-                            </div>
-
-                            <ul className="dash-stats">
-                                <li><span>emitidas</span><b>5</b></li>
-                                <li><span>recorrentes</span><b>2</b></li>
-                                <li><span>para emitir</span><b>1</b></li>
-                                <li><span>impostos separados</span><b>R$ 212</b></li>
-                            </ul>
-
-                            <footer className="dash-foot">
-                                <svg className="dash-voice" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5c-1 4-3 6-7 7 4 1 6 3 7 7 1-4 3-6 7-7-4-1-6-3-7-7Z"/><path d="M17 14.5c-.4 2-1.5 3-3.5 3.5 2 .5 3 1.5 3.5 3.5.5-2 1.5-3 3.5-3.5-2-.5-3-1.5-3.5-3.5Z"/></svg>
-                                <p>a nota da <b>mentoria</b> de setembro já está agendada para o dia 1º.</p>
-                            </footer>
-                        </article>
-
-                      </div>
-                    </div>
-                </div>
-            </div> 
-
-            <div className="team-text-block">
-                <h2 className="team-headline"><span className="hl-so-desktop">Pare de tentar organizar tudo sozinho. </span>Tenha um assessor especializado em cada parte da sua rotina.</h2>
-                <p className="team-description">Cada assessor é especialista em uma área, mas todos trabalham juntos. Você envia uma mensagem pelo WhatsApp e a equipe transforma o pedido em algo resolvido.</p>
-                <a href="/assessores" className="hero-btn team-btn"><span>Conheça seus assessores</span></a>
+            <div className="flex items-center gap-2 text-xs text-zinc-500">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Resposta média em menos de 3 segundos</span>
             </div>
+          </div>
+
+          {/* Lado Direito: Preview Real do WhatsApp */}
+          <div className="md:col-span-7 bg-zinc-900/90 rounded-2xl border border-white/10 p-5 shadow-lg flex flex-col gap-3">
+            <div className="text-[11px] text-zinc-500 uppercase font-semibold tracking-wider pb-2 border-b border-white/5 flex items-center justify-between">
+              <span>Como você pede no WhatsApp</span>
+              <span className="text-emerald-400 font-normal">Exemplo real</span>
+            </div>
+
+            {/* Mensagem do Usuário */}
+            <div className="flex justify-end">
+              <div className="bg-emerald-950/60 border border-emerald-500/30 rounded-2xl rounded-tr-sm p-3 text-xs sm:text-sm text-zinc-200 max-w-[90%]">
+                <p>{current.exampleChat.user}</p>
+                <div className="text-[10px] text-zinc-500 text-right mt-1">Agora mesmo ✓✓</div>
+              </div>
+            </div>
+
+            {/* Resposta do Pierre */}
+            <div className="flex justify-start">
+              <div className="bg-black/60 border border-white/10 rounded-2xl rounded-tl-sm p-3.5 text-xs sm:text-sm text-zinc-200 max-w-[95%] shadow">
+                <div className="flex items-center gap-1.5 mb-1.5 text-emerald-400 font-semibold text-xs">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                  <span>Simplific Pro Pierre</span>
+                </div>
+                <p className="text-zinc-300 leading-relaxed">
+                  {current.exampleChat.reply}
+                </p>
+                <div className="text-[10px] text-zinc-500 text-right mt-1.5">Agora mesmo</div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
-    </section></>
+
+      </div>
+
+    </section>
   );
 };
 
