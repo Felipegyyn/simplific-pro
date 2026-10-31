@@ -144,8 +144,11 @@ const Vision = ({ user, onLogout }) => {
         message: text
       });
 
-      const aiText = response?.reply || response?.data?.reply || 'Entendido. Estou processando sua análise financeira.';
       const visuals = response?.visuals || response?.data?.visuals || [];
+      const rawReply = response?.reply ?? response?.data?.reply;
+      const aiText = rawReply !== undefined && rawReply !== null
+        ? rawReply
+        : (visuals.length > 0 ? '' : 'Entendido. Estou processando sua análise financeira.');
       
       setMessages(prev => [...prev, { sender: 'ai', text: aiText, visuals }]);
     } catch (error) {
@@ -276,9 +279,11 @@ const Vision = ({ user, onLogout }) => {
                 <div className={msg.sender === 'user' ? styles.userBubble : styles.aiBubble}>
                   {msg.sender === 'ai' ? (
                     <div className="w-full">
-                      <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
-                        <ReactMarkdown>{msg.text}</ReactMarkdown>
-                      </div>
+                      {msg.text && msg.text.trim() !== '' && (
+                        <div className="prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
+                          <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        </div>
+                      )}
 
                       {/* Renderizador de Gráficos e Widgets Explicativos */}
                       {msg.visuals && msg.visuals.length > 0 && (

@@ -17,6 +17,7 @@ from src.services.whatsapp_service import user_sessions
 from src.routes.routes_whatsapp import executar_acao_simplific
 from src.services.search_service import obter_ultimos_cards_pesquisa
 from src.services.investments_service import buscar_dados_ativo
+from src.services.reports_service import buscar_resumo_planejamento
 
 # Paleta harmoniosa para categorias de despesas
 PALETTE_COLORS = [
@@ -161,6 +162,57 @@ def coletar_dados_financeiros(user_id):
     except Exception as e:
         print(f"Erro ao coletar dados financeiros para o Vision: {e}")
         return None
+
+
+def extrair_apenas_alerta_financeiro(user_id, texto_ia=""):
+    """
+    Quando o gráfico de Balanço Financeiro já traz o resumo completo (receitas, despesas,
+    saldo e principais gastos), removemos todo o texto redundante e retornamos no máximo
+    a linha de alerta de orçamento (ou string vazia se não houver alerta).
+    """
+    if texto_ia:
+        match = re.search(
+            r'(?i)(?:🚨\s*)?\*{0,2}alertas?\*{0,2}\s*[:\-–]\s*([^\n]+(?:\n(?!\s*(?:precisa|quer|deseja|posso|se precisar|como posso|📊|orçamento|receitas|principais))[^\n]+)*)',
+            texto_ia
+        )
+        if match:
+            alerta_txt = " ".join(match.group(1).split()).strip()
+            alerta_txt = re.split(
+                r'(?i)\s+(?:precisa de mais detalhes|quer mais detalhes|deseja ver|posso te ajudar|se precisar de mais).*$',
+                alerta_txt
+            )[0].strip()
+            if alerta_txt and not any(neg in alerta_txt.lower() for neg in ['nenhum alerta', 'sem alertas', 'tudo sob controle', 'dentro do orçamento']):
+                return f"🚨 **Alerta:** {alerta_txt}"
+
+    try:
+        hoje = date.today()
+        inicio_mes = hoje.replace(day=1)
+        resumo = buscar_resumo_planejamento(user_id, inicio_mes, hoje)
+        if resumo:
+            total_orcado = sum(float(item.get('orcado') or 0) for item in resumo)
+            total_realizado = sum(float(item.get('realizado') or 0) for item in resumo)
+            esgotadas = [
+                str(item.get('categoria'))
+                for item in resumo
+                if float(item.get('orcado') or 0) > 0 and float(item.get('percentual') or 0) >= 100
+            ]
+            partes = []
+            if total_orcado > 0 and total_realizado > total_orcado:
+                pct_acima = round(((total_realizado - total_orcado) / total_orcado) * 100)
+                if pct_acima > 0:
+                    partes.append(f"Você está gastando {pct_acima}% acima do orçamento.")
+            if esgotadas:
+                if len(esgotadas) == 1:
+                    partes.append(f"A categoria {esgotadas[0]} está 100% esgotada.")
+                else:
+                    lista_cats = ", ".join(esgotadas[:-1]) + f" e {esgotadas[-1]}"
+                    partes.append(f"As categorias {lista_cats} estão 100% esgotadas.")
+            if partes:
+                return "🚨 **Alerta:** " + " ".join(partes)
+    except Exception as e:
+        print(f"Aviso ao verificar alerta de orçamento no Vision: {e}")
+
+    return ""
 
 
 def coletar_dados_cartoes(user_id):
@@ -485,8 +537,16 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
             if fin_data:
                 visuals.append({"type": "finance_chart", "data": fin_data})
 
-    # Atualiza a sessão
-    historico_chat.append({"role": "model", "content": resposta_final})
+    # Se o gráfico de Balanço Financeiro já vai ser exibido e não houve ação de escrita/recibo,
+    # removemos o texto redundante do resumo e mantemos no máximo o alerta de orçamento.
+    if any(v.get('type') == 'finance_chart' for v in visuals) and not recibos_gerados and not resultados_acoes:
+        resposta_final = extrair_apenas_alerta_financeiro(user_id, resposta_final)
+
+    # Atualiza a sessão (garantindo texto não-vazio no histórico do LLM)
+    historico_chat.append({
+        "role": "model",
+        "content": resposta_final if resposta_final else "[Gráfico de Balanço Financeiro exibido]"
+    })
     sessao['chat_history'] = historico_chat
     user_sessions[session_key] = sessao
 
