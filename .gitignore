@@ -10,3 +10,6 @@ __pycache__/
 
 # Arquivos de áudio temporários
 src/temp_audio/
+
+# Ferramentas externas (FigCraft portable)
+tools/figcraft/

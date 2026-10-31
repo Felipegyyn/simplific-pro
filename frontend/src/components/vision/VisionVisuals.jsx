@@ -42,6 +42,7 @@ export const VisionFinanceChart = ({ data }) => {
   const [activeKpi, setActiveKpi] = useState(null); // 'receitas' | 'despesas' | 'saldo' | null
   const [selectedCategory, setSelectedCategory] = useState(null); // Para filtrar despesas por categoria
   const [showAllTxs, setShowAllTxs] = useState(false);
+  const [hoveredCatIdx, setHoveredCatIdx] = useState(null);
 
   const handleKpiToggle = (kpi) => {
     if (activeKpi === kpi) {
@@ -73,22 +74,56 @@ export const VisionFinanceChart = ({ data }) => {
     { name: 'Despesas', valor: despesas, fill: '#f43f5e' }
   ];
 
-  // Cálculo da proporção para a barra de fluxo
+  // Cálculo da proporção para a barra de fluxo e percentuais de categorias
   const totalVolume = (receitas || 0) + (despesas || 0);
   const receitasPct = totalVolume > 0 ? Math.round((receitas / totalVolume) * 100) : 50;
   const despesasPct = 100 - receitasPct;
 
+  const displayedCategories = (categorias || []).slice(0, 6);
+  const totalCategoriasValue = displayedCategories.reduce((acc, c) => acc + (Number(c.value) || 0), 0) || despesas || 1;
+  const topCategory = displayedCategories.length > 0
+    ? [...displayedCategories].sort((a, b) => (Number(b.value) || 0) - (Number(a.value) || 0))[0]
+    : null;
+  const topCategoryPct = topCategory
+    ? ((Number(topCategory.value) / totalCategoriasValue) * 100).toFixed(1).replace('.', ',') + '%'
+    : '0%';
+
+  const activeTooltipCat = hoveredCatIdx !== null && displayedCategories[hoveredCatIdx]
+    ? displayedCategories[hoveredCatIdx]
+    : (displayedCategories[2] || displayedCategories[0] || null);
+
+  const comprometimentoRenda = detalhes_saldo?.comprometimento_renda
+    ?? (receitas > 0 ? Math.round((despesas / receitas) * 100) : (despesas > 0 ? 100 : 0));
+
+  const saldoVariacaoPct = receitas > 0
+    ? Math.round((saldo / receitas) * 100)
+    : 0;
+
   return (
-    <div className={styles.glassCard}>
+    <div className={`${styles.glassCard} ${styles.financeCardSquare}`}>
+      {/* Cabeçalho estilo FigCraft Redesign */}
       <div className={styles.financeHeader}>
-        <div className={styles.financeTitle}>
-          <Wallet size={18} className="text-emerald-500" />
-          <span>Balanço Financeiro</span>
+        <div className={styles.financeTitleGroup}>
+          <div className={styles.financeIconBox}>
+            <Wallet size={18} />
+          </div>
+          <div className={styles.financeTitleTexts}>
+            <span className={styles.financeMainTitle}>Balanço Financeiro</span>
+            <span className={styles.financeSubTitle}>Análise inteligente de fluxo de caixa e categorias</span>
+          </div>
         </div>
-        <span className={styles.periodPill}>{periodo || 'Mês Atual'}</span>
+
+        <div className={styles.financeHeaderBadges}>
+          {comprometimentoRenda > 0 && (
+            <span className={comprometimentoRenda > 100 ? styles.commitmentAlertPill : styles.commitmentOkPill}>
+              {comprometimentoRenda > 100 ? '▲' : '●'} {comprometimentoRenda}% da renda comprometida
+            </span>
+          )}
+          <span className={styles.periodPill}>{periodo || 'Mês Atual'} ▾</span>
+        </div>
       </div>
 
-      {/* Grid de Métricas Chave Interativas (Estilo Pierre) */}
+      {/* Grid de 3 Métricas Chave Interativas (Cantos Retos) */}
       <div className={styles.metricsGrid}>
         {/* KPI 1: RECEITAS */}
         <div 
@@ -98,18 +133,23 @@ export const VisionFinanceChart = ({ data }) => {
           tabIndex={0}
           title="Clique para ver o detalhamento de receitas"
         >
-          <div className={styles.metricLabel}>
-            <ArrowDownLeft size={13} className="text-emerald-500" />
-            <span>Receitas</span>
+          <div className={styles.metricTopRow}>
+            <div className={`${styles.metricLabel} ${styles.metricLabelReceitas}`}>
+              <ArrowDownLeft size={13} />
+              <span>RECEITAS</span>
+            </div>
+            <span className={styles.metricCountMeta}>
+              {detalhes_receitas.length} {detalhes_receitas.length === 1 ? 'entrada' : 'entradas'}
+            </span>
           </div>
           <div className={`${styles.metricValue} ${styles.metricPositive}`}>
             {formatBRL(receitas)}
           </div>
           <div className={styles.kpiActionHint}>
             {activeKpi === 'receitas' ? (
-              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+              <span className={styles.kpiHintActive}>Ocultar entradas ↑</span>
             ) : (
-              <span>Ver entradas ▼</span>
+              <span>Ver entradas detalhadas →</span>
             )}
           </div>
         </div>
@@ -122,51 +162,63 @@ export const VisionFinanceChart = ({ data }) => {
           tabIndex={0}
           title="Clique para ver o detalhamento de despesas"
         >
-          <div className={styles.metricLabel}>
-            <ArrowUpRight size={13} className="text-rose-500" />
-            <span>Despesas</span>
+          <div className={styles.metricTopRow}>
+            <div className={`${styles.metricLabel} ${styles.metricLabelDespesas}`}>
+              <ArrowUpRight size={13} />
+              <span>DESPESAS</span>
+            </div>
+            <span className={styles.metricCountMeta}>
+              {detalhes_despesas.length} {detalhes_despesas.length === 1 ? 'saída' : 'saídas'}
+            </span>
           </div>
           <div className={`${styles.metricValue} ${styles.metricNegative}`}>
             {formatBRL(despesas)}
           </div>
           <div className={styles.kpiActionHint}>
             {activeKpi === 'despesas' ? (
-              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+              <span className={styles.kpiHintActive}>Ocultar saídas ↑</span>
             ) : (
-              <span>Ver saídas ▼</span>
+              <span>Ver saídas detalhadas →</span>
             )}
           </div>
         </div>
 
         {/* KPI 3: SALDO LÍQUIDO */}
         <div 
-          className={`${styles.metricBox} ${styles.metricBoxInteractive} ${activeKpi === 'saldo' ? styles.metricActiveSaldo : ''}`}
+          className={`${styles.metricBox} ${styles.metricBoxInteractive} ${saldo < 0 ? styles.metricBoxDeficit : ''} ${activeKpi === 'saldo' ? styles.metricActiveSaldo : ''}`}
           onClick={() => handleKpiToggle('saldo')}
           role="button"
           tabIndex={0}
           title="Clique para ver o raio-x do fluxo de caixa"
         >
-          <div className={styles.metricLabel}>
-            <Wallet size={13} />
-            <span>Saldo Líquido</span>
+          <div className={styles.metricTopRow}>
+            <div className={`${styles.metricLabel} ${saldo < 0 ? styles.metricLabelDeficit : ''}`}>
+              <Wallet size={13} />
+              <span>SALDO LÍQUIDO</span>
+            </div>
+            <span className={styles.metricCountMeta}>
+              {saldo < 0 ? `Déficit ${saldoVariacaoPct}%` : `Superávit +${saldoVariacaoPct}%`}
+            </span>
           </div>
           <div className={`${styles.metricValue} ${saldo >= 0 ? styles.metricPositive : styles.metricNegative}`}>
             {formatBRL(saldo)}
           </div>
-          <div className={styles.kpiActionHint}>
+          <div className={`${styles.kpiActionHint} ${saldo < 0 ? styles.kpiActionHintDeficit : ''}`}>
             {activeKpi === 'saldo' ? (
-              <span className={styles.kpiHintActive}>Ocultar ▲</span>
+              <span className={styles.kpiHintActive}>Ocultar Raio-X ↑</span>
             ) : (
-              <span>Raio-X de caixa ▼</span>
+              <span>Abrir Raio-X de caixa →</span>
             )}
           </div>
         </div>
 
         {taxa_poupanca > 0 && (
           <div className={styles.metricBox}>
-            <div className={styles.metricLabel}>
-              <Sparkles size={13} className="text-amber-500" />
-              <span>Taxa Poupança</span>
+            <div className={styles.metricTopRow}>
+              <div className={styles.metricLabel}>
+                <Sparkles size={13} className="text-amber-500" />
+                <span>TAXA POUPANÇA</span>
+              </div>
             </div>
             <div className={`${styles.metricValue} ${styles.metricPositive}`}>
               {taxa_poupanca}%
@@ -175,7 +227,7 @@ export const VisionFinanceChart = ({ data }) => {
         )}
       </div>
 
-      {/* PAINEL DINÂMICO DE SUBINFORMAÇÕES (ESTILO PIERRE) OU DONUT PADRÃO */}
+      {/* PAINEL DINÂMICO DE SUBINFORMAÇÕES OU DONUT + BARRAS DE CATEGORIAS */}
       {activeKpi === 'receitas' && (
         <div className={styles.subDetailsWrapper}>
           <div className={styles.subDetailsHeader}>
@@ -198,7 +250,6 @@ export const VisionFinanceChart = ({ data }) => {
             </button>
           </div>
 
-          {/* Cards resumo */}
           <div className={styles.kpiSummaryStrip}>
             <div className={styles.kpiSummaryCard}>
               <div className={styles.kpiSummaryCardLabel}>Maior Entrada</div>
@@ -221,7 +272,6 @@ export const VisionFinanceChart = ({ data }) => {
             </div>
           </div>
 
-          {/* Lista de Entradas */}
           <div className={styles.transactionsList}>
             {detalhes_receitas.map((tx, idx) => (
               <div key={tx.id || idx} className={styles.transactionRow}>
@@ -270,7 +320,6 @@ export const VisionFinanceChart = ({ data }) => {
             </button>
           </div>
 
-          {/* Chips para Filtrar por Categoria */}
           {categorias && categorias.length > 0 && (
             <div className={styles.categoryFilterBar}>
               <button
@@ -300,7 +349,6 @@ export const VisionFinanceChart = ({ data }) => {
             </div>
           )}
 
-          {/* Lista de Saídas */}
           <div className={styles.transactionsList}>
             {displayedDespesas.map((tx, idx) => (
               <div key={tx.id || idx} className={styles.transactionRow}>
@@ -325,7 +373,6 @@ export const VisionFinanceChart = ({ data }) => {
             ))}
           </div>
 
-          {/* Botão Ver Mais / Ver Menos */}
           {filteredDespesas.length > 5 && (
             <button
               className={styles.txExpandBtn}
@@ -363,7 +410,6 @@ export const VisionFinanceChart = ({ data }) => {
             </button>
           </div>
 
-          {/* Barra de Proporção Receitas vs Despesas */}
           <div className={styles.ratioBarContainer}>
             <div className={styles.ratioBarHeader}>
               <span>Receitas: {receitasPct}% ({formatBRL(receitas)})</span>
@@ -383,7 +429,6 @@ export const VisionFinanceChart = ({ data }) => {
             </div>
           </div>
 
-          {/* 4 KPI tiles Pierre */}
           <div className={styles.kpiSummaryStrip}>
             <div className={styles.kpiSummaryCard}>
               <div className={styles.kpiSummaryCardLabel}>Comprometimento</div>
@@ -428,56 +473,119 @@ export const VisionFinanceChart = ({ data }) => {
         </div>
       )}
 
-      {/* MODO PADRÃO: GRÁFICO RECHARTS DONUT COM CATEGORIAS CLICÁVEIS */}
+      {/* MODO PADRÃO: DONUT BOX (ESQUERDA) + CARDS DE CATEGORIAS COM BARRA DE PROGRESSO (DIREITA) */}
       {!activeKpi && (
         <>
-          {categorias && categorias.length > 0 ? (
+          {displayedCategories.length > 0 ? (
             <div className={styles.chartContainer}>
-              <div style={{ width: '160px', height: '160px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categorias}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={45}
-                      outerRadius={70}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {categorias.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color || '#10b981'} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip 
-                      formatter={(value) => [formatBRL(value), 'Gasto']}
-                      contentStyle={{
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backgroundColor: '#18181b',
-                        color: '#ffffff',
-                        fontSize: '12px'
-                      }}
+              {/* Coluna Esquerda: Donut Chart Box com Centro Informativo e Badge de Seleção */}
+              <div className={styles.donutCardBox}>
+                <div className={styles.donutRingWrap}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={displayedCategories}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={64}
+                        outerRadius={92}
+                        paddingAngle={3}
+                        stroke="none"
+                        dataKey="value"
+                        startAngle={90}
+                        endAngle={-270}
+                        onMouseEnter={(_, index) => setHoveredCatIdx(index)}
+                        onMouseLeave={() => setHoveredCatIdx(null)}
+                        onClick={(entry) => entry?.name && handleCategoryDrilldown(entry.name)}
+                        style={{ cursor: 'pointer', outline: 'none' }}
+                      >
+                        {displayedCategories.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color || '#10b981'}
+                            stroke="none"
+                            opacity={hoveredCatIdx === null || hoveredCatIdx === index ? 1 : 0.45}
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Centro da Rosca: Maior Fatia */}
+                  {topCategory && (
+                    <div className={styles.donutCenterInfo}>
+                      <span className={styles.donutCenterLabel}>MAIOR FATIA</span>
+                      <span className={styles.donutCenterPct}>{topCategoryPct}</span>
+                      <span
+                        className={styles.donutCenterName}
+                        style={{ color: topCategory.color || '#34d399' }}
+                      >
+                        {topCategory.name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Badge Inferior de Alto Contraste (Fatia Selecionada / Hovered) */}
+                {activeTooltipCat && (
+                  <div
+                    className={styles.donutSelectedBox}
+                    style={{ borderColor: activeTooltipCat.color || '#f59e0b' }}
+                    onClick={() => handleCategoryDrilldown(activeTooltipCat.name)}
+                    role="button"
+                    tabIndex={0}
+                    title={`Filtrar despesas de ${activeTooltipCat.name}`}
+                  >
+                    <span
+                      className={styles.donutSelectedDot}
+                      style={{ backgroundColor: activeTooltipCat.color || '#f59e0b' }}
                     />
-                  </PieChart>
-                </ResponsiveContainer>
+                    <span className={styles.donutSelectedText}>
+                      {activeTooltipCat.name}: {formatBRL(activeTooltipCat.value)}
+                    </span>
+                  </div>
+                )}
               </div>
 
+              {/* Coluna Direita: Lista de Categorias com Percentual + Barra Proporcional */}
               <div className={styles.categoriesList}>
-                {categorias.slice(0, 6).map((cat, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`${styles.categoryItem} ${styles.categoryItemClickable}`}
-                    onClick={() => handleCategoryDrilldown(cat.name)}
-                    title={`Clique para filtrar lançamentos de ${cat.name}`}
-                  >
-                    <div className={styles.categoryDotName}>
-                      <div className={styles.colorDot} style={{ backgroundColor: cat.color || '#10b981' }} />
-                      <span>{cat.name}</span>
+                {displayedCategories.map((cat, idx) => {
+                  const pctNum = Math.max(0, Math.min(100, ((Number(cat.value) || 0) / totalCategoriasValue) * 100));
+                  const pctFormatted = pctNum.toFixed(1).replace('.', ',') + '%';
+                  const catColor = cat.color || '#10b981';
+
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`${styles.categoryItem} ${styles.categoryItemClickable} ${hoveredCatIdx === idx ? styles.categoryItemHovered : ''}`}
+                      onClick={() => handleCategoryDrilldown(cat.name)}
+                      onMouseEnter={() => setHoveredCatIdx(idx)}
+                      onMouseLeave={() => setHoveredCatIdx(null)}
+                      title={`Clique para filtrar lançamentos de ${cat.name}`}
+                    >
+                      <div className={styles.categoryItemTop}>
+                        <div className={styles.categoryDotName}>
+                          <div className={styles.colorDot} style={{ backgroundColor: catColor }} />
+                          <span>{cat.name}</span>
+                        </div>
+                        <div className={styles.categoryRightGroup}>
+                          <span className={styles.categoryPctText}>{pctFormatted}</span>
+                          <span className={styles.categoryValue}>{formatBRL(cat.value)}</span>
+                        </div>
+                      </div>
+
+                      <div className={styles.categoryProgressTrack}>
+                        <div
+                          className={styles.categoryProgressFill}
+                          style={{
+                            width: `${Math.max(2.5, pctNum)}%`,
+                            backgroundColor: catColor
+                          }}
+                        />
+                      </div>
                     </div>
-                    <span className={styles.categoryValue}>{formatBRL(cat.value)}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -488,17 +596,19 @@ export const VisionFinanceChart = ({ data }) => {
                   <YAxis dataKey="name" type="category" stroke="#71717a" fontSize={12} width={70} />
                   <RechartsTooltip 
                     formatter={(val) => [formatBRL(val), 'Total']} 
-                    contentStyle={{ borderRadius: '8px', backgroundColor: '#18181b', color: '#fff', fontSize: '12px' }} 
+                    contentStyle={{ borderRadius: '0px', border: '1px solid #1e293b', backgroundColor: '#111622', color: '#f8fafc', fontSize: '12px' }} 
+                    itemStyle={{ color: '#f8fafc' }}
+                    labelStyle={{ color: '#94a3b8' }}
                   />
-                  <Bar dataKey="valor" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="valor" radius={[0, 0, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
 
           <div className={styles.interactiveHintFooter}>
-            <Sparkles size={12} className="text-emerald-500" />
-            <span>Toque nos cards acima ou nas categorias para ver as subinformações</span>
+            <Sparkles size={12} className="text-emerald-400" />
+            <span>Toque nos cards acima ou em qualquer categoria para expandir as subinformações e lançamentos</span>
           </div>
         </>
       )}
