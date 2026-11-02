@@ -174,6 +174,14 @@ const App = () => {
                 path="/login" 
                 element={user ? <Navigate to="/vision" replace /> : <Login onLogin={handleLogin} />} 
             />
+            <Route 
+                path="/cadastro" 
+                element={user ? <Navigate to="/vision" replace /> : <Navigate to="/login?tab=register" replace />} 
+            />
+            <Route 
+                path="/register" 
+                element={user ? <Navigate to="/vision" replace /> : <Navigate to="/login?tab=register" replace />} 
+            />
 
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />

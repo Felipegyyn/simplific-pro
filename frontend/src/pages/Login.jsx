@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,18 @@ import './Login.css';
 
 const Login = ({ onLogin }) => {
   // Controle de Tabs: 'login' (01 ENTRAR) ou 'register' (02 CADASTRAR)
-  const [activeTab, setActiveTab] = useState('login');
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') === 'register' || searchParams.get('tab') === 'cadastro') ? 'register' : 'login';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'register' || tab === 'cadastro') {
+      setActiveTab('register');
+    } else if (tab === 'login' || tab === 'entrar') {
+      setActiveTab('login');
+    }
+  }, [searchParams]);
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
   // Estados Form Login

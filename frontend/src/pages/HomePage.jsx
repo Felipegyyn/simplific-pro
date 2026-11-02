@@ -185,7 +185,7 @@ const HomePage = () => {
               Entrar
             </Link>
             <Link
-              to="/checkout?plan=annual"
+              to="/login?tab=register"
               className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-black transition-all hover:bg-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
             >
               <span>Testar 7 dias grátis</span>
@@ -214,7 +214,7 @@ const HomePage = () => {
             <Link to="/contato" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Contato</Link>
             <div className="pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
               <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="rounded-full border border-white/15 py-2.5 text-center text-sm font-medium text-white">Entrar</Link>
-              <Link to="/checkout?plan=annual" onClick={() => setMobileMenuOpen(false)} className="rounded-full bg-emerald-400 py-2.5 text-center text-sm font-semibold text-black">Começar</Link>
+              <Link to="/login?tab=register" onClick={() => setMobileMenuOpen(false)} className="rounded-full bg-emerald-400 py-2.5 text-center text-sm font-semibold text-black">Testar 7 dias grátis</Link>
             </div>
           </div>
         )}
@@ -250,10 +250,10 @@ const HomePage = () => {
           {/* Chamadas para Ação */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <Link
-              to="/checkout?plan=annual"
+              to="/login?tab=register"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 px-8 py-4 text-base font-semibold text-black transition-all shadow-[0_0_35px_rgba(16,185,129,0.25)] hover:shadow-[0_0_45px_rgba(16,185,129,0.35)] transform hover:-translate-y-0.5"
             >
-              <span>Começar no plano anual (R$ 16,58/mês)</span>
+              <span>Testar 7 dias grátis</span>
               <ArrowRight size={17} />
             </Link>
             <Link
@@ -502,10 +502,10 @@ const HomePage = () => {
             </div>
 
             <Link
-              to="/checkout?plan=annual"
+              to="/login?tab=register"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-5 py-3 text-xs font-semibold text-emerald-300 transition-colors whitespace-nowrap"
             >
-              <span>Experimentar este nível de clareza</span>
+              <span>Testar 7 dias grátis</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -774,6 +774,7 @@ const HomePage = () => {
               <span className="font-semibold text-white uppercase tracking-wider block mb-3">Acesso</span>
               <ul className="space-y-2">
                 <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Fazer Login</Link></li>
+                <li><Link to="/login?tab=register" className="hover:text-emerald-400 transition-colors">Testar 7 Dias Grátis</Link></li>
                 <li><Link to="/checkout?plan=annual" className="hover:text-emerald-400 transition-colors">Plano Anual</Link></li>
                 <li><Link to="/checkout" className="hover:text-emerald-400 transition-colors">Plano Mensal</Link></li>
                 <li><Link to="/contato" className="hover:text-emerald-400 transition-colors">Fale Conosco</Link></li>
