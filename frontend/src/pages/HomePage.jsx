@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { 
-  ShieldCheck, 
-  ArrowRight, 
-  CheckCircle2, 
-  TrendingUp, 
-  Calendar, 
-  Camera, 
-  Search, 
-  Users, 
-  Sparkles, 
-  Lock, 
+import {
+  ShieldCheck,
+  ArrowRight,
+  CheckCircle2,
+  TrendingUp,
+  Calendar,
+  Camera,
+  Search,
+  Users,
+  Sparkles,
+  Lock,
   MessageSquare,
   Play,
   Pause,
@@ -144,11 +144,11 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-[#050605] text-[#f4f4f5] font-sans selection:bg-emerald-400 selection:text-black overflow-x-hidden">
-      
+
       {/* Glow de ambientação no topo */}
-      <div 
-        className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-emerald-500/10 blur-[150px] rounded-full z-0" 
-        aria-hidden="true" 
+      <div
+        className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-emerald-500/10 blur-[150px] rounded-full z-0"
+        aria-hidden="true"
       />
 
       {/* ========================================================================= */}
@@ -156,7 +156,7 @@ const HomePage = () => {
       {/* ========================================================================= */}
       <header className="sticky top-0 z-50 border-b border-white/5 bg-[#050605]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          
+
           {/* Logo Oficial com o Mascote Simplific */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 p-0.5 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
@@ -178,14 +178,14 @@ const HomePage = () => {
 
           {/* Botões de Ação */}
           <div className="hidden items-center gap-3.5 md:flex">
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="text-sm font-medium text-zinc-300 transition-colors hover:text-white px-3 py-2"
             >
               Entrar
             </Link>
-            <Link 
-              to="/checkout?plan=annual" 
+            <Link
+              to="/checkout?plan=annual"
               className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-black transition-all hover:bg-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
             >
               <span>Testar 7 dias grátis</span>
@@ -194,8 +194,8 @@ const HomePage = () => {
           </div>
 
           {/* Menu Hambúrguer Mobile */}
-          <button 
-            type="button" 
+          <button
+            type="button"
             aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden rounded-lg p-2 text-zinc-400 hover:text-white border border-white/10"
@@ -225,7 +225,7 @@ const HomePage = () => {
       {/* ========================================================================= */}
       <section className="relative z-10 pt-16 md:pt-24 pb-20 px-6 max-w-7xl mx-auto">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          
+
           {/* Mascote Simplific em Destaque Central */}
           <div className="relative mb-6 flex flex-col items-center">
             <div className="relative p-2.5 rounded-3xl bg-zinc-950/80 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.18)] transition-transform duration-500 hover:scale-105">
@@ -249,15 +249,15 @@ const HomePage = () => {
 
           {/* Chamadas para Ação */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <Link 
-              to="/checkout?plan=annual" 
+            <Link
+              to="/checkout?plan=annual"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 px-8 py-4 text-base font-semibold text-black transition-all shadow-[0_0_35px_rgba(16,185,129,0.25)] hover:shadow-[0_0_45px_rgba(16,185,129,0.35)] transform hover:-translate-y-0.5"
             >
               <span>Começar no plano anual (R$ 16,58/mês)</span>
               <ArrowRight size={17} />
             </Link>
-            <Link 
-              to="/beneficios" 
+            <Link
+              to="/beneficios"
               className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/30 px-6 py-4 text-sm font-medium text-zinc-300 transition-colors"
             >
               Conhecer todas as funções
@@ -312,7 +312,7 @@ const HomePage = () => {
 
         {/* Grade Split Stage: Lista de Atos à Esquerda, Terminal Interativo à Direita */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* Lado Esquerdo: Atos Interativos */}
           <div className="lg:col-span-6 space-y-3">
             {acts.map((act, index) => {
@@ -323,11 +323,10 @@ const HomePage = () => {
                   key={act.id}
                   type="button"
                   onClick={() => setActiveActIndex(index)}
-                  className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden ${
-                    isActive 
-                      ? 'bg-zinc-900/90 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.12)]' 
+                  className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden ${isActive
+                      ? 'bg-zinc-900/90 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.12)]'
                       : 'bg-zinc-950/40 border-white/5 hover:border-white/15 text-zinc-400'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2.5">
@@ -344,11 +343,11 @@ const HomePage = () => {
                       </span>
                     )}
                   </div>
-                  
+
                   <h3 className={`text-base font-medium mb-1 ${isActive ? 'text-white' : 'text-zinc-400'}`}>
                     {act.title}
                   </h3>
-                  
+
                   {isActive && (
                     <p className="text-xs text-zinc-400 leading-relaxed mt-2 pt-2 border-t border-white/5">
                       {act.description}
@@ -362,7 +361,7 @@ const HomePage = () => {
           {/* Lado Direito: Terminal Vivo do WhatsApp com o Mascote Simplific */}
           <div className="lg:col-span-6 lg:sticky lg:top-28">
             <div className="rounded-3xl bg-[#090a09] border border-white/10 p-5 md:p-7 shadow-2xl relative overflow-hidden">
-              
+
               {/* Brilho interno suave */}
               <div className="absolute top-0 right-0 w-52 h-52 bg-emerald-500/10 blur-[80px] pointer-events-none rounded-full" />
 
@@ -387,7 +386,7 @@ const HomePage = () => {
 
               {/* Corpo da Conversa com Respostas Reais */}
               <div className="space-y-4">
-                
+
                 {/* Balão do Usuário */}
                 <div className="flex justify-end">
                   <div className="bg-emerald-950/60 border border-emerald-500/30 rounded-2xl rounded-tr-sm p-3.5 max-w-[88%] text-xs sm:text-sm text-zinc-100 shadow-sm">
@@ -433,7 +432,7 @@ const HomePage = () => {
       {/* ========================================================================= */}
       <section className="py-20 px-6 border-y border-white/5 bg-zinc-950/40 relative z-10">
         <div className="max-w-7xl mx-auto">
-          
+
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div>
               <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
@@ -443,7 +442,7 @@ const HomePage = () => {
                 Um dia normal na sua rotina com o Simplific.
               </h2>
             </div>
-            
+
             {/* Controle de Play/Pause */}
             <button
               type="button"
@@ -467,11 +466,10 @@ const HomePage = () => {
                     setActiveTimeline(idx);
                     setIsPlayingTimeline(false);
                   }}
-                  className={`p-3.5 rounded-2xl text-left border transition-all ${
-                    isSelected 
-                      ? 'bg-zinc-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                  className={`p-3.5 rounded-2xl text-left border transition-all ${isSelected
+                      ? 'bg-zinc-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
                       : 'bg-zinc-950/50 border-white/5 hover:border-white/15 text-zinc-500'
-                  }`}
+                    }`}
                 >
                   <span className={`font-mono text-sm font-bold block mb-1 ${isSelected ? 'text-emerald-400' : 'text-zinc-400'}`}>
                     {step.hour}
@@ -503,8 +501,8 @@ const HomePage = () => {
               </div>
             </div>
 
-            <Link 
-              to="/checkout?plan=annual" 
+            <Link
+              to="/checkout?plan=annual"
               className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-5 py-3 text-xs font-semibold text-emerald-300 transition-colors whitespace-nowrap"
             >
               <span>Experimentar este nível de clareza</span>
@@ -519,7 +517,7 @@ const HomePage = () => {
       {/* 6. PLANOS DE PREÇOS TRANSPARENTES (MENSAL E ANUAL)                       */}
       {/* ========================================================================= */}
       <section className="py-24 px-6 max-w-7xl mx-auto relative z-10" id="planos">
-        
+
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
             Preço Claro & Sem Surpresas
@@ -534,10 +532,10 @@ const HomePage = () => {
 
         {/* Grade com 2 Cards Principais: Anual e Mensal */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-          
+
           {/* Card 1: PLANO ANUAL (Melhor Custo-Benefício) */}
           <div className="rounded-3xl bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950 border-2 border-emerald-500/50 p-8 md:p-9 flex flex-col justify-between shadow-[0_0_50px_rgba(16,185,129,0.15)] relative overflow-hidden">
-            
+
             {/* Tag Superior */}
             <div className="absolute top-0 right-0 bg-emerald-400 text-black text-xs font-bold px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
               Economize 44%
@@ -744,7 +742,7 @@ const HomePage = () => {
       {/* ========================================================================= */}
       <footer className="border-t border-white/10 bg-[#080908] py-14 px-6 text-zinc-400 text-sm relative z-10">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
-          
+
           {/* Lado Esquerdo: Marca */}
           <div className="max-w-sm">
             <div className="flex items-center gap-2.5 mb-3">
@@ -787,7 +785,7 @@ const HomePage = () => {
               <ul className="space-y-2">
                 <li><Link to="/termos" className="hover:text-emerald-400 transition-colors">Termos de Uso</Link></li>
                 <li><Link to="/privacidade" className="hover:text-emerald-400 transition-colors">Privacidade LGPD</Link></li>
-                <li><a href="https://wa.me/5547992921005" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">WhatsApp Suporte</a></li>
+                <li><a href="contato@simplificpro.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">E-mail Suporte</a></li>
               </ul>
             </div>
           </div>
