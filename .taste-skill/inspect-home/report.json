@@ -1,0 +1,1703 @@
+{
+ "url": "http://127.0.0.1:5173/#/home",
+ "at": "2026-11-03T17:48:46.479Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 8,
+   "filled": [
+    0.99,
+    0.99,
+    1,
+    1,
+    0.89,
+    0.92,
+    0.98,
+    1
+   ],
+   "motion": {
+    "elements": 28,
+    "css": 5,
+    "transitions": 21,
+    "scripted": 2,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 6638,
+     "screens": 7.4,
+     "words": 961,
+     "img": 14,
+     "video": 1,
+     "canvas": 0,
+     "svg": 11,
+     "sections": 8,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 11,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 1,
+     "uiPictures": 2,
+     "pictureSamples": [
+      "simplific-insight.jpg",
+      "simplific-insight.jpg",
+      "simplific-assessor-agenda.jpg",
+      "simplific-hero-hands.jpg",
+      "simplific-assessor-financeiro.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Seu dinheiro no ritmo da voz.",
+     "words": 6,
+     "chars": 29,
+     "lines": 2,
+     "size": 68,
+     "vw": 4.7,
+     "font": "Geist",
+     "weight": 500,
+     "tracking": -0.035,
+     "leading": 1.03,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.38,
+     "top": 161,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Seu dinheiro no ritmo da voz.",
+     "words": 6,
+     "lines": 2,
+     "size": 68,
+     "font": "Geist"
+    },
+    "headings": [
+     {
+      "text": "Seu dinheiro no ritmo da voz.",
+      "words": 6,
+      "chars": 29,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.035,
+      "leading": 1.03,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 161,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Fale uma vez.",
+      "words": 3,
+      "chars": 13,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 991,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "- R$ 240,00",
+      "words": 3,
+      "chars": 11,
+      "lines": 1,
+      "size": 28,
+      "vw": 1.9,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.03,
+      "leading": 1.45,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.33,
+      "top": 1108,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "Vinte e quatro horas.",
+      "words": 4,
+      "chars": 21,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 1576,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "R$ 2.450,00",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.007,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.25,
+      "top": 1667,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "Cinco motores vivos.",
+      "words": 3,
+      "chars": 20,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.23,
+      "top": 2284,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Quantos gastos na semana?",
+      "words": 4,
+      "chars": 25,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.36,
+      "top": 3435,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "58",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 180,
+      "vw": 12.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 0.86,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.14,
+      "top": 3739,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Preço claro, sem letras.",
+      "words": 4,
+      "chars": 24,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 4230,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "16,58",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 180,
+      "vw": 12.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 0.86,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.31,
+      "top": 4338,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "R$",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.225,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.02,
+      "top": 4342,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Defesa em profundidade.",
+      "words": 3,
+      "chars": 23,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.025,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.37,
+      "top": 4864,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Dúvidas comuns.",
+      "words": 2,
+      "chars": 15,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 5332,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Teste sete dias grátis.",
+      "words": 4,
+      "chars": 23,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.24,
+      "top": 6171,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 14,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 0,
+     "medianWords": 3,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Geist",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      17,
+      36,
+      68,
+      180
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Geist",
+      "size": 17,
+      "leading": 1.58,
+      "weight": 400,
+      "tracking": -0.014,
+      "contrast": 14.9
+     },
+     "measureChars": 72,
+     "max": {
+      "size": 180,
+      "vw": 12.5,
+      "font": "Geist",
+      "text": "58"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#09090b",
+     "bodyBgHsl": {
+      "h": 240,
+      "s": 0.1,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#080908",
+       "top": 0,
+       "hsl": {
+        "h": 120,
+        "s": 0.06,
+        "l": 0.03
+       }
+      },
+      {
+       "color": "#111513",
+       "top": 132,
+       "hsl": {
+        "h": 150,
+        "s": 0.11,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d8e1dc",
+       "share": 0.4
+      },
+      {
+       "color": "#f3f6f4",
+       "share": 0.26
+      },
+      {
+       "color": "#062519",
+       "share": 0.17
+      },
+      {
+       "color": "#10b981",
+       "share": 0.05
+      },
+      {
+       "color": "#a8b4ac",
+       "share": 0.04
+      }
+     ],
+     "button": {
+      "bg": "#10b981",
+      "hsl": {
+       "h": 160,
+       "s": 0.84,
+       "l": 0.39
+      },
+      "fg": "#05120c"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 18,
+     "inHero": 6,
+     "radius": 4,
+     "height": 77,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Testar 7 dias grátis",
+      "Testar 7 dias grátis",
+      "Áudio · Mercado",
+      "Foto · Cupom Fiscal",
+      "Agenda · Google Meet"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 10,
+     "boxRadius": 8,
+     "squareMedia": 1,
+     "roundedMedia": 4,
+     "mediaRadius": 4,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 6,
+       "iconTopped": false,
+       "rounded": false,
+       "top": 2383
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.31
+     }
+    ],
+    "nav": {
+     "links": 8,
+     "fixed": false,
+     "height": 89,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "geist"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 6638,
+    "margins": {
+     "left": 40,
+     "right": 40
+    },
+    "sections": [
+     {
+      "sel": "section.sp-hero",
+      "tag": "section",
+      "top": 89,
+      "height": 650,
+      "words": 110,
+      "media": 1,
+      "middle": 119,
+      "heading": {
+       "text": "Seu dinheiro no",
+       "size": 68,
+       "tag": "h1"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 99,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#demonstracao.sp-showcase",
+      "tag": "section",
+      "top": 739,
+      "height": 709,
+      "words": 61,
+      "media": 1,
+      "middle": 87,
+      "heading": {
+       "text": "Fale uma vez.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 501,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#rotina-24h.sp-routine-act",
+      "tag": "section",
+      "top": 1448,
+      "height": 715,
+      "words": 136,
+      "media": 1,
+      "middle": 52,
+      "heading": {
+       "text": "Vinte e quatro horas.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 75,
+      "textLeft": 40,
+      "textRight": 75,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#capacidades.sp-features",
+      "tag": "section",
+      "top": 2164,
+      "height": 1167,
+      "words": 264,
+      "media": 1,
+      "middle": 53,
+      "heading": {
+       "text": "Cinco motores vivos.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 67,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#simulador.sp-stats",
+      "tag": "section",
+      "top": 3331,
+      "height": 780,
+      "words": 67,
+      "media": 0,
+      "middle": 489,
+      "heading": {
+       "text": "58",
+       "size": 180,
+       "tag": "span"
+      },
+      "left": 40,
+      "right": 61,
+      "textLeft": 40,
+      "textRight": 61,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#planos.sp-pricing",
+      "tag": "section",
+      "top": 4110,
+      "height": 1110,
+      "words": 171,
+      "media": 1,
+      "middle": 49,
+      "heading": {
+       "text": "16,58",
+       "size": 180,
+       "tag": "span"
+      },
+      "left": 40,
+      "right": 93,
+      "textLeft": 40,
+      "textRight": 93,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#faq.sp-faq",
+      "tag": "section",
+      "top": 5220,
+      "height": 801,
+      "words": 254,
+      "media": 0,
+      "middle": 44,
+      "heading": {
+       "text": "Dúvidas comuns.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 357,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-cta-board",
+      "tag": "section",
+      "top": 6021,
+      "height": 468,
+      "words": 33,
+      "media": 1,
+      "middle": 52,
+      "heading": {
+       "text": "Teste sete dias grátis.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 599,
+      "textLeft": 315,
+      "textRight": 599,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.sp-footer-void",
+      "tag": "footer",
+      "top": 6489,
+      "height": 149,
+      "words": 19,
+      "media": 0,
+      "middle": 187,
+      "heading": null,
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Seu dinheiro no ritmo da voz.",
+      "size": 68,
+      "top": 161,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 15
+     },
+     {
+      "x": 68,
+      "n": 6
+     },
+     {
+      "x": 524,
+      "n": 4
+     },
+     {
+      "x": 980,
+      "n": 4
+     },
+     {
+      "x": 1017,
+      "n": 3
+     },
+     {
+      "x": 315,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 34,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.2,
+    "voidBox": {
+     "x": 0,
+     "y": 660,
+     "w": 1440,
+     "h": 180
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 12,
+   "filled": [
+    0.94,
+    1,
+    1,
+    0.94,
+    1,
+    1,
+    1,
+    1,
+    0.82,
+    0.78,
+    0.88,
+    1
+   ],
+   "motion": {
+    "elements": 28,
+    "css": 5,
+    "transitions": 21,
+    "scripted": 2,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 10793,
+     "screens": 12.8,
+     "words": 956,
+     "img": 14,
+     "video": 1,
+     "canvas": 0,
+     "svg": 11,
+     "sections": 8,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 11,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 1,
+     "uiPictures": 2,
+     "pictureSamples": [
+      "simplific-insight.jpg",
+      "simplific-insight.jpg",
+      "simplific-assessor-agenda.jpg",
+      "simplific-hero-hands.jpg",
+      "simplific-assessor-financeiro.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Seu dinheiro no ritmo da voz.",
+     "words": 6,
+     "chars": 29,
+     "lines": 2,
+     "size": 38,
+     "vw": 9.7,
+     "font": "Geist",
+     "weight": 500,
+     "tracking": -0.035,
+     "leading": 1.03,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.91,
+     "top": 134,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Seu dinheiro no ritmo da voz.",
+     "words": 6,
+     "lines": 2,
+     "size": 38,
+     "font": "Geist"
+    },
+    "headings": [
+     {
+      "text": "Seu dinheiro no ritmo da voz.",
+      "words": 6,
+      "chars": 29,
+      "lines": 2,
+      "size": 38,
+      "vw": 9.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.035,
+      "leading": 1.03,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 134,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Fale uma vez.",
+      "words": 3,
+      "chars": 13,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 1364,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "- R$ 240,00",
+      "words": 3,
+      "chars": 11,
+      "lines": 1,
+      "size": 28,
+      "vw": 7.2,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.03,
+      "leading": 1.45,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.7,
+      "top": 1794,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "Vinte e quatro horas.",
+      "words": 4,
+      "chars": 21,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 2696,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "R$ 2.450,00",
+      "words": 2,
+      "chars": 11,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.009,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.76,
+      "top": 3467,
+      "tag": "p",
+      "kind": "statement"
+     },
+     {
+      "text": "Cinco motores vivos.",
+      "words": 3,
+      "chars": 20,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.61,
+      "top": 3978,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Quantos gastos na semana?",
+      "words": 4,
+      "chars": 25,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 6357,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "58",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 88,
+      "vw": 22.6,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 0.86,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.26,
+      "top": 6670,
+      "tag": "span",
+      "kind": "statement"
+     },
+     {
+      "text": "Preço claro, sem letras.",
+      "words": 4,
+      "chars": 24,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 7069,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "16,58",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 88,
+      "vw": 22.6,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 0.86,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.56,
+      "top": 7501,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "R$",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.152,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.07,
+      "top": 7504,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Defesa em profundidade.",
+      "words": 3,
+      "chars": 23,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.025,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.74,
+      "top": 8143,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Dúvidas comuns.",
+      "words": 2,
+      "chars": 15,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.91,
+      "top": 8799,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Teste sete dias grátis.",
+      "words": 4,
+      "chars": 23,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.63,
+      "top": 10097,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 14,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 2,
+     "centered": 0,
+     "medianWords": 3,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Geist",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      17,
+      26,
+      38,
+      88
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Geist",
+      "size": 17,
+      "leading": 1.58,
+      "weight": 400,
+      "tracking": -0.014,
+      "contrast": 14.9
+     },
+     "measureChars": 42,
+     "max": {
+      "size": 88,
+      "vw": 22.6,
+      "font": "Geist",
+      "text": "58"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#09090b",
+     "bodyBgHsl": {
+      "h": 240,
+      "s": 0.1,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#080908",
+       "top": 0,
+       "hsl": {
+        "h": 120,
+        "s": 0.06,
+        "l": 0.03
+       }
+      },
+      {
+       "color": "#111513",
+       "top": 476,
+       "hsl": {
+        "h": 150,
+        "s": 0.11,
+        "l": 0.07
+       }
+      },
+      {
+       "color": "#0c100e",
+       "top": 468,
+       "hsl": {
+        "h": 150,
+        "s": 0.14,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#141b17",
+       "top": 736,
+       "hsl": {
+        "h": 146,
+        "s": 0.15,
+        "l": 0.09
+       }
+      },
+      {
+       "color": "#0b0f0d",
+       "top": 1591,
+       "hsl": {
+        "h": 150,
+        "s": 0.15,
+        "l": 0.05
+       }
+      },
+      {
+       "color": "#10b981",
+       "top": 10073,
+       "hsl": {
+        "h": 160,
+        "s": 0.84,
+        "l": 0.39
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d8e1dc",
+       "share": 0.39
+      },
+      {
+       "color": "#f3f6f4",
+       "share": 0.26
+      },
+      {
+       "color": "#062519",
+       "share": 0.17
+      },
+      {
+       "color": "#10b981",
+       "share": 0.05
+      },
+      {
+       "color": "#a8b4ac",
+       "share": 0.04
+      }
+     ],
+     "button": {
+      "bg": "#10b981",
+      "hsl": {
+       "h": 160,
+       "s": 0.84,
+       "l": 0.39
+      },
+      "fg": "#05120c"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 18,
+     "inHero": 5,
+     "radius": 4,
+     "height": 34,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Testar 7 dias grátis",
+      "Testar 7 dias grátis",
+      "Áudio · Mercado",
+      "Foto · Cupom Fiscal",
+      "Agenda · Google Meet"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 10,
+     "boxRadius": 8,
+     "squareMedia": 1,
+     "roundedMedia": 3,
+     "mediaRadius": 4,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.4
+     }
+    ],
+    "nav": {
+     "links": 3,
+     "fixed": false,
+     "height": 110,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "geist"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 10793,
+    "margins": {
+     "left": 18,
+     "right": 18
+    },
+    "sections": [
+     {
+      "sel": "section.sp-hero",
+      "tag": "section",
+      "top": 110,
+      "height": 1182,
+      "words": 110,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Seu dinheiro no",
+       "size": 38,
+       "tag": "h1"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 41,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#demonstracao.sp-showcase",
+      "tag": "section",
+      "top": 1292,
+      "height": 1332,
+      "words": 61,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "- R$ 240,00",
+       "size": 28,
+       "tag": "div"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 63,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#rotina-24h.sp-routine-act",
+      "tag": "section",
+      "top": 2624,
+      "height": 1282,
+      "words": 136,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Vinte e quatro horas.",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 21,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#capacidades.sp-features",
+      "tag": "section",
+      "top": 3906,
+      "height": 2379,
+      "words": 264,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Cinco motores vivos.",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#simulador.sp-stats",
+      "tag": "section",
+      "top": 6285,
+      "height": 713,
+      "words": 67,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "58",
+       "size": 88,
+       "tag": "span"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 18,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#planos.sp-pricing",
+      "tag": "section",
+      "top": 6997,
+      "height": 1730,
+      "words": 171,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "16,58",
+       "size": 88,
+       "tag": "span"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 18,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section#faq.sp-faq",
+      "tag": "section",
+      "top": 8727,
+      "height": 1158,
+      "words": 225,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Dúvidas comuns.",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-cta-board",
+      "tag": "section",
+      "top": 9885,
+      "height": 687,
+      "words": 33,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Teste sete dias grátis.",
+       "size": 26,
+       "tag": "h2"
+      },
+      "left": 18,
+      "right": 18,
+      "textLeft": 38,
+      "textRight": 63,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.sp-footer-void",
+      "tag": "footer",
+      "top": 10573,
+      "height": 220,
+      "words": 19,
+      "media": 0,
+      "middle": 0,
+      "heading": null,
+      "left": 18,
+      "right": 18,
+      "textLeft": 18,
+      "textRight": 18,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [
+     {
+      "top": 10372,
+      "height": 264
+     }
+    ],
+    "h1s": [
+     {
+      "text": "Seu dinheiro no ritmo da voz.",
+      "size": 38,
+      "top": 134,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 18,
+      "n": 16
+     },
+     {
+      "x": 38,
+      "n": 16
+     },
+     {
+      "x": 50,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 34,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\desktop-page-01.jpg",
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\mobile-page-01.jpg",
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-home\\mobile-page-02.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

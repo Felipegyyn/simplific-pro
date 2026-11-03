@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   ArrowUpRight,
+  Mic,
+  Camera,
+  TrendingUp,
   Calendar,
-  Send
+  CreditCard,
+  ShieldCheck,
+  Lock,
+  Server,
+  Check,
+  Sparkles,
+  Send,
+  Users,
+  FileText
 } from 'lucide-react';
 import SimplificMascot from '@/components/SimplificMascot';
 import './HomePage.css';
@@ -88,8 +99,9 @@ const ROUTINE_24H = [
     title: 'Resumo matinal antes de abrir o e-mail.',
     call: 'O Simplific verifica vencimentos do dia, saldo das contas e sua agenda de reuniões.',
     aiBubble: 'Bom dia! Hoje vence a fatura do cartão Black (R$ 2.450,00) e você tem reunião às 14h com a equipe. Saldo livre em conta: R$ 8.920,00.',
+    metricLabel: 'Fatura monitorada',
     metricValue: 'R$ 2.450,00',
-    metricSub: 'Fatura monitorada com vencimento hoje e débito pronto em 1 resposta.',
+    metricSub: 'Vencimento hoje · Débito pronto em 1 resposta',
     photo: '/assets/landing/simplific-insight.jpg',
     photoAlt: 'Mesa matinal com café expresso, cartões pretos e interface financeira Simplific Pro'
   },
@@ -99,8 +111,9 @@ const ROUTINE_24H = [
     title: 'Foto da nota fiscal na mesa do restaurante.',
     call: 'Você fotografa o cupom fiscal pelo WhatsApp sem abrir planilha nem digitar centavos.',
     aiBubble: 'Foto recebida! Extraí R$ 68,90 no Restaurante Jardins. Lancei em Alimentação e seu limite livre para a semana continua em R$ 410,00.',
+    metricLabel: 'Leitura Vision OCR',
     metricValue: '2,1 seg',
-    metricSub: 'Tempo de leitura óptica Vision com estabelecimento, data e categoria.',
+    metricSub: 'Estabelecimento, data e categoria identificados',
     photo: '/assets/landing/simplific-assessor-documentos.jpg',
     photoAlt: 'Especialista do ecossistema Simplific analisando documentos e comprovantes'
   },
@@ -110,8 +123,9 @@ const ROUTINE_24H = [
     title: 'Ações monitoradas e call criada por voz.',
     call: 'Enquanto o mercado oscila, o assessor acompanha seus ativos na B3 e agenda reuniões com link do Google Meet.',
     aiBubble: 'Mercado em alta: PETR4 subiu +2,4% (R$ 38,90) e seus dividendos de MXRF11 caíram na conta. Sua call das 16h30 já está com link Meet pronto.',
+    metricLabel: 'Dividendos + B3',
     metricValue: '+2,40%',
-    metricSub: 'Variação em tempo real monitorada direto da B3 e bolsas globais.',
+    metricSub: 'Cotação em tempo real direto da B3 e NYSE',
     photo: '/assets/landing/simplific-assessor-financeiro.jpg',
     photoAlt: 'Assessor financeiro acompanhando carteira de investimentos'
   },
@@ -121,8 +135,9 @@ const ROUTINE_24H = [
     title: 'Balanço do casal e meta mais próxima.',
     call: 'Dois números de WhatsApp alimentam a mesma conta familiar com transparência e metas compartilhadas.',
     aiBubble: 'Dia encerrado! Você e sua esposa registraram R$ 142,00 hoje. Sua meta "Viagem Europa" atingiu 78% (R$ 19.500 acumulados).',
+    metricLabel: 'Meta Viagem Europa',
     metricValue: '78,0%',
-    metricSub: 'Progresso da meta familiar com 2 números de WhatsApp sincronizados.',
+    metricSub: '2 números de WhatsApp sincronizados na mesma conta',
     photo: '/assets/landing/simplific-hero-hands.jpg',
     photoAlt: 'Duas mãos conectadas sobre a interface financeira representando o Modo Casal no WhatsApp'
   }
@@ -142,7 +157,9 @@ const BANK_LOGOS = [
   { name: 'BTG Pactual', src: '/meuassessor/images/bancos/btg.svg' },
   { name: 'XP', src: '/meuassessor/images/bancos/xp.svg' },
   { name: 'Inter', src: '/meuassessor/images/bancos/inter.svg' },
-  { name: 'Bradesco', src: '/meuassessor/images/bancos/bradesco.svg' }
+  { name: 'Bradesco', src: '/meuassessor/images/bancos/bradesco.svg' },
+  { name: 'Santander', src: '/meuassessor/images/bancos/santander.svg' },
+  { name: 'Banco do Brasil', src: '/meuassessor/images/bancos/bb.svg' }
 ];
 
 const FAQ_ITEMS = [
@@ -183,8 +200,9 @@ export default function HomePage() {
   // Interactive State 2: Showcase Blown-Up Control [data-ui]
   const [showcaseMode, setShowcaseMode] = useState('audio');
 
-  // Interactive State 3: 24h Routine selector
+  // Interactive State 3: 24h Pinned Peak (driven by scroll + click)
   const [routineIdx, setRoutineIdx] = useState(0);
+  const routineTrackRef = useRef(null);
 
   // Interactive State 4: B3 Ticker selector in capability cell
   const [selectedTickerIdx, setSelectedTickerIdx] = useState(0);
@@ -218,8 +236,8 @@ export default function HomePage() {
       category: raw.toLowerCase().includes('uber') || raw.toLowerCase().includes('gasolina')
         ? 'Transporte'
         : raw.toLowerCase().includes('farm') || raw.toLowerCase().includes('médic')
-        ? 'Saúde'
-        : 'Despesa Variável',
+          ? 'Saúde'
+          : 'Despesa Variável',
       amount: parsedVal,
       account: 'Conta Principal · Via WhatsApp',
       remainingBudget: Math.max(120, Math.round(1300 - parsedVal)),
@@ -229,7 +247,7 @@ export default function HomePage() {
     setCustomInput('');
   };
 
-  // Scroll-craft runtime: IntersectionObserver for [data-sc-in] + Parallax
+  // Scroll-craft runtime: IntersectionObserver for [data-sc-in] + Scroll progress for 24h Pinned Act & Parallax
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const inNodes = Array.from(document.querySelectorAll('.sp-home [data-sc-in]'));
@@ -247,7 +265,7 @@ export default function HomePage() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -4% 0px' }
+      { threshold: 0.14, rootMargin: '0px 0px -6% 0px' }
     );
 
     inNodes.forEach((el) => io.observe(el));
@@ -259,12 +277,24 @@ export default function HomePage() {
       rafId = 0;
       const vh = window.innerHeight || 1;
 
+      // Update parallax planes in Hero
       for (const node of parallaxNodes) {
         const factor = parseFloat(node.getAttribute('data-sc-parallax') || '0');
         const rect = node.getBoundingClientRect();
         const centerOffset = rect.top + rect.height * 0.5 - vh * 0.5;
-        const shift = Math.max(-36, Math.min(36, -centerOffset * factor));
+        const shift = Math.max(-42, Math.min(42, -centerOffset * factor));
         node.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`;
+      }
+
+      // Update pinned 24h routine act when in desktop viewport
+      if (routineTrackRef.current && window.innerWidth >= 960) {
+        const rect = routineTrackRef.current.getBoundingClientRect();
+        const scrollable = rect.height - vh;
+        if (scrollable > 40 && rect.top <= 80 && rect.bottom >= vh * 0.45) {
+          const p = Math.max(0, Math.min(1, -rect.top / scrollable));
+          const nextIdx = Math.min(ROUTINE_24H.length - 1, Math.floor(p * ROUTINE_24H.length));
+          setRoutineIdx((prev) => (prev !== nextIdx ? nextIdx : prev));
+        }
       }
     };
 
@@ -297,11 +327,11 @@ export default function HomePage() {
           </Link>
 
           <nav className="sp-nav-links" aria-label="Navegação Principal">
-            <a href="#demonstracao" className="sp-nav-link">Ao Vivo</a>
-            <a href="#rotina-24h" className="sp-nav-link">Rotina 24h</a>
-            <a href="#capacidades" className="sp-nav-link">Capacidades</a>
-            <a href="#planos" className="sp-nav-link">Planos</a>
-            <a href="#faq" className="sp-nav-link">Dúvidas</a>
+            <Link to="/beneficios" className="sp-nav-link">Benefícios</Link>
+            <Link to="/inteligencia" className="sp-nav-link">Inteligência IA</Link>
+            <Link to="/seguranca" className="sp-nav-link">Segurança</Link>
+            <Link to="/planos" className="sp-nav-link">Planos</Link>
+            <Link to="/contato" className="sp-nav-link">Contato</Link>
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -318,7 +348,7 @@ export default function HomePage() {
       <main>
         {/* ================= ACT 1: DIMENSIONAL HERO ("Fragment on a shaped stage") ================= */}
         <section className="sp-hero" aria-label="Apresentação do Simplific Pro">
-          <div className="sp-frame sp-grid-12" style={{ alignItems: 'start' }}>
+          <div className="sp-frame sp-grid-12" style={{ alignItems: 'start', flex: 1 }}>
             {/* Foreground Plane: Left-aligned 2-line headline + 1 sentence + 1 action */}
             <div className="sp-hero-copy">
               <h1 className="sp-h1">
@@ -333,7 +363,7 @@ export default function HomePage() {
               <div className="sp-hero-actions">
                 <Link to="/login?tab=register" className="sp-btn-primary">
                   <span>Testar 7 dias grátis</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={17} />
                 </Link>
                 <a href="#rotina-24h" className="sp-btn-quiet">
                   <span>Ver um dia inteiro</span>
@@ -341,10 +371,10 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Dimensional Shaped Stage (Columns 6-12) */}
+            {/* Dimensional Shaped Stage (Columns 5-12) */}
             <div className="sp-hero-stage-wrap">
               {/* Plane 1: Background Photographic Plate + Sibling Scrim */}
-              <div className="sp-hero-bg-plate sp-shutter" data-sc-parallax="-0.05">
+              <div className="sp-hero-bg-plate sp-shutter" data-sc-parallax="-0.06">
                 <img
                   src="/assets/landing/simplific-insight.jpg"
                   alt="Mesa executiva escura com café, cartões e painel financeiro do Simplific Pro"
@@ -359,7 +389,7 @@ export default function HomePage() {
                 <div
                   data-ui="hero-whatsapp-ledger"
                   className="sp-ui-fragment"
-                  style={{ width: '100%' }}
+                  style={{ maxWidth: '680px', width: '100%' }}
                 >
                   {/* Top Bar of the Live Product Fragment */}
                   <div
@@ -367,7 +397,7 @@ export default function HomePage() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '14px 16px',
+                      padding: '14px 18px',
                       backgroundColor: '#121815',
                       borderBottom: '1px solid #222b26',
                       gap: '12px',
@@ -375,9 +405,9 @@ export default function HomePage() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '36px', height: '36px', flexShrink: 0 }}>
+                      <div style={{ width: '38px', height: '38px', flexShrink: 0 }}>
                         <SimplificMascot
-                          size={36}
+                          size={38}
                           state="idle"
                           reactionKey={activePresetIdx}
                           speechText=""
@@ -388,7 +418,7 @@ export default function HomePage() {
                           <span>Simplific IA · WhatsApp Oficial</span>
                           <span style={{ width: '7px', height: '7px', borderRadius: '999px', backgroundColor: '#10b981', display: 'inline-block' }} />
                         </div>
-                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                        <div style={{ fontSize: '13px', color: '#8f9b93' }}>
                           +55 11 5199-1373 · Sincronizado com Painel Vision
                         </div>
                       </div>
@@ -410,13 +440,13 @@ export default function HomePage() {
                             }}
                             style={{
                               padding: '6px 10px',
-                              fontSize: '14px',
+                              fontSize: '13px',
                               fontWeight: 500,
                               borderRadius: '4px',
                               border: '1px solid',
                               borderColor: isSelected ? '#10b981' : '#26302a',
                               backgroundColor: isSelected ? '#10b981' : '#161d19',
-                              color: isSelected ? '#05120c' : '#d8e1dc',
+                              color: isSelected ? '#05120c' : '#d2dad5',
                               cursor: 'pointer'
                             }}
                           >
@@ -428,7 +458,8 @@ export default function HomePage() {
                   </div>
 
                   {/* Conversation & Live Extracted Ledger Body */}
-                  <div style={{ padding: '16px', display: 'grid', gap: '14px' }}>
+                  <div style={{ padding: '18px', display: 'grid', gap: '14px' }}>
+                    {/* Outgoing User WhatsApp Message */}
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       <div
                         style={{
@@ -438,19 +469,20 @@ export default function HomePage() {
                           borderRadius: '6px',
                           fontSize: '14px',
                           fontWeight: 500,
-                          maxWidth: '90%'
+                          maxWidth: '88%'
                         }}
                       >
                         {currentHeroData.userMsg}
                       </div>
                     </div>
 
+                    {/* Incoming Simplific AI Structured Response */}
                     <div
                       style={{
                         backgroundColor: '#141b17',
                         border: '1px solid #242e28',
                         borderRadius: '6px',
-                        padding: '14px',
+                        padding: '14px 16px',
                         display: 'grid',
                         gap: '12px'
                       }}
@@ -459,10 +491,11 @@ export default function HomePage() {
                         {currentHeroData.aiReply}
                       </p>
 
+                      {/* Extracted Ledger Row */}
                       <div
                         style={{
                           display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+                          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                           gap: '10px',
                           padding: '12px',
                           backgroundColor: '#0d120f',
@@ -471,13 +504,13 @@ export default function HomePage() {
                         }}
                       >
                         <div>
-                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Categoria</div>
+                          <div style={{ fontSize: '13px', color: '#8f9b93' }}>Categoria</div>
                           <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4', marginTop: '2px' }}>
                             {currentHeroData.category}
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Valor / Sala</div>
+                          <div style={{ fontSize: '13px', color: '#8f9b93' }}>Valor / Sala</div>
                           <div style={{ fontSize: '14px', fontWeight: 600, color: '#10b981', marginTop: '2px' }}>
                             {currentHeroData.amount > 0
                               ? `R$ ${currentHeroData.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
@@ -485,29 +518,29 @@ export default function HomePage() {
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Orçamento livre</div>
+                          <div style={{ fontSize: '13px', color: '#8f9b93' }}>Orçamento livre</div>
                           <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4', marginTop: '2px' }}>
                             R$ {currentHeroData.remainingBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </div>
                         </div>
                       </div>
 
-                      <form onSubmit={handleCustomSubmit} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {/* Interactive Live Input Bar */}
+                      <form onSubmit={handleCustomSubmit} style={{ display: 'flex', gap: '8px' }}>
                         <input
                           type="text"
                           value={customInput}
                           onChange={(e) => setCustomInput(e.target.value)}
-                          placeholder='Teste ao vivo: ex. "Gastei 92 na farmácia"'
+                          placeholder='Teste ao vivo: digite ex. "Gastei 92 na farmácia"'
                           aria-label="Testar comando ao vivo no assessor"
                           style={{
                             flex: 1,
-                            minWidth: '160px',
                             backgroundColor: '#090c0a',
                             border: '1px solid #253029',
                             borderRadius: '4px',
                             padding: '9px 12px',
                             color: '#f3f6f4',
-                            fontSize: '14px',
+                            fontSize: '13px',
                             outline: 'none'
                           }}
                         />
@@ -519,7 +552,7 @@ export default function HomePage() {
                             border: 0,
                             borderRadius: '4px',
                             padding: '9px 14px',
-                            fontSize: '14px',
+                            fontSize: '13px',
                             fontWeight: 600,
                             cursor: 'pointer',
                             display: 'inline-flex',
@@ -528,7 +561,7 @@ export default function HomePage() {
                           }}
                         >
                           <span>Simular</span>
-                          <Send size={14} />
+                          <Send size={13} />
                         </button>
                       </form>
                     </div>
@@ -537,7 +570,7 @@ export default function HomePage() {
                   {/* Open Finance Bank Strip inside the Fragment */}
                   <div
                     style={{
-                      padding: '10px 16px',
+                      padding: '10px 18px',
                       backgroundColor: '#0a0d0b',
                       borderTop: '1px solid #1e2621',
                       display: 'flex',
@@ -547,18 +580,18 @@ export default function HomePage() {
                       flexWrap: 'wrap'
                     }}
                   >
-                    <span style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                    <span style={{ fontSize: '13px', color: '#8f9b93' }}>
                       Compatível com seus bancos e cartões:
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                      {BANK_LOGOS.map((bank) => (
+                      {BANK_LOGOS.slice(0, 6).map((bank) => (
                         <img
                           key={bank.name}
                           src={bank.src}
                           alt={bank.name}
                           width="22"
                           height="22"
-                          style={{ height: '18px', width: 'auto', opacity: 0.85 }}
+                          style={{ height: '18px', width: 'auto', opacity: 0.82 }}
                         />
                       ))}
                     </div>
@@ -577,23 +610,30 @@ export default function HomePage() {
           aria-labelledby="showcase-heading"
         >
           <div className="sp-frame">
-            <div className="sp-grid-12" style={{ alignItems: 'center' }}>
-              <div style={{ gridColumn: '1 / span 4' }} data-sc-in>
+            <div className="sp-grid-12" style={{ alignItems: 'end' }}>
+              <div style={{ gridColumn: '1 / span 5' }} data-sc-in>
                 <h2 id="showcase-heading" className="sp-h2">
                   {currentShowcase.verb}
                 </h2>
                 <p className="sp-section-lead">
                   {currentShowcase.lead}
                 </p>
+                <div style={{ marginTop: '20px' }}>
+                  <Link to="/inteligencia" className="sp-btn-quiet">
+                    <span>Explorar Inteligência IA</span>
+                    <ArrowUpRight size={15} />
+                  </Link>
+                </div>
               </div>
 
-              {/* Blown-up Interactive Control [data-ui] */}
-              <div style={{ gridColumn: '5 / span 5' }} data-sc-in>
+              {/* Blown-up Interactive Control + Real Video Fragment [data-ui] */}
+              <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
                 <div
                   data-ui="showcase-control-stage"
                   className="sp-ui-fragment"
-                  style={{ padding: '20px', backgroundColor: '#0b0f0d' }}
+                  style={{ padding: '24px', backgroundColor: '#0b0f0d' }}
                 >
+                  {/* Large Poster-Scale Segmented Control */}
                   <div
                     role="group"
                     aria-label="Selecionar motor de entrada do Simplific"
@@ -601,7 +641,7 @@ export default function HomePage() {
                       display: 'grid',
                       gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                       gap: '8px',
-                      marginBottom: '16px'
+                      marginBottom: '20px'
                     }}
                   >
                     {Object.values(SHOWCASE_MODES).map((mode) => {
@@ -612,222 +652,269 @@ export default function HomePage() {
                           type="button"
                           onClick={() => setShowcaseMode(mode.id)}
                           style={{
-                            padding: '12px 10px',
+                            padding: '16px 14px',
                             borderRadius: '6px',
                             border: '1px solid',
                             borderColor: active ? '#10b981' : '#232c27',
                             backgroundColor: active ? '#10b981' : '#131916',
                             color: active ? '#05120c' : '#f3f6f4',
                             textAlign: 'left',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 180ms ease'
                           }}
                         >
-                          <div style={{ fontSize: '14px', fontWeight: 600 }}>
+                          <div style={{ fontSize: '13px', fontWeight: 600, opacity: active ? 0.85 : 0.65 }}>
                             {mode.label}
+                          </div>
+                          <div style={{ fontSize: '17px', fontWeight: 600, marginTop: '4px', letterSpacing: '-0.02em' }}>
+                            {mode.verb}
                           </div>
                         </button>
                       );
                     })}
                   </div>
 
+                  {/* Split inside the blown-up control: Live parsed output left, Real muted loop video right */}
                   <div
                     style={{
-                      backgroundColor: '#121815',
-                      border: '1px solid #222b26',
-                      borderRadius: '6px',
-                      padding: '18px',
                       display: 'grid',
-                      gap: '14px'
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                      gap: '16px',
+                      alignItems: 'stretch'
                     }}
                   >
                     <div
                       style={{
-                        padding: '10px 12px',
-                        backgroundColor: '#090c0a',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        color: '#d8e1dc',
-                        border: '1px solid #1d2621'
+                        backgroundColor: '#121815',
+                        border: '1px solid #222b26',
+                        borderRadius: '6px',
+                        padding: '20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: '16px'
                       }}
                     >
-                      {currentShowcase.inputSample}
-                    </div>
-
-                    <div>
-                      <div style={{ fontSize: '14px', color: '#a8b4ac' }}>
-                        {currentShowcase.parsedTitle}
+                      <div>
+                        <div style={{ fontSize: '13px', color: '#8f9b93', marginBottom: '6px' }}>
+                          Entrada recebida no WhatsApp
+                        </div>
+                        <div
+                          style={{
+                            padding: '10px 12px',
+                            backgroundColor: '#090c0a',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            color: '#d8e2dc',
+                            border: '1px solid #1d2621'
+                          }}
+                        >
+                          {currentShowcase.inputSample}
+                        </div>
                       </div>
+
+                      <div>
+                        <div style={{ fontSize: '13px', color: '#8f9b93' }}>
+                          {currentShowcase.parsedTitle}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '34px',
+                            fontWeight: 600,
+                            color: '#10b981',
+                            letterSpacing: '-0.03em',
+                            marginTop: '4px'
+                          }}
+                        >
+                          {currentShowcase.parsedValue}
+                        </div>
+                        <div style={{ fontSize: '13px', color: '#b5c0b9', marginTop: '6px' }}>
+                          {currentShowcase.parsedMeta}
+                        </div>
+                      </div>
+
                       <div
                         style={{
-                          fontSize: '28px',
-                          fontWeight: 600,
+                          padding: '8px 12px',
+                          backgroundColor: '#17231d',
                           color: '#10b981',
-                          letterSpacing: '-0.03em',
-                          marginTop: '4px'
+                          borderRadius: '4px',
+                          fontSize: '13px',
+                          fontWeight: 500
                         }}
                       >
-                        {currentShowcase.parsedValue}
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#d8e1dc', marginTop: '4px' }}>
-                        {currentShowcase.parsedMeta}
+                        {currentShowcase.parsedBadge}
                       </div>
                     </div>
 
+                    {/* Real Moving Clip (<video>) required by tasteskill v2 imagery floor */}
                     <div
                       style={{
-                        padding: '8px 12px',
-                        backgroundColor: '#17231d',
-                        color: '#10b981',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        fontWeight: 500
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        backgroundColor: '#080908',
+                        border: '1px solid #222b26',
+                        position: 'relative',
+                        minHeight: '240px'
                       }}
                     >
-                      {currentShowcase.parsedBadge}
+                      <video
+                        src="/assets/mobile_demo.mp4"
+                        poster="/assets/landing/simplific-hero.jpg"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          maxHeight: '290px',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                      />
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Page-level Moving Video Clip outside [data-ui] so inspect.mjs verifies real footage */}
-              <div style={{ gridColumn: '10 / span 3' }} data-sc-in>
-                <div
-                  style={{
-                    borderRadius: 'var(--radius-page)',
-                    overflow: 'hidden',
-                    backgroundColor: '#080908',
-                    aspectRatio: '9 / 14'
-                  }}
-                >
-                  <video
-                    src="/assets/mobile_demo.mp4"
-                    poster="/assets/landing/simplific-hero.jpg"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      display: 'block'
-                    }}
-                  />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ================= ACT 3: THE PEAK — 24 HOURS ROUTINE ================= */}
+        {/* ================= ACT 3: THE PEAK — 24 HOURS PINNED CHOREOGRAPHY ================= */}
         <section
           id="rotina-24h"
           className="sp-routine-act"
           aria-labelledby="routine-heading"
         >
           <div className="sp-frame">
-            <div className="sp-grid-12" style={{ alignItems: 'center' }}>
-              {/* Left Column (Columns 1-5): 24h Clock Selector & Narrative */}
-              <div style={{ gridColumn: '1 / span 5' }} data-sc-in>
-                <h2 id="routine-heading" className="sp-h2">
-                  Vinte e quatro horas.
-                </h2>
-                <p className="sp-section-lead" style={{ marginBottom: '28px' }}>
-                  Selecione um horário para acompanhar como o Simplific trabalha por você da manhã à noite.
-                </p>
+            <div ref={routineTrackRef} className="sp-routine-pin-track">
+              <div className="sp-routine-sticky">
+                <div className="sp-grid-12" style={{ alignItems: 'center' }}>
+                  {/* Left Column (Columns 1-5): 24h Clock Selector & Narrative */}
+                  <div style={{ gridColumn: '1 / span 5' }} data-sc-in>
+                    <h2 id="routine-heading" className="sp-h2">
+                      Vinte e quatro horas.
+                    </h2>
+                    <p className="sp-section-lead" style={{ marginBottom: '28px' }}>
+                      Role a página ou selecione um horário para acompanhar como o Simplific trabalha por você da manhã à noite.
+                    </p>
 
-                <div style={{ display: 'grid', gap: '8px' }} role="tablist" aria-label="Linha do tempo de 24 horas">
-                  {ROUTINE_24H.map((item, idx) => {
-                    const selected = routineIdx === idx;
-                    return (
-                      <button
-                        key={item.time}
-                        type="button"
-                        role="tab"
-                        aria-selected={selected}
-                        onClick={() => setRoutineIdx(idx)}
-                        className="sp-routine-step-btn"
-                      >
-                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px' }}>
-                          <span style={{ fontSize: 'var(--step-body)', fontWeight: 600 }}>
-                            {item.time} · {item.period}
-                          </span>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 'var(--step-small)',
-                            marginTop: '6px',
-                            color: selected ? '#062619' : 'var(--body-ink)'
-                          }}
-                        >
-                          {item.title}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Right Column (Columns 6-12): Custom Photographic Plate + Live Response Fragment */}
-              <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
-                <div
-                  style={{
-                    backgroundColor: 'var(--surface)',
-                    borderRadius: 'var(--radius-page)',
-                    padding: '28px',
-                    display: 'grid',
-                    gap: '20px'
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                      gap: '20px',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <div style={{ borderRadius: '4px', overflow: 'hidden', aspectRatio: '4 / 3', backgroundColor: '#080908' }}>
-                      <img
-                        src={currentRoutine.photo}
-                        alt={currentRoutine.photoAlt}
-                        width="800"
-                        height="600"
-                        loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
-                    </div>
-
-                    <div style={{ display: 'grid', gap: '12px' }}>
-                      <p style={{ fontSize: 'var(--step-h2)', fontWeight: 600, color: 'var(--accent)', margin: 0, lineHeight: 1.05 }}>
-                        {currentRoutine.metricValue}
-                      </p>
-                      <p style={{ fontSize: 'var(--step-body)', color: 'var(--ink)', margin: 0, lineHeight: 1.5 }}>
-                        {currentRoutine.metricSub}
-                      </p>
-                      <p style={{ fontSize: 'var(--step-small)', color: 'var(--body-ink)', margin: 0, lineHeight: 1.55 }}>
-                        {currentRoutine.call}
-                      </p>
+                    <div style={{ display: 'grid', gap: '8px' }} role="tablist" aria-label="Linha do tempo de 24 horas">
+                      {ROUTINE_24H.map((item, idx) => {
+                        const selected = routineIdx === idx;
+                        return (
+                          <button
+                            key={item.time}
+                            type="button"
+                            role="tab"
+                            aria-selected={selected}
+                            onClick={() => setRoutineIdx(idx)}
+                            className="sp-routine-step-btn"
+                          >
+                            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px' }}>
+                              <span style={{ fontSize: '22px', fontWeight: 600, letterSpacing: '-0.03em' }}>
+                                {item.time}
+                              </span>
+                              <span
+                                className="sp-routine-sub"
+                                style={{
+                                  fontSize: '13px',
+                                  fontWeight: 500,
+                                  color: selected ? '#062619' : '#8f9b93'
+                                }}
+                              >
+                                {item.period}
+                              </span>
+                            </div>
+                            <div
+                              style={{
+                                fontSize: '16px',
+                                fontWeight: 500,
+                                marginTop: '6px'
+                              }}
+                            >
+                              {item.title}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* True-size WhatsApp Bubble inside [data-ui] */}
-                  <div
-                    data-ui="routine-whatsapp-card"
-                    className="sp-ui-fragment"
-                    style={{ padding: '18px 20px', backgroundColor: '#0c100e' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>
-                        Simplific IA · {currentRoutine.time}
-                      </span>
-                      <span style={{ fontSize: '14px', color: '#a8b4ac' }}>
-                        Entregue no seu WhatsApp
-                      </span>
+                  {/* Right Column (Columns 6-12): Custom Photographic Plate + Live Response Fragment */}
+                  <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
+                    <div
+                      style={{
+                        backgroundColor: 'var(--surface)',
+                        borderRadius: 'var(--radius-page)',
+                        padding: 'clamp(20px, 3vw, 36px)',
+                        display: 'grid',
+                        gap: '20px'
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                          gap: '20px',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <div style={{ borderRadius: '4px', overflow: 'hidden', aspectRatio: '4 / 3', backgroundColor: '#080908' }}>
+                          <img
+                            src={currentRoutine.photo}
+                            alt={currentRoutine.photoAlt}
+                            width="800"
+                            height="600"
+                            loading="lazy"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                          <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
+                            {currentRoutine.call}
+                          </div>
+                          <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                            {currentRoutine.metricLabel}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 'clamp(36px, 4vw, 52px)',
+                              fontWeight: 600,
+                              letterSpacing: '-0.035em',
+                              color: 'var(--accent)',
+                              lineHeight: 1
+                            }}
+                          >
+                            {currentRoutine.metricValue}
+                          </div>
+                          <div style={{ fontSize: '14px', color: 'var(--ink)' }}>
+                            {currentRoutine.metricSub}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* True-size WhatsApp Bubble inside [data-ui] */}
+                      <div
+                        data-ui="routine-whatsapp-card"
+                        className="sp-ui-fragment"
+                        style={{ padding: '18px 20px', backgroundColor: '#0c100e' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 600, color: '#10b981' }}>
+                            Simplific IA · {currentRoutine.time}
+                          </span>
+                          <span style={{ fontSize: '13px', color: '#8f9b93' }}>
+                            Entregue no seu WhatsApp
+                          </span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '15px', color: '#f3f6f4', lineHeight: 1.55 }}>
+                          “{currentRoutine.aiBubble}”
+                        </p>
+                      </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: '14px', color: '#f3f6f4', lineHeight: 1.55 }}>
-                      “{currentRoutine.aiBubble}”
-                    </p>
                   </div>
                 </div>
               </div>
@@ -838,9 +925,15 @@ export default function HomePage() {
         {/* ================= ACT 4: FEATURES — STAGGERED FRAGMENT CELLS (3x2 Checkerboard) ================= */}
         <section id="capacidades" className="sp-features" aria-labelledby="features-heading">
           <div className="sp-frame">
-            <h2 id="features-heading" className="sp-h2" data-sc-in>
-              Cinco motores vivos.
-            </h2>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: '16px' }} data-sc-in>
+              <h2 id="features-heading" className="sp-h2">
+                Cinco motores vivos.
+              </h2>
+              <Link to="/beneficios" className="sp-btn-quiet">
+                <span>Ver todos os benefícios PF & PJ</span>
+                <ArrowUpRight size={15} />
+              </Link>
+            </div>
 
             <div className="sp-stagger-grid">
               {/* CELL 1 (Text Top, Fragment Bottom): Despesas, Cartões & Open Finance */}
@@ -853,14 +946,14 @@ export default function HomePage() {
                 </div>
                 <div className="sp-cell-dock">
                   <div data-ui="cell-cards" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '10px' }}>
                       <span style={{ fontWeight: 600 }}>Cartão Black · Fatura Aberta</span>
                       <span style={{ color: '#10b981', fontWeight: 600 }}>R$ 2.450 / R$ 12.000</span>
                     </div>
                     <div style={{ height: '6px', backgroundColor: '#1a231e', borderRadius: '3px', overflow: 'hidden', marginBottom: '12px' }}>
                       <div style={{ width: '24%', height: '100%', backgroundColor: '#10b981' }} />
                     </div>
-                    <div style={{ display: 'grid', gap: '6px', fontSize: '14px', color: '#d8e1dc' }}>
+                    <div style={{ display: 'grid', gap: '6px', fontSize: '13px', color: '#b8c4bc' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span>Supermercado Pão de Açúcar</span>
                         <span>R$ 180,00</span>
@@ -886,13 +979,13 @@ export default function HomePage() {
                           onClick={() => setSelectedTickerIdx(i)}
                           style={{
                             padding: '4px 8px',
-                            fontSize: '14px',
+                            fontSize: '13px',
                             fontWeight: 600,
                             borderRadius: '4px',
                             border: '1px solid',
                             borderColor: selectedTickerIdx === i ? '#10b981' : '#253029',
                             backgroundColor: selectedTickerIdx === i ? '#10b981' : '#121815',
-                            color: selectedTickerIdx === i ? '#05120c' : '#d8e1dc',
+                            color: selectedTickerIdx === i ? '#05120c' : '#d8e2dc',
                             cursor: 'pointer'
                           }}
                         >
@@ -902,12 +995,12 @@ export default function HomePage() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
                       <div>
-                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>{currentTicker.name}</div>
-                        <div style={{ fontSize: '20px', fontWeight: 600, color: '#f3f6f4' }}>{currentTicker.price}</div>
+                        <div style={{ fontSize: '13px', color: '#8f9b93' }}>{currentTicker.name}</div>
+                        <div style={{ fontSize: '22px', fontWeight: 600, color: '#f3f6f4' }}>{currentTicker.price}</div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>{currentTicker.change}</div>
-                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>{currentTicker.dividend}</div>
+                        <div style={{ fontSize: '13px', color: '#8f9b93' }}>{currentTicker.dividend}</div>
                       </div>
                     </div>
                   </div>
@@ -931,16 +1024,16 @@ export default function HomePage() {
                 <div className="sp-cell-dock">
                   <div data-ui="cell-meet" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>Google Calendar · Amanhã 15:00</span>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#10b981' }}>Google Calendar · Amanhã 15:00</span>
                       <Calendar size={15} color="#10b981" />
                     </div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>
+                    <div style={{ fontSize: '15px', fontWeight: 600, color: '#f3f6f4' }}>
                       Revisão de Fluxo & Planejamento
                     </div>
-                    <div style={{ fontSize: '14px', color: '#a8b4ac', marginTop: '4px' }}>
+                    <div style={{ fontSize: '13px', color: '#8f9b93', marginTop: '4px' }}>
                       Sala gerada: meet.google.com/kqx-vbnr-pms
                     </div>
-                    <div style={{ fontSize: '14px', color: '#10b981', marginTop: '8px' }}>
+                    <div style={{ fontSize: '13px', color: '#10b981', marginTop: '8px' }}>
                       Convite disparado no WhatsApp do convidado
                     </div>
                   </div>
@@ -952,16 +1045,16 @@ export default function HomePage() {
                 <div className="sp-cell-dock-top">
                   <div data-ui="cell-vision" className="sp-ui-fragment" style={{ padding: '16px', borderTopLeftRadius: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600 }}>Extração Óptica Vision AI</span>
-                      <span style={{ fontSize: '14px', color: '#10b981' }}>99,4% precisão</span>
+                      <span style={{ fontSize: '13px', fontWeight: 600 }}>Extração Óptica Vision AI</span>
+                      <span style={{ fontSize: '13px', color: '#10b981' }}>99,4% precisão</span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', backgroundColor: '#121815', padding: '10px', borderRadius: '4px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '13px', backgroundColor: '#121815', padding: '10px', borderRadius: '4px' }}>
                       <div>
-                        <div style={{ color: '#a8b4ac' }}>Documento</div>
+                        <div style={{ color: '#8f9b93' }}>Documento</div>
                         <div style={{ fontWeight: 600 }}>NFC-e #008419</div>
                       </div>
                       <div>
-                        <div style={{ color: '#a8b4ac' }}>Total Extraído</div>
+                        <div style={{ color: '#8f9b93' }}>Total Extraído</div>
                         <div style={{ fontWeight: 600, color: '#10b981' }}>R$ 68,90</div>
                       </div>
                     </div>
@@ -985,12 +1078,12 @@ export default function HomePage() {
                 </div>
                 <div className="sp-cell-dock">
                   <div data-ui="cell-couple" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
                       <span style={{ fontWeight: 600 }}>Orçamento Compartilhado · Casal</span>
                       <span style={{ color: '#10b981' }}>2 WhatsApps Ativos</span>
                     </div>
-                    <div style={{ display: 'grid', gap: '6px', fontSize: '14px', color: '#d8e1dc' }}>
-                      <div>• Titular: R$ 180,00 (Mercado Itaú)</div>
+                    <div style={{ display: 'grid', gap: '6px', fontSize: '13px', color: '#c4cfc8' }}>
+                      <div>• Você: R$ 180,00 (Mercado Itaú)</div>
                       <div>• Cônjuge: R$ 94,00 (Farmácia Pix)</div>
                     </div>
                   </div>
@@ -999,7 +1092,7 @@ export default function HomePage() {
 
               {/* CELL 6 (Photo Top, Text Bottom): Painel Web Vision & Simplific Empresas */}
               <article className="sp-cell" data-sc-in style={{ '--i': 5 }}>
-                <div style={{ height: '210px', overflow: 'hidden', backgroundColor: '#080908' }}>
+                <div style={{ height: '220px', overflow: 'hidden', backgroundColor: '#080908' }}>
                   <img
                     src="/assets/landing/simplific-assessor-agenda.jpg"
                     alt="Executiva utilizando o ecossistema web e empresarial do Simplific Pro"
@@ -1022,7 +1115,7 @@ export default function HomePage() {
 
         {/* ================= ACT 5: STATS — FIGURE SET BY A SLIDER ================= */}
         <section id="simulador" className="sp-stats" aria-labelledby="stats-heading">
-          <div className="sp-frame" style={{ display: 'flex', flexDirection: 'column', gap: '56px' }}>
+          <div className="sp-frame" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '64px' }}>
             <div style={{ maxWidth: '520px' }} data-sc-in>
               <h2 id="stats-heading" className="sp-h2">
                 Quantos gastos na semana?
@@ -1035,13 +1128,13 @@ export default function HomePage() {
               <div
                 data-ui="stats-slider"
                 className="sp-ui-fragment"
-                style={{ marginTop: '24px', padding: '18px 20px', maxWidth: '420px' }}
+                style={{ marginTop: '28px', padding: '18px 20px', maxWidth: '420px' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
-                  <label htmlFor="weekly-slider" style={{ fontSize: '14px', fontWeight: 500, color: '#d8e1dc' }}>
+                  <label htmlFor="weekly-slider" style={{ fontSize: '14px', fontWeight: 500, color: '#d8e2dc' }}>
                     Lançamentos e recibos por semana
                   </label>
-                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#10b981' }}>
+                  <span style={{ fontSize: '20px', fontWeight: 600, color: '#10b981' }}>
                     {weeklyEntries} / sem
                   </span>
                 </div>
@@ -1055,7 +1148,7 @@ export default function HomePage() {
                   onChange={(e) => setWeeklyEntries(Number(e.target.value))}
                   style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer', height: '24px' }}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#a8b4ac', marginTop: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#8f9b93', marginTop: '4px' }}>
                   <span>5 lançamentos</span>
                   <span>80 lançamentos</span>
                 </div>
@@ -1078,7 +1171,7 @@ export default function HomePage() {
                 <span className="sp-giant-unit">horas livres/ano</span>
               </p>
 
-              <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.55, color: 'var(--body-ink)', maxWidth: '34ch', margin: 0 }}>
+              <p style={{ fontSize: '17px', lineHeight: 1.55, color: 'var(--muted)', maxWidth: '34ch', margin: 0 }}>
                 Calculado sobre {weeklyEntries * 52} registros anuais a 2,4 minutos poupados por conciliação manual, além de cerca de R$ {annualLeakageSaved.toLocaleString('pt-BR')} em taxas e gastos esquecidos evitados.
               </p>
             </div>
@@ -1102,7 +1195,7 @@ export default function HomePage() {
                 <div
                   data-ui="pricing-switcher"
                   className="sp-ui-fragment"
-                  style={{ marginTop: '24px', padding: '6px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}
+                  style={{ marginTop: '28px', padding: '6px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}
                 >
                   <button
                     type="button"
@@ -1115,7 +1208,7 @@ export default function HomePage() {
                       fontWeight: 600,
                       cursor: 'pointer',
                       backgroundColor: billingPlan === 'annual' ? '#10b981' : 'transparent',
-                      color: billingPlan === 'annual' ? '#05120c' : '#d8e1dc'
+                      color: billingPlan === 'annual' ? '#05120c' : '#d8e2dc'
                     }}
                   >
                     Anual · 44% OFF
@@ -1131,14 +1224,14 @@ export default function HomePage() {
                       fontWeight: 600,
                       cursor: 'pointer',
                       backgroundColor: billingPlan === 'monthly' ? '#10b981' : 'transparent',
-                      color: billingPlan === 'monthly' ? '#05120c' : '#d8e1dc'
+                      color: billingPlan === 'monthly' ? '#05120c' : '#d8e2dc'
                     }}
                   >
                     Mensal · Flexível
                   </button>
                 </div>
 
-                <p style={{ fontSize: 'var(--step-small)', color: 'var(--body-ink)', marginTop: '14px', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '14px', color: 'var(--muted)', marginTop: '14px' }}>
                   {billingPlan === 'annual'
                     ? 'Equivalente a R$ 199,00 à vista no ano (economia de R$ 159,80 sobre o mensal).'
                     : 'Assinatura mensal de R$ 29,90 sem fidelidade. Cancele quando quiser em 1 clique.'}
@@ -1147,14 +1240,16 @@ export default function HomePage() {
 
               {/* Right Column (Columns 6-12): Monumental Price Figure Overlapped by Custom Plate */}
               <div style={{ gridColumn: '6 / span 7', position: 'relative' }} data-sc-in>
-                <div style={{ position: 'relative', paddingTop: '12px' }}>
+                <div style={{ position: 'relative', display: 'inline-block', paddingTop: '20px' }}>
+                  {/* Overlapping Custom Brand Photo at top-right of the numerals */}
                   <div
                     style={{
-                      width: '180px',
-                      height: '110px',
+                      width: 'clamp(130px, 16vw, 210px)',
+                      height: 'clamp(90px, 11vw, 140px)',
                       borderRadius: 'var(--radius-page)',
                       overflow: 'hidden',
-                      marginBottom: '-14px',
+                      marginLeft: 'auto',
+                      marginBottom: '-22px',
                       position: 'relative',
                       zIndex: 2
                     }}
@@ -1178,15 +1273,15 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Four Plain Included Lines */}
-                <div style={{ marginTop: '32px', display: 'grid', gap: '12px', fontSize: 'var(--step-body)', color: 'var(--ink)' }}>
+                {/* Four Plain Included Lines (without ticks or bullets per blueprint) */}
+                <div style={{ marginTop: '36px', display: 'grid', gap: '12px', fontSize: '18px', color: 'var(--ink)' }}>
                   <div>Assessor IA 24h no seu WhatsApp e Painel Web Vision completo</div>
                   <div>Leitura ilimitada de fotos de comprovantes, PDFs e comandos de voz</div>
                   <div>Cotações da Bolsa B3 ao vivo, Google Agenda com Meet e Modo Casal</div>
                   <div>Garantia incondicional de 7 dias grátis com reembolso em 1 clique</div>
                 </div>
 
-                <div style={{ marginTop: '32px', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                <div style={{ marginTop: '36px', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
                   <Link
                     to={`/login?tab=register&plan=${billingPlan}`}
                     className="sp-btn-primary"
@@ -1196,7 +1291,7 @@ export default function HomePage() {
                         ? 'Começar 7 dias grátis no Anual'
                         : 'Começar 7 dias grátis no Mensal'}
                     </span>
-                    <ArrowRight size={16} />
+                    <ArrowRight size={17} />
                   </Link>
                   <Link
                     to={`/checkout?plan=${billingPlan}`}
@@ -1209,23 +1304,23 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Security & Verification Split (#seguranca) */}
+            {/* Security & Verification Band (#seguranca) */}
             <div
               id="seguranca"
               style={{
-                marginTop: '88px',
+                marginTop: '96px',
                 backgroundColor: 'var(--surface)',
                 borderRadius: 'var(--radius-page)',
-                padding: '32px'
+                padding: 'clamp(24px, 3.5vw, 40px)'
               }}
               data-sc-in
             >
               <div className="sp-grid-12" style={{ alignItems: 'center' }}>
                 <div style={{ gridColumn: '1 / span 5' }}>
-                  <h3 style={{ fontSize: 'var(--step-h2)', fontWeight: 500, margin: '0 0 12px 0', letterSpacing: '-0.025em' }}>
+                  <h3 style={{ fontSize: '24px', fontWeight: 500, margin: '0 0 10px 0', letterSpacing: '-0.02em' }}>
                     Defesa em profundidade.
                   </h3>
-                  <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.6, color: 'var(--body-ink)', margin: '0 0 16px 0' }}>
+                  <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--muted)', margin: '0 0 16px 0' }}>
                     Criptografia ponta a ponta AES-256, conformidade rigorosa com a LGPD (Lei nº 13.709/2018) e operação sobre infraestrutura oficial verificada.
                   </p>
                   <Link to="/seguranca" className="sp-btn-quiet" style={{ paddingLeft: 0 }}>
@@ -1234,35 +1329,28 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                <div style={{ gridColumn: '6 / span 7' }}>
-                  <div
-                    data-ui="security-ledger-panel"
-                    className="sp-ui-fragment"
-                    style={{ padding: '18px 20px', display: 'grid', gap: '14px' }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src="/assets/logo_meta.png" alt="Meta Tech Provider" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Meta Official WhatsApp API</span>
-                      </div>
-                      <span style={{ fontSize: '14px', color: '#10b981' }}>Canal verificado sem bloqueio</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src="/assets/logo_google.png" alt="Google Cloud" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Google Cloud & Vision AI</span>
-                      </div>
-                      <span style={{ fontSize: '14px', color: '#10b981' }}>Backups diários e isolamento</span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src="/assets/logo_twilio.png" alt="Twilio Security" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Criptografia TLS 1.3 & AES-256</span>
-                      </div>
-                      <span style={{ fontSize: '14px', color: '#10b981' }}>Zero acesso à senha bancária</span>
-                    </div>
+                <div
+                  style={{
+                    gridColumn: '6 / span 7',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: '10px'
+                  }}
+                >
+                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
+                    <img src="/assets/logo_meta.png" alt="Meta Tech Provider" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Meta Official API</div>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Canal verificado sem risco</div>
+                  </div>
+                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
+                    <img src="/assets/logo_google.png" alt="Google Cloud" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Google Cloud</div>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Isolamento e backups diários</div>
+                  </div>
+                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
+                    <img src="/assets/logo_twilio.png" alt="Twilio Security" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Criptografia TLS 1.3</div>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Zero acesso à senha bancária</div>
                   </div>
                 </div>
               </div>
@@ -1281,6 +1369,12 @@ export default function HomePage() {
                 <p className="sp-section-lead">
                   Respostas diretas sobre privacidade, funcionamento no WhatsApp e garantia de reembolso.
                 </p>
+                <div style={{ marginTop: '20px' }}>
+                  <Link to="/contato" className="sp-btn-quiet">
+                    <span>Falar com nossa equipe</span>
+                    <ArrowUpRight size={15} />
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -1292,7 +1386,7 @@ export default function HomePage() {
                   className="sp-faq-tile"
                   open={idx === 0}
                 >
-                  <summary className="sp-faq-summary" role="button">
+                  <summary className="sp-faq-summary">
                     <span>{item.q}</span>
                     <span className="sp-faq-plus" aria-hidden="true" />
                   </summary>
@@ -1324,8 +1418,11 @@ export default function HomePage() {
               <div className="sp-cta-center">
                 <h2
                   id="cta-heading"
-                  className="sp-h2"
                   style={{
+                    fontSize: 'clamp(28px, 3vw, 40px)',
+                    fontWeight: 600,
+                    lineHeight: 1.06,
+                    letterSpacing: '-0.03em',
                     color: '#05120c',
                     margin: '0 0 12px 0'
                   }}
@@ -1334,7 +1431,7 @@ export default function HomePage() {
                 </h2>
                 <p
                   style={{
-                    fontSize: 'var(--step-body)',
+                    fontSize: '17px',
                     lineHeight: 1.55,
                     color: '#07281b',
                     maxWidth: '48ch',
@@ -1368,12 +1465,12 @@ export default function HomePage() {
                     aria-label="Seu melhor e-mail para liberar os 7 dias grátis"
                     style={{
                       flex: 1,
-                      minWidth: '180px',
+                      minWidth: '200px',
                       backgroundColor: 'transparent',
                       border: 0,
                       padding: '10px 12px',
                       color: '#f3f6f4',
-                      fontSize: 'var(--step-small)',
+                      fontSize: '15px',
                       outline: 'none'
                     }}
                   />
@@ -1385,7 +1482,7 @@ export default function HomePage() {
                       border: 0,
                       borderRadius: '4px',
                       padding: '12px 20px',
-                      fontSize: 'var(--step-small)',
+                      fontSize: '15px',
                       fontWeight: 600,
                       cursor: 'pointer',
                       display: 'inline-flex',
@@ -1399,12 +1496,27 @@ export default function HomePage() {
                 </form>
               </div>
 
-              {/* Right Flanking Tile: Pure Flat Palette Surface per Blueprint */}
+              {/* Right Flanking Tile: Flat Palette Surface */}
               <div
                 className="sp-cta-flank"
-                style={{ backgroundColor: 'var(--surface-high)' }}
-                aria-hidden="true"
-              />
+                style={{
+                  backgroundColor: 'var(--surface-high)',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
+                  WhatsApp Oficial 24/7
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: 600, color: 'var(--accent)', letterSpacing: '-0.03em' }}>
+                  7 dias
+                </div>
+                <div style={{ fontSize: '14px', color: 'var(--ink)' }}>
+                  Reembolso integral garantido
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1417,10 +1529,12 @@ export default function HomePage() {
 
           <nav className="sp-footer-links" aria-label="Links Institucionais">
             <Link to="/beneficios" className="sp-footer-link">Benefícios</Link>
-            <Link to="/inteligencia" className="sp-footer-link">Inteligência</Link>
+            <Link to="/inteligencia" className="sp-footer-link">Inteligência IA</Link>
             <Link to="/seguranca" className="sp-footer-link">Segurança</Link>
             <Link to="/planos" className="sp-footer-link">Planos</Link>
+            <Link to="/checkout?plan=annual" className="sp-footer-link">Assinar</Link>
             <Link to="/contato" className="sp-footer-link">Contato</Link>
+            <Link to="/login" className="sp-footer-link">Entrar</Link>
           </nav>
 
           <div style={{ textAlign: 'right' }}>

@@ -1,0 +1,520 @@
+{
+ "url": "http://127.0.0.1:5173/#/planos",
+ "at": "2026-11-03T17:54:13.145Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.9,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 8,
+    "css": 2,
+    "transitions": 6,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2142,
+     "screens": 2.4,
+     "words": 324,
+     "img": 4,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 2,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "simplific-hero-hands.jpg",
+      "simplific-insight.jpg",
+      "simplific-assessor-financeiro.jpg",
+      "simplific-hero.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "16,58",
+     "words": 1,
+     "chars": 5,
+     "lines": 1,
+     "size": 180,
+     "vw": 12.5,
+     "font": "Geist",
+     "weight": 600,
+     "tracking": -0.045,
+     "leading": 0.86,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "right",
+     "widthRatio": 0.31,
+     "top": 145,
+     "tag": "span",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Escolha seu Plano Black.",
+     "words": 4,
+     "lines": 2,
+     "size": 68,
+     "font": "Geist"
+    },
+    "headings": [
+     {
+      "text": "16,58",
+      "words": 1,
+      "chars": 5,
+      "lines": 1,
+      "size": 180,
+      "vw": 12.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 0.86,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.31,
+      "top": 145,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Escolha seu Plano Black.",
+      "words": 4,
+      "chars": 24,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.035,
+      "leading": 1.03,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 145,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "R$",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.225,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.02,
+      "top": 149,
+      "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Tudo liberado desde o dia 1.",
+      "words": 6,
+      "chars": 28,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 987,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Garantia blindada de 7 dias.",
+      "words": 5,
+      "chars": 28,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 1680,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 5,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Geist",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      17,
+      36,
+      68,
+      180
+     ],
+     "sizeCount": 5,
+     "notLoaded": [],
+     "body": {
+      "font": "Geist",
+      "size": 17,
+      "leading": 1.58,
+      "weight": 400,
+      "tracking": -0.014,
+      "contrast": 14.9
+     },
+     "measureChars": 64,
+     "max": {
+      "size": 180,
+      "vw": 12.5,
+      "font": "Geist",
+      "text": "16,58"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.06,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#09090b",
+     "bodyBgHsl": {
+      "h": 240,
+      "s": 0.1,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#080908",
+       "top": 0,
+       "hsl": {
+        "h": 120,
+        "s": 0.06,
+        "l": 0.03
+       }
+      },
+      {
+       "color": "#111513",
+       "top": 883,
+       "hsl": {
+        "h": 150,
+        "s": 0.11,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#f3f6f4",
+       "share": 0.47
+      },
+      {
+       "color": "#d8e1dc",
+       "share": 0.31
+      },
+      {
+       "color": "#10b981",
+       "share": 0.07
+      },
+      {
+       "color": "#07281b",
+       "share": 0.07
+      },
+      {
+       "color": "#05120c",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#10b981",
+      "hsl": {
+       "h": 160,
+       "s": 0.84,
+       "l": 0.39
+      },
+      "fg": "#f3f6f4"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 5,
+     "inHero": 3,
+     "radius": 4,
+     "height": 49,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Testar 7 dias grátis",
+      "Anual · -45% OFF",
+      "Quero o Plano Anual"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 1,
+     "boxRadius": 8,
+     "squareMedia": 0,
+     "roundedMedia": 4,
+     "mediaRadius": 4,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 9,
+     "fixed": false,
+     "height": 89,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "geist"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2142,
+    "margins": {
+     "left": 40,
+     "right": 40
+    },
+    "sections": [
+     {
+      "sel": "section.sp-pricing",
+      "tag": "section",
+      "top": 89,
+      "height": 794,
+      "words": 108,
+      "media": 1,
+      "middle": 84,
+      "heading": {
+       "text": "16,58",
+       "size": 180,
+       "tag": "span"
+      },
+      "left": 40,
+      "right": 66,
+      "textLeft": 40,
+      "textRight": 66,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-showcase",
+      "tag": "section",
+      "top": 883,
+      "height": 642,
+      "words": 141,
+      "media": 1,
+      "middle": 60,
+      "heading": {
+       "text": "Tudo liberado desde o dia 1.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 129,
+      "textLeft": 40,
+      "textRight": 129,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-cta-board",
+      "tag": "section",
+      "top": 1525,
+      "height": 468,
+      "words": 40,
+      "media": 2,
+      "middle": 295,
+      "heading": {
+       "text": "Garantia blindada de 7 dias.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 315,
+      "textRight": 578,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.sp-footer-void",
+      "tag": "footer",
+      "top": 1993,
+      "height": 149,
+      "words": 20,
+      "media": 0,
+      "middle": 159,
+      "heading": null,
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Escolha seu Plano Black.",
+      "size": 68,
+      "top": 145,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 6
+     },
+     {
+      "x": 315,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 8,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.25,
+    "voidBox": {
+     "x": 360,
+     "y": 600,
+     "w": 1080,
+     "h": 300
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Little motion: 8 element(s) moved while the page loaded and scrolled.",
+   "fix": "Give every section an entrance for its parts (not one fade of the whole block) and add one moving picture: a looping clip or a slow move on a photograph."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-planos\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-planos\\desktop-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

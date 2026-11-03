@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import apiService from '../services/api';
-import logo from '../assets/LOGO.png';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import './HomePage.css';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const [status, setStatus] = useState('loading'); // loading, success, error
+  const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState('Verificando sua conta...');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (!token) {
       setStatus('error');
-      setMessage('Nenhum token de verificação foi fornecido.');
+      setMessage('Nenhum token de verificação foi fornecido na URL.');
       return;
     }
 
@@ -34,65 +35,65 @@ const VerifyEmail = () => {
   }, [token]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center font-sans bg-slate-950 p-4">
-      {/* Efeitos de Luz de Fundo (Glow) */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green-500/20 rounded-full blur-[120px] animate-pulse pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
-      
-      <Card className="relative z-10 w-full max-w-md border-0 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
-        {/* Barra superior colorida */}
-        <div className="h-2 w-full bg-gradient-to-r from-green-500 to-emerald-600"></div>
+    <div className="sp-home">
+      <Navbar />
 
-        <CardHeader className="text-center pb-2 pt-8">
-          <div className="flex justify-center mb-6">
-            <div className="p-3 bg-green-50 rounded-2xl shadow-inner">
-              <img src={logo} alt="Simplific Pro" className="h-12 w-auto" />
+      <main>
+        <section className="sp-hero" style={{ paddingBottom: '96px' }} aria-labelledby="verify-heading">
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'start' }}>
+              <div style={{ gridColumn: '1 / span 5' }}>
+                <h1 id="verify-heading" className="sp-h1">
+                  <span className="sp-line"><span>Verificação</span></span>
+                  <span className="sp-line"><span>de e-mail.</span></span>
+                </h1>
+
+                <p className="sp-hero-lead">
+                  Validamos seu endereço de e-mail para liberar o acesso seguro ao Painel Vision e à integração com o Assessor IA no WhatsApp.
+                </p>
+              </div>
+
+              <div style={{ gridColumn: '6 / span 7' }}>
+                <div
+                  data-ui="verify-email-card"
+                  className="sp-ui-fragment"
+                  style={{ padding: '28px', backgroundColor: '#0c100e', display: 'grid', gap: '18px' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #1e2621' }}>
+                    <span style={{ fontSize: '17px', fontWeight: 600, color: '#f3f6f4' }}>
+                      Status da Ativação de Conta
+                    </span>
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: status === 'error' ? '#fca5a5' : '#10b981'
+                      }}
+                    >
+                      {status === 'loading' ? 'Validando Token...' : status === 'success' ? 'Verificado' : 'Token Inválido'}
+                    </span>
+                  </div>
+
+                  <p style={{ margin: 0, fontSize: '17px', color: '#f3f6f4', lineHeight: 1.6 }}>
+                    {message}
+                  </p>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', paddingTop: '8px' }}>
+                    <Link to="/login" className="sp-btn-primary">
+                      <span>Ir para o Login</span>
+                      <ArrowRight size={15} />
+                    </Link>
+                    <Link to="/contato" className="sp-btn-quiet">
+                      <span>Precisa de ajuda? Fale conosco</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
-            Verificação de E-mail
-          </CardTitle>
-        </CardHeader>
+        </section>
+      </main>
 
-        <CardContent className="px-8 pb-8 pt-4 text-center">
-          
-          {status === 'loading' && (
-            <div className="flex flex-col items-center justify-center space-y-4 py-8">
-              <Loader2 className="h-12 w-12 text-emerald-500 animate-spin" />
-              <p className="text-gray-600 font-medium">{message}</p>
-            </div>
-          )}
-
-          {status === 'success' && (
-            <div className="flex flex-col items-center justify-center space-y-4 py-6">
-              <CheckCircle2 className="h-16 w-16 text-green-500" />
-              <p className="text-gray-700 font-medium text-lg">{message}</p>
-              <div className="pt-4 w-full">
-                <Link to="/login">
-                  <Button className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-500/30 rounded-xl transition-all">
-                    Ir para o Login
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {status === 'error' && (
-            <div className="flex flex-col items-center justify-center space-y-4 py-6">
-              <XCircle className="h-16 w-16 text-red-500" />
-              <p className="text-gray-700 font-medium">{message}</p>
-              <div className="pt-4 w-full">
-                <Link to="/login">
-                  <Button variant="outline" className="w-full h-12 text-base rounded-xl border-gray-300 text-gray-700 hover:bg-gray-100 transition-all">
-                    Voltar
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-        </CardContent>
-      </Card>
+      <Footer />
     </div>
   );
 };

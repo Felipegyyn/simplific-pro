@@ -1,0 +1,485 @@
+{
+ "url": "http://127.0.0.1:5173/#/inteligencia",
+ "at": "2026-11-03T17:52:02.441Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.98,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 10,
+    "css": 6,
+    "transitions": 4,
+    "scripted": 0,
+    "videos": 1,
+    "playingVideos": 1
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 2045,
+     "screens": 2.3,
+     "words": 304,
+     "img": 3,
+     "video": 1,
+     "canvas": 0,
+     "svg": 6,
+     "sections": 3,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 2,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 1,
+     "uiPictures": 2,
+     "pictureSamples": [
+      "simplific-assessor-documentos.jpg",
+      "simplific-hero-hands.jpg",
+      "simplific-hero.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Assessor IA no seu WhatsApp.",
+     "words": 5,
+     "chars": 28,
+     "lines": 2,
+     "size": 68,
+     "vw": 4.7,
+     "font": "Geist",
+     "weight": 500,
+     "tracking": -0.035,
+     "leading": 1.03,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.38,
+     "top": 161,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Assessor IA no seu WhatsApp.",
+     "words": 5,
+     "lines": 2,
+     "size": 68,
+     "font": "Geist"
+    },
+    "headings": [
+     {
+      "text": "Assessor IA no seu WhatsApp.",
+      "words": 5,
+      "chars": 28,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.035,
+      "leading": 1.03,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 161,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Dez capacidades nativas.",
+      "words": 3,
+      "chars": 24,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 707,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Coloque a IA para trabalhar.",
+      "words": 5,
+      "chars": 28,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 1596,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 3,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 5,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Geist",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      17,
+      36,
+      68
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": {
+      "font": "Geist",
+      "size": 17,
+      "leading": 1.58,
+      "weight": 400,
+      "tracking": -0.014,
+      "contrast": 14.9
+     },
+     "measureChars": 52,
+     "max": {
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "text": "Assessor IA no"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#09090b",
+     "bodyBgHsl": {
+      "h": 240,
+      "s": 0.1,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#080908",
+       "top": 0,
+       "hsl": {
+        "h": 120,
+        "s": 0.06,
+        "l": 0.03
+       }
+      },
+      {
+       "color": "#111513",
+       "top": 603,
+       "hsl": {
+        "h": 150,
+        "s": 0.11,
+        "l": 0.07
+       }
+      },
+      {
+       "color": "#0c100e",
+       "top": 707,
+       "hsl": {
+        "h": 150,
+        "s": 0.14,
+        "l": 0.05
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#f3f6f4",
+       "share": 0.47
+      },
+      {
+       "color": "#d8e1dc",
+       "share": 0.19
+      },
+      {
+       "color": "#10b981",
+       "share": 0.13
+      },
+      {
+       "color": "#05120c",
+       "share": 0.11
+      },
+      {
+       "color": "#07281b",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#111613",
+      "hsl": {
+       "h": 144,
+       "s": 0.13,
+       "l": 0.08
+      },
+      "fg": "#f3f6f4"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 14,
+     "inHero": 6,
+     "radius": 4,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Testar 7 dias grátis",
+      "Falar com o Simplific",
+      "Enviar",
+      "Registrar receitas e despesas por texto ",
+      "Consultar saldos e status do orçamento e"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 2,
+     "boxRadius": 8,
+     "squareMedia": 1,
+     "roundedMedia": 3,
+     "mediaRadius": 4,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.23
+     }
+    ],
+    "nav": {
+     "links": 9,
+     "fixed": false,
+     "height": 89,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "geist"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 2045,
+    "margins": {
+     "left": 40,
+     "right": 40
+    },
+    "sections": [
+     {
+      "sel": "section.sp-hero",
+      "tag": "section",
+      "top": 89,
+      "height": 514,
+      "words": 102,
+      "media": 1,
+      "middle": 134,
+      "heading": {
+       "text": "Assessor IA no",
+       "size": 68,
+       "tag": "h1"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 87,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-showcase",
+      "tag": "section",
+      "top": 603,
+      "height": 825,
+      "words": 141,
+      "media": 1,
+      "middle": 45,
+      "heading": {
+       "text": "Dez capacidades nativas.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 61,
+      "textLeft": 40,
+      "textRight": 78,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-cta-board",
+      "tag": "section",
+      "top": 1428,
+      "height": 468,
+      "words": 32,
+      "media": 2,
+      "middle": 381,
+      "heading": {
+       "text": "Coloque a IA para trabalhar.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 315,
+      "textRight": 644,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.sp-footer-void",
+      "tag": "footer",
+      "top": 1896,
+      "height": 149,
+      "words": 20,
+      "media": 0,
+      "middle": 159,
+      "heading": null,
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Assessor IA no seu WhatsApp.",
+      "size": 68,
+      "top": 161,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 5
+     },
+     {
+      "x": 315,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 7,
+    "bodySize": 14,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.13,
+    "voidBox": {
+     "x": 0,
+     "y": 540,
+     "w": 1440,
+     "h": 120
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Little motion: 10 element(s) moved while the page loaded and scrolled.",
+   "fix": "Give every section an entrance for its parts (not one fade of the whole block) and add one moving picture: a looping clip or a slow move on a photograph."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-inteligencia\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-inteligencia\\desktop-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

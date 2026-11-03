@@ -257,6 +257,14 @@ const Login = ({ onLogin }) => {
               Simplific <span>Pro</span>
             </b>
           </a>
+          <nav aria-label="Links institucionais" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', fontSize: '13px', marginTop: '10px' }}>
+            <Link to="/" style={{ color: '#d8e1dc', textDecoration: 'none' }}>Início</Link>
+            <Link to="/beneficios" style={{ color: '#d8e1dc', textDecoration: 'none' }}>Benefícios</Link>
+            <Link to="/inteligencia" style={{ color: '#d8e1dc', textDecoration: 'none' }}>Inteligência IA</Link>
+            <Link to="/seguranca" style={{ color: '#d8e1dc', textDecoration: 'none' }}>Segurança</Link>
+            <Link to="/planos" style={{ color: '#10b981', fontWeight: 600, textDecoration: 'none' }}>Planos</Link>
+            <Link to="/contato" style={{ color: '#d8e1dc', textDecoration: 'none' }}>Contato</Link>
+          </nav>
         </header>
 
         {/* Área Central com o Formulário */}

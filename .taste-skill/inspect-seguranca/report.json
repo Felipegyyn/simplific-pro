@@ -1,0 +1,594 @@
+{
+ "url": "http://127.0.0.1:5173/#/seguranca",
+ "at": "2026-11-03T17:54:01.371Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 4,
+   "filled": [
+    0.99,
+    0.98,
+    1,
+    1
+   ],
+   "motion": {
+    "elements": 12,
+    "css": 4,
+    "transitions": 8,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 3110,
+     "screens": 3.5,
+     "words": 427,
+     "img": 7,
+     "video": 0,
+     "canvas": 0,
+     "svg": 3,
+     "sections": 5,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 3,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 1,
+     "pictureSamples": [
+      "simplific-insight.jpg",
+      "simplific-assessor-financeiro.jpg",
+      "simplific-hero.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Defesa total dos seus dados.",
+     "words": 5,
+     "chars": 28,
+     "lines": 2,
+     "size": 68,
+     "vw": 4.7,
+     "font": "Geist",
+     "weight": 500,
+     "tracking": -0.035,
+     "leading": 1.03,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.38,
+     "top": 161,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Defesa total dos seus dados.",
+     "words": 5,
+     "lines": 2,
+     "size": 68,
+     "font": "Geist"
+    },
+    "headings": [
+     {
+      "text": "Defesa total dos seus dados.",
+      "words": 5,
+      "chars": 28,
+      "lines": 2,
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.035,
+      "leading": 1.03,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 161,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Jornada do dado seguro.",
+      "words": 4,
+      "chars": 23,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 815,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Canal Oficial WhatsApp API",
+      "words": 4,
+      "chars": 26,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.5,
+      "top": 847,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Seus dados são seus.",
+      "words": 4,
+      "chars": 20,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.46,
+      "top": 1542,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Dúvidas de segurança.",
+      "words": 3,
+      "chars": 21,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 1938,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Segurança é nossa premissa.",
+      "words": 4,
+      "chars": 27,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.32,
+      "top": 2661,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 6,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Geist",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      14,
+      17,
+      36,
+      68
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": {
+      "font": "Geist",
+      "size": 17,
+      "leading": 1.58,
+      "weight": 400,
+      "tracking": -0.014,
+      "contrast": 14.9
+     },
+     "measureChars": 72,
+     "max": {
+      "size": 68,
+      "vw": 4.7,
+      "font": "Geist",
+      "text": "Defesa total"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#09090b",
+     "bodyBgHsl": {
+      "h": 240,
+      "s": 0.1,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#080908",
+       "top": 0,
+       "hsl": {
+        "h": 120,
+        "s": 0.06,
+        "l": 0.03
+       }
+      },
+      {
+       "color": "#111513",
+       "top": 1421,
+       "hsl": {
+        "h": 150,
+        "s": 0.11,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#d8e1dc",
+       "share": 0.5
+      },
+      {
+       "color": "#f3f6f4",
+       "share": 0.19
+      },
+      {
+       "color": "#a8b4ac",
+       "share": 0.1
+      },
+      {
+       "color": "#062519",
+       "share": 0.07
+      },
+      {
+       "color": "#10b981",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#111513",
+      "hsl": {
+       "h": 150,
+       "s": 0.11,
+       "l": 0.07
+      },
+      "fg": "#f3f6f4"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 7,
+     "inHero": 2,
+     "radius": 4,
+     "height": 75,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Testar 7 dias grátis",
+      "Começar com proteção total"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 8,
+     "squareMedia": 1,
+     "roundedMedia": 2,
+     "mediaRadius": 4,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.28
+     }
+    ],
+    "nav": {
+     "links": 9,
+     "fixed": false,
+     "height": 89,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "geist"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 3110,
+    "margins": {
+     "left": 40,
+     "right": 40
+    },
+    "sections": [
+     {
+      "sel": "section.sp-hero",
+      "tag": "section",
+      "top": 89,
+      "height": 598,
+      "words": 104,
+      "media": 1,
+      "middle": 104,
+      "heading": {
+       "text": "Defesa total",
+       "size": 68,
+       "tag": "h1"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 89,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-routine-act",
+      "tag": "section",
+      "top": 687,
+      "height": 734,
+      "words": 108,
+      "media": 0,
+      "middle": 56,
+      "heading": {
+       "text": "Jornada do dado seguro.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 76,
+      "textLeft": 40,
+      "textRight": 76,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-showcase",
+      "tag": "section",
+      "top": 1421,
+      "height": 405,
+      "words": 85,
+      "media": 0,
+      "middle": 229,
+      "heading": {
+       "text": "Seus dados são seus.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 65,
+      "textLeft": 40,
+      "textRight": 65,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-faq",
+      "tag": "section",
+      "top": 1826,
+      "height": 667,
+      "words": 203,
+      "media": 0,
+      "middle": 37,
+      "heading": {
+       "text": "Dúvidas de segurança.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 362,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.sp-cta-board",
+      "tag": "section",
+      "top": 2493,
+      "height": 468,
+      "words": 30,
+      "media": 2,
+      "middle": 364,
+      "heading": {
+       "text": "Segurança é nossa premissa.",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 40,
+      "right": 40,
+      "textLeft": 315,
+      "textRight": 627,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "footer.sp-footer-void",
+      "tag": "footer",
+      "top": 2961,
+      "height": 149,
+      "words": 20,
+      "media": 0,
+      "middle": 159,
+      "heading": null,
+      "left": 40,
+      "right": 40,
+      "textLeft": 40,
+      "textRight": 40,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Defesa total dos seus dados.",
+      "size": 68,
+      "top": 161,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 40,
+      "n": 9
+     },
+     {
+      "x": 315,
+      "n": 2
+     },
+     {
+      "x": 649,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 13,
+    "bodySize": 17,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.2,
+    "voidBox": {
+     "x": 0,
+     "y": 600,
+     "w": 1440,
+     "h": 180
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "still-page",
+   "width": 1440,
+   "message": "Little motion: 12 element(s) moved while the page loaded and scrolled.",
+   "fix": "Give every section an entrance for its parts (not one fade of the whole block) and add one moving picture: a looping clip or a slow move on a photograph."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-seguranca\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\felipe.oliveira\\.gemini\\antigravity-ide\\scratch\\simplific-pro\\.taste-skill\\inspect-seguranca\\desktop-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

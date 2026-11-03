@@ -1,44 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { ShieldCheck, Lock, User, CreditCard, MapPin, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
+import './HomePage.css';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const isAnnual = searchParams.get('plan') === 'annual';
-  
-  // Preço Base
-  const totalAmount = isAnnual ? 199.90 : 29.90;
-  
-  // Estado para parcelas (Padrão 1x)
-  const [installments, setInstallments] = useState(1);
-  
-  // Calcula valor da parcela atual
-  const installmentValue = totalAmount / installments;
+  const initialAnnual = searchParams.get('plan') === 'annual';
 
-  // Se mudar de plano, reseta para 1x
+  const [isAnnual, setIsAnnual] = useState(initialAnnual);
+  const [installments, setInstallments] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    cpfCnpj: '',
+    mobilePhone: '',
+    postalCode: '',
+    addressNumber: '',
+    cardHolderName: '',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCcv: ''
+  });
+
+  useEffect(() => {
+    setIsAnnual(searchParams.get('plan') === 'annual');
+  }, [location.search]);
+
   useEffect(() => {
     setInstallments(1);
   }, [isAnnual]);
 
-  const planName = isAnnual 
-    ? "Plano Anual (12 Meses)" 
-    : "Plano Mensal - Recorrente";
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-  const [loading, setLoading] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false); // NOVO: Aceite de termos
-  const [formData, setFormData] = useState({
-    name: '', email: '', cpfCnpj: '', mobilePhone: '', 
-    postalCode: '', addressNumber: '',
-    cardHolderName: '', cardNumber: '', cardExpiry: '', cardCcv: ''
-  });
+  const totalAmount = isAnnual ? 199.90 : 29.90;
+  const installmentValue = totalAmount / installments;
+  const planName = isAnnual ? 'Plano Anual (12 Meses)' : 'Plano Mensal · Recorrente';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleExpiryChange = (e) => {
@@ -46,36 +56,45 @@ const Checkout = () => {
     if (val.length >= 2) {
       val = val.substring(0, 2) + '/' + val.substring(2, 4);
     }
-    setFormData(prev => ({ ...prev, cardExpiry: val }));
+    setFormData((prev) => ({ ...prev, cardExpiry: val }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setStatusMessage(null);
 
     if (!termsAccepted) {
-      alert("Você precisa concordar com os Termos de Uso e Política de Privacidade para prosseguir.");
+      setStatusMessage({
+        type: 'error',
+        text: 'Você precisa concordar com os Termos de Uso e Política de Privacidade para prosseguir.'
+      });
       setLoading(false);
       return;
     }
 
     if (!formData.name || !formData.email || !formData.cpfCnpj || !formData.cardNumber || !formData.cardCcv) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
+      setStatusMessage({
+        type: 'error',
+        text: 'Por favor, preencha todos os campos obrigatórios.'
+      });
       setLoading(false);
       return;
     }
 
     const [expMonth, expYear] = formData.cardExpiry.split('/');
-    if (!expMonth || !expYear || expMonth > 12) {
-       alert("Data de validade inválida. Use MM/AA.");
-       setLoading(false);
-       return;
+    if (!expMonth || !expYear || Number(expMonth) > 12) {
+      setStatusMessage({
+        type: 'error',
+        text: 'Data de validade inválida. Use o formato MM/AA.'
+      });
+      setLoading(false);
+      return;
     }
 
-    // Payload para o Backend
     const payload = {
       plan_type: isAnnual ? 'yearly' : 'monthly',
-      installments: parseInt(installments),
+      installments: parseInt(installments, 10),
       payer: {
         name: formData.name,
         email: formData.email,
@@ -97,245 +116,417 @@ const Checkout = () => {
       const response = await fetch('https://simplificpro-backend.onrender.com/api/payment/process_subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
 
       if (response.ok) {
         if (window.fbq) window.fbq('track', 'Purchase', { value: totalAmount, currency: 'BRL' });
-        alert("Sucesso! Acesso liberado. Verifique seu e-mail.");
-        navigate('/login');
+        setStatusMessage({
+          type: 'success',
+          text: 'Assinatura confirmada! Acesso liberado. Verifique seu e-mail.'
+        });
+        setTimeout(() => navigate('/login'), 1800);
       } else {
-        console.error("Erro Pagamento:", data);
-        alert(`Pagamento recusado: ${data.detail || data.message || "Verifique os dados."}`);
+        setStatusMessage({
+          type: 'error',
+          text: `Pagamento recusado: ${data.detail || data.message || 'Verifique os dados informados.'}`
+        });
       }
     } catch (error) {
-      console.error("Erro Conexão:", error);
-      alert("Erro de comunicação com o servidor.");
+      setStatusMessage({
+        type: 'error',
+        text: 'Erro de comunicação com o servidor de pagamentos. Tente novamente em instantes.'
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // Estilos comuns para inputs (Dark Theme)
-  const inputClass = "w-full p-3 bg-black border border-gray-800 rounded-lg text-white placeholder-gray-600 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all";
+  const fieldStyle = {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '11px 14px',
+    backgroundColor: '#080a09',
+    border: '1px solid #242e28',
+    borderRadius: '4px',
+    color: '#f3f6f4',
+    fontSize: '14px',
+    outline: 'none'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#d8e1dc',
+    marginBottom: '6px'
+  };
 
   return (
-    <div className="min-h-screen bg-black font-sans text-gray-100 selection:bg-green-500 selection:text-black">
-      <div className="bg-black/90 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <Navbar />
-      </div>
+    <div className="sp-home">
+      <Navbar />
 
-      <div className="flex-grow container mx-auto px-4 py-12">
-        <form onSubmit={handleSubmit} className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
-          
-          {/* ESQUERDA: DADOS PESSOAIS */}
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Finalizar Assinatura</h1>
-              <p className="text-gray-400">Você está a um passo de organizar sua vida financeira.</p>
-            </div>
+      <main>
+        <section className="sp-hero" style={{ paddingBottom: '96px' }} aria-labelledby="checkout-heading">
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'start' }}>
+              {/* Left Column: Summary & Plan Selector */}
+              <div style={{ gridColumn: '1 / span 5' }}>
+                <h1 id="checkout-heading" className="sp-h1">
+                  <span className="sp-line"><span>Finalizar sua</span></span>
+                  <span className="sp-line"><span>assinatura.</span></span>
+                </h1>
 
-            {/* RESUMO DO PLANO (DARK) */}
-            <div className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-2xl relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-green-500 to-emerald-700"></div>
-               <div className="relative z-10">
-                 <div className="flex justify-between items-start mb-4">
+                <p className="sp-hero-lead">
+                  Você está a um passo de conectar o Assessor IA ao seu WhatsApp e liberar o Painel Vision completo com garantia incondicional de 7 dias.
+                </p>
+
+                <div
+                  data-ui="checkout-summary-card"
+                  className="sp-ui-fragment"
+                  style={{ padding: '22px', backgroundColor: '#0c100e', marginTop: '24px' }}
+                >
+                  <div
+                    role="group"
+                    aria-label="Alternar ciclo de cobrança"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '8px',
+                      marginBottom: '18px'
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setIsAnnual(true)}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '4px',
+                        border: '1px solid',
+                        borderColor: isAnnual ? '#10b981' : '#242e28',
+                        backgroundColor: isAnnual ? '#10b981' : '#121714',
+                        color: isAnnual ? '#05120c' : '#f3f6f4',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Plano Anual · -45% OFF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAnnual(false)}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '4px',
+                        border: '1px solid',
+                        borderColor: !isAnnual ? '#10b981' : '#242e28',
+                        backgroundColor: !isAnnual ? '#10b981' : '#121714',
+                        color: !isAnnual ? '#05120c' : '#f3f6f4',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Plano Mensal
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
-                        <p className="text-green-500 text-xs font-bold uppercase tracking-widest mb-1">Resumo do Pedido</p>
-                        <h2 className="text-2xl font-bold text-white">{planName}</h2>
+                      <div style={{ color: '#10b981', fontWeight: 600 }}>Resumo do Pedido</div>
+                      <div style={{ fontSize: '20px', fontWeight: 600, color: '#f3f6f4', marginTop: '4px' }}>
+                        {planName}
+                      </div>
                     </div>
-                    {isAnnual && <span className="bg-green-900/30 text-green-400 text-xs font-bold px-3 py-1 rounded-full border border-green-500/20">45% OFF</span>}
-                 </div>
-                 
-                 <div className="mt-6 pt-6 border-t border-gray-800">
-                    <div className="flex justify-between items-end">
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: '#a8b4ac' }}>Valor Total</div>
+                      <div style={{ fontSize: '28px', fontWeight: 600, color: '#10b981' }}>
+                        R$ {totalAmount.toFixed(2).replace('.', ',')}
+                      </div>
+                    </div>
+                  </div>
+
+                  {isAnnual && (
+                    <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #1e2621' }}>
+                      <label htmlFor="checkout-installments" style={labelStyle}>
+                        Opções de Parcelamento no Cartão
+                      </label>
+                      <select
+                        id="checkout-installments"
+                        value={installments}
+                        onChange={(e) => setInstallments(Number(e.target.value))}
+                        style={fieldStyle}
+                      >
+                        <option value={1}>À vista (1x de R$ {totalAmount.toFixed(2).replace('.', ',')})</option>
+                        <option value={2}>2x de R$ {(totalAmount / 2).toFixed(2).replace('.', ',')}</option>
+                        <option value={3}>3x de R$ {(totalAmount / 3).toFixed(2).replace('.', ',')}</option>
+                        <option value={4}>4x de R$ {(totalAmount / 4).toFixed(2).replace('.', ',')}</option>
+                        <option value={5}>5x de R$ {(totalAmount / 5).toFixed(2).replace('.', ',')}</option>
+                        <option value={6}>6x de R$ {(totalAmount / 6).toFixed(2).replace('.', ',')}</option>
+                        <option value={10}>10x de R$ {(totalAmount / 10).toFixed(2).replace('.', ',')}</option>
+                        <option value={12}>12x de R$ {(totalAmount / 12).toFixed(2).replace('.', ',')}</option>
+                      </select>
+                    </div>
+                  )}
+
+                  <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #1e2621', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', color: '#a8b4ac' }}>
+                    <span>Ambiente Seguro 256-bit SSL</span>
+                    <span style={{ color: '#10b981', fontWeight: 600 }}>Processado por Asaas · 7 dias de garantia</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Payment & Holder Form */}
+              <div style={{ gridColumn: '6 / span 7' }}>
+                <form
+                  onSubmit={handleSubmit}
+                  data-ui="checkout-payment-form"
+                  className="sp-ui-fragment"
+                  style={{ padding: '28px', backgroundColor: '#0c100e', display: 'grid', gap: '20px' }}
+                >
+                  {statusMessage && (
+                    <div
+                      role="alert"
+                      style={{
+                        padding: '12px 16px',
+                        borderRadius: '4px',
+                        backgroundColor: statusMessage.type === 'success' ? '#0d281e' : '#2a1215',
+                        border: `1px solid ${statusMessage.type === 'success' ? '#10b981' : '#f87171'}`,
+                        color: statusMessage.type === 'success' ? '#10b981' : '#fca5a5',
+                        fontWeight: 500
+                      }}
+                    >
+                      {statusMessage.text}
+                    </div>
+                  )}
+
+                  <div>
+                    <div style={{ fontSize: '17px', fontWeight: 600, color: '#f3f6f4', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid #1e2621' }}>
+                      1. Dados do Titular e Endereço
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <div>
+                        <label htmlFor="chk-name" style={labelStyle}>Nome Completo</label>
+                        <input
+                          id="chk-name"
+                          type="text"
+                          name="name"
+                          required
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Ex: João da Silva"
+                          style={fieldStyle}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="chk-email" style={labelStyle}>E-mail de Acesso</label>
+                        <input
+                          id="chk-email"
+                          type="email"
+                          name="email"
+                          required
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="seu@email.com"
+                          style={fieldStyle}
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
                         <div>
-                            <p className="text-gray-500 text-sm mb-1">Valor Total</p>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-gray-400 font-medium">R$</span>
-                                <p className="text-4xl font-bold text-white tracking-tight">{totalAmount.toFixed(2).replace('.', ',')}</p>
-                            </div>
+                          <label htmlFor="chk-cpf" style={labelStyle}>CPF ou CNPJ</label>
+                          <input
+                            id="chk-cpf"
+                            type="text"
+                            name="cpfCnpj"
+                            required
+                            maxLength="18"
+                            value={formData.cpfCnpj}
+                            onChange={handleInputChange}
+                            placeholder="000.000.000-00"
+                            style={fieldStyle}
+                          />
                         </div>
-                        <div className="text-right">
-                             {/* SELETOR DE PARCELAS */}
-                             {isAnnual ? (
-                                 <div className="flex flex-col items-end">
-                                     <label className="text-xs text-green-500 font-bold mb-2 uppercase tracking-wide">Parcelamento</label>
-                                     <div className="relative">
-                                         <select 
-                                            value={installments}
-                                            onChange={(e) => setInstallments(e.target.value)}
-                                            className="appearance-none bg-gray-950 text-white text-sm font-medium pl-4 pr-10 py-2.5 rounded-lg border border-gray-700 hover:border-green-500 cursor-pointer outline-none focus:ring-1 focus:ring-green-500 transition-all"
-                                         >
-                                             <option value="1">À vista (1x)</option>
-                                             <option value="2">2x de R$ {(totalAmount/2).toFixed(2)}</option>
-                                             <option value="3">3x de R$ {(totalAmount/3).toFixed(2)}</option>
-                                             <option value="4">4x de R$ {(totalAmount/4).toFixed(2)}</option>
-                                             <option value="5">5x de R$ {(totalAmount/5).toFixed(2)}</option>
-                                             <option value="6">6x de R$ {(totalAmount/6).toFixed(2)}</option>
-                                             <option value="10">10x de R$ {(totalAmount/10).toFixed(2)}</option>
-                                             <option value="12">12x de R$ {(totalAmount/12).toFixed(2)}</option>
-                                         </select>
-                                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-green-500">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                          </div>
-                                     </div>
-                                 </div>
-                             ) : (
-                                 <span className="text-gray-400 text-sm font-medium">Cobrança Mensal</span>
-                             )}
+                        <div>
+                          <label htmlFor="chk-phone" style={labelStyle}>Celular (WhatsApp)</label>
+                          <input
+                            id="chk-phone"
+                            type="tel"
+                            name="mobilePhone"
+                            required
+                            value={formData.mobilePhone}
+                            onChange={handleInputChange}
+                            placeholder="(11) 99999-9999"
+                            style={fieldStyle}
+                          />
                         </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <label htmlFor="chk-cep" style={labelStyle}>CEP</label>
+                          <input
+                            id="chk-cep"
+                            type="text"
+                            name="postalCode"
+                            required
+                            maxLength="9"
+                            value={formData.postalCode}
+                            onChange={handleInputChange}
+                            placeholder="00000-000"
+                            style={fieldStyle}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="chk-num" style={labelStyle}>Número da Residência</label>
+                          <input
+                            id="chk-num"
+                            type="text"
+                            name="addressNumber"
+                            required
+                            value={formData.addressNumber}
+                            onChange={handleInputChange}
+                            placeholder="Ex: 123"
+                            style={fieldStyle}
+                          />
+                        </div>
+                      </div>
                     </div>
-                 </div>
-               </div>
-               {/* Background Glow */}
-               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-green-500/10 blur-[50px] rounded-full pointer-events-none"></div>
-            </div>
-
-            {/* FORMULÁRIO DADOS PESSOAIS */}
-            <div className="bg-gray-900/50 border border-gray-800 p-8 rounded-2xl space-y-6">
-              <h3 className="font-bold text-white border-b border-gray-800 pb-4 flex items-center gap-2">
-                <User size={18} className="text-green-500"/> Dados do Titular
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">Nome Completo</label>
-                    <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className={inputClass} placeholder="Ex: João da Silva" />
-                </div>
-                
-                <div className="space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">E-mail</label>
-                    <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className={inputClass} placeholder="seu@email.com" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">CPF/CNPJ</label>
-                    <input type="text" name="cpfCnpj" required maxLength="18" value={formData.cpfCnpj} onChange={handleInputChange} className={inputClass} placeholder="000.000.000-00" />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">Celular</label>
-                    <input type="tel" name="mobilePhone" required value={formData.mobilePhone} onChange={handleInputChange} className={inputClass} placeholder="(00) 00000-0000" />
+
+                  <div>
+                    <div style={{ fontSize: '17px', fontWeight: 600, color: '#f3f6f4', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid #1e2621' }}>
+                      2. Dados do Cartão de Crédito
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '14px' }}>
+                      <div>
+                        <label htmlFor="chk-card-num" style={labelStyle}>Número do Cartão</label>
+                        <input
+                          id="chk-card-num"
+                          type="text"
+                          name="cardNumber"
+                          required
+                          maxLength="19"
+                          value={formData.cardNumber}
+                          onChange={handleInputChange}
+                          placeholder="0000 0000 0000 0000"
+                          style={fieldStyle}
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="chk-card-holder" style={labelStyle}>Nome Impresso no Cartão</label>
+                        <input
+                          id="chk-card-holder"
+                          type="text"
+                          name="cardHolderName"
+                          required
+                          value={formData.cardHolderName}
+                          onChange={handleInputChange}
+                          placeholder="COMO NO CARTÃO"
+                          style={fieldStyle}
+                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <label htmlFor="chk-expiry" style={labelStyle}>Validade (MM/AA)</label>
+                          <input
+                            id="chk-expiry"
+                            type="text"
+                            name="cardExpiry"
+                            required
+                            maxLength="5"
+                            value={formData.cardExpiry}
+                            onChange={handleExpiryChange}
+                            placeholder="MM/AA"
+                            style={fieldStyle}
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="chk-ccv" style={labelStyle}>Código de Segurança (CCV)</label>
+                          <input
+                            id="chk-ccv"
+                            type="password"
+                            name="cardCcv"
+                            required
+                            maxLength="4"
+                            value={formData.cardCcv}
+                            onChange={handleInputChange}
+                            placeholder="123"
+                            style={fieldStyle}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <h3 className="font-bold text-white border-b border-gray-800 pb-4 pt-4 flex items-center gap-2">
-                <MapPin size={18} className="text-green-500"/> Endereço
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
-                 <div className="col-span-1 space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">CEP</label>
-                    <input type="text" name="postalCode" required maxLength="9" value={formData.postalCode} onChange={handleInputChange} className={inputClass} placeholder="00000-000" />
-                 </div>
-                 <div className="col-span-2 space-y-1">
-                    <label className="text-xs text-gray-500 ml-1">Número</label>
-                    <input type="text" name="addressNumber" required value={formData.addressNumber} onChange={handleInputChange} className={inputClass} placeholder="Ex: 123" />
-                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* DIREITA: CARTÃO DE CRÉDITO */}
-          <div className="space-y-6">
-            <div className="bg-gray-900 border border-gray-800 p-8 rounded-2xl shadow-2xl h-fit sticky top-28">
-              <div className="flex items-center gap-2 mb-8 text-white font-bold border-b border-gray-800 pb-4">
-                <Lock size={18} className="text-green-500" /> Pagamento Seguro
-              </div>
-
-              <div className="space-y-5">
-                 <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-500 ml-1">Número do Cartão</label>
-                    <div className="relative">
-                      <CreditCard className="absolute left-3 top-3.5 text-gray-500" size={20}/>
-                      <input type="text" name="cardNumber" placeholder="0000 0000 0000 0000" required maxLength="19" value={formData.cardNumber} onChange={handleInputChange} className={`${inputClass} pl-10 font-mono tracking-wide`} />
-                    </div>
-                 </div>
-
-                 <div className="space-y-1">
-                    <label className="text-xs font-bold text-gray-500 ml-1">Nome Impresso</label>
-                    <input type="text" name="cardHolderName" placeholder="COMO NO CARTAO" required value={formData.cardHolderName} onChange={handleInputChange} className={`${inputClass} uppercase`} />
-                 </div>
-
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-500 ml-1">Validade</label>
-                        <div className="relative">
-                           <Calendar className="absolute left-3 top-3.5 text-gray-500" size={18}/>
-                           <input type="text" name="cardExpiry" placeholder="MM/AA" required maxLength="5" value={formData.cardExpiry} onChange={handleExpiryChange} className={`${inputClass} pl-10 text-center`} />
-                        </div>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-500 ml-1">CCV</label>
-                        <div className="relative">
-                           <Lock className="absolute left-3 top-3.5 text-gray-500" size={18}/>
-                           <input type="password" name="cardCcv" placeholder="123" required maxLength="4" value={formData.cardCcv} onChange={handleInputChange} className={`${inputClass} pl-10 text-center`} />
-                        </div>
-                    </div>
-                 </div>
-
-                 {/* Checkbox de Termos (Obrigatório Klavi/LGPD) */}
-                 <div className="mt-6 bg-gray-900 border border-gray-800 p-4 rounded-xl flex items-start gap-3">
-                    <input 
-                      type="checkbox" 
-                      id="terms" 
-                      className="mt-1 w-5 h-5 accent-green-500 bg-gray-800 border-gray-700 rounded cursor-pointer"
+                  {/* Mandatory LGPD & Terms Consent */}
+                  <div
+                    style={{
+                      padding: '14px',
+                      backgroundColor: '#111613',
+                      border: '1px solid #1f2823',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      id="terms"
                       checked={termsAccepted}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
+                      style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }}
                     />
-                    <label htmlFor="terms" className="text-xs text-gray-400 leading-relaxed cursor-pointer select-none">
-                      Li e concordo com os <a href="#/termos" target="_blank" className="text-green-500 hover:underline font-bold">Termos de Uso</a> e a <a href="#/privacidade" target="_blank" className="text-green-500 hover:underline font-bold">Política de Privacidade</a> do Simplific Pro, autorizando o tratamento dos meus dados para a prestação dos serviços.
+                    <label htmlFor="terms" style={{ color: '#d8e1dc', lineHeight: 1.5, cursor: 'pointer' }}>
+                      Li e concordo com os{' '}
+                      <Link to="/termos" style={{ color: '#10b981', fontWeight: 600 }}>
+                        Termos de Uso
+                      </Link>{' '}
+                      e a{' '}
+                      <Link to="/privacidade" style={{ color: '#10b981', fontWeight: 600 }}>
+                        Política de Privacidade
+                      </Link>{' '}
+                      do Simplific Pro, autorizando o tratamento dos meus dados para a prestação dos serviços.
                     </label>
-                 </div>
+                  </div>
 
-                 <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={loading || !termsAccepted}
-                    className={`w-full py-5 rounded-xl font-bold text-black text-lg mt-4 transition-all flex flex-col items-center justify-center shadow-lg hover:-translate-y-1
-                      ${(loading || !termsAccepted) ? 'bg-gray-700 cursor-not-allowed text-gray-400 shadow-none' : 'bg-green-500 hover:bg-green-400 hover:shadow-green-900/20'}
-                    `}
-                 >
-                    {loading ? (
-                        <span>Processando...</span>
-                    ) : (
-                        <>
-                            <span className="flex items-center gap-2">Pagar R$ {totalAmount.toFixed(2).replace('.', ',')} <ArrowRight size={18}/></span>
-                            {installments > 1 && (
-                                <span className="text-xs font-normal opacity-80 mt-0.5">
-                                    em {installments}x de R$ {installmentValue.toFixed(2).replace('.', ',')}
-                                </span>
-                            )}
-                        </>
-                    )}
-                 </button>
-
-                 <div className="mt-6 border-t border-gray-800 pt-4 flex flex-col items-center gap-3">
-                    <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                        <ShieldCheck size={14} className="text-green-500"/> Ambiente Seguro 256-bit SSL
-                    </div>
-                    
-                    {/* INFO ASAAS */}
-                    <div className="flex items-center gap-2 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                        <span className="text-[10px] text-gray-600 uppercase tracking-widest">Processado por</span>
-                        {/* Logo Asaas (Texto estilizado simulando logo) */}
-                        <div className="flex items-center gap-1 font-bold text-gray-400 text-sm tracking-tight">
-                            <div className="w-3 h-3 bg-blue-900 rounded-sm"></div> asaas
-                        </div>
-                    </div>
-                 </div>
+                    className="sp-btn-primary"
+                    style={{
+                      width: '100%',
+                      padding: '16px 24px',
+                      opacity: loading || !termsAccepted ? 0.55 : 1,
+                      cursor: loading || !termsAccepted ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    <span>
+                      {loading
+                        ? 'Processando pagamento seguro...'
+                        : `Pagar R$ ${totalAmount.toFixed(2).replace('.', ',')}${
+                            installments > 1 ? ` (em ${installments}x de R$ ${installmentValue.toFixed(2).replace('.', ',')})` : ''
+                          }`}
+                    </span>
+                    <ArrowRight size={16} />
+                  </button>
+                </form>
               </div>
             </div>
           </div>
+        </section>
+      </main>
 
-        </form>
-      </div>
-      
-      <div className="bg-black border-t border-gray-900 pt-10">
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 };

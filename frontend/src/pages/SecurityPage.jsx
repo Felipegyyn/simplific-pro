@@ -1,349 +1,444 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { 
-  ShieldCheck, Lock, Server, EyeOff, FileKey, 
-  CheckCircle, Smartphone, Database, 
-  Activity, Users, Fingerprint, AlertTriangle, Key, BadgeCheck
-} from 'lucide-react';
+import './HomePage.css';
+
+const VERIFIED_PARTNERS = [
+  {
+    name: 'Meta Business',
+    badge: 'Verificação Concluída',
+    desc: 'Identidade empresarial validada para operação oficial na WhatsApp Business API.',
+    logo: '/assets/logo_meta.png'
+  },
+  {
+    name: 'Twilio Tech',
+    badge: 'Parceiro Oficial',
+    desc: 'Infraestrutura global de mensageria criptografada com alta disponibilidade.',
+    logo: '/assets/logo_twilio.png'
+  },
+  {
+    name: 'Google Cloud',
+    badge: 'Ambiente Isolado',
+    desc: 'Servidores blindados com backups diários e criptografia em repouso AES-256.',
+    logo: '/assets/logo_google.png'
+  },
+  {
+    name: 'Reclame Aqui',
+    badge: 'RA Verificada',
+    desc: 'Empresa auditada e comprometida com transparência radical no atendimento.',
+    logo: '/assets/logo_reclameaqui.png'
+  }
+];
+
+const DATA_JOURNEY = [
+  {
+    stage: 'Etapa 1 · Coleta Segura',
+    title: 'Canal Oficial WhatsApp API',
+    detail:
+      'Você envia áudio, texto ou foto pelo WhatsApp. A comunicação trafega sob a criptografia oficial da Meta (WhatsApp Business API) e TLS 1.3.',
+    protocol: 'TLS 1.3 + Meta Official Webhook'
+  },
+  {
+    stage: 'Etapa 2 · Anonimização',
+    title: 'Separação de Identidade',
+    detail:
+      'Ao chegar em nossos servidores, dados identificadores (como telefone e e-mail) são desacoplados dos payloads de processamento da Inteligência Artificial.',
+    protocol: 'Zero-Training PII Isolation'
+  },
+  {
+    stage: 'Etapa 3 · Armazenamento',
+    title: 'Bancos Isolados no Google Cloud',
+    detail:
+      'Os registros financeiros são persistidos em instâncias isoladas no Google Cloud, criptografados em repouso no padrão militar AES-256.',
+    protocol: 'AES-256 Encryption at Rest'
+  },
+  {
+    stage: 'Etapa 4 · Acesso Restrito',
+    title: 'Leitura Exclusiva (Read-Only)',
+    detail:
+      'Nenhum humano tem acesso aos seus dados brutos e o sistema jamais solicita sua senha de transação bancária. Apenas você visualiza seu dashboard.',
+    protocol: 'Least-Privilege & Hash Bcrypt'
+  }
+];
+
+const SECURITY_FAQ = [
+  {
+    q: 'O Simplific pode movimentar meu dinheiro?',
+    a: 'Absolutamente não. Nossa tecnologia opera exclusivamente em modo de leitura e organização (Read-Only). Nós estruturamos as informações que você registra ou consulta, mas não possuímos permissão técnica nem credenciais para realizar TEDs, Pix ou pagamentos em seu nome.'
+  },
+  {
+    q: 'E se eu perder meu celular?',
+    a: 'Seu acesso ao Painel Web do Simplific Pro é protegido por autenticação própria criptografada. Mesmo que terceiros tenham acesso temporário ao aparelho, não conseguirão acessar seu painel administrativo nem movimentar qualquer conta bancária.'
+  },
+  {
+    q: 'Como excluo meus dados definitivamente (LGPD)?',
+    a: 'Em conformidade rigorosa com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você dispõe do comando de exclusão de conta nas configurações. Seus dados são imediatamente removidos do painel e agendados para exclusão definitiva (Hard Delete) em até 30 dias.'
+  },
+  {
+    q: 'Como reportar uma vulnerabilidade (White Hat)?',
+    a: 'Valorizamos pesquisadores de segurança. Caso identifique qualquer anomalia ou oportunidade de reforço em nossa infraestrutura, envie um relatório direto para nossa equipe de engenharia em contato@simplificpro.com.'
+  }
+];
 
 const SecurityPage = () => {
   const navigate = useNavigate();
+  const [stepIdx, setStepIdx] = useState(0);
+
+  const activeStep = DATA_JOURNEY[stepIdx];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const els = document.querySelectorAll('[data-sc-in]');
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-black font-sans text-gray-100 selection:bg-green-500 selection:text-black overflow-x-hidden">
-      
-      {/* Navbar Fixa */}
-      <div className="bg-black/90 backdrop-blur-xl sticky top-0 z-50 border-b border-green-900/30">
-        <Navbar /> 
-      </div>
+    <div className="sp-home">
+      <Navbar />
 
-      {/* --- HERO SECTION --- */}
-      <section className="relative pt-20 pb-16 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl bg-green-500/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+      <main>
+        {/* ================= ACT 1: HERO STAGE ================= */}
+        <section className="sp-hero" aria-labelledby="security-heading">
+          <div className="sp-frame sp-grid-12" style={{ alignItems: 'start' }}>
+            <div className="sp-hero-copy">
+              <h1 id="security-heading" className="sp-h1">
+                <span className="sp-line"><span>Defesa total</span></span>
+                <span className="sp-line"><span>dos seus dados.</span></span>
+              </h1>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          
-          {/* Status Indicator */}
-          <div className="inline-flex items-center gap-2 bg-green-900/20 border border-green-500/30 rounded-full px-4 py-1.5 mb-8 backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-green-400 text-xs font-bold tracking-widest uppercase">Sistemas Operacionais & Seguros</span>
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-            Sua confiança é a nossa <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
-               linha de código mais importante.
-            </span>
-          </h1>
-          
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
-            Adotamos uma postura de defesa em profundidade. Proteção de nível bancário, transparência radical e privacidade por design.
-          </p>
+              <p className="sp-hero-lead">
+                Adotamos uma arquitetura de defesa em profundidade: criptografia AES-256, conformidade integral com a LGPD, operação Read-Only e zero venda de dados.
+              </p>
 
-        </div>
-      </section>
-
-      {/* --- SEÇÃO: ECOSSISTEMA VERIFICADO (Meta/Twilio/Google/Reclame Aqui) --- */}
-      <section className="py-12 bg-gray-950/80 border-y border-gray-900 mb-10">
-        <div className="container mx-auto px-4">
-            <p className="text-center text-xs font-bold text-gray-500 uppercase tracking-widest mb-8">
-                Empresa Auditada e Verificada por
-            </p>
-            
-            {/* GRID ALTERADO PARA 4 COLUNAS EM TELAS GRANDES */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                
-                {/* Meta Verification Card */}
-                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-blue-500/50 transition-colors group">
-                    <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center shrink-0">
-                        <img src="/assets/logo_meta.png" alt="Meta" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                        <div className="flex items-center gap-1">
-                            <h4 className="text-white font-bold text-sm">Meta Business</h4>
-                            <BadgeCheck size={16} className="text-blue-500" />
-                        </div>
-                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Verificação Concluída</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Identidade empresarial validada para uso da API Oficial.</p>
-                    </div>
-                </div>
-
-                {/* Twilio Verification Card */}
-                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-red-500/50 transition-colors group">
-                    <div className="w-12 h-12 bg-white rounded-lg p-1.5 flex items-center justify-center shrink-0">
-                        <img src="/assets/logo_twilio.png" alt="Twilio" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                         <div className="flex items-center gap-1">
-                            <h4 className="text-white font-bold text-sm">Twilio Tech</h4>
-                            <BadgeCheck size={16} className="text-red-500" />
-                        </div>
-                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Parceiro Oficial</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Infraestrutura de mensageria de alta confiabilidade.</p>
-                    </div>
-                </div>
-
-                {/* Google Verification Card */}
-                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-gray-500/50 transition-colors group">
-                    <div className="w-12 h-12 bg-white rounded-lg p-2 flex items-center justify-center shrink-0">
-                        <img src="/assets/logo_google.png" alt="Google" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                         <div className="flex items-center gap-1">
-                            <h4 className="text-white font-bold text-sm">Google Cloud</h4>
-                            <BadgeCheck size={16} className="text-gray-400" />
-                        </div>
-                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">Ambiente Seguro</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Servidores blindados com a mesma segurança do Google.</p>
-                    </div>
-                </div>
-
-                {/* --- NOVO CARD: RECLAME AQUI --- */}
-                <div className="bg-black border border-gray-800 p-5 rounded-xl flex items-center gap-4 hover:border-green-500/50 transition-colors group">
-                    <div className="w-12 h-12 bg-white rounded-lg p-1 flex items-center justify-center shrink-0">
-                        {/* Certifique-se de salvar a imagem como logo_reclameaqui.png em public/assets */}
-                        <img src="/assets/logo_reclameaqui.png" alt="Reclame Aqui" className="w-full h-full object-contain" />
-                    </div>
-                    <div>
-                         <div className="flex items-center gap-1">
-                            <h4 className="text-white font-bold text-sm">Reclame Aqui</h4>
-                            <BadgeCheck size={16} className="text-green-500" />
-                        </div>
-                        <span className="text-xs text-green-500 font-medium bg-green-900/20 px-1.5 py-0.5 rounded">RA Verificada</span>
-                        <p className="text-gray-500 text-[10px] mt-1 leading-tight">Empresa comprometida com a satisfação do cliente.</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-      </section>
-
-      {/* --- COMPLIANCE STRIP (Ícones Técnicos) --- */}
-      <section className="py-8 bg-black">
-        <div className="container mx-auto px-4">
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                <div className="flex items-center gap-3">
-                    <ShieldCheck size={28} className="text-green-500" />
-                    <div className="text-left">
-                        <div className="text-white font-bold text-sm">LGPD Compliant</div>
-                        <div className="text-gray-500 text-[10px] uppercase">Lei 13.709/2018</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Lock size={28} className="text-green-500" />
-                    <div className="text-left">
-                        <div className="text-white font-bold text-sm">End-to-End</div>
-                        <div className="text-gray-500 text-[10px] uppercase">Criptografia</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Key size={28} className="text-green-500" />
-                    <div className="text-left">
-                        <div className="text-white font-bold text-sm">AES-256</div>
-                        <div className="text-gray-500 text-[10px] uppercase">Padrão Militar</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </section>
-
-      {/* --- ARQUITETURA DE DADOS (Jornada) --- */}
-      <section className="py-24 bg-black relative border-t border-gray-900">
-        <div className="container mx-auto px-4">
-            <div className="mb-16 text-center md:text-left">
-                <h2 className="text-3xl font-bold text-white mb-4">A Jornada do Dado Seguro</h2>
-                <p className="text-gray-400">Entenda como suas informações trafegam dentro do nosso ecossistema.</p>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-4 relative">
-                {/* Linha conectora (Desktop) */}
-                <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-green-900 via-green-500 to-green-900 z-0 opacity-30"></div>
-
-                {/* Passo 1 */}
-                <div className="relative z-10 bg-gray-950 border border-gray-800 p-6 rounded-xl hover:border-green-500 transition-colors group">
-                    <div className="w-12 h-12 bg-black border border-gray-700 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/20 group-hover:text-green-500 transition-colors shadow-lg shadow-black">
-                        <Smartphone size={24} />
-                    </div>
-                    <h3 className="text-white font-bold mb-2">1. Coleta Segura</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">
-                        Você envia a mensagem pelo WhatsApp. A comunicação é protegida pela criptografia oficial da Meta (WhatsApp Business API).
-                    </p>
-                </div>
-
-                {/* Passo 2 */}
-                <div className="relative z-10 bg-gray-950 border border-gray-800 p-6 rounded-xl hover:border-green-500 transition-colors group">
-                    <div className="w-12 h-12 bg-black border border-gray-700 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/20 group-hover:text-green-500 transition-colors shadow-lg shadow-black">
-                        <Fingerprint size={24} />
-                    </div>
-                    <h3 className="text-white font-bold mb-2">2. Anonimização</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">
-                        Ao chegar em nossos servidores, dados sensíveis (como número de telefone) são tratados e separados das informações financeiras.
-                    </p>
-                </div>
-
-                {/* Passo 3 */}
-                <div className="relative z-10 bg-gray-950 border border-gray-800 p-6 rounded-xl hover:border-green-500 transition-colors group">
-                    <div className="w-12 h-12 bg-black border border-gray-700 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/20 group-hover:text-green-500 transition-colors shadow-lg shadow-black">
-                        <Database size={24} />
-                    </div>
-                    <h3 className="text-white font-bold mb-2">3. Armazenamento</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">
-                        Os dados são salvos em bancos de dados isolados no Google Cloud, criptografados em repouso (AES-256).
-                    </p>
-                </div>
-
-                {/* Passo 4 */}
-                <div className="relative z-10 bg-gray-950 border border-gray-800 p-6 rounded-xl hover:border-green-500 transition-colors group">
-                    <div className="w-12 h-12 bg-black border border-gray-700 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/20 group-hover:text-green-500 transition-colors shadow-lg shadow-black">
-                        <EyeOff size={24} />
-                    </div>
-                    <h3 className="text-white font-bold mb-2">4. Acesso Restrito</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">
-                        Nenhum humano tem acesso aos seus dados brutos. Apenas você, através da sua autenticação, visualiza seu dashboard.
-                    </p>
-                </div>
-            </div>
-        </div>
-      </section>
-
-      {/* --- GRID TÉCNICO (Bento Grid Style) --- */}
-      <section className="py-20 bg-gray-950 border-t border-gray-900">
-        <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 md:grid-rows-2 gap-6 h-auto md:h-[600px]">
-                
-                {/* Card Grande Esquerda */}
-                <div className="md:col-span-2 md:row-span-2 bg-gradient-to-br from-gray-900 to-black p-8 rounded-2xl border border-gray-800 flex flex-col justify-between relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <ShieldCheck size={200} />
-                    </div>
-                    <div>
-                        <div className="inline-block bg-green-500/10 text-green-500 text-xs font-bold px-2 py-1 rounded mb-4">PRIVACIDADE</div>
-                        <h3 className="text-3xl font-bold text-white mb-4">Seus dados são <span className="text-green-500">SEUS</span>.</h3>
-                        <p className="text-gray-400 leading-relaxed max-w-lg">
-                            Diferente de apps "gratuitos" que vendem suas informações para bancos e anunciantes, o Simplific Pro é sustentado pela sua assinatura. 
-                            <br/><br/>
-                            <strong>Nosso modelo de negócio é simples:</strong> você nos paga para organizar sua vida, e nós protegemos seus segredos. Não existe "compartilhamento com parceiros" nas letras miúdas.
-                        </p>
-                    </div>
-                    <div className="mt-8 flex gap-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                            <CheckCircle size={16} className="text-green-500" /> Sem venda de dados
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-300">
-                            <CheckCircle size={16} className="text-green-500" /> Sem anúncios
-                        </div>
-                    </div>
-                </div>
-
-                {/* Card Superior Direita */}
-                <div className="bg-black p-6 rounded-2xl border border-gray-800 flex flex-col justify-center hover:bg-gray-900 transition-colors">
-                    <Activity className="text-green-500 mb-4" size={32} />
-                    <h4 className="text-white font-bold text-lg mb-2">Monitoramento 24/7</h4>
-                    <p className="text-gray-400 text-xs">
-                        Sistemas automatizados vigiam qualquer anomalia de tráfego ou tentativa de acesso indevido em tempo real.
-                    </p>
-                </div>
-
-                {/* Card Inferior Direita */}
-                <div className="bg-black p-6 rounded-2xl border border-gray-800 flex flex-col justify-center hover:bg-gray-900 transition-colors">
-                    <Users className="text-green-500 mb-4" size={32} />
-                    <h4 className="text-white font-bold text-lg mb-2">Controle de Acesso</h4>
-                    <p className="text-gray-400 text-xs">
-                        Adotamos o princípio do "menor privilégio". Funcionários do Simplific não têm acesso ao banco de dados de produção.
-                    </p>
-                </div>
-
-            </div>
-        </div>
-      </section>
-
-      {/* --- WHITE HAT / VULNERABILITY --- */}
-      <section className="py-16 bg-black border-t border-gray-900">
-          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div>
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                      <AlertTriangle className="text-yellow-500" size={24} />
-                      Reporte de Vulnerabilidade
-                  </h3>
-                  <p className="text-gray-400 text-sm mt-2 max-w-xl">
-                      Acreditamos na comunidade de segurança. Se você é um pesquisador ou desenvolvedor e encontrou uma falha, queremos saber.
-                  </p>
+              <div className="sp-hero-actions">
+                <Link to="/checkout?plan=annual" className="sp-btn-primary">
+                  <span>Começar com proteção total</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <Link to="/privacidade" className="sp-btn-quiet">
+                  <span>Ler Política de Privacidade</span>
+                  <ArrowUpRight size={15} />
+                </Link>
               </div>
-              <Button variant="outline" className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800">
-                  contato@simplificpro.com
-              </Button>
-          </div>
-      </section>
-
-      {/* --- FAQ TÉCNICO --- */}
-      <section className="py-24 bg-gray-950/50 border-t border-gray-900">
-        <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="text-2xl font-bold text-center mb-12 text-white">Perguntas Frequentes de Segurança</h2>
-          <div className="space-y-6">
-            
-            <div className="bg-black border border-gray-800 p-6 rounded-xl">
-                <h4 className="text-white font-bold mb-2">O Simplific pode movimentar meu dinheiro?</h4>
-                <p className="text-gray-400 text-sm">
-                    <strong>Absolutamente não.</strong> Nossa tecnologia é de "leitura apenas" (Read-Only). Nós organizamos as informações que você nos fornece ou que conectamos via Open Finance, mas não temos "permissão de escrita" para realizar TEDs, Pix ou pagamentos.
-                </p>
             </div>
 
-            <div className="bg-black border border-gray-800 p-6 rounded-xl">
-                <h4 className="text-white font-bold mb-2">E se eu perder meu celular?</h4>
-                <p className="text-gray-400 text-sm">
-                    Seu acesso ao Simplific Pro é protegido por senha e, opcionalmente, biometria (no app). Mesmo que alguém acesse seu WhatsApp, não conseguirá acessar o painel administrativo completo sem suas credenciais de login.
-                </p>
-            </div>
+            <div className="sp-hero-stage-wrap">
+              <div className="sp-hero-bg-plate sp-shutter">
+                <img
+                  src="/assets/landing/simplific-insight.jpg"
+                  alt="Infraestrutura segura do Simplific Pro"
+                  width="1600"
+                  height="1200"
+                />
+                <div className="sp-hero-scrim" aria-hidden="true" />
+              </div>
 
-            <div className="bg-black border border-gray-800 p-6 rounded-xl">
-                <h4 className="text-white font-bold mb-2">Como excluo meus dados?</h4>
-                <p className="text-gray-400 text-sm">
-                    Em conformidade com a LGPD, você tem um botão "Deletar Conta" nas configurações. Ao clicar, seus dados são imediatamente removidos do painel e agendados para exclusão definitiva (Hard Delete) dos backups em até 30 dias.
-                </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* --- CTA FINAL --- */}
-      <section className="py-20 border-t border-gray-900 bg-gradient-to-b from-gray-900 to-black text-center">
-        <div className="container mx-auto px-4">
-            <ShieldCheck className="w-16 h-16 text-green-500 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-white mb-4">Segurança para nós não é feature. É premissa.</h2>
-            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-               Junte-se a milhares de usuários que controlam suas finanças com a tranquilidade de quem está protegido.
-            </p>
-            <div className="flex justify-center gap-4">
-                <Button 
-                    onClick={() => navigate('/')}
-                    variant="outline"
-                    className="border-gray-700 text-white hover:bg-gray-800"
+              <div className="sp-hero-stage-inner">
+                <div
+                  data-ui="security-partner-ledger"
+                  className="sp-ui-fragment"
+                  style={{ padding: '20px', backgroundColor: '#0c100e' }}
                 >
-                    Voltar para Home
-                </Button>
-                <Button 
-                    onClick={() => navigate('/checkout')}
-                    className="bg-green-600 hover:bg-green-500 text-white font-bold px-8 shadow-lg shadow-green-900/20"
-                >
-                    Começar Agora
-                </Button>
-            </div>
-        </div>
-      </section>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingBottom: '14px',
+                      marginBottom: '14px',
+                      borderBottom: '1px solid #1e2621'
+                    }}
+                  >
+                    <span style={{ fontWeight: 600, color: '#f3f6f4' }}>
+                      Ecossistema Auditado & Verificado
+                    </span>
+                    <span style={{ color: '#10b981', fontWeight: 600 }}>
+                      Sistemas Operacionais · AES-256
+                    </span>
+                  </div>
 
-      {/* Footer */}
-      <div className="bg-black border-t border-gray-900 pt-10">
-        <Footer />
-      </div>
+                  <div style={{ display: 'grid', gap: '8px' }}>
+                    {VERIFIED_PARTNERS.map((partner) => (
+                      <div
+                        key={partner.name}
+                        style={{
+                          padding: '8px 4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '14px',
+                          flexWrap: 'wrap'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <img
+                            src={partner.logo}
+                            alt={partner.name}
+                            width="68"
+                            height="22"
+                            style={{ height: '20px', width: 'auto', objectFit: 'contain' }}
+                          />
+                          <div>
+                            <span style={{ fontWeight: 600, color: '#f3f6f4' }}>{partner.name}</span>
+                            <span style={{ color: '#a8b4ac', marginLeft: '8px' }}>· {partner.desc}</span>
+                          </div>
+                        </div>
+                        <span style={{ color: '#10b981', fontWeight: 600 }}>{partner.badge}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 2: A JORNADA DO DADO SEGURO ================= */}
+        <section className="sp-routine-act" aria-labelledby="jornada-dado-heading">
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'start' }}>
+              <div style={{ gridColumn: '1 / span 5' }} data-sc-in>
+                <h2 id="jornada-dado-heading" className="sp-h2">
+                  Jornada do dado seguro.
+                </h2>
+                <p className="sp-section-lead">
+                  Acompanhe cada etapa de proteção desde o momento em que você envia uma mensagem no WhatsApp até a visualização no seu painel.
+                </p>
+
+                <div
+                  role="tablist"
+                  aria-label="Etapas da Jornada do Dado Seguro"
+                  style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '28px' }}
+                >
+                  {DATA_JOURNEY.map((item, idx) => {
+                    const selected = stepIdx === idx;
+                    return (
+                      <button
+                        key={item.stage}
+                        type="button"
+                        role="tab"
+                        aria-selected={selected}
+                        onClick={() => setStepIdx(idx)}
+                        className="sp-routine-step-btn"
+                      >
+                        <div style={{ fontWeight: 600 }}>{item.stage}</div>
+                        <div style={{ fontSize: 'var(--step-small)', marginTop: '4px', color: selected ? '#062619' : 'var(--body-ink)' }}>
+                          {item.title}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
+                <div
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderRadius: 'var(--radius-page)',
+                    padding: '32px',
+                    display: 'grid',
+                    gap: '24px'
+                  }}
+                >
+                  <div style={{ display: 'grid', gap: '12px' }}>
+                    <h3 className="sp-h2">{activeStep.title}</h3>
+                    <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.6, color: 'var(--body-ink)', margin: 0 }}>
+                      {activeStep.detail}
+                    </p>
+                  </div>
+
+                  <div
+                    data-ui="security-protocol-box"
+                    className="sp-ui-fragment"
+                    style={{ padding: '18px 20px', backgroundColor: '#0c100e' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                      <span style={{ color: '#10b981', fontWeight: 600 }}>Protocolo Ativo</span>
+                      <span style={{ color: '#f3f6f4', fontWeight: 600 }}>{activeStep.protocol}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px', paddingTop: '10px', borderTop: '1px solid #1e2621' }}>
+                      <div>
+                        <div style={{ color: '#a8b4ac' }}>Conformidade</div>
+                        <div style={{ fontWeight: 600, color: '#f3f6f4' }}>LGPD 13.709/2018</div>
+                      </div>
+                      <div>
+                        <div style={{ color: '#a8b4ac' }}>Permissão Bancária</div>
+                        <div style={{ fontWeight: 600, color: '#10b981' }}>100% Read-Only</div>
+                      </div>
+                      <div>
+                        <div style={{ color: '#a8b4ac' }}>Venda de Dados</div>
+                        <div style={{ fontWeight: 600, color: '#10b981' }}>Zero Terceiros</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 3: PRIVACY BY DESIGN & WHITE HAT ================= */}
+        <section className="sp-showcase" aria-labelledby="privacidade-design-heading">
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'center' }}>
+              <div style={{ gridColumn: '1 / span 6' }} data-sc-in>
+                <h2 id="privacidade-design-heading" className="sp-h2">
+                  Seus dados são seus.
+                </h2>
+                <p className="sp-section-lead">
+                  Diferente de aplicativos gratuitos que monetizam seu perfil para bancos e corretoras, o Simplific Pro é sustentado exclusivamente pela sua assinatura: sem anúncios, sem venda de dados e com princípio de menor privilégio.
+                </p>
+              </div>
+
+              <div style={{ gridColumn: '7 / span 6' }} data-sc-in>
+                <div
+                  data-ui="whitehat-card"
+                  className="sp-ui-fragment"
+                  style={{ padding: '24px', backgroundColor: '#0c100e', display: 'grid', gap: '14px' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <span style={{ fontWeight: 600, color: '#f3f6f4' }}>Monitoramento 24/7 & White Hat</span>
+                    <span style={{ color: '#10b981', fontWeight: 600 }}>Canal de Segurança</span>
+                  </div>
+                  <p style={{ margin: 0, color: '#d8e1dc', lineHeight: 1.55 }}>
+                    Sistemas automatizados vigiam anomalias de tráfego em tempo real e funcionários não possuem acesso aos dados brutos de produção. Pesquisadores de segurança podem reportar achados diretamente à engenharia.
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', paddingTop: '12px', borderTop: '1px solid #1e2621' }}>
+                    <a
+                      href="mailto:contato@simplificpro.com"
+                      style={{ color: '#10b981', fontWeight: 600, textDecoration: 'none' }}
+                    >
+                      contato@simplificpro.com
+                    </a>
+                    <Link to="/termos" style={{ color: '#f3f6f4', textDecoration: 'none', fontWeight: 500 }}>
+                      Consultar Termos de Uso →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 4: FAQ TÉCNICO DE SEGURANÇA ================= */}
+        <section className="sp-faq" aria-labelledby="sec-faq-heading">
+          <div className="sp-frame sp-grid-12">
+            <div style={{ gridColumn: '1 / span 4' }} data-sc-in>
+              <h2 id="sec-faq-heading" className="sp-h2">
+                Dúvidas de segurança.
+              </h2>
+              <p className="sp-section-lead">
+                Respostas técnicas sobre permissão de leitura, perda de aparelho e exclusão definitiva de dados.
+              </p>
+            </div>
+
+            <div style={{ gridColumn: '5 / span 8' }} className="sp-faq-list" data-sc-in>
+              {SECURITY_FAQ.map((item, idx) => (
+                <details
+                  key={item.q}
+                  name="security-faq"
+                  className="sp-faq-tile"
+                  open={idx === 0}
+                >
+                  <summary className="sp-faq-summary" role="button">
+                    <span>{item.q}</span>
+                    <span className="sp-faq-plus" aria-hidden="true" />
+                  </summary>
+                  <div className="sp-faq-answer">{item.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 5: CTA BOARD ================= */}
+        <section className="sp-cta-board" aria-labelledby="sec-cta-heading">
+          <div className="sp-frame">
+            <div className="sp-cta-row" data-sc-in>
+              <div className="sp-cta-flank">
+                <img
+                  src="/assets/landing/simplific-assessor-financeiro.jpg"
+                  alt="Segurança como premissa no Simplific Pro"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                />
+              </div>
+
+              <div className="sp-cta-center">
+                <h2 id="sec-cta-heading" className="sp-h2" style={{ color: '#05120c', margin: '0 0 12px 0' }}>
+                  Segurança é nossa premissa.
+                </h2>
+                <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.55, color: '#07281b', maxWidth: '48ch', margin: '0 0 28px 0' }}>
+                  Junte-se a milhares de usuários que controlam suas finanças com proteção de nível bancário e garantia de 7 dias.
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/checkout?plan=annual')}
+                    style={{
+                      backgroundColor: '#080908',
+                      color: '#f3f6f4',
+                      border: 0,
+                      borderRadius: '4px',
+                      padding: '14px 24px',
+                      fontSize: 'var(--step-small)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}
+                  >
+                    <span>Começar Agora</span>
+                    <ArrowRight size={16} />
+                  </button>
+
+                  <Link
+                    to="/"
+                    style={{
+                      color: '#05120c',
+                      fontSize: 'var(--step-small)',
+                      fontWeight: 600,
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Voltar para a Página Inicial →
+                  </Link>
+                </div>
+              </div>
+
+              <div className="sp-cta-flank">
+                <img
+                  src="/assets/landing/simplific-hero.jpg"
+                  alt="Infraestrutura criptografada Simplific Pro"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
     </div>
   );
 };
