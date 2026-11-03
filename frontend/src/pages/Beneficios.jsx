@@ -30,16 +30,16 @@ const COCKPIT_MODES = {
       { name: 'Renda Fixa CDI & Tesouro Selic', status: 'R$ 86.520,00 · Liquidez diária', tone: '#f3f6f4' }
     ]
   },
-  pj: {
-    id: 'pj',
-    label: 'Balanço Mensal & ERP PJ',
-    headline: 'Fechamento Mensal Automático',
-    metricLabel: 'Resultado Operacional Líquido',
-    metricValue: '+ R$ 24.300,00',
+  casal: {
+    id: 'casal',
+    label: 'Modo Casal & Metas',
+    headline: 'Orçamento Compartilhado em Tempo Real',
+    metricLabel: 'Meta de Reserva Familiar',
+    metricValue: 'R$ 28.800,00',
     rows: [
-      { name: 'Contas a Receber Conciliadas', status: 'R$ 48.900,00 (96% quitado no prazo)', tone: '#10b981' },
-      { name: 'Contas a Pagar & Fornecedores', status: 'R$ 24.600,00 (0 atrasos)', tone: '#f3f6f4' },
-      { name: 'Relatório DRE & Evolução Patrimonial', status: 'PDF e Dashboard prontos em 1 clique', tone: '#10b981' }
+      { name: '2 Números de WhatsApp Conectados', status: 'Sincronização instantânea sem custo extra', tone: '#10b981' },
+      { name: 'Fechamento Mensal Automático', status: 'Fluxo de caixa e evolução patrimonial prontos', tone: '#f3f6f4' },
+      { name: 'Progresso das Metas do Ano', status: '80% concluído dentro do prazo', tone: '#10b981' }
     ]
   }
 };
@@ -324,14 +324,14 @@ const Beneficios = () => {
               <div style={{ gridColumn: '5 / span 4', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <h3 className="sp-cell-title">Balanço Geral Mensal</h3>
                 <p className="sp-cell-desc">
-                  Relatórios automáticos que fecham o seu mês, mostrando sua evolução patrimonial, fluxo de caixa, DRE empresarial e pendências sem esforço manual.
+                  Relatórios automáticos que fecham o seu mês, mostrando sua evolução patrimonial, fluxo de caixa, cartões e metas sem esforço manual.
                 </p>
               </div>
 
               <div style={{ gridColumn: '9 / span 4', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <h3 className="sp-cell-title">Categorias Personalizadas</h3>
                 <p className="sp-cell-desc">
-                  O sistema se adapta a você. Crie, edite e exclua categorias de despesas e receitas conforme a sua realidade pessoal, familiar ou empresarial.
+                  O sistema se adapta a você. Crie, edite e exclua categorias de despesas e receitas conforme a sua realidade pessoal e familiar.
                 </p>
               </div>
             </div>

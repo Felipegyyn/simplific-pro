@@ -1,6 +1,6 @@
 {
  "url": "http://127.0.0.1:5173/#/home",
- "at": "2026-11-03T17:48:46.479Z",
+ "at": "2026-11-03T18:12:51.635Z",
  "allow": [],
  "viewports": [
   {
@@ -10,18 +10,18 @@
    "screens": 8,
    "filled": [
     0.99,
-    0.99,
-    1,
-    1,
-    0.89,
-    0.92,
+    0.96,
     0.98,
+    1,
+    0.93,
+    0.95,
+    1,
     1
    ],
    "motion": {
-    "elements": 28,
+    "elements": 27,
     "css": 5,
-    "transitions": 21,
+    "transitions": 20,
     "scripted": 2,
     "videos": 1,
     "playingVideos": 1
@@ -32,26 +32,25 @@
      "h": 900
     },
     "page": {
-     "height": 6638,
-     "screens": 7.4,
-     "words": 961,
-     "img": 14,
+     "height": 6521,
+     "screens": 7.2,
+     "words": 977,
+     "img": 13,
      "video": 1,
      "canvas": 0,
-     "svg": 11,
+     "svg": 12,
      "sections": 8,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
-     "uiFragments": 11,
+     "uiFragments": 12,
      "uiAbuse": false,
-     "realPictures": 6,
-     "videoCount": 1,
-     "uiPictures": 2,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 3,
      "pictureSamples": [
       "simplific-insight.jpg",
       "simplific-insight.jpg",
       "simplific-assessor-agenda.jpg",
-      "simplific-hero-hands.jpg",
       "simplific-assessor-financeiro.jpg"
      ],
      "blendText": 0,
@@ -126,8 +125,8 @@
       "mono": false,
       "align": "left",
       "position": "left",
-      "widthRatio": 0.3,
-      "top": 991,
+      "widthRatio": 0.38,
+      "top": 1107,
       "tag": "h2",
       "kind": "heading"
      },
@@ -136,8 +135,8 @@
       "words": 3,
       "chars": 11,
       "lines": 1,
-      "size": 28,
-      "vw": 1.9,
+      "size": 34,
+      "vw": 2.4,
       "font": "Geist",
       "weight": 600,
       "tracking": -0.03,
@@ -147,8 +146,8 @@
       "mono": false,
       "align": "left",
       "position": "center",
-      "widthRatio": 0.33,
-      "top": 1108,
+      "widthRatio": 0.22,
+      "top": 1114,
       "tag": "div",
       "kind": "heading"
      },
@@ -169,7 +168,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.38,
-      "top": 1576,
+      "top": 1517,
       "tag": "h2",
       "kind": "heading"
      },
@@ -182,17 +181,17 @@
       "vw": 2.5,
       "font": "Geist",
       "weight": 600,
-      "tracking": -0.007,
+      "tracking": -0.035,
       "leading": 1.05,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "right",
-      "widthRatio": 0.25,
-      "top": 1667,
-      "tag": "p",
-      "kind": "statement"
+      "widthRatio": 0.24,
+      "top": 1704,
+      "tag": "div",
+      "kind": "heading"
      },
      {
       "text": "Cinco motores vivos.",
@@ -211,7 +210,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.23,
-      "top": 2284,
+      "top": 2246,
       "tag": "h2",
       "kind": "heading"
      },
@@ -232,7 +231,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.36,
-      "top": 3435,
+      "top": 3397,
       "tag": "h2",
       "kind": "heading"
      },
@@ -253,30 +252,9 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.14,
-      "top": 3739,
+      "top": 3715,
       "tag": "span",
       "kind": "statement"
-     },
-     {
-      "text": "Preço claro, sem letras.",
-      "words": 4,
-      "chars": 24,
-      "lines": 1,
-      "size": 36,
-      "vw": 2.5,
-      "font": "Geist",
-      "weight": 500,
-      "tracking": -0.03,
-      "leading": 1.08,
-      "upper": false,
-      "italic": false,
-      "mono": false,
-      "align": "left",
-      "position": "left",
-      "widthRatio": 0.3,
-      "top": 4230,
-      "tag": "h2",
-      "kind": "heading"
      },
      {
       "text": "16,58",
@@ -295,8 +273,29 @@
       "align": "left",
       "position": "right",
       "widthRatio": 0.31,
-      "top": 4338,
+      "top": 4206,
       "tag": "span",
+      "kind": "heading"
+     },
+     {
+      "text": "Preço claro, sem letras.",
+      "words": 4,
+      "chars": 24,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 500,
+      "tracking": -0.03,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.3,
+      "top": 4206,
+      "tag": "h2",
       "kind": "heading"
      },
      {
@@ -316,7 +315,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.02,
-      "top": 4342,
+      "top": 4210,
       "tag": "span",
       "kind": "heading"
      },
@@ -329,15 +328,15 @@
       "vw": 2.5,
       "font": "Geist",
       "weight": 500,
-      "tracking": -0.025,
-      "leading": 1.5,
+      "tracking": -0.03,
+      "leading": 1.08,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "left",
-      "widthRatio": 0.37,
-      "top": 4864,
+      "widthRatio": 0.36,
+      "top": 4756,
       "tag": "h3",
       "kind": "heading"
      },
@@ -358,7 +357,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.3,
-      "top": 5332,
+      "top": 5215,
       "tag": "h2",
       "kind": "heading"
      },
@@ -379,16 +378,37 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.24,
-      "top": 6171,
+      "top": 6054,
       "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "7 dias",
+      "words": 2,
+      "chars": 6,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.03,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.12,
+      "top": 6124,
+      "tag": "div",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 14,
+     "count": 15,
      "maxLines": 2,
      "over2Lines": 0,
-     "statements": 2,
+     "statements": 1,
      "centered": 0,
      "medianWords": 3,
      "mixedFontHeadings": 0
@@ -437,7 +457,18 @@
      "centerShare": 0.02,
      "smallText": 0
     },
-    "eyebrows": [],
+    "eyebrows": [
+     {
+      "text": "Fatura monitorada",
+      "above": "R$ 2.450,00",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 1671
+     }
+    ],
     "numbered": [],
     "color": {
      "bodyBg": "#09090b",
@@ -459,7 +490,7 @@
       },
       {
        "color": "#111513",
-       "top": 132,
+       "top": 131,
        "hsl": {
         "h": 150,
         "s": 0.11,
@@ -470,22 +501,22 @@
      "textColors": [
       {
        "color": "#d8e1dc",
-       "share": 0.4
+       "share": 0.39
       },
       {
        "color": "#f3f6f4",
        "share": 0.26
       },
       {
-       "color": "#062519",
-       "share": 0.17
+       "color": "#a8b4ac",
+       "share": 0.1
       },
       {
-       "color": "#10b981",
+       "color": "#8f9b93",
        "share": 0.05
       },
       {
-       "color": "#a8b4ac",
+       "color": "#05120c",
        "share": 0.04
       }
      ],
@@ -501,10 +532,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 18,
-     "inHero": 6,
+     "count": 17,
+     "inHero": 9,
      "radius": 4,
-     "height": 77,
+     "height": 82,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -530,7 +561,7 @@
      "outlinedBoxes": 0,
      "dashed": 0,
      "blurred": 0,
-     "roundedBoxes": 10,
+     "roundedBoxes": 13,
      "boxRadius": 8,
      "squareMedia": 1,
      "roundedMedia": 4,
@@ -541,7 +572,13 @@
        "count": 6,
        "iconTopped": false,
        "rounded": false,
-       "top": 2383
+       "top": 2345
+      },
+      {
+       "count": 3,
+       "iconTopped": true,
+       "rounded": false,
+       "top": 4797
       }
      ]
     },
@@ -552,7 +589,7 @@
      }
     ],
     "nav": {
-     "links": 8,
+     "links": 9,
      "fixed": false,
      "height": 89,
      "floatingPill": false,
@@ -567,17 +604,17 @@
      "w": 1440,
      "h": 900
     },
-    "pageH": 6638,
+    "pageH": 6521,
     "margins": {
      "left": 40,
-     "right": 40
+     "right": 65
     },
     "sections": [
      {
       "sel": "section.sp-hero",
       "tag": "section",
       "top": 89,
-      "height": 650,
+      "height": 647,
       "words": 110,
       "media": 1,
       "middle": 119,
@@ -589,7 +626,7 @@
       "left": 40,
       "right": 40,
       "textLeft": 40,
-      "textRight": 99,
+      "textRight": 140,
       "fullBleed": false,
       "footer": false,
       "hero": true,
@@ -599,20 +636,20 @@
      {
       "sel": "section#demonstracao.sp-showcase",
       "tag": "section",
-      "top": 739,
-      "height": 709,
-      "words": 61,
+      "top": 736,
+      "height": 653,
+      "words": 74,
       "media": 1,
-      "middle": 87,
+      "middle": 153,
       "heading": {
        "text": "Fale uma vez.",
        "size": 36,
        "tag": "h2"
       },
       "left": 40,
-      "right": 40,
+      "right": 65,
       "textLeft": 40,
-      "textRight": 501,
+      "textRight": 118,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -622,20 +659,20 @@
      {
       "sel": "section#rotina-24h.sp-routine-act",
       "tag": "section",
-      "top": 1448,
-      "height": 715,
-      "words": 136,
+      "top": 1389,
+      "height": 737,
+      "words": 138,
       "media": 1,
-      "middle": 52,
+      "middle": 60,
       "heading": {
        "text": "Vinte e quatro horas.",
        "size": 36,
        "tag": "h2"
       },
       "left": 40,
-      "right": 75,
+      "right": 97,
       "textLeft": 40,
-      "textRight": 75,
+      "textRight": 97,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -645,9 +682,9 @@
      {
       "sel": "section#capacidades.sp-features",
       "tag": "section",
-      "top": 2164,
+      "top": 2126,
       "height": 1167,
-      "words": 264,
+      "words": 263,
       "media": 1,
       "middle": 53,
       "heading": {
@@ -668,8 +705,8 @@
      {
       "sel": "section#simulador.sp-stats",
       "tag": "section",
-      "top": 3331,
-      "height": 780,
+      "top": 3293,
+      "height": 793,
       "words": 67,
       "media": 0,
       "middle": 489,
@@ -691,20 +728,20 @@
      {
       "sel": "section#planos.sp-pricing",
       "tag": "section",
-      "top": 4110,
-      "height": 1110,
-      "words": 171,
-      "media": 1,
-      "middle": 49,
+      "top": 4086,
+      "height": 1017,
+      "words": 165,
+      "media": 0,
+      "middle": 41,
       "heading": {
        "text": "16,58",
        "size": 180,
        "tag": "span"
       },
       "left": 40,
-      "right": 93,
+      "right": 96,
       "textLeft": 40,
-      "textRight": 93,
+      "textRight": 96,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -714,20 +751,20 @@
      {
       "sel": "section#faq.sp-faq",
       "tag": "section",
-      "top": 5220,
+      "top": 5103,
       "height": 801,
-      "words": 254,
+      "words": 263,
       "media": 0,
-      "middle": 44,
+      "middle": 68,
       "heading": {
        "text": "Dúvidas comuns.",
        "size": 36,
        "tag": "h2"
       },
       "left": 40,
-      "right": 40,
+      "right": 358,
       "textLeft": 40,
-      "textRight": 357,
+      "textRight": 358,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -737,20 +774,20 @@
      {
       "sel": "section.sp-cta-board",
       "tag": "section",
-      "top": 6021,
+      "top": 5904,
       "height": 468,
-      "words": 33,
+      "words": 41,
       "media": 1,
-      "middle": 52,
+      "middle": 360,
       "heading": {
        "text": "Teste sete dias grátis.",
        "size": 36,
        "tag": "h2"
       },
       "left": 40,
-      "right": 599,
+      "right": 98,
       "textLeft": 315,
-      "textRight": 599,
+      "textRight": 98,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -760,16 +797,16 @@
      {
       "sel": "footer.sp-footer-void",
       "tag": "footer",
-      "top": 6489,
+      "top": 6372,
       "height": 149,
-      "words": 19,
+      "words": 20,
       "media": 0,
-      "middle": 187,
+      "middle": 145,
       "heading": null,
       "left": 40,
-      "right": 40,
+      "right": 160,
       "textLeft": 40,
-      "textRight": 40,
+      "textRight": 160,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -777,7 +814,12 @@
       "pinned": false
      }
     ],
-    "gaps": [],
+    "gaps": [
+     {
+      "top": 4936,
+      "height": 272
+     }
+    ],
     "h1s": [
      {
       "text": "Seu dinheiro no ritmo da voz.",
@@ -794,7 +836,7 @@
      },
      {
       "x": 68,
-      "n": 6
+      "n": 4
      },
      {
       "x": 524,
@@ -805,15 +847,19 @@
       "n": 4
      },
      {
-      "x": 1017,
-      "n": 3
+      "x": 80,
+      "n": 2
      },
      {
       "x": 315,
       "n": 2
+     },
+     {
+      "x": 1017,
+      "n": 1
      }
     ],
-    "leftBlocks": 34,
+    "leftBlocks": 32,
     "bodySize": 17,
     "stage": false,
     "explains": false,
@@ -837,21 +883,21 @@
    "filled": [
     0.94,
     1,
-    1,
+    0.98,
     0.94,
     1,
     1,
     1,
     1,
-    0.82,
-    0.78,
-    0.88,
+    0.81,
+    0.94,
+    0.91,
     1
    ],
    "motion": {
-    "elements": 28,
+    "elements": 27,
     "css": 5,
-    "transitions": 21,
+    "transitions": 20,
     "scripted": 2,
     "videos": 1,
     "playingVideos": 1
@@ -862,26 +908,25 @@
      "h": 844
     },
     "page": {
-     "height": 10793,
-     "screens": 12.8,
-     "words": 956,
-     "img": 14,
+     "height": 10553,
+     "screens": 12.5,
+     "words": 970,
+     "img": 13,
      "video": 1,
      "canvas": 0,
-     "svg": 11,
+     "svg": 12,
      "sections": 8,
      "horizontalOverflow": 0,
      "overflowCulprits": [],
-     "uiFragments": 11,
+     "uiFragments": 12,
      "uiAbuse": false,
-     "realPictures": 6,
-     "videoCount": 1,
-     "uiPictures": 2,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 3,
      "pictureSamples": [
       "simplific-insight.jpg",
       "simplific-insight.jpg",
       "simplific-assessor-agenda.jpg",
-      "simplific-hero-hands.jpg",
       "simplific-assessor-financeiro.jpg"
      ],
      "blendText": 0,
@@ -907,7 +952,7 @@
      "align": "left",
      "position": "center",
      "widthRatio": 0.91,
-     "top": 134,
+     "top": 132,
      "tag": "h1",
      "kind": "heading"
     },
@@ -936,7 +981,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 134,
+      "top": 132,
       "tag": "h1",
       "kind": "heading"
      },
@@ -957,7 +1002,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 1364,
+      "top": 1218,
       "tag": "h2",
       "kind": "heading"
      },
@@ -966,8 +1011,8 @@
       "words": 3,
       "chars": 11,
       "lines": 1,
-      "size": 28,
-      "vw": 7.2,
+      "size": 34,
+      "vw": 8.7,
       "font": "Geist",
       "weight": 600,
       "tracking": -0.03,
@@ -977,8 +1022,8 @@
       "mono": false,
       "align": "left",
       "position": "center",
-      "widthRatio": 0.7,
-      "top": 1794,
+      "widthRatio": 0.67,
+      "top": 1768,
       "tag": "div",
       "kind": "heading"
      },
@@ -999,7 +1044,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 2696,
+      "top": 2409,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1012,17 +1057,17 @@
       "vw": 6.7,
       "font": "Geist",
       "weight": 600,
-      "tracking": -0.009,
+      "tracking": -0.035,
       "leading": 1.05,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
-      "widthRatio": 0.76,
-      "top": 3467,
-      "tag": "p",
-      "kind": "statement"
+      "widthRatio": 0.81,
+      "top": 3310,
+      "tag": "div",
+      "kind": "heading"
      },
      {
       "text": "Cinco motores vivos.",
@@ -1041,8 +1086,29 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.61,
-      "top": 3978,
+      "top": 3712,
       "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "R$ 38,90",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.011,
+      "leading": 1.45,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.24,
+      "top": 4311,
+      "tag": "div",
       "kind": "heading"
      },
      {
@@ -1062,7 +1128,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 6357,
+      "top": 6082,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1083,7 +1149,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.26,
-      "top": 6670,
+      "top": 6409,
       "tag": "span",
       "kind": "statement"
      },
@@ -1104,7 +1170,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 7069,
+      "top": 6808,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1125,7 +1191,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.56,
-      "top": 7501,
+      "top": 7135,
       "tag": "span",
       "kind": "heading"
      },
@@ -1146,7 +1212,7 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.07,
-      "top": 7504,
+      "top": 7138,
       "tag": "span",
       "kind": "heading"
      },
@@ -1159,15 +1225,15 @@
       "vw": 6.7,
       "font": "Geist",
       "weight": 500,
-      "tracking": -0.025,
-      "leading": 1.5,
+      "tracking": -0.03,
+      "leading": 1.08,
       "upper": false,
       "italic": false,
       "mono": false,
       "align": "left",
       "position": "center",
-      "widthRatio": 0.74,
-      "top": 8143,
+      "widthRatio": 0.78,
+      "top": 7786,
       "tag": "h3",
       "kind": "heading"
      },
@@ -1188,7 +1254,7 @@
       "align": "left",
       "position": "center",
       "widthRatio": 0.91,
-      "top": 8799,
+      "top": 8559,
       "tag": "h2",
       "kind": "heading"
      },
@@ -1209,16 +1275,37 @@
       "align": "left",
       "position": "left",
       "widthRatio": 0.63,
-      "top": 10097,
+      "top": 9857,
       "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "7 dias",
+      "words": 2,
+      "chars": 6,
+      "lines": 1,
+      "size": 26,
+      "vw": 6.7,
+      "font": "Geist",
+      "weight": 600,
+      "tracking": -0.03,
+      "leading": 1.5,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.78,
+      "top": 10218,
+      "tag": "div",
       "kind": "heading"
      }
     ],
     "headingSummary": {
-     "count": 14,
+     "count": 16,
      "maxLines": 2,
      "over2Lines": 0,
-     "statements": 2,
+     "statements": 1,
      "centered": 0,
      "medianWords": 3,
      "mixedFontHeadings": 0
@@ -1289,7 +1376,7 @@
       },
       {
        "color": "#111513",
-       "top": 476,
+       "top": 473,
        "hsl": {
         "h": 150,
         "s": 0.11,
@@ -1298,7 +1385,7 @@
       },
       {
        "color": "#0c100e",
-       "top": 468,
+       "top": 467,
        "hsl": {
         "h": 150,
         "s": 0.14,
@@ -1306,17 +1393,8 @@
        }
       },
       {
-       "color": "#141b17",
-       "top": 736,
-       "hsl": {
-        "h": 146,
-        "s": 0.15,
-        "l": 0.09
-       }
-      },
-      {
        "color": "#0b0f0d",
-       "top": 1591,
+       "top": 1445,
        "hsl": {
         "h": 150,
         "s": 0.15,
@@ -1325,7 +1403,7 @@
       },
       {
        "color": "#10b981",
-       "top": 10073,
+       "top": 9833,
        "hsl": {
         "h": 160,
         "s": 0.84,
@@ -1336,22 +1414,22 @@
      "textColors": [
       {
        "color": "#d8e1dc",
-       "share": 0.39
+       "share": 0.38
       },
       {
        "color": "#f3f6f4",
-       "share": 0.26
-      },
-      {
-       "color": "#062519",
-       "share": 0.17
-      },
-      {
-       "color": "#10b981",
-       "share": 0.05
+       "share": 0.27
       },
       {
        "color": "#a8b4ac",
+       "share": 0.1
+      },
+      {
+       "color": "#8f9b93",
+       "share": 0.05
+      },
+      {
+       "color": "#05120c",
        "share": 0.04
       }
      ],
@@ -1367,10 +1445,10 @@
      "lowContrast": []
     },
     "buttons": {
-     "count": 18,
+     "count": 14,
      "inHero": 5,
      "radius": 4,
-     "height": 34,
+     "height": 82,
      "withShadow": 0,
      "withGradient": 0,
      "mono": 0,
@@ -1402,18 +1480,25 @@
      "roundedMedia": 3,
      "mediaRadius": 4,
      "textShadow": 0,
-     "cardRows": []
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": true,
+       "rounded": false,
+       "top": 8029
+      }
+     ]
     },
     "heroMedia": [
      {
       "type": "img",
-      "ratio": 0.4
+      "ratio": 0.42
      }
     ],
     "nav": {
-     "links": 3,
+     "links": 2,
      "fixed": false,
-     "height": 110,
+     "height": 108,
      "floatingPill": false,
      "blur": false
     },
@@ -1426,7 +1511,7 @@
      "w": 390,
      "h": 844
     },
-    "pageH": 10793,
+    "pageH": 10553,
     "margins": {
      "left": 18,
      "right": 18
@@ -1435,8 +1520,8 @@
      {
       "sel": "section.sp-hero",
       "tag": "section",
-      "top": 110,
-      "height": 1182,
+      "top": 108,
+      "height": 1038,
       "words": 110,
       "media": 1,
       "middle": 0,
@@ -1446,10 +1531,10 @@
        "tag": "h1"
       },
       "left": 18,
-      "right": 18,
+      "right": 0,
       "textLeft": 18,
-      "textRight": 41,
-      "fullBleed": false,
+      "textRight": -6,
+      "fullBleed": true,
       "footer": false,
       "hero": true,
       "continues": true,
@@ -1458,20 +1543,20 @@
      {
       "sel": "section#demonstracao.sp-showcase",
       "tag": "section",
-      "top": 1292,
-      "height": 1332,
-      "words": 61,
+      "top": 1146,
+      "height": 1192,
+      "words": 74,
       "media": 1,
       "middle": 0,
       "heading": {
-       "text": "- R$ 240,00",
-       "size": 28,
-       "tag": "div"
+       "text": "Fale uma vez.",
+       "size": 26,
+       "tag": "h2"
       },
       "left": 18,
-      "right": 18,
+      "right": 43,
       "textLeft": 18,
-      "textRight": 63,
+      "textRight": 54,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1481,9 +1566,9 @@
      {
       "sel": "section#rotina-24h.sp-routine-act",
       "tag": "section",
-      "top": 2624,
-      "height": 1282,
-      "words": 136,
+      "top": 2337,
+      "height": 1302,
+      "words": 138,
       "media": 1,
       "middle": 0,
       "heading": {
@@ -1494,7 +1579,7 @@
       "left": 18,
       "right": 18,
       "textLeft": 18,
-      "textRight": 21,
+      "textRight": 38,
       "fullBleed": false,
       "footer": false,
       "hero": false,
@@ -1504,9 +1589,9 @@
      {
       "sel": "section#capacidades.sp-features",
       "tag": "section",
-      "top": 3906,
-      "height": 2379,
-      "words": 264,
+      "top": 3640,
+      "height": 2370,
+      "words": 263,
       "media": 1,
       "middle": 0,
       "heading": {
@@ -1527,8 +1612,8 @@
      {
       "sel": "section#simulador.sp-stats",
       "tag": "section",
-      "top": 6285,
-      "height": 713,
+      "top": 6010,
+      "height": 726,
       "words": 67,
       "media": 0,
       "middle": 0,
@@ -1550,10 +1635,10 @@
      {
       "sel": "section#planos.sp-pricing",
       "tag": "section",
-      "top": 6997,
-      "height": 1730,
-      "words": 171,
-      "media": 1,
+      "top": 6736,
+      "height": 1751,
+      "words": 165,
+      "media": 0,
       "middle": 0,
       "heading": {
        "text": "16,58",
@@ -1573,9 +1658,9 @@
      {
       "sel": "section#faq.sp-faq",
       "tag": "section",
-      "top": 8727,
+      "top": 8487,
       "height": 1158,
-      "words": 225,
+      "words": 228,
       "media": 0,
       "middle": 0,
       "heading": {
@@ -1584,7 +1669,7 @@
        "tag": "h2"
       },
       "left": 18,
-      "right": 18,
+      "right": 46,
       "textLeft": 18,
       "textRight": 46,
       "fullBleed": false,
@@ -1596,9 +1681,9 @@
      {
       "sel": "section.sp-cta-board",
       "tag": "section",
-      "top": 9885,
+      "top": 9645,
       "height": 687,
-      "words": 33,
+      "words": 41,
       "media": 1,
       "middle": 0,
       "heading": {
@@ -1619,16 +1704,16 @@
      {
       "sel": "footer.sp-footer-void",
       "tag": "footer",
-      "top": 10573,
+      "top": 10333,
       "height": 220,
-      "words": 19,
+      "words": 20,
       "media": 0,
       "middle": 0,
       "heading": null,
       "left": 18,
-      "right": 18,
+      "right": 74,
       "textLeft": 18,
-      "textRight": 18,
+      "textRight": 74,
       "fullBleed": false,
       "footer": true,
       "hero": false,
@@ -1636,17 +1721,12 @@
       "pinned": false
      }
     ],
-    "gaps": [
-     {
-      "top": 10372,
-      "height": 264
-     }
-    ],
+    "gaps": [],
     "h1s": [
      {
       "text": "Seu dinheiro no ritmo da voz.",
       "size": 38,
-      "top": 134,
+      "top": 132,
       "firstScreen": true
      }
     ],
@@ -1659,13 +1739,9 @@
      {
       "x": 38,
       "n": 16
-     },
-     {
-      "x": 50,
-      "n": 2
      }
     ],
-    "leftBlocks": 34,
+    "leftBlocks": 32,
     "bodySize": 17,
     "stage": false,
     "explains": false,
@@ -1677,7 +1753,39 @@
    "consoleErrors": []
   }
  ],
- "findings": [],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "eyebrow",
+   "width": 1440,
+   "message": "1 eyebrow/kicker label(s) above headings: \"Fatura monitorada\" above \"R$ 2.450,00\"",
+   "fix": "Delete them. If the label carried real information, fold it into the headline or the supporting sentence."
+  },
+  {
+   "level": "FAIL",
+   "id": "icon-cards",
+   "width": 1440,
+   "message": "1 row(s) of identical cards each topped with a small icon (3 cards).",
+   "fix": "Replace with one composed section from the direction: a narrative split, a list set in large type, or real imagery per item.",
+   "alsoAt": [
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The margins differ: 40px on the left, 65px on the right, at 1440px.",
+   "fix": "Put the navigation and the content on one pair of margins; check for padding on one side only, a scrollbar gutter, or a header on another inset than the page."
+  }
+ ],
  "images": [
   {
    "viewport": "desktop",

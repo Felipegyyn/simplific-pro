@@ -9,7 +9,7 @@ const TOPICS = [
   { id: 'suporte', label: 'Suporte Técnico & WhatsApp' },
   { id: 'comercial', label: 'Dúvidas sobre Planos & Assinatura' },
   { id: 'lgpd', label: 'Privacidade & Direitos LGPD (DPO)' },
-  { id: 'parcerias', label: 'Parcerias & Empresarial PJ' }
+  { id: 'parcerias', label: 'Parcerias & Imprensa' }
 ];
 
 const Contato = () => {

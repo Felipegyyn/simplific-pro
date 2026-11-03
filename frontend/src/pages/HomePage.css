@@ -132,6 +132,37 @@
   color: var(--accent-ink);
 }
 
+.sp-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sp-mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--surface-high);
+  color: var(--ink);
+  border: 0;
+  border-radius: var(--radius-page);
+  cursor: pointer;
+}
+
+.sp-mobile-drawer {
+  display: none;
+}
+
+.sp-plan-matrix-head,
+.sp-plan-matrix-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
 /* --- UNIFIED BUTTONS --- */
 .sp-btn-primary {
   display: inline-flex;
@@ -676,6 +707,49 @@
 
   .sp-nav-links {
     display: none;
+  }
+
+  .sp-nav-actions .sp-nav-link {
+    display: none;
+  }
+
+  .sp-nav-cta {
+    padding: 9px 12px;
+  }
+
+  .sp-mobile-toggle {
+    display: inline-flex;
+  }
+
+  .sp-mobile-drawer {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 16px;
+    background-color: var(--surface);
+    border-radius: var(--radius-page);
+  }
+
+  .sp-mobile-drawer-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: var(--step-body);
+    font-weight: 500;
+    border-radius: var(--radius-page);
+    background-color: var(--surface-high);
+  }
+
+  .sp-plan-matrix-head {
+    display: none;
+  }
+
+  .sp-plan-matrix-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .sp-grid-12 {

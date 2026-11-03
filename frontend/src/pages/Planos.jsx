@@ -17,7 +17,7 @@ const PLAN_INCLUDED = [
     monthly: 'Ilimitado · Incluso'
   },
   {
-    feature: 'Painel Web Completo (Vision PF + Mini-ERP PJ com DRE)',
+    feature: 'Painel Web Vision Completo (Fluxo de Caixa, Cartões e Metas)',
     annual: 'Acesso Total',
     monthly: 'Acesso Total'
   },
@@ -153,16 +153,6 @@ const Planos = () => {
                     ? 'De R$ 358,80 por apenas R$ 199,00 à vista no ano (ou em até 12x de R$ 16,58). Economia imediata de R$ 159,80.'
                     : 'Assinatura mensal de R$ 29,90 sem fidelidade. Cancele quando quiser em 1 clique.'}
                 </p>
-
-                <div style={{ marginTop: '20px', borderRadius: '4px', overflow: 'hidden', maxWidth: '300px', aspectRatio: '16 / 10' }}>
-                  <img
-                    src="/assets/landing/simplific-hero-hands.jpg"
-                    alt="Simplific Pro conectado ao WhatsApp"
-                    width="640"
-                    height="400"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
-                </div>
               </div>
 
               <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
@@ -182,7 +172,7 @@ const Planos = () => {
                   }}
                 >
                   <div style={{ fontSize: 'var(--step-body)', color: 'var(--ink)' }}>
-                    Acesso ilimitado à Plataforma Web Vision (PF + PJ) e Assessor IA no WhatsApp
+                    Acesso ilimitado à Plataforma Web Vision e Assessor IA 24h no WhatsApp
                   </div>
                   <div style={{ fontSize: 'var(--step-body)', color: 'var(--ink)' }}>
                     Sincronização automática de Google Agenda, Cotações B3 e Leitura Vision OCR
@@ -242,10 +232,8 @@ const Planos = () => {
                   style={{ padding: '20px', backgroundColor: '#0c100e' }}
                 >
                   <div
+                    className="sp-plan-matrix-head"
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: '2fr 1fr 1fr',
-                      gap: '12px',
                       paddingBottom: '12px',
                       marginBottom: '12px',
                       borderBottom: '1px solid #1e2621',
@@ -262,11 +250,8 @@ const Planos = () => {
                     {PLAN_INCLUDED.map((row) => (
                       <div
                         key={row.feature}
+                        className="sp-plan-matrix-row"
                         style={{
-                          display: 'grid',
-                          gridTemplateColumns: '2fr 1fr 1fr',
-                          gap: '12px',
-                          alignItems: 'center',
                           padding: '10px 12px',
                           backgroundColor: '#111613',
                           borderRadius: '4px'

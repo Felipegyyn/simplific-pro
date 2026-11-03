@@ -18,6 +18,8 @@ import {
   FileText
 } from 'lucide-react';
 import SimplificMascot from '@/components/SimplificMascot';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import './HomePage.css';
 
 const HERO_PRESETS = [
@@ -184,8 +186,8 @@ const FAQ_ITEMS = [
     a: 'Sim. Basta enviar um áudio como "Marca reunião com João amanhã às 15h". O Simplific agenda no seu Google Calendar, gera a sala do Google Meet e envia o convite no WhatsApp do convidado.'
   },
   {
-    q: 'Também serve para minha empresa ou CNPJ?',
-    a: 'Sim. Além do controle pessoal e familiar, sua conta inclui o módulo Simplific Empresas para gerenciar fluxo de caixa PJ, DRE, estoque, vendas e contas a pagar e receber.'
+    q: 'Como acompanho meus relatórios e metas no Painel Web?',
+    a: 'Tudo o que você conversa por áudio, texto ou foto no WhatsApp alimenta instantaneamente o seu Painel Web Vision com gráficos de fluxo de caixa, evolução patrimonial e progresso das suas metas.'
   }
 ];
 
@@ -318,32 +320,7 @@ export default function HomePage() {
 
   return (
     <div className="sp-home">
-      {/* ================= PLAIN NAVIGATION ROW ================= */}
-      <header className="sp-nav">
-        <div className="sp-frame sp-nav-inner">
-          <Link to="/" className="sp-wordmark" aria-label="Simplific Pro Início">
-            <span className="sp-wordmark-mark">S</span>
-            <span>Simplific Pro</span>
-          </Link>
-
-          <nav className="sp-nav-links" aria-label="Navegação Principal">
-            <Link to="/beneficios" className="sp-nav-link">Benefícios</Link>
-            <Link to="/inteligencia" className="sp-nav-link">Inteligência IA</Link>
-            <Link to="/seguranca" className="sp-nav-link">Segurança</Link>
-            <Link to="/planos" className="sp-nav-link">Planos</Link>
-            <Link to="/contato" className="sp-nav-link">Contato</Link>
-          </nav>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Link to="/login" className="sp-nav-link">
-              Entrar
-            </Link>
-            <Link to="/login?tab=register" className="sp-nav-cta">
-              Testar 7 dias grátis
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main>
         {/* ================= ACT 1: DIMENSIONAL HERO ("Fragment on a shaped stage") ================= */}
@@ -389,7 +366,7 @@ export default function HomePage() {
                 <div
                   data-ui="hero-whatsapp-ledger"
                   className="sp-ui-fragment"
-                  style={{ maxWidth: '680px', width: '100%' }}
+                  style={{ width: '100%' }}
                 >
                   {/* Top Bar of the Live Product Fragment */}
                   <div
@@ -626,15 +603,15 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Blown-up Interactive Control + Real Video Fragment [data-ui] */}
+              {/* Blown-up Interactive Control + Real Video Fragment */}
               <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
                 <div
-                  data-ui="showcase-control-stage"
                   className="sp-ui-fragment"
                   style={{ padding: '24px', backgroundColor: '#0b0f0d' }}
                 >
                   {/* Large Poster-Scale Segmented Control */}
                   <div
+                    data-ui="showcase-segmented-tabs"
                     role="group"
                     aria-label="Selecionar motor de entrada do Simplific"
                     style={{
@@ -684,6 +661,7 @@ export default function HomePage() {
                     }}
                   >
                     <div
+                      data-ui="showcase-parsed-card"
                       style={{
                         backgroundColor: '#121815',
                         border: '1px solid #222b26',
@@ -753,7 +731,6 @@ export default function HomePage() {
                         borderRadius: '6px',
                         overflow: 'hidden',
                         backgroundColor: '#080908',
-                        border: '1px solid #222b26',
                         position: 'relative',
                         minHeight: '240px'
                       }}
@@ -800,7 +777,12 @@ export default function HomePage() {
                       Role a página ou selecione um horário para acompanhar como o Simplific trabalha por você da manhã à noite.
                     </p>
 
-                    <div style={{ display: 'grid', gap: '8px' }} role="tablist" aria-label="Linha do tempo de 24 horas">
+                    <div
+                      data-ui="routine-step-list"
+                      style={{ display: 'grid', gap: '8px' }}
+                      role="tablist"
+                      aria-label="Linha do tempo de 24 horas"
+                    >
                       {ROUTINE_24H.map((item, idx) => {
                         const selected = routineIdx === idx;
                         return (
@@ -813,15 +795,15 @@ export default function HomePage() {
                             className="sp-routine-step-btn"
                           >
                             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px' }}>
-                              <span style={{ fontSize: '22px', fontWeight: 600, letterSpacing: '-0.03em' }}>
+                              <span style={{ fontSize: '20px', fontWeight: 600, letterSpacing: '-0.03em' }}>
                                 {item.time}
                               </span>
                               <span
                                 className="sp-routine-sub"
                                 style={{
-                                  fontSize: '13px',
+                                  fontSize: '14px',
                                   fontWeight: 500,
-                                  color: selected ? '#062619' : '#8f9b93'
+                                  color: selected ? '#062619' : '#a8b4ac'
                                 }}
                               >
                                 {item.period}
@@ -829,7 +811,7 @@ export default function HomePage() {
                             </div>
                             <div
                               style={{
-                                fontSize: '16px',
+                                fontSize: '15px',
                                 fontWeight: 500,
                                 marginTop: '6px'
                               }}
@@ -872,25 +854,25 @@ export default function HomePage() {
                           />
                         </div>
 
-                        <div style={{ display: 'grid', gap: '12px' }}>
-                          <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
+                        <div data-ui="routine-metric-card" style={{ display: 'grid', gap: '12px' }}>
+                          <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)' }}>
                             {currentRoutine.call}
                           </div>
-                          <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                          <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)' }}>
                             {currentRoutine.metricLabel}
                           </div>
                           <div
                             style={{
-                              fontSize: 'clamp(36px, 4vw, 52px)',
+                              fontSize: 'var(--step-h2)',
                               fontWeight: 600,
                               letterSpacing: '-0.035em',
                               color: 'var(--accent)',
-                              lineHeight: 1
+                              lineHeight: 1.05
                             }}
                           >
                             {currentRoutine.metricValue}
                           </div>
-                          <div style={{ fontSize: '14px', color: 'var(--ink)' }}>
+                          <div style={{ fontSize: 'var(--step-small)', color: 'var(--ink)' }}>
                             {currentRoutine.metricSub}
                           </div>
                         </div>
@@ -930,7 +912,7 @@ export default function HomePage() {
                 Cinco motores vivos.
               </h2>
               <Link to="/beneficios" className="sp-btn-quiet">
-                <span>Ver todos os benefícios PF & PJ</span>
+                <span>Ver todos os benefícios</span>
                 <ArrowUpRight size={15} />
               </Link>
             </div>
@@ -1090,12 +1072,12 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* CELL 6 (Photo Top, Text Bottom): Painel Web Vision & Simplific Empresas */}
+              {/* CELL 6 (Photo Top, Text Bottom): Painel Web Vision & Metas */}
               <article className="sp-cell" data-sc-in style={{ '--i': 5 }}>
                 <div style={{ height: '220px', overflow: 'hidden', backgroundColor: '#080908' }}>
                   <img
                     src="/assets/landing/simplific-assessor-agenda.jpg"
-                    alt="Executiva utilizando o ecossistema web e empresarial do Simplific Pro"
+                    alt="Painel Web Vision e acompanhamento de metas financeiras do Simplific Pro"
                     width="900"
                     height="900"
                     loading="lazy"
@@ -1103,9 +1085,9 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="sp-cell-copy">
-                  <h3 className="sp-cell-title">Painel Web & ERP PJ</h3>
+                  <h3 className="sp-cell-title">Painel Web Vision & Metas</h3>
                   <p className="sp-cell-desc">
-                    Tudo o que você conversa no WhatsApp alimenta dashboards interativos, DRE, fluxo de caixa, metas e o módulo empresarial completo.
+                    Tudo o que você conversa no WhatsApp alimenta dashboards interativos, evolução patrimonial, fluxo de caixa e metas financeiras em tempo real.
                   </p>
                 </div>
               </article>
@@ -1238,43 +1220,18 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Right Column (Columns 6-12): Monumental Price Figure Overlapped by Custom Plate */}
+              {/* Right Column (Columns 6-12): Monumental Price Figure */}
               <div style={{ gridColumn: '6 / span 7', position: 'relative' }} data-sc-in>
-                <div style={{ position: 'relative', display: 'inline-block', paddingTop: '20px' }}>
-                  {/* Overlapping Custom Brand Photo at top-right of the numerals */}
-                  <div
-                    style={{
-                      width: 'clamp(130px, 16vw, 210px)',
-                      height: 'clamp(90px, 11vw, 140px)',
-                      borderRadius: 'var(--radius-page)',
-                      overflow: 'hidden',
-                      marginLeft: 'auto',
-                      marginBottom: '-22px',
-                      position: 'relative',
-                      zIndex: 2
-                    }}
-                  >
-                    <img
-                      src="/assets/landing/simplific-hero-hands.jpg"
-                      alt="Conexão humana e inteligência artificial no Simplific Pro"
-                      width="600"
-                      height="400"
-                      loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    />
-                  </div>
-
-                  <div className="sp-price-numerals">
-                    <span className="sp-price-currency">R$</span>
-                    <span>{billingPlan === 'annual' ? '16,58' : '29,90'}</span>
-                    <span className="sp-price-period">
-                      {billingPlan === 'annual' ? '/mês em 12x (ou R$ 199/ano)' : '/mês sem fidelidade'}
-                    </span>
-                  </div>
+                <div className="sp-price-numerals">
+                  <span className="sp-price-currency">R$</span>
+                  <span>{billingPlan === 'annual' ? '16,58' : '29,90'}</span>
+                  <span className="sp-price-period">
+                    {billingPlan === 'annual' ? '/mês em 12x (ou R$ 199/ano)' : '/mês sem fidelidade'}
+                  </span>
                 </div>
 
                 {/* Four Plain Included Lines (without ticks or bullets per blueprint) */}
-                <div style={{ marginTop: '36px', display: 'grid', gap: '12px', fontSize: '18px', color: 'var(--ink)' }}>
+                <div style={{ marginTop: '36px', display: 'grid', gap: '12px', fontSize: 'var(--step-body)', color: 'var(--ink)' }}>
                   <div>Assessor IA 24h no seu WhatsApp e Painel Web Vision completo</div>
                   <div>Leitura ilimitada de fotos de comprovantes, PDFs e comandos de voz</div>
                   <div>Cotações da Bolsa B3 ao vivo, Google Agenda com Meet e Modo Casal</div>
@@ -1317,10 +1274,10 @@ export default function HomePage() {
             >
               <div className="sp-grid-12" style={{ alignItems: 'center' }}>
                 <div style={{ gridColumn: '1 / span 5' }}>
-                  <h3 style={{ fontSize: '24px', fontWeight: 500, margin: '0 0 10px 0', letterSpacing: '-0.02em' }}>
+                  <h3 className="sp-h2" style={{ margin: '0 0 10px 0' }}>
                     Defesa em profundidade.
                   </h3>
-                  <p style={{ fontSize: '15px', lineHeight: 1.6, color: 'var(--muted)', margin: '0 0 16px 0' }}>
+                  <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.6, color: 'var(--muted)', margin: '0 0 16px 0' }}>
                     Criptografia ponta a ponta AES-256, conformidade rigorosa com a LGPD (Lei nº 13.709/2018) e operação sobre infraestrutura oficial verificada.
                   </p>
                   <Link to="/seguranca" className="sp-btn-quiet" style={{ paddingLeft: 0 }}>
@@ -1330,6 +1287,7 @@ export default function HomePage() {
                 </div>
 
                 <div
+                  data-ui="security-badges"
                   style={{
                     gridColumn: '6 / span 7',
                     display: 'grid',
@@ -1339,18 +1297,18 @@ export default function HomePage() {
                 >
                   <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
                     <img src="/assets/logo_meta.png" alt="Meta Tech Provider" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Meta Official API</div>
-                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Canal verificado sem risco</div>
+                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Meta Official API</div>
+                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Canal verificado sem risco</div>
                   </div>
                   <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
                     <img src="/assets/logo_google.png" alt="Google Cloud" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Google Cloud</div>
-                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Isolamento e backups diários</div>
+                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Google Cloud</div>
+                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Isolamento e backups diários</div>
                   </div>
                   <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
                     <img src="/assets/logo_twilio.png" alt="Twilio Security" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Criptografia TLS 1.3</div>
-                    <div style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '2px' }}>Zero acesso à senha bancária</div>
+                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Criptografia TLS 1.3</div>
+                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Zero acesso à senha bancária</div>
                   </div>
                 </div>
               </div>
@@ -1418,11 +1376,8 @@ export default function HomePage() {
               <div className="sp-cta-center">
                 <h2
                   id="cta-heading"
+                  className="sp-h2"
                   style={{
-                    fontSize: 'clamp(28px, 3vw, 40px)',
-                    fontWeight: 600,
-                    lineHeight: 1.06,
-                    letterSpacing: '-0.03em',
                     color: '#05120c',
                     margin: '0 0 12px 0'
                   }}
@@ -1431,7 +1386,7 @@ export default function HomePage() {
                 </h2>
                 <p
                   style={{
-                    fontSize: '17px',
+                    fontSize: 'var(--step-body)',
                     lineHeight: 1.55,
                     color: '#07281b',
                     maxWidth: '48ch',
@@ -1442,6 +1397,7 @@ export default function HomePage() {
                 </p>
 
                 <form
+                  data-ui="cta-quick-form"
                   onSubmit={(e) => {
                     e.preventDefault();
                     navigate('/login?tab=register');
@@ -1470,7 +1426,7 @@ export default function HomePage() {
                       border: 0,
                       padding: '10px 12px',
                       color: '#f3f6f4',
-                      fontSize: '15px',
+                      fontSize: 'var(--step-small)',
                       outline: 'none'
                     }}
                   />
@@ -1482,7 +1438,7 @@ export default function HomePage() {
                       border: 0,
                       borderRadius: '4px',
                       padding: '12px 20px',
-                      fontSize: '15px',
+                      fontSize: 'var(--step-small)',
                       fontWeight: 600,
                       cursor: 'pointer',
                       display: 'inline-flex',
@@ -1507,13 +1463,13 @@ export default function HomePage() {
                   justifyContent: 'space-between'
                 }}
               >
-                <div style={{ fontSize: '14px', color: 'var(--muted)' }}>
+                <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)' }}>
                   WhatsApp Oficial 24/7
                 </div>
-                <div style={{ fontSize: '28px', fontWeight: 600, color: 'var(--accent)', letterSpacing: '-0.03em' }}>
+                <div style={{ fontSize: 'var(--step-h2)', fontWeight: 600, color: 'var(--accent)', letterSpacing: '-0.03em' }}>
                   7 dias
                 </div>
-                <div style={{ fontSize: '14px', color: 'var(--ink)' }}>
+                <div style={{ fontSize: 'var(--step-small)', color: 'var(--ink)' }}>
                   Reembolso integral garantido
                 </div>
               </div>
@@ -1522,29 +1478,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* ================= FOOTER — A SINGLE QUIET LINE ================= */}
-      <footer className="sp-footer-void">
-        <div className="sp-frame sp-footer-line">
-          <div>Simplific Pro · Assessor Financeiro IA</div>
-
-          <nav className="sp-footer-links" aria-label="Links Institucionais">
-            <Link to="/beneficios" className="sp-footer-link">Benefícios</Link>
-            <Link to="/inteligencia" className="sp-footer-link">Inteligência IA</Link>
-            <Link to="/seguranca" className="sp-footer-link">Segurança</Link>
-            <Link to="/planos" className="sp-footer-link">Planos</Link>
-            <Link to="/checkout?plan=annual" className="sp-footer-link">Assinar</Link>
-            <Link to="/contato" className="sp-footer-link">Contato</Link>
-            <Link to="/login" className="sp-footer-link">Entrar</Link>
-          </nav>
-
-          <div style={{ textAlign: 'right' }}>
-            <span>© {new Date().getFullYear()} Simplific · </span>
-            <Link to="/termos" className="sp-footer-link">Termos</Link>
-            <span> · </span>
-            <Link to="/privacidade" className="sp-footer-link">Privacidade</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
