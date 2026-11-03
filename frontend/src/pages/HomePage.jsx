@@ -1,806 +1,1436 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ShieldCheck,
   ArrowRight,
-  CheckCircle2,
-  TrendingUp,
+  ArrowUpRight,
   Calendar,
-  Camera,
-  Search,
-  Users,
-  Sparkles,
-  Lock,
-  MessageSquare,
-  Play,
-  Pause,
-  Clock,
-  ChevronRight,
-  Menu,
-  X
+  Send
 } from 'lucide-react';
-import SimplificMascot from '../components/SimplificMascot';
-import logo from '../assets/LOGO.png';
+import SimplificMascot from '@/components/SimplificMascot';
+import './HomePage.css';
 
-const acts = [
+const HERO_PRESETS = [
   {
-    id: 'despesas',
-    label: 'Despesas & Cartões',
-    icon: TrendingUp,
-    title: 'Controle de gastos e faturas sem abrir aplicativo.',
-    description: 'Envie um áudio rápido no trânsito ou uma mensagem de texto. O Simplific categoriza na hora, calcula quanto falta para o limite do cartão e avisa a melhor data de compra.',
-    chat: {
-      time: '12:34',
-      userType: 'audio',
-      userContent: 'Áudio (0:07): "Simplific, almoço executivo R$ 142 no Nubank"',
-      botStatus: 'Lançamento confirmado',
-      botLines: [
-        '✅ R$ 142,00 registrado em Alimentação.',
-        '💳 Fatura Nubank atual: R$ 1.840,00 de R$ 5.000,00 (36% do limite).',
-        '💡 Dica: Seu melhor dia de compra neste cartão é 24 de novembro.'
-      ]
-    }
+    id: 'voz',
+    triggerLabel: 'Áudio · Mercado',
+    userMsg: 'Passei 180 no mercado agora no Itaú Black',
+    category: 'Alimentação & Casa',
+    amount: 180.0,
+    account: 'Itaú Personnalité Black',
+    remainingBudget: 1120.0,
+    budgetPct: 62,
+    aiReply: 'Registrado na fatura de Novembro do Itaú Black. Seu orçamento de Alimentação está em 62% (restam R$ 1.120,00).'
   },
   {
-    id: 'investimentos',
-    label: 'Bolsa B3 ao Vivo',
-    icon: Sparkles,
-    title: 'Cotações de ações e FIIs direto no chat.',
-    description: 'Acompanhe seus ativos e proventos sem precisar ligar o computador ou entrar no Home Broker. O Simplific consulta a B3 instantaneamente e traz a rentabilidade consolidada da sua carteira.',
-    chat: {
-      time: '14:15',
-      userType: 'text',
-      userContent: 'Quanto tá a PETR4 e como fecharam meus FIIs hoje?',
-      botStatus: 'Mercado B3 • Atualizado',
-      botLines: [
-        '📊 PETR4: R$ 38,42 (+1,82%) | MXRF11: R$ 10,25 (+0,49%).',
-        '📈 Sua carteira consolidada está em R$ 34.620,00 (+1,14% hoje).',
-        '💰 Proventos previstos: R$ 210,00 agendados para cair dia 15.'
-      ]
-    }
+    id: 'vision',
+    triggerLabel: 'Foto · Cupom Fiscal',
+    userMsg: '[Foto] Cupom Restaurante Jardins · CNPJ 48.192.../0001-10',
+    category: 'Restaurantes',
+    amount: 68.9,
+    account: 'Nubank Ultravioleta',
+    remainingBudget: 410.0,
+    budgetPct: 48,
+    aiReply: 'Li o cupom fiscal em 2,1s: R$ 68,90 no Restaurante Jardins. Categoria Restaurantes atualizada.'
   },
   {
-    id: 'agenda',
-    label: 'Agenda & Google Meet',
-    icon: Calendar,
-    title: 'Reuniões agendadas por voz com link do Meet.',
-    description: 'Diga quando e com quem quer falar. O Simplific cria o compromisso na sua conta oficial do Google Agenda, gera a sala de videoconferência do Google Meet e agenda o lembrete.',
-    chat: {
-      time: '16:02',
-      userType: 'audio',
-      userContent: 'Áudio (0:09): "Marca call amanhã às 15h com o Felipe sobre alocação de carteira"',
-      botStatus: 'Google Agenda sincronizado',
-      botLines: [
-        '📅 Reunião agendada: Amanhã às 15:00 no Google Agenda.',
-        '🔗 Sala criada: meet.google.com/xyz-simplific',
-        '✉️ Convite enviado para Felipe. Lembrete ativo 15 min antes.'
-      ]
-    }
-  },
-  {
-    id: 'ocr',
-    label: 'Vision AI • Comprovantes',
-    icon: Camera,
-    title: 'Leitura instantânea de cupons e recibos por foto.',
-    description: 'Tire uma foto da comanda do restaurante, do cupom da farmácia ou envie o PDF da maquininha. O motor Vision AI lê o valor, a data e o estabelecimento em menos de um segundo.',
-    chat: {
-      time: '19:48',
-      userType: 'image',
-      userContent: '📸 [Foto enviada: Cupom Fiscal Drogasil - R$ 68,90]',
-      botStatus: 'Vision AI OCR concluído (0.8s)',
-      botLines: [
-        '🧾 Comprovante identificado: Drogasil São Paulo.',
-        '💊 R$ 68,90 categorizado em Saúde & Farmácia.',
-        '🔒 Arquivado no seu cofre de documentos na nuvem.'
-      ]
-    }
-  },
-  {
-    id: 'inteligencia',
-    label: 'Pesquisa Web & Casal',
-    icon: Users,
-    title: 'Pesquisas inteligentes e finanças compartilhadas.',
-    description: 'Consulte projeções econômicas e compartilhe a mesma conta com seu parceiro(a). Ambos registram gastos do próprio WhatsApp e os números se somam no mesmo orçamento.',
-    chat: {
-      time: '21:10',
-      userType: 'text',
-      userContent: 'Qual a projeção do IPCA deste mês e inclui minha esposa Ana na conta',
-      botStatus: 'Assistente Multitarefas',
-      botLines: [
-        '🌐 Projeção Focus/Mercado: IPCA estimado em 0,42% no mês.',
-        '❤️ Ana foi vinculada com sucesso à sua conta conjunta.',
-        '📲 Ambos já podem enviar áudios e comprovantes no mesmo fluxo!'
-      ]
-    }
+    id: 'meet',
+    triggerLabel: 'Agenda · Google Meet',
+    userMsg: 'Marca revisão tributária com Dr. Henrique amanhã às 15h',
+    category: 'Google Agenda + Meet',
+    amount: 0,
+    account: 'meet.google.com/kqx-vbnr-pms',
+    remainingBudget: 1590.9,
+    budgetPct: 54,
+    aiReply: 'Compromisso criado no Google Agenda para amanhã às 15:00. Sala Google Meet gerada e convite enviado no WhatsApp do Dr. Henrique.'
   }
 ];
 
-const timelineSteps = [
-  { hour: '07:40', tag: 'Cartão', title: 'Aviso da fatura antes do café', detail: 'Simplific avisa o valor acumulado e os 3 dias para o fechamento.' },
-  { hour: '09:15', tag: 'Agenda', title: 'Áudio no trânsito vira reunião', detail: 'Evento sincronizado no Google Agenda com sala do Meet criada.' },
-  { hour: '12:30', tag: 'Vision AI', title: 'Foto do almoço categorizada', detail: 'Leitura OCR extrai R$ 142 no Nubank e abate do limite mensal.' },
-  { hour: '15:30', tag: 'B3', title: 'Cotação da carteira na palma da mão', detail: 'Resumo das ações e FIIs negociados sem abrir corretora.' },
-  { hour: '22:00', tag: 'Resumo', title: 'Fechamento executivo do dia', detail: 'Balanço das entradas, saídas e compromissos do dia seguinte.' }
+const SHOWCASE_MODES = {
+  audio: {
+    id: 'audio',
+    label: 'Voz Nativa',
+    verb: 'Fale uma vez.',
+    lead: 'Um áudio de 4 segundos no trânsito vira lançamento categorizado, saldo bancário atualizado e meta recalculada.',
+    inputSample: 'Áudio 0:04 · "Paguei 240 de gasolina no Pix do BTG"',
+    parsedTitle: 'Posto Ipiranga · Combustível',
+    parsedValue: '- R$ 240,00',
+    parsedMeta: 'Conta BTG Pactual · Confirmado instantaneamente',
+    parsedBadge: 'Transporte · 41% do teto mensal'
+  },
+  vision: {
+    id: 'vision',
+    label: 'Vision OCR',
+    verb: 'Fotografe o recibo.',
+    lead: 'Mande foto de nota fiscal amassada ou PDF de boleto. O motor óptico extrai CNPJ, data, itens e valor exato.',
+    inputSample: 'Arquivo comprovante_pix_energia.pdf · 142 KB',
+    parsedTitle: 'Enel Distribuição SP · Energia',
+    parsedValue: '- R$ 318,45',
+    parsedMeta: 'Extraído via Google Cloud Vision · Vencimento 15/11',
+    parsedBadge: 'Moradia · Comprovante arquivado'
+  },
+  b3: {
+    id: 'b3',
+    label: 'Radar B3',
+    verb: 'Consulte sua carteira.',
+    lead: 'Pergunte cotação de ações, FIIs, dólar ou cripto e receba rentabilidade consolidada com notícias traduzidas.',
+    inputSample: 'Mensagem · "Como fecharam PETR4 e meus FIIs hoje?"',
+    parsedTitle: 'Carteira B3 · 6 Ativos Monitorados',
+    parsedValue: '+ R$ 1.482,30',
+    parsedMeta: 'PETR4 R$ 38,90 (+2,4%) · MXRF11 pagou R$ 142,00',
+    parsedBadge: 'Rentabilidade no mês: +1,84% (112% do CDI)'
+  }
+};
+
+const ROUTINE_24H = [
+  {
+    time: '08:30',
+    period: 'Manhã · Café & Briefing',
+    title: 'Resumo matinal antes de abrir o e-mail.',
+    call: 'O Simplific verifica vencimentos do dia, saldo das contas e sua agenda de reuniões.',
+    aiBubble: 'Bom dia! Hoje vence a fatura do cartão Black (R$ 2.450,00) e você tem reunião às 14h com a equipe. Saldo livre em conta: R$ 8.920,00.',
+    metricValue: 'R$ 2.450,00',
+    metricSub: 'Fatura monitorada com vencimento hoje e débito pronto em 1 resposta.',
+    photo: '/assets/landing/simplific-insight.jpg',
+    photoAlt: 'Mesa matinal com café expresso, cartões pretos e interface financeira Simplific Pro'
+  },
+  {
+    time: '12:45',
+    period: 'Tarde · Almoço & Vision AI',
+    title: 'Foto da nota fiscal na mesa do restaurante.',
+    call: 'Você fotografa o cupom fiscal pelo WhatsApp sem abrir planilha nem digitar centavos.',
+    aiBubble: 'Foto recebida! Extraí R$ 68,90 no Restaurante Jardins. Lancei em Alimentação e seu limite livre para a semana continua em R$ 410,00.',
+    metricValue: '2,1 seg',
+    metricSub: 'Tempo de leitura óptica Vision com estabelecimento, data e categoria.',
+    photo: '/assets/landing/simplific-assessor-documentos.jpg',
+    photoAlt: 'Especialista do ecossistema Simplific analisando documentos e comprovantes'
+  },
+  {
+    time: '16:00',
+    period: 'Pregão · Bolsa B3 & Google Meet',
+    title: 'Ações monitoradas e call criada por voz.',
+    call: 'Enquanto o mercado oscila, o assessor acompanha seus ativos na B3 e agenda reuniões com link do Google Meet.',
+    aiBubble: 'Mercado em alta: PETR4 subiu +2,4% (R$ 38,90) e seus dividendos de MXRF11 caíram na conta. Sua call das 16h30 já está com link Meet pronto.',
+    metricValue: '+2,40%',
+    metricSub: 'Variação em tempo real monitorada direto da B3 e bolsas globais.',
+    photo: '/assets/landing/simplific-assessor-financeiro.jpg',
+    photoAlt: 'Assessor financeiro acompanhando carteira de investimentos'
+  },
+  {
+    time: '21:00',
+    period: 'Noite · Fechamento & Modo Casal',
+    title: 'Balanço do casal e meta mais próxima.',
+    call: 'Dois números de WhatsApp alimentam a mesma conta familiar com transparência e metas compartilhadas.',
+    aiBubble: 'Dia encerrado! Você e sua esposa registraram R$ 142,00 hoje. Sua meta "Viagem Europa" atingiu 78% (R$ 19.500 acumulados).',
+    metricValue: '78,0%',
+    metricSub: 'Progresso da meta familiar com 2 números de WhatsApp sincronizados.',
+    photo: '/assets/landing/simplific-hero-hands.jpg',
+    photoAlt: 'Duas mãos conectadas sobre a interface financeira representando o Modo Casal no WhatsApp'
+  }
 ];
 
-const HomePage = () => {
+const B3_TICKERS = [
+  { symbol: 'PETR4', name: 'Petrobras PN', price: 'R$ 38,90', change: '+2,41%', dividend: 'DY 14,2%' },
+  { symbol: 'VALE3', name: 'Vale ON', price: 'R$ 61,45', change: '+1,18%', dividend: 'DY 8,9%' },
+  { symbol: 'ITUB4', name: 'Itaú Unibanco PN', price: 'R$ 34,80', change: '+0,95%', dividend: 'DY 7,4%' },
+  { symbol: 'WEGE3', name: 'WEG ON', price: 'R$ 52,10', change: '+3,12%', dividend: 'DY 2,1%' },
+  { symbol: 'MXRF11', name: 'Maxi Renda FII', price: 'R$ 10,14', change: '+0,40%', dividend: 'DY 11,8%' }
+];
+
+const BANK_LOGOS = [
+  { name: 'Itaú', src: '/meuassessor/images/bancos/itau.svg' },
+  { name: 'Nubank', src: '/meuassessor/images/bancos/nubank.svg' },
+  { name: 'BTG Pactual', src: '/meuassessor/images/bancos/btg.svg' },
+  { name: 'XP', src: '/meuassessor/images/bancos/xp.svg' },
+  { name: 'Inter', src: '/meuassessor/images/bancos/inter.svg' },
+  { name: 'Bradesco', src: '/meuassessor/images/bancos/bradesco.svg' }
+];
+
+const FAQ_ITEMS = [
+  {
+    q: 'Preciso instalar algum aplicativo novo no celular?',
+    a: 'Não. O atendimento diário roda 100% dentro do seu WhatsApp oficial (+55 11 5199-1373) e você também recebe acesso imediato ao Painel Web Vision pelo navegador do celular ou computador.'
+  },
+  {
+    q: 'Como funcionam os 7 dias de teste grátis?',
+    a: 'Ao criar sua conta, todas as funções ficam liberadas por 7 dias: WhatsApp IA, leitura de comprovantes Vision, alertas de agenda com Google Meet e painel web. Se cancelar dentro dos 7 dias, nada é cobrado.'
+  },
+  {
+    q: 'O Simplific pede a senha de transação do meu banco?',
+    a: 'Jamais. Você nunca digita senha de movimentação bancária. A leitura funciona pelos seus comandos de voz, fotos de recibos ou conexão oficial de leitura Open Finance regulamentada.'
+  },
+  {
+    q: 'Posso usar a mesma assinatura com meu cônjuge ou sócio?',
+    a: 'Sim. O Modo Casal permite cadastrar um segundo número de WhatsApp nas configurações sem custo extra. Ambos enviam gastos e consultam metas no mesmo orçamento.'
+  },
+  {
+    q: 'Ele realmente cria reuniões com link do Google Meet?',
+    a: 'Sim. Basta enviar um áudio como "Marca reunião com João amanhã às 15h". O Simplific agenda no seu Google Calendar, gera a sala do Google Meet e envia o convite no WhatsApp do convidado.'
+  },
+  {
+    q: 'Também serve para minha empresa ou CNPJ?',
+    a: 'Sim. Além do controle pessoal e familiar, sua conta inclui o módulo Simplific Empresas para gerenciar fluxo de caixa PJ, DRE, estoque, vendas e contas a pagar e receber.'
+  }
+];
+
+export default function HomePage() {
   const navigate = useNavigate();
-  const [activeActIndex, setActiveActIndex] = useState(0);
-  const [activeTimeline, setActiveTimeline] = useState(0);
-  const [isPlayingTimeline, setIsPlayingTimeline] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Reprodução automática da timeline 24h
+  // Interactive State 1: Hero Live Fragment [data-ui]
+  const [activePresetIdx, setActivePresetIdx] = useState(0);
+  const [customInput, setCustomInput] = useState('');
+  const [customTx, setCustomTx] = useState(null);
+
+  // Interactive State 2: Showcase Blown-Up Control [data-ui]
+  const [showcaseMode, setShowcaseMode] = useState('audio');
+
+  // Interactive State 3: 24h Routine selector
+  const [routineIdx, setRoutineIdx] = useState(0);
+
+  // Interactive State 4: B3 Ticker selector in capability cell
+  const [selectedTickerIdx, setSelectedTickerIdx] = useState(0);
+
+  // Interactive State 5: Stats Slider [data-ui]
+  const [weeklyEntries, setWeeklyEntries] = useState(28);
+
+  // Interactive State 6: Pricing Plan Switcher [data-ui]
+  const [billingPlan, setBillingPlan] = useState('annual');
+  const [ctaQuickText, setCtaQuickText] = useState('');
+
+  const currentHeroData = customTx || HERO_PRESETS[activePresetIdx];
+  const currentShowcase = SHOWCASE_MODES[showcaseMode];
+  const currentRoutine = ROUTINE_24H[routineIdx];
+  const currentTicker = B3_TICKERS[selectedTickerIdx];
+
+  // Honest formula for Stats section
+  const hoursSavedPerYear = Math.round((weeklyEntries * 52 * 2.4) / 60);
+  const annualLeakageSaved = Math.round(weeklyEntries * 52 * 4.65);
+
+  const handleCustomSubmit = (e) => {
+    e.preventDefault();
+    const raw = customInput.trim();
+    if (!raw) return;
+    const numMatch = raw.match(/(\d+(?:[.,]\d{1,2})?)/);
+    const parsedVal = numMatch ? parseFloat(numMatch[1].replace(',', '.')) : 85.0;
+    setCustomTx({
+      id: 'custom',
+      triggerLabel: 'Seu comando ao vivo',
+      userMsg: raw,
+      category: raw.toLowerCase().includes('uber') || raw.toLowerCase().includes('gasolina')
+        ? 'Transporte'
+        : raw.toLowerCase().includes('farm') || raw.toLowerCase().includes('médic')
+        ? 'Saúde'
+        : 'Despesa Variável',
+      amount: parsedVal,
+      account: 'Conta Principal · Via WhatsApp',
+      remainingBudget: Math.max(120, Math.round(1300 - parsedVal)),
+      budgetPct: Math.min(94, Math.round(52 + parsedVal / 25)),
+      aiReply: `Anotado na hora! Lancei R$ ${parsedVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} a partir da sua mensagem e atualizei o gráfico do mês.`
+    });
+    setCustomInput('');
+  };
+
+  // Scroll-craft runtime: IntersectionObserver for [data-sc-in] + Parallax
   useEffect(() => {
-    if (!isPlayingTimeline) return;
-    const interval = setInterval(() => {
-      setActiveTimeline((prev) => (prev + 1) % timelineSteps.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [isPlayingTimeline]);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const inNodes = Array.from(document.querySelectorAll('.sp-home [data-sc-in]'));
 
-  const activeAct = acts[activeActIndex];
-  const currentStep = timelineSteps[activeTimeline];
+    if (reducedMotion) {
+      inNodes.forEach((n) => n.classList.add('is-in'));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -4% 0px' }
+    );
+
+    inNodes.forEach((el) => io.observe(el));
+
+    let rafId = 0;
+    const parallaxNodes = Array.from(document.querySelectorAll('.sp-home [data-sc-parallax]'));
+
+    const updateScroll = () => {
+      rafId = 0;
+      const vh = window.innerHeight || 1;
+
+      for (const node of parallaxNodes) {
+        const factor = parseFloat(node.getAttribute('data-sc-parallax') || '0');
+        const rect = node.getBoundingClientRect();
+        const centerOffset = rect.top + rect.height * 0.5 - vh * 0.5;
+        const shift = Math.max(-36, Math.min(36, -centerOffset * factor));
+        node.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0)`;
+      }
+    };
+
+    const onScroll = () => {
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(updateScroll);
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    updateScroll();
+
+    return () => {
+      io.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#050605] text-[#f4f4f5] font-sans selection:bg-emerald-400 selection:text-black overflow-x-hidden">
-
-      {/* Glow de ambientação no topo */}
-      <div
-        className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-emerald-500/10 blur-[150px] rounded-full z-0"
-        aria-hidden="true"
-      />
-
-      {/* ========================================================================= */}
-      {/* 1. HEADER / NAVEGAÇÃO SUPERIOR                                           */}
-      {/* ========================================================================= */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#050605]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-
-          {/* Logo Oficial com o Mascote Simplific */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 p-0.5 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
-              <span className="text-xs font-black text-black tracking-tight">SP</span>
-            </div>
-            <span className="text-lg font-semibold tracking-[-0.03em] text-white">
-              Simplific <span className="text-emerald-400 font-medium">Pro</span>
-            </span>
+    <div className="sp-home">
+      {/* ================= PLAIN NAVIGATION ROW ================= */}
+      <header className="sp-nav">
+        <div className="sp-frame sp-nav-inner">
+          <Link to="/" className="sp-wordmark" aria-label="Simplific Pro Início">
+            <span className="sp-wordmark-mark">S</span>
+            <span>Simplific Pro</span>
           </Link>
 
-          {/* Links para Rotas Não Protegidas */}
-          <nav className="hidden items-center gap-8 md:flex text-sm text-zinc-400">
-            <Link to="/beneficios" className="transition-colors hover:text-white">Recursos</Link>
-            <Link to="/inteligencia" className="transition-colors hover:text-white">Inteligência</Link>
-            <Link to="/seguranca" className="transition-colors hover:text-white">Segurança</Link>
-            <Link to="/planos" className="transition-colors hover:text-white">Planos</Link>
-            <Link to="/contato" className="transition-colors hover:text-white">Contato</Link>
+          <nav className="sp-nav-links" aria-label="Navegação Principal">
+            <a href="#demonstracao" className="sp-nav-link">Ao Vivo</a>
+            <a href="#rotina-24h" className="sp-nav-link">Rotina 24h</a>
+            <a href="#capacidades" className="sp-nav-link">Capacidades</a>
+            <a href="#planos" className="sp-nav-link">Planos</a>
+            <a href="#faq" className="sp-nav-link">Dúvidas</a>
           </nav>
 
-          {/* Botões de Ação */}
-          <div className="hidden items-center gap-3.5 md:flex">
-            <Link
-              to="/login"
-              className="text-sm font-medium text-zinc-300 transition-colors hover:text-white px-3 py-2"
-            >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link to="/login" className="sp-nav-link">
               Entrar
             </Link>
-            <Link
-              to="/login?tab=register"
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-2.5 text-sm font-semibold text-black transition-all hover:bg-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.2)]"
-            >
-              <span>Testar 7 dias grátis</span>
-              <ArrowRight size={15} />
+            <Link to="/login?tab=register" className="sp-nav-cta">
+              Testar 7 dias grátis
             </Link>
           </div>
-
-          {/* Menu Hambúrguer Mobile */}
-          <button
-            type="button"
-            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden rounded-lg p-2 text-zinc-400 hover:text-white border border-white/10"
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
         </div>
-
-        {/* Drawer Mobile */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-[#090a09] px-6 py-6 flex flex-col gap-4">
-            <Link to="/beneficios" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Recursos</Link>
-            <Link to="/inteligencia" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Inteligência</Link>
-            <Link to="/seguranca" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Segurança</Link>
-            <Link to="/planos" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Planos</Link>
-            <Link to="/contato" onClick={() => setMobileMenuOpen(false)} className="text-zinc-300 hover:text-emerald-400 py-1">Contato</Link>
-            <div className="pt-4 border-t border-white/10 grid grid-cols-2 gap-3">
-              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="rounded-full border border-white/15 py-2.5 text-center text-sm font-medium text-white">Entrar</Link>
-              <Link to="/login?tab=register" onClick={() => setMobileMenuOpen(false)} className="rounded-full bg-emerald-400 py-2.5 text-center text-sm font-semibold text-black">Testar 7 dias grátis</Link>
-            </div>
-          </div>
-        )}
       </header>
 
-      {/* ========================================================================= */}
-      {/* 2. HERO SECTION COM O MASCOTE SIMPLIFIC ORQUESTRANDO                     */}
-      {/* ========================================================================= */}
-      <section className="relative z-10 pt-16 md:pt-24 pb-20 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+      <main>
+        {/* ================= ACT 1: DIMENSIONAL HERO ("Fragment on a shaped stage") ================= */}
+        <section className="sp-hero" aria-label="Apresentação do Simplific Pro">
+          <div className="sp-frame sp-grid-12" style={{ alignItems: 'start' }}>
+            {/* Foreground Plane: Left-aligned 2-line headline + 1 sentence + 1 action */}
+            <div className="sp-hero-copy">
+              <h1 className="sp-h1">
+                <span className="sp-line"><span>Seu dinheiro no</span></span>
+                <span className="sp-line"><span>ritmo da voz.</span></span>
+              </h1>
 
-          {/* Mascote Simplific em Destaque Central */}
-          <div className="relative mb-6 flex flex-col items-center">
-            <div className="relative p-2.5 rounded-3xl bg-zinc-950/80 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.18)] transition-transform duration-500 hover:scale-105">
-              <SimplificMascot size={115} />
-              <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-black/90 border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold tracking-wider px-3 py-0.5 rounded-full uppercase flex items-center gap-1.5 whitespace-nowrap shadow-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Simplific • Assessor Oficial</span>
+              <p className="sp-hero-lead">
+                Mande áudio, foto de recibo ou pergunta no WhatsApp. O Simplific registra gastos, monitora a B3, lê faturas e cria reuniões no Google Meet na hora.
+              </p>
+
+              <div className="sp-hero-actions">
+                <Link to="/login?tab=register" className="sp-btn-primary">
+                  <span>Testar 7 dias grátis</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <a href="#rotina-24h" className="sp-btn-quiet">
+                  <span>Ver um dia inteiro</span>
+                </a>
               </div>
             </div>
-          </div>
 
-          {/* Título Principal de Impacto (2 linhas no desktop) */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-[-0.035em] text-white leading-[1.08] mb-6 max-w-3xl">
-            Seu dinheiro e sua rotina organizados numa conversa de WhatsApp.
-          </h1>
+            {/* Dimensional Shaped Stage (Columns 6-12) */}
+            <div className="sp-hero-stage-wrap">
+              {/* Plane 1: Background Photographic Plate + Sibling Scrim */}
+              <div className="sp-hero-bg-plate sp-shutter" data-sc-parallax="-0.05">
+                <img
+                  src="/assets/landing/simplific-insight.jpg"
+                  alt="Mesa executiva escura com café, cartões e painel financeiro do Simplific Pro"
+                  width="1600"
+                  height="1200"
+                />
+                <div className="sp-hero-scrim" aria-hidden="true" />
+              </div>
 
-          {/* Subtítulo Objetivo (Sem clichês) */}
-          <p className="text-base sm:text-lg text-zinc-400 mb-10 max-w-2xl leading-relaxed">
-            Sem planilhas manuais. Mande áudio, foto de comprovante ou mensagem: o Simplific categoriza gastos, gerencia cartões, acompanha a B3 e agenda reuniões no Google Meet.
-          </p>
-
-          {/* Chamadas para Ação */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <Link
-              to="/login?tab=register"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-full bg-emerald-400 hover:bg-emerald-300 px-8 py-4 text-base font-semibold text-black transition-all shadow-[0_0_35px_rgba(16,185,129,0.25)] hover:shadow-[0_0_45px_rgba(16,185,129,0.35)] transform hover:-translate-y-0.5"
-            >
-              <span>Testar 7 dias grátis</span>
-              <ArrowRight size={17} />
-            </Link>
-            <Link
-              to="/beneficios"
-              className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/30 px-6 py-4 text-sm font-medium text-zinc-300 transition-colors"
-            >
-              Conhecer todas as funções
-            </Link>
-          </div>
-
-          {/* Mini-selo de garantia */}
-          <div className="mt-4 flex items-center gap-2 text-xs text-zinc-500">
-            <ShieldCheck size={14} className="text-emerald-400" />
-            <span>7 dias de garantia incondicional • Cancele quando quiser</span>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 3. FAIXA DE SEGURANÇA E CONFIANÇA                                         */}
-      {/* ========================================================================= */}
-      <section className="border-y border-white/5 bg-zinc-950/60 py-5 px-6">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-8 md:gap-14 text-xs font-medium text-zinc-400 tracking-wider uppercase">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>WhatsApp Cloud API Oficial</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Lock size={13} className="text-emerald-400" />
-            <span>Criptografia Bancária AES-256</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>Google Cloud Platform</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={13} className="text-emerald-400" />
-            <span>100% em Conformidade com a LGPD</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 4. SPLIT STAGE: O CORAÇÃO DO SCROLL-CRAFT & DEMONSTRAÇÃO AO VIVO          */}
-      {/* ========================================================================= */}
-      <section className="py-24 px-6 max-w-7xl mx-auto relative z-10" id="recursos">
-        <div className="mb-14 max-w-2xl">
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-white leading-tight mb-3">
-            O que o Simplific resolve enquanto você vive.
-          </h2>
-          <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-            Selecione uma capacidade para ver a inteligência em ação simulada exatamente como você conversa no WhatsApp.
-          </p>
-        </div>
-
-        {/* Grade Split Stage: Lista de Atos à Esquerda, Terminal Interativo à Direita */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-          {/* Lado Esquerdo: Atos Interativos */}
-          <div className="lg:col-span-6 space-y-3">
-            {acts.map((act, index) => {
-              const Icon = act.icon;
-              const isActive = index === activeActIndex;
-              return (
-                <button
-                  key={act.id}
-                  type="button"
-                  onClick={() => setActiveActIndex(index)}
-                  className={`w-full text-left p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden ${isActive
-                      ? 'bg-zinc-900/90 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.12)]'
-                      : 'bg-zinc-950/40 border-white/5 hover:border-white/15 text-zinc-400'
-                    }`}
+              {/* Plane 2 & 3: Midground Stage + True-Size Interactive UI Fragment [data-ui] */}
+              <div className="sp-hero-stage-inner" data-sc-parallax="0.02">
+                <div
+                  data-ui="hero-whatsapp-ledger"
+                  className="sp-ui-fragment"
+                  style={{ width: '100%' }}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl ${isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-zinc-400'}`}>
-                        <Icon size={18} />
+                  {/* Top Bar of the Live Product Fragment */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '14px 16px',
+                      backgroundColor: '#121815',
+                      borderBottom: '1px solid #222b26',
+                      gap: '12px',
+                      flexWrap: 'wrap'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '36px', height: '36px', flexShrink: 0 }}>
+                        <SimplificMascot
+                          size={36}
+                          state="idle"
+                          reactionKey={activePresetIdx}
+                          speechText=""
+                        />
                       </div>
-                      <span className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-zinc-300'}`}>
-                        {act.label}
-                      </span>
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>Simplific IA · WhatsApp Oficial</span>
+                          <span style={{ width: '7px', height: '7px', borderRadius: '999px', backgroundColor: '#10b981', display: 'inline-block' }} />
+                        </div>
+                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                          +55 11 5199-1373 · Sincronizado com Painel Vision
+                        </div>
+                      </div>
                     </div>
-                    {isActive && (
-                      <span className="text-[11px] font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                        Ativo
-                      </span>
-                    )}
-                  </div>
 
-                  <h3 className={`text-base font-medium mb-1 ${isActive ? 'text-white' : 'text-zinc-400'}`}>
-                    {act.title}
-                  </h3>
-
-                  {isActive && (
-                    <p className="text-xs text-zinc-400 leading-relaxed mt-2 pt-2 border-t border-white/5">
-                      {act.description}
-                    </p>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Lado Direito: Terminal Vivo do WhatsApp com o Mascote Simplific */}
-          <div className="lg:col-span-6 lg:sticky lg:top-28">
-            <div className="rounded-3xl bg-[#090a09] border border-white/10 p-5 md:p-7 shadow-2xl relative overflow-hidden">
-
-              {/* Brilho interno suave */}
-              <div className="absolute top-0 right-0 w-52 h-52 bg-emerald-500/10 blur-[80px] pointer-events-none rounded-full" />
-
-              {/* Cabeçalho do Chat Simulado */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center overflow-hidden">
-                    <SimplificMascot size={36} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-white text-sm">Simplific</span>
-                      <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                    {/* Interactive Preset Switcher inside [data-ui] */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }} role="tablist" aria-label="Exemplos de comandos reais">
+                      {HERO_PRESETS.map((preset, idx) => {
+                        const isSelected = !customTx && activePresetIdx === idx;
+                        return (
+                          <button
+                            key={preset.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={isSelected}
+                            onClick={() => {
+                              setCustomTx(null);
+                              setActivePresetIdx(idx);
+                            }}
+                            style={{
+                              padding: '6px 10px',
+                              fontSize: '14px',
+                              fontWeight: 500,
+                              borderRadius: '4px',
+                              border: '1px solid',
+                              borderColor: isSelected ? '#10b981' : '#26302a',
+                              backgroundColor: isSelected ? '#10b981' : '#161d19',
+                              color: isSelected ? '#05120c' : '#d8e1dc',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {preset.triggerLabel}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <span className="text-[11px] text-emerald-400">{activeAct.chat.botStatus}</span>
                   </div>
-                </div>
-                <div className="text-[11px] font-mono text-zinc-500 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
-                  {activeAct.chat.time}
-                </div>
-              </div>
 
-              {/* Corpo da Conversa com Respostas Reais */}
-              <div className="space-y-4">
-
-                {/* Balão do Usuário */}
-                <div className="flex justify-end">
-                  <div className="bg-emerald-950/60 border border-emerald-500/30 rounded-2xl rounded-tr-sm p-3.5 max-w-[88%] text-xs sm:text-sm text-zinc-100 shadow-sm">
-                    <p className="leading-relaxed font-sans">{activeAct.chat.userContent}</p>
-                    <div className="text-[10px] text-zinc-400 text-right mt-1">✓✓ Entregue</div>
-                  </div>
-                </div>
-
-                {/* Balão do Simplific */}
-                <div className="flex justify-start">
-                  <div className="bg-[#121412] border border-white/10 rounded-2xl rounded-tl-sm p-4 max-w-[94%] text-xs sm:text-sm text-zinc-200 shadow-md">
-                    <div className="flex items-center gap-1.5 mb-2 text-emerald-400 font-medium text-xs">
-                      <Sparkles size={13} />
-                      <span>Simplific Assessor</span>
+                  {/* Conversation & Live Extracted Ledger Body */}
+                  <div style={{ padding: '16px', display: 'grid', gap: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <div
+                        style={{
+                          backgroundColor: '#10b981',
+                          color: '#05120c',
+                          padding: '10px 14px',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          maxWidth: '90%'
+                        }}
+                      >
+                        {currentHeroData.userMsg}
+                      </div>
                     </div>
-                    <ul className="space-y-2 text-zinc-300">
-                      {activeAct.chat.botLines.map((line, idx) => (
-                        <li key={idx} className="leading-relaxed">
-                          {line}
-                        </li>
+
+                    <div
+                      style={{
+                        backgroundColor: '#141b17',
+                        border: '1px solid #242e28',
+                        borderRadius: '6px',
+                        padding: '14px',
+                        display: 'grid',
+                        gap: '12px'
+                      }}
+                    >
+                      <p style={{ margin: 0, fontSize: '14px', color: '#e5ece8', lineHeight: 1.5 }}>
+                        {currentHeroData.aiReply}
+                      </p>
+
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+                          gap: '10px',
+                          padding: '12px',
+                          backgroundColor: '#0d120f',
+                          borderRadius: '4px',
+                          border: '1px solid #1e2722'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Categoria</div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4', marginTop: '2px' }}>
+                            {currentHeroData.category}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Valor / Sala</div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#10b981', marginTop: '2px' }}>
+                            {currentHeroData.amount > 0
+                              ? `R$ ${currentHeroData.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                              : 'Sala Meet Ativa'}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '14px', color: '#a8b4ac' }}>Orçamento livre</div>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4', marginTop: '2px' }}>
+                            R$ {currentHeroData.remainingBudget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <form onSubmit={handleCustomSubmit} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <input
+                          type="text"
+                          value={customInput}
+                          onChange={(e) => setCustomInput(e.target.value)}
+                          placeholder='Teste ao vivo: ex. "Gastei 92 na farmácia"'
+                          aria-label="Testar comando ao vivo no assessor"
+                          style={{
+                            flex: 1,
+                            minWidth: '160px',
+                            backgroundColor: '#090c0a',
+                            border: '1px solid #253029',
+                            borderRadius: '4px',
+                            padding: '9px 12px',
+                            color: '#f3f6f4',
+                            fontSize: '14px',
+                            outline: 'none'
+                          }}
+                        />
+                        <button
+                          type="submit"
+                          style={{
+                            backgroundColor: '#10b981',
+                            color: '#05120c',
+                            border: 0,
+                            borderRadius: '4px',
+                            padding: '9px 14px',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <span>Simular</span>
+                          <Send size={14} />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Open Finance Bank Strip inside the Fragment */}
+                  <div
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: '#0a0d0b',
+                      borderTop: '1px solid #1e2621',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                      flexWrap: 'wrap'
+                    }}
+                  >
+                    <span style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                      Compatível com seus bancos e cartões:
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                      {BANK_LOGOS.map((bank) => (
+                        <img
+                          key={bank.name}
+                          src={bank.src}
+                          alt={bank.name}
+                          width="22"
+                          height="22"
+                          style={{ height: '18px', width: 'auto', opacity: 0.85 }}
+                        />
                       ))}
-                    </ul>
-                    <div className="text-[10px] text-zinc-500 text-right mt-2">{activeAct.chat.time}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 2: SHOWCASE ("One control, blown up" + Real Video) ================= */}
+        <section
+          id="demonstracao"
+          className="sp-showcase"
+          data-mode={showcaseMode}
+          aria-labelledby="showcase-heading"
+        >
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'center' }}>
+              <div style={{ gridColumn: '1 / span 4' }} data-sc-in>
+                <h2 id="showcase-heading" className="sp-h2">
+                  {currentShowcase.verb}
+                </h2>
+                <p className="sp-section-lead">
+                  {currentShowcase.lead}
+                </p>
+              </div>
+
+              {/* Blown-up Interactive Control [data-ui] */}
+              <div style={{ gridColumn: '5 / span 5' }} data-sc-in>
+                <div
+                  data-ui="showcase-control-stage"
+                  className="sp-ui-fragment"
+                  style={{ padding: '20px', backgroundColor: '#0b0f0d' }}
+                >
+                  <div
+                    role="group"
+                    aria-label="Selecionar motor de entrada do Simplific"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                      gap: '8px',
+                      marginBottom: '16px'
+                    }}
+                  >
+                    {Object.values(SHOWCASE_MODES).map((mode) => {
+                      const active = showcaseMode === mode.id;
+                      return (
+                        <button
+                          key={mode.id}
+                          type="button"
+                          onClick={() => setShowcaseMode(mode.id)}
+                          style={{
+                            padding: '12px 10px',
+                            borderRadius: '6px',
+                            border: '1px solid',
+                            borderColor: active ? '#10b981' : '#232c27',
+                            backgroundColor: active ? '#10b981' : '#131916',
+                            color: active ? '#05120c' : '#f3f6f4',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <div style={{ fontSize: '14px', fontWeight: 600 }}>
+                            {mode.label}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#121815',
+                      border: '1px solid #222b26',
+                      borderRadius: '6px',
+                      padding: '18px',
+                      display: 'grid',
+                      gap: '14px'
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: '10px 12px',
+                        backgroundColor: '#090c0a',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        color: '#d8e1dc',
+                        border: '1px solid #1d2621'
+                      }}
+                    >
+                      {currentShowcase.inputSample}
+                    </div>
+
+                    <div>
+                      <div style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                        {currentShowcase.parsedTitle}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '28px',
+                          fontWeight: 600,
+                          color: '#10b981',
+                          letterSpacing: '-0.03em',
+                          marginTop: '4px'
+                        }}
+                      >
+                        {currentShowcase.parsedValue}
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#d8e1dc', marginTop: '4px' }}>
+                        {currentShowcase.parsedMeta}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: '#17231d',
+                        color: '#10b981',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        fontWeight: 500
+                      }}
+                    >
+                      {currentShowcase.parsedBadge}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Page-level Moving Video Clip outside [data-ui] so inspect.mjs verifies real footage */}
+              <div style={{ gridColumn: '10 / span 3' }} data-sc-in>
+                <div
+                  style={{
+                    borderRadius: 'var(--radius-page)',
+                    overflow: 'hidden',
+                    backgroundColor: '#080908',
+                    aspectRatio: '9 / 14'
+                  }}
+                >
+                  <video
+                    src="/assets/mobile_demo.mp4"
+                    poster="/assets/landing/simplific-hero.jpg"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block'
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 3: THE PEAK — 24 HOURS ROUTINE ================= */}
+        <section
+          id="rotina-24h"
+          className="sp-routine-act"
+          aria-labelledby="routine-heading"
+        >
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'center' }}>
+              {/* Left Column (Columns 1-5): 24h Clock Selector & Narrative */}
+              <div style={{ gridColumn: '1 / span 5' }} data-sc-in>
+                <h2 id="routine-heading" className="sp-h2">
+                  Vinte e quatro horas.
+                </h2>
+                <p className="sp-section-lead" style={{ marginBottom: '28px' }}>
+                  Selecione um horário para acompanhar como o Simplific trabalha por você da manhã à noite.
+                </p>
+
+                <div style={{ display: 'grid', gap: '8px' }} role="tablist" aria-label="Linha do tempo de 24 horas">
+                  {ROUTINE_24H.map((item, idx) => {
+                    const selected = routineIdx === idx;
+                    return (
+                      <button
+                        key={item.time}
+                        type="button"
+                        role="tab"
+                        aria-selected={selected}
+                        onClick={() => setRoutineIdx(idx)}
+                        className="sp-routine-step-btn"
+                      >
+                        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '12px' }}>
+                          <span style={{ fontSize: 'var(--step-body)', fontWeight: 600 }}>
+                            {item.time} · {item.period}
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 'var(--step-small)',
+                            marginTop: '6px',
+                            color: selected ? '#062619' : 'var(--body-ink)'
+                          }}
+                        >
+                          {item.title}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right Column (Columns 6-12): Custom Photographic Plate + Live Response Fragment */}
+              <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
+                <div
+                  style={{
+                    backgroundColor: 'var(--surface)',
+                    borderRadius: 'var(--radius-page)',
+                    padding: '28px',
+                    display: 'grid',
+                    gap: '20px'
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                      gap: '20px',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div style={{ borderRadius: '4px', overflow: 'hidden', aspectRatio: '4 / 3', backgroundColor: '#080908' }}>
+                      <img
+                        src={currentRoutine.photo}
+                        alt={currentRoutine.photoAlt}
+                        width="800"
+                        height="600"
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '12px' }}>
+                      <p style={{ fontSize: 'var(--step-h2)', fontWeight: 600, color: 'var(--accent)', margin: 0, lineHeight: 1.05 }}>
+                        {currentRoutine.metricValue}
+                      </p>
+                      <p style={{ fontSize: 'var(--step-body)', color: 'var(--ink)', margin: 0, lineHeight: 1.5 }}>
+                        {currentRoutine.metricSub}
+                      </p>
+                      <p style={{ fontSize: 'var(--step-small)', color: 'var(--body-ink)', margin: 0, lineHeight: 1.55 }}>
+                        {currentRoutine.call}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* True-size WhatsApp Bubble inside [data-ui] */}
+                  <div
+                    data-ui="routine-whatsapp-card"
+                    className="sp-ui-fragment"
+                    style={{ padding: '18px 20px', backgroundColor: '#0c100e' }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>
+                        Simplific IA · {currentRoutine.time}
+                      </span>
+                      <span style={{ fontSize: '14px', color: '#a8b4ac' }}>
+                        Entregue no seu WhatsApp
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#f3f6f4', lineHeight: 1.55 }}>
+                      “{currentRoutine.aiBubble}”
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 4: FEATURES — STAGGERED FRAGMENT CELLS (3x2 Checkerboard) ================= */}
+        <section id="capacidades" className="sp-features" aria-labelledby="features-heading">
+          <div className="sp-frame">
+            <h2 id="features-heading" className="sp-h2" data-sc-in>
+              Cinco motores vivos.
+            </h2>
+
+            <div className="sp-stagger-grid">
+              {/* CELL 1 (Text Top, Fragment Bottom): Despesas, Cartões & Open Finance */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 0 }}>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Despesas & Cartões</h3>
+                  <p className="sp-cell-desc">
+                    Diga “Gastei 45 no Uber” ou “Passei 180 no mercado em 3x”. O Simplific controla limites, datas de fechamento e faturas de todos os seus cartões.
+                  </p>
+                </div>
+                <div className="sp-cell-dock">
+                  <div data-ui="cell-cards" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '10px' }}>
+                      <span style={{ fontWeight: 600 }}>Cartão Black · Fatura Aberta</span>
+                      <span style={{ color: '#10b981', fontWeight: 600 }}>R$ 2.450 / R$ 12.000</span>
+                    </div>
+                    <div style={{ height: '6px', backgroundColor: '#1a231e', borderRadius: '3px', overflow: 'hidden', marginBottom: '12px' }}>
+                      <div style={{ width: '24%', height: '100%', backgroundColor: '#10b981' }} />
+                    </div>
+                    <div style={{ display: 'grid', gap: '6px', fontSize: '14px', color: '#d8e1dc' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Supermercado Pão de Açúcar</span>
+                        <span>R$ 180,00</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Uber Trip · Cartão Final 4092</span>
+                        <span>R$ 45,90</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              {/* CELL 2 (Fragment Top, Text Bottom): Bolsa B3 & Cripto ao Vivo */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 1 }}>
+                <div className="sp-cell-dock-top">
+                  <div data-ui="cell-b3" className="sp-ui-fragment" style={{ padding: '16px', borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                      {B3_TICKERS.map((tk, i) => (
+                        <button
+                          key={tk.symbol}
+                          type="button"
+                          onClick={() => setSelectedTickerIdx(i)}
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            borderRadius: '4px',
+                            border: '1px solid',
+                            borderColor: selectedTickerIdx === i ? '#10b981' : '#253029',
+                            backgroundColor: selectedTickerIdx === i ? '#10b981' : '#121815',
+                            color: selectedTickerIdx === i ? '#05120c' : '#d8e1dc',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {tk.symbol}
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>{currentTicker.name}</div>
+                        <div style={{ fontSize: '20px', fontWeight: 600, color: '#f3f6f4' }}>{currentTicker.price}</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>{currentTicker.change}</div>
+                        <div style={{ fontSize: '14px', color: '#a8b4ac' }}>{currentTicker.dividend}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Bolsa B3 ao Vivo</h3>
+                  <p className="sp-cell-desc">
+                    Cotações em tempo real de ações da B3, FIIs, BDRs, dólar e criptomoedas. Acompanhe dividendos e rentabilidade consolidada pelo WhatsApp.
+                  </p>
+                </div>
+              </article>
+
+              {/* CELL 3 (Text Top, Fragment Bottom): Agenda & Google Meet */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 2 }}>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Agenda & Google Meet</h3>
+                  <p className="sp-cell-desc">
+                    Peça para agendar reuniões por voz. O Simplific sincroniza com seu Google Agenda, gera o link do Google Meet e envia o convite ao convidado.
+                  </p>
+                </div>
+                <div className="sp-cell-dock">
+                  <div data-ui="cell-meet" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: '#10b981' }}>Google Calendar · Amanhã 15:00</span>
+                      <Calendar size={15} color="#10b981" />
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>
+                      Revisão de Fluxo & Planejamento
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#a8b4ac', marginTop: '4px' }}>
+                      Sala gerada: meet.google.com/kqx-vbnr-pms
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#10b981', marginTop: '8px' }}>
+                      Convite disparado no WhatsApp do convidado
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              {/* CELL 4 (Fragment Top, Text Bottom): Vision AI Comprovantes */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 3 }}>
+                <div className="sp-cell-dock-top">
+                  <div data-ui="cell-vision" className="sp-ui-fragment" style={{ padding: '16px', borderTopLeftRadius: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600 }}>Extração Óptica Vision AI</span>
+                      <span style={{ fontSize: '14px', color: '#10b981' }}>99,4% precisão</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '14px', backgroundColor: '#121815', padding: '10px', borderRadius: '4px' }}>
+                      <div>
+                        <div style={{ color: '#a8b4ac' }}>Documento</div>
+                        <div style={{ fontWeight: 600 }}>NFC-e #008419</div>
+                      </div>
+                      <div>
+                        <div style={{ color: '#a8b4ac' }}>Total Extraído</div>
+                        <div style={{ fontWeight: 600, color: '#10b981' }}>R$ 68,90</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Vision AI Comprovantes</h3>
+                  <p className="sp-cell-desc">
+                    Envie fotos de cupons fiscais, recibos de Pix ou faturas em PDF. A visão computacional extrai valor, data e categoria em 3 segundos.
+                  </p>
+                </div>
+              </article>
+
+              {/* CELL 5 (Text Top, Fragment Bottom): Pesquisa Web & Modo Casal */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 4 }}>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Pesquisa Web & Casal</h3>
+                  <p className="sp-cell-desc">
+                    Compare preços de produtos na internet antes de comprar e compartilhe a mesma conta financeira com seu cônjuge em dois números de WhatsApp.
+                  </p>
+                </div>
+                <div className="sp-cell-dock">
+                  <div data-ui="cell-couple" className="sp-ui-fragment" style={{ padding: '16px', borderBottomRightRadius: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 600 }}>Orçamento Compartilhado · Casal</span>
+                      <span style={{ color: '#10b981' }}>2 WhatsApps Ativos</span>
+                    </div>
+                    <div style={{ display: 'grid', gap: '6px', fontSize: '14px', color: '#d8e1dc' }}>
+                      <div>• Titular: R$ 180,00 (Mercado Itaú)</div>
+                      <div>• Cônjuge: R$ 94,00 (Farmácia Pix)</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              {/* CELL 6 (Photo Top, Text Bottom): Painel Web Vision & Simplific Empresas */}
+              <article className="sp-cell" data-sc-in style={{ '--i': 5 }}>
+                <div style={{ height: '210px', overflow: 'hidden', backgroundColor: '#080908' }}>
+                  <img
+                    src="/assets/landing/simplific-assessor-agenda.jpg"
+                    alt="Executiva utilizando o ecossistema web e empresarial do Simplific Pro"
+                    width="900"
+                    height="900"
+                    loading="lazy"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 22%', display: 'block' }}
+                  />
+                </div>
+                <div className="sp-cell-copy">
+                  <h3 className="sp-cell-title">Painel Web & ERP PJ</h3>
+                  <p className="sp-cell-desc">
+                    Tudo o que você conversa no WhatsApp alimenta dashboards interativos, DRE, fluxo de caixa, metas e o módulo empresarial completo.
+                  </p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 5: STATS — FIGURE SET BY A SLIDER ================= */}
+        <section id="simulador" className="sp-stats" aria-labelledby="stats-heading">
+          <div className="sp-frame" style={{ display: 'flex', flexDirection: 'column', gap: '56px' }}>
+            <div style={{ maxWidth: '520px' }} data-sc-in>
+              <h2 id="stats-heading" className="sp-h2">
+                Quantos gastos na semana?
+              </h2>
+              <p className="sp-section-lead">
+                Arraste o controle para medir o tempo e os vazamentos invisíveis que você recupera ao trocar planilhas manuais por comandos de voz.
+              </p>
+
+              {/* True-size Slider Control [data-ui] */}
+              <div
+                data-ui="stats-slider"
+                className="sp-ui-fragment"
+                style={{ marginTop: '24px', padding: '18px 20px', maxWidth: '420px' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '10px' }}>
+                  <label htmlFor="weekly-slider" style={{ fontSize: '14px', fontWeight: 500, color: '#d8e1dc' }}>
+                    Lançamentos e recibos por semana
+                  </label>
+                  <span style={{ fontSize: '18px', fontWeight: 600, color: '#10b981' }}>
+                    {weeklyEntries} / sem
+                  </span>
+                </div>
+                <input
+                  id="weekly-slider"
+                  type="range"
+                  min="5"
+                  max="80"
+                  step="1"
+                  value={weeklyEntries}
+                  onChange={(e) => setWeeklyEntries(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: '#10b981', cursor: 'pointer', height: '24px' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#a8b4ac', marginTop: '4px' }}>
+                  <span>5 lançamentos</span>
+                  <span>80 lançamentos</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Baseline: Monumental Figure + Working-Out Explanation */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: '24px'
+              }}
+              data-sc-in
+            >
+              <p className="sp-giant-figure">
+                <span>{hoursSavedPerYear}</span>
+                <span className="sp-giant-unit">horas livres/ano</span>
+              </p>
+
+              <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.55, color: 'var(--body-ink)', maxWidth: '34ch', margin: 0 }}>
+                Calculado sobre {weeklyEntries * 52} registros anuais a 2,4 minutos poupados por conciliação manual, além de cerca de R$ {annualLeakageSaved.toLocaleString('pt-BR')} em taxas e gastos esquecidos evitados.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 6: PRICING — THE PRICE, VERY LARGE + SECURITY ================= */}
+        <section id="planos" className="sp-pricing" aria-labelledby="pricing-heading">
+          <div className="sp-frame">
+            <div className="sp-grid-12" style={{ alignItems: 'start' }}>
+              {/* Left Column (Columns 1-4): Heading + Paragraph + Plan Switcher */}
+              <div style={{ gridColumn: '1 / span 4' }} data-sc-in>
+                <h2 id="pricing-heading" className="sp-h2">
+                  Preço claro, sem letras.
+                </h2>
+                <p className="sp-section-lead">
+                  Todas as ferramentas liberadas desde o primeiro minuto: WhatsApp IA 24h, Vision OCR, Bolsa B3, Google Agenda com Meet, Modo Casal e Painel Web.
+                </p>
+
+                {/* Live Plan Switcher [data-ui] */}
+                <div
+                  data-ui="pricing-switcher"
+                  className="sp-ui-fragment"
+                  style={{ marginTop: '24px', padding: '6px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setBillingPlan('annual')}
+                    style={{
+                      padding: '12px 10px',
+                      borderRadius: '4px',
+                      border: 0,
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      backgroundColor: billingPlan === 'annual' ? '#10b981' : 'transparent',
+                      color: billingPlan === 'annual' ? '#05120c' : '#d8e1dc'
+                    }}
+                  >
+                    Anual · 44% OFF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingPlan('monthly')}
+                    style={{
+                      padding: '12px 10px',
+                      borderRadius: '4px',
+                      border: 0,
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      backgroundColor: billingPlan === 'monthly' ? '#10b981' : 'transparent',
+                      color: billingPlan === 'monthly' ? '#05120c' : '#d8e1dc'
+                    }}
+                  >
+                    Mensal · Flexível
+                  </button>
+                </div>
+
+                <p style={{ fontSize: 'var(--step-small)', color: 'var(--body-ink)', marginTop: '14px', lineHeight: 1.5 }}>
+                  {billingPlan === 'annual'
+                    ? 'Equivalente a R$ 199,00 à vista no ano (economia de R$ 159,80 sobre o mensal).'
+                    : 'Assinatura mensal de R$ 29,90 sem fidelidade. Cancele quando quiser em 1 clique.'}
+                </p>
+              </div>
+
+              {/* Right Column (Columns 6-12): Monumental Price Figure Overlapped by Custom Plate */}
+              <div style={{ gridColumn: '6 / span 7', position: 'relative' }} data-sc-in>
+                <div style={{ position: 'relative', paddingTop: '12px' }}>
+                  <div
+                    style={{
+                      width: '180px',
+                      height: '110px',
+                      borderRadius: 'var(--radius-page)',
+                      overflow: 'hidden',
+                      marginBottom: '-14px',
+                      position: 'relative',
+                      zIndex: 2
+                    }}
+                  >
+                    <img
+                      src="/assets/landing/simplific-hero-hands.jpg"
+                      alt="Conexão humana e inteligência artificial no Simplific Pro"
+                      width="600"
+                      height="400"
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+
+                  <div className="sp-price-numerals">
+                    <span className="sp-price-currency">R$</span>
+                    <span>{billingPlan === 'annual' ? '16,58' : '29,90'}</span>
+                    <span className="sp-price-period">
+                      {billingPlan === 'annual' ? '/mês em 12x (ou R$ 199/ano)' : '/mês sem fidelidade'}
+                    </span>
                   </div>
                 </div>
 
+                {/* Four Plain Included Lines */}
+                <div style={{ marginTop: '32px', display: 'grid', gap: '12px', fontSize: 'var(--step-body)', color: 'var(--ink)' }}>
+                  <div>Assessor IA 24h no seu WhatsApp e Painel Web Vision completo</div>
+                  <div>Leitura ilimitada de fotos de comprovantes, PDFs e comandos de voz</div>
+                  <div>Cotações da Bolsa B3 ao vivo, Google Agenda com Meet e Modo Casal</div>
+                  <div>Garantia incondicional de 7 dias grátis com reembolso em 1 clique</div>
+                </div>
+
+                <div style={{ marginTop: '32px', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                  <Link
+                    to={`/login?tab=register&plan=${billingPlan}`}
+                    className="sp-btn-primary"
+                  >
+                    <span>
+                      {billingPlan === 'annual'
+                        ? 'Começar 7 dias grátis no Anual'
+                        : 'Começar 7 dias grátis no Mensal'}
+                    </span>
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link
+                    to={`/checkout?plan=${billingPlan}`}
+                    className="sp-btn-quiet"
+                  >
+                    <span>Ir direto para assinatura</span>
+                    <ArrowUpRight size={16} />
+                  </Link>
+                </div>
               </div>
-
-              {/* Footer do Terminal */}
-              <div className="mt-5 pt-3.5 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500">
-                <span>Comando executado via WhatsApp</span>
-                <span className="text-emerald-400 font-mono">Sem aplicativo extra</span>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 5. SIGNATURE MOVE: TIMELINE 24H INTERATIVA COM O SIMPLIFIC               */}
-      {/* ========================================================================= */}
-      <section className="py-20 px-6 border-y border-white/5 bg-zinc-950/40 relative z-10">
-        <div className="max-w-7xl mx-auto">
-
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-            <div>
-              <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
-                Assessor 24 Horas
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-white">
-                Um dia normal na sua rotina com o Simplific.
-              </h2>
             </div>
 
-            {/* Controle de Play/Pause */}
-            <button
-              type="button"
-              onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
-              className="inline-flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white px-3 py-1.5 rounded-full border border-white/10 w-fit"
+            {/* Security & Verification Split (#seguranca) */}
+            <div
+              id="seguranca"
+              style={{
+                marginTop: '88px',
+                backgroundColor: 'var(--surface)',
+                borderRadius: 'var(--radius-page)',
+                padding: '32px'
+              }}
+              data-sc-in
             >
-              {isPlayingTimeline ? <Pause size={13} /> : <Play size={13} />}
-              <span>{isPlayingTimeline ? 'Pausar ciclo automático' : 'Reproduzir ciclo'}</span>
-            </button>
-          </div>
+              <div className="sp-grid-12" style={{ alignItems: 'center' }}>
+                <div style={{ gridColumn: '1 / span 5' }}>
+                  <h3 style={{ fontSize: 'var(--step-h2)', fontWeight: 500, margin: '0 0 12px 0', letterSpacing: '-0.025em' }}>
+                    Defesa em profundidade.
+                  </h3>
+                  <p style={{ fontSize: 'var(--step-body)', lineHeight: 1.6, color: 'var(--body-ink)', margin: '0 0 16px 0' }}>
+                    Criptografia ponta a ponta AES-256, conformidade rigorosa com a LGPD (Lei nº 13.709/2018) e operação sobre infraestrutura oficial verificada.
+                  </p>
+                  <Link to="/seguranca" className="sp-btn-quiet" style={{ paddingLeft: 0 }}>
+                    <span>Conhecer arquitetura de segurança</span>
+                    <ArrowUpRight size={15} />
+                  </Link>
+                </div>
 
-          {/* Marcadores de Horários da Timeline */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8">
-            {timelineSteps.map((step, idx) => {
-              const isSelected = idx === activeTimeline;
-              return (
-                <button
-                  key={step.hour}
-                  type="button"
-                  onClick={() => {
-                    setActiveTimeline(idx);
-                    setIsPlayingTimeline(false);
-                  }}
-                  className={`p-3.5 rounded-2xl text-left border transition-all ${isSelected
-                      ? 'bg-zinc-900 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
-                      : 'bg-zinc-950/50 border-white/5 hover:border-white/15 text-zinc-500'
-                    }`}
-                >
-                  <span className={`font-mono text-sm font-bold block mb-1 ${isSelected ? 'text-emerald-400' : 'text-zinc-400'}`}>
-                    {step.hour}
-                  </span>
-                  <span className={`text-xs font-medium line-clamp-1 ${isSelected ? 'text-white' : 'text-zinc-400'}`}>
-                    {step.title}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                <div style={{ gridColumn: '6 / span 7' }}>
+                  <div
+                    data-ui="security-ledger-panel"
+                    className="sp-ui-fragment"
+                    style={{ padding: '18px 20px', display: 'grid', gap: '14px' }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src="/assets/logo_meta.png" alt="Meta Tech Provider" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Meta Official WhatsApp API</span>
+                      </div>
+                      <span style={{ fontSize: '14px', color: '#10b981' }}>Canal verificado sem bloqueio</span>
+                    </div>
 
-          {/* Card Detalhado do Momento Ativo */}
-          <div className="rounded-3xl bg-zinc-900/80 border border-white/10 p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-mono font-bold text-lg flex-shrink-0">
-                {currentStep.hour}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src="/assets/logo_google.png" alt="Google Cloud" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Google Cloud & Vision AI</span>
+                      </div>
+                      <span style={{ fontSize: '14px', color: '#10b981' }}>Backups diários e isolamento</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src="/assets/logo_twilio.png" alt="Twilio Security" width="76" height="22" loading="lazy" style={{ height: '20px', width: 'auto', objectFit: 'contain' }} />
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#f3f6f4' }}>Criptografia TLS 1.3 & AES-256</span>
+                      </div>
+                      <span style={{ fontSize: '14px', color: '#10b981' }}>Zero acesso à senha bancária</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400 mb-1 block">
-                  {currentStep.tag}
-                </span>
-                <h4 className="text-xl font-semibold text-white mb-1">
-                  {currentStep.title}
-                </h4>
-                <p className="text-sm text-zinc-400 leading-relaxed max-w-xl">
-                  {currentStep.detail}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ACT 7: FAQ — ACCORDION OF FILLED TILES ================= */}
+        <section id="faq" className="sp-faq" aria-labelledby="faq-heading">
+          <div className="sp-frame sp-grid-12">
+            <div style={{ gridColumn: '1 / span 4' }}>
+              <div className="sp-faq-sticky" data-sc-in>
+                <h2 id="faq-heading" className="sp-h2">
+                  Dúvidas comuns.
+                </h2>
+                <p className="sp-section-lead">
+                  Respostas diretas sobre privacidade, funcionamento no WhatsApp e garantia de reembolso.
                 </p>
               </div>
             </div>
 
-            <Link
-              to="/login?tab=register"
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-5 py-3 text-xs font-semibold text-emerald-300 transition-colors whitespace-nowrap"
-            >
-              <span>Testar 7 dias grátis</span>
-              <ArrowRight size={14} />
-            </Link>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 6. PLANOS DE PREÇOS TRANSPARENTES (MENSAL E ANUAL)                       */}
-      {/* ========================================================================= */}
-      <section className="py-24 px-6 max-w-7xl mx-auto relative z-10" id="planos">
-
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-emerald-400 text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3 inline-block">
-            Preço Claro & Sem Surpresas
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.035em] text-white mb-4">
-            Escolha o plano ideal para você.
-          </h2>
-          <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
-            Sem limites de mensagens, sem travas de funcionalidades. Tudo liberado desde o primeiro instante.
-          </p>
-        </div>
-
-        {/* Grade com 2 Cards Principais: Anual e Mensal */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-
-          {/* Card 1: PLANO ANUAL (Melhor Custo-Benefício) */}
-          <div className="rounded-3xl bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950 border-2 border-emerald-500/50 p-8 md:p-9 flex flex-col justify-between shadow-[0_0_50px_rgba(16,185,129,0.15)] relative overflow-hidden">
-
-            {/* Tag Superior */}
-            <div className="absolute top-0 right-0 bg-emerald-400 text-black text-xs font-bold px-4 py-1.5 rounded-bl-2xl uppercase tracking-wider">
-              Economize 44%
+            <div style={{ gridColumn: '5 / span 8' }} className="sp-faq-list" data-sc-in>
+              {FAQ_ITEMS.map((item, idx) => (
+                <details
+                  key={item.q}
+                  name="simplific-faq"
+                  className="sp-faq-tile"
+                  open={idx === 0}
+                >
+                  <summary className="sp-faq-summary" role="button">
+                    <span>{item.q}</span>
+                    <span className="sp-faq-plus" aria-hidden="true" />
+                  </summary>
+                  <div className="sp-faq-answer">
+                    {item.a}
+                  </div>
+                </details>
+              ))}
             </div>
+          </div>
+        </section>
 
-            <div>
-              <div className="text-xs uppercase font-bold tracking-wider text-emerald-400 mb-2">
-                Plano Anual
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Assinatura Anual
-              </h3>
-              <p className="text-zinc-400 text-xs sm:text-sm mb-6 leading-relaxed">
-                A opção preferida por quem quer tranquilidade o ano inteiro pelo menor custo por dia.
-              </p>
-
-              {/* Preço de Destaque */}
-              <div className="mb-6 pb-6 border-b border-white/10">
-                <span className="text-xs text-zinc-500 line-through block mb-1">De R$ 358,80 por ano</span>
-                <div className="flex items-baseline gap-1 text-white">
-                  <span className="text-lg font-bold text-emerald-400">12x de R$</span>
-                  <span className="text-5xl font-extrabold tracking-tight">16</span>
-                  <span className="text-2xl font-bold">,58</span>
-                  <span className="text-zinc-400 text-sm font-normal">/mês</span>
-                </div>
-                <span className="text-xs text-emerald-400/90 block mt-1.5 font-medium">
-                  ou R$ 199,00 à vista no PIX / cartão
-                </span>
+        {/* ================= ACT 8: CTA — THE ACTION TILE ================= */}
+        <section className="sp-cta-board" aria-labelledby="cta-heading">
+          <div className="sp-frame">
+            <div className="sp-cta-row" data-sc-in>
+              {/* Left Flanking Tile: Real Custom Photography */}
+              <div className="sp-cta-flank">
+                <img
+                  src="/assets/landing/simplific-assessor-financeiro.jpg"
+                  alt="Assessor Simplific Pro pronto para atender no WhatsApp"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                />
               </div>
 
-              {/* Lista de Vantagens */}
-              <ul className="space-y-3 text-xs sm:text-sm text-zinc-300 mb-8">
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Simplific disponível 24h no seu WhatsApp oficial</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Registros ilimitados por áudio, texto e fotos de cupom</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Motor Vision AI OCR de alta precisão para recibos</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Cotações de ações e FIIs da Bolsa B3 em tempo real</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Integração Google Agenda + Links Google Meet</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Conta compartilhada para casal ou família</span>
-                </li>
-              </ul>
-            </div>
+              {/* Center Wide Accent Tile */}
+              <div className="sp-cta-center">
+                <h2
+                  id="cta-heading"
+                  className="sp-h2"
+                  style={{
+                    color: '#05120c',
+                    margin: '0 0 12px 0'
+                  }}
+                >
+                  Teste sete dias grátis.
+                </h2>
+                <p
+                  style={{
+                    fontSize: 'var(--step-body)',
+                    lineHeight: 1.55,
+                    color: '#07281b',
+                    maxWidth: '48ch',
+                    margin: '0 0 28px 0'
+                  }}
+                >
+                  Configure seu número em menos de 1 minuto. Se não transformar sua rotina financeira na primeira semana, você cancela com 1 clique sem pagar nada.
+                </p>
 
-            <div>
-              <Link
-                to="/checkout?plan=annual"
-                className="w-full py-4 px-6 rounded-full bg-emerald-400 hover:bg-emerald-300 text-black font-semibold text-center text-sm shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all block transform hover:-translate-y-0.5"
-              >
-                Garantir Plano Anual com 44% OFF →
-              </Link>
-              <p className="text-[11px] text-zinc-500 text-center mt-3">
-                Garantia incondicional de 7 dias com devolução 100%
-              </p>
-            </div>
-          </div>
-
-          {/* Card 2: PLANO MENSAL (Flexibilidade Total) */}
-          <div className="rounded-3xl bg-zinc-950/80 border border-white/10 p-8 md:p-9 flex flex-col justify-between backdrop-blur-xl relative">
-            <div>
-              <div className="text-xs uppercase font-bold tracking-wider text-zinc-400 mb-2">
-                Plano Mensal
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    navigate('/login?tab=register');
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    width: '100%',
+                    maxWidth: '480px',
+                    backgroundColor: '#080908',
+                    padding: '6px',
+                    borderRadius: '4px'
+                  }}
+                >
+                  <input
+                    type="email"
+                    value={ctaQuickText}
+                    onChange={(e) => setCtaQuickText(e.target.value)}
+                    placeholder="Seu melhor e-mail para liberar o teste"
+                    aria-label="Seu melhor e-mail para liberar os 7 dias grátis"
+                    style={{
+                      flex: 1,
+                      minWidth: '180px',
+                      backgroundColor: 'transparent',
+                      border: 0,
+                      padding: '10px 12px',
+                      color: '#f3f6f4',
+                      fontSize: 'var(--step-small)',
+                      outline: 'none'
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      backgroundColor: '#10b981',
+                      color: '#05120c',
+                      border: 0,
+                      borderRadius: '4px',
+                      padding: '12px 20px',
+                      fontSize: 'var(--step-small)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <span>Liberar acesso</span>
+                    <ArrowRight size={16} />
+                  </button>
+                </form>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Assinatura Mensal
-              </h3>
-              <p className="text-zinc-400 text-xs sm:text-sm mb-6 leading-relaxed">
-                Ideal para experimentar mês a mês. Cancele com um clique no painel sem multas ou fidelidade.
-              </p>
 
-              {/* Preço Mensal */}
-              <div className="mb-6 pb-6 border-b border-white/10">
-                <span className="text-xs text-zinc-500 block mb-1">Cobrança mês a mês</span>
-                <div className="flex items-baseline gap-1 text-white">
-                  <span className="text-lg font-bold text-zinc-400">R$</span>
-                  <span className="text-5xl font-extrabold tracking-tight">29</span>
-                  <span className="text-2xl font-bold">,90</span>
-                  <span className="text-zinc-400 text-sm font-normal">/mês</span>
-                </div>
-                <span className="text-xs text-zinc-400 block mt-1.5">
-                  Sem contrato ou fidelidade
-                </span>
-              </div>
-
-              {/* Lista de Vantagens */}
-              <ul className="space-y-3 text-xs sm:text-sm text-zinc-300 mb-8">
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Simplific disponível 24h no seu WhatsApp oficial</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Registros ilimitados por áudio, texto e fotos de cupom</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Motor Vision AI OCR de alta precisão para recibos</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Cotações de ações e FIIs da Bolsa B3 em tempo real</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Integração Google Agenda + Links Google Meet</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <span>Conta compartilhada para casal ou família</span>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <Link
-                to="/checkout"
-                className="w-full py-4 px-6 rounded-full bg-zinc-900 hover:bg-zinc-800 text-white font-semibold text-center text-sm border border-white/15 transition-all block"
-              >
-                Assinar Plano Mensal →
-              </Link>
-              <p className="text-[11px] text-zinc-500 text-center mt-3">
-                Cancele a qualquer momento direto no painel
-              </p>
+              {/* Right Flanking Tile: Pure Flat Palette Surface per Blueprint */}
+              <div
+                className="sp-cta-flank"
+                style={{ backgroundColor: 'var(--surface-high)' }}
+                aria-hidden="true"
+              />
             </div>
           </div>
+        </section>
+      </main>
 
-        </div>
+      {/* ================= FOOTER — A SINGLE QUIET LINE ================= */}
+      <footer className="sp-footer-void">
+        <div className="sp-frame sp-footer-line">
+          <div>Simplific Pro · Assessor Financeiro IA</div>
 
-      </section>
+          <nav className="sp-footer-links" aria-label="Links Institucionais">
+            <Link to="/beneficios" className="sp-footer-link">Benefícios</Link>
+            <Link to="/inteligencia" className="sp-footer-link">Inteligência</Link>
+            <Link to="/seguranca" className="sp-footer-link">Segurança</Link>
+            <Link to="/planos" className="sp-footer-link">Planos</Link>
+            <Link to="/contato" className="sp-footer-link">Contato</Link>
+          </nav>
 
-      {/* ========================================================================= */}
-      {/* 7. PERGUNTAS FREQUENTES                                                   */}
-      {/* ========================================================================= */}
-      <section className="py-20 px-6 max-w-4xl mx-auto border-t border-white/5 relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-2">
-            Perguntas Frequentes
-          </h2>
-          <p className="text-zinc-400 text-sm">
-            Dúvidas comuns sobre o funcionamento do Simplific.
-          </p>
-        </div>
-
-        <div className="space-y-3.5">
-          <details className="group rounded-2xl bg-zinc-950/70 border border-white/10 p-5 open:bg-zinc-900/60 transition-all">
-            <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-white text-sm sm:text-base">
-              <span>Como o Simplific funciona no meu WhatsApp?</span>
-              <ChevronRight size={16} className="text-zinc-400 group-open:rotate-90 transition-transform" />
-            </summary>
-            <p className="mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed pt-2 border-t border-white/5">
-              Logo após assinar, você recebe uma mensagem do Simplific no seu WhatsApp. A partir daí, é só conversar como falaria com um amigo: mandar um áudio de gasto, pedir a cotação de um fundo da B3 ou agendar uma reunião no Meet.
-            </p>
-          </details>
-
-          <details className="group rounded-2xl bg-zinc-950/70 border border-white/10 p-5 open:bg-zinc-900/60 transition-all">
-            <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-white text-sm sm:text-base">
-              <span>Preciso instalar algum aplicativo no celular?</span>
-              <ChevronRight size={16} className="text-zinc-400 group-open:rotate-90 transition-transform" />
-            </summary>
-            <p className="mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed pt-2 border-t border-white/5">
-              Não. O Simplific vive no WhatsApp que você já usa todos os dias. Você também tem acesso ao painel Web Vision pelo navegador se quiser ver gráficos em tela grande.
-            </p>
-          </details>
-
-          <details className="group rounded-2xl bg-zinc-950/70 border border-white/10 p-5 open:bg-zinc-900/60 transition-all">
-            <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-white text-sm sm:text-base">
-              <span>Meus dados e conversas são seguros?</span>
-              <ChevronRight size={16} className="text-zinc-400 group-open:rotate-90 transition-transform" />
-            </summary>
-            <p className="mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed pt-2 border-t border-white/5">
-              Sim. Utilizamos a API Oficial da Meta com criptografia de ponta a ponta AES-256 e servidores no Google Cloud. Nenhum dado é compartilhado ou vendido.
-            </p>
-          </details>
-
-          <details className="group rounded-2xl bg-zinc-950/70 border border-white/10 p-5 open:bg-zinc-900/60 transition-all">
-            <summary className="flex items-center justify-between cursor-pointer list-none font-medium text-white text-sm sm:text-base">
-              <span>Como funciona a garantia de 7 dias?</span>
-              <ChevronRight size={16} className="text-zinc-400 group-open:rotate-90 transition-transform" />
-            </summary>
-            <p className="mt-3 text-xs sm:text-sm text-zinc-400 leading-relaxed pt-2 border-t border-white/5">
-              Você tem 7 dias para testar tudo. Se não gostar por qualquer motivo, basta solicitar o reembolso com uma mensagem e devolvemos 100% do valor pago.
-            </p>
-          </details>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 8. FOOTER / RODAPÉ OFICIAL                                                */}
-      {/* ========================================================================= */}
-      <footer className="border-t border-white/10 bg-[#080908] py-14 px-6 text-zinc-400 text-sm relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
-
-          {/* Lado Esquerdo: Marca */}
-          <div className="max-w-sm">
-            <div className="flex items-center gap-2.5 mb-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-400 text-xs font-black text-black">SP</span>
-              <span className="text-base font-semibold text-white">Simplific <span className="text-emerald-400">Pro</span></span>
-            </div>
-            <p className="text-xs text-zinc-500 leading-relaxed mb-4">
-              A inteligência artificial que organiza seu dinheiro, seus cartões, seus investimentos e sua agenda no WhatsApp.
-            </p>
-            <div className="flex items-center gap-2 text-xs text-zinc-400">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              <span>Suporte Oficial: contato@simplificpro.com</span>
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <span>© {new Date().getFullYear()} Simplific · </span>
+            <Link to="/termos" className="sp-footer-link">Termos</Link>
+            <span> · </span>
+            <Link to="/privacidade" className="sp-footer-link">Privacidade</Link>
           </div>
-
-          {/* Links para Rotas Públicas */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 text-xs">
-            <div>
-              <span className="font-semibold text-white uppercase tracking-wider block mb-3">Plataforma</span>
-              <ul className="space-y-2">
-                <li><Link to="/beneficios" className="hover:text-emerald-400 transition-colors">Recursos</Link></li>
-                <li><Link to="/inteligencia" className="hover:text-emerald-400 transition-colors">Inteligência</Link></li>
-                <li><Link to="/seguranca" className="hover:text-emerald-400 transition-colors">Segurança</Link></li>
-                <li><Link to="/planos" className="hover:text-emerald-400 transition-colors">Planos & Preços</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <span className="font-semibold text-white uppercase tracking-wider block mb-3">Acesso</span>
-              <ul className="space-y-2">
-                <li><Link to="/login" className="hover:text-emerald-400 transition-colors">Fazer Login</Link></li>
-                <li><Link to="/login?tab=register" className="hover:text-emerald-400 transition-colors">Testar 7 Dias Grátis</Link></li>
-                <li><Link to="/checkout?plan=annual" className="hover:text-emerald-400 transition-colors">Plano Anual</Link></li>
-                <li><Link to="/checkout" className="hover:text-emerald-400 transition-colors">Plano Mensal</Link></li>
-                <li><Link to="/contato" className="hover:text-emerald-400 transition-colors">Fale Conosco</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <span className="font-semibold text-white uppercase tracking-wider block mb-3">Legal</span>
-              <ul className="space-y-2">
-                <li><Link to="/termos" className="hover:text-emerald-400 transition-colors">Termos de Uso</Link></li>
-                <li><Link to="/privacidade" className="hover:text-emerald-400 transition-colors">Privacidade LGPD</Link></li>
-                <li><a href="contato@simplificpro.com" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 transition-colors">E-mail Suporte</a></li>
-              </ul>
-            </div>
-          </div>
-
-        </div>
-
-        <div className="max-w-7xl mx-auto pt-10 mt-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
-          <p>© 2026 Simplific Pro. 41.851.029/0001-64. Todos os direitos reservados.</p>
-          <p className="text-zinc-500">Desenvolvido com padrão de precisão e segurança.</p>
         </div>
       </footer>
-
     </div>
   );
-};
-
-export default HomePage;
+}

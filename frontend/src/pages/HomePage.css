@@ -1,0 +1,792 @@
+/* ==========================================================================
+   SIMPLIFIC PRO — HOMEPAGE (tasteskill v2 "product-performs" + scroll-craft)
+   Ground: #080908 · Surface: #111513 · Surface-2: #171d1a
+   Ink: #f3f6f4 · Body-Ink: #d8e1dc · Muted: #a8b4ac · Accent: #10b981
+   Strict 5 Type Steps at 1440px: 14px, 17px, 36px, 68px, 180px
+   ========================================================================== */
+
+.sp-home {
+  --bg: #080908;
+  --surface: #111513;
+  --surface-high: #171d1a;
+  --ink: #f3f6f4;
+  --body-ink: #d8e1dc;
+  --muted: #a8b4ac;
+  --accent: #10b981;
+  --accent-ink: #05120c;
+  --radius-page: 4px;
+  --pad-x: 40px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Strict 5 Type Steps */
+  --step-giant: clamp(88px, 12.5vw, 180px);
+  --step-display: clamp(38px, 4.72vw, 68px);
+  --step-h2: clamp(26px, 2.5vw, 36px);
+  --step-body: 17px;
+  --step-small: 14px;
+
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--step-body);
+  font-variant-numeric: tabular-nums;
+  overflow-x: clip;
+  min-height: 100svh;
+}
+
+.sp-home ::selection {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- GRID & EQUAL MARGIN FRAME --- */
+.sp-frame {
+  width: 100%;
+  padding-inline: var(--pad-x);
+  box-sizing: border-box;
+}
+
+.sp-grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+.sp-grid-12 > * {
+  min-width: 0;
+}
+
+/* --- NAVIGATION (Plain row at 28px from top, zero glass/borders) --- */
+.sp-nav {
+  padding-top: 28px;
+  padding-bottom: 20px;
+  background-color: var(--bg);
+  position: relative;
+  z-index: 30;
+}
+
+.sp-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.sp-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--step-body);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.sp-wordmark-mark {
+  width: 24px;
+  height: 24px;
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-page);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step-small);
+  font-weight: 700;
+}
+
+.sp-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.sp-nav-link {
+  color: var(--body-ink);
+  text-decoration: none;
+  font-size: var(--step-small);
+  font-weight: 500;
+  transition: color 160ms var(--ease-out);
+}
+
+.sp-nav-link:hover,
+.sp-nav-link:focus-visible {
+  color: var(--accent);
+}
+
+.sp-nav-cta {
+  background-color: var(--surface-high);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--step-small);
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: var(--radius-page);
+  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 120ms ease;
+}
+
+.sp-nav-cta:hover {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- UNIFIED BUTTONS --- */
+.sp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--step-small);
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: var(--radius-page);
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition: background-color 180ms var(--ease-out), transform 120ms ease;
+}
+
+.sp-btn-primary:hover {
+  background-color: #22c993;
+}
+
+.sp-btn-primary:active {
+  transform: scale(0.985);
+}
+
+.sp-btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 14px 4px;
+  transition: color 160ms var(--ease-out);
+}
+
+.sp-btn-quiet:hover {
+  color: var(--accent);
+}
+
+/* --- MASKED HEADLINE & SHUTTER REVEALS --- */
+.sp-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.sp-line > span {
+  display: block;
+  transform: translateY(105%);
+  animation: spLineUp 780ms var(--ease-expo) forwards;
+}
+
+.sp-line:nth-child(2) > span {
+  animation-delay: 95ms;
+}
+
+@keyframes spLineUp {
+  to {
+    transform: translateY(0);
+  }
+}
+
+.sp-shutter {
+  clip-path: inset(0 0 0 0);
+  animation: spShutterOpen 1050ms var(--ease-expo) both;
+}
+
+.sp-shutter > img,
+.sp-shutter > video {
+  animation: spShutterScale 1150ms var(--ease-expo) both;
+}
+
+@keyframes spShutterOpen {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes spShutterScale {
+  from {
+    transform: scale(1.1);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* --- SCROLL-CRAFT ENTRANCES --- */
+[data-sc-in] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 640ms var(--ease-out), transform 640ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+[data-sc-in].is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- ACT 1: DIMENSIONAL HERO ("Fragment on a shaped stage") --- */
+.sp-hero {
+  position: relative;
+  padding-top: 48px;
+  padding-bottom: 88px;
+  overflow: hidden;
+}
+
+.sp-hero-copy {
+  grid-column: 1 / span 5;
+  position: relative;
+  z-index: 10;
+  padding-top: 24px;
+}
+
+.sp-h1 {
+  font-size: var(--step-display);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  margin: 0 0 24px 0;
+}
+
+.sp-hero-lead {
+  font-size: var(--step-body);
+  line-height: 1.58;
+  color: var(--body-ink);
+  max-width: 39ch;
+  margin: 0 0 32px 0;
+}
+
+.sp-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Dimensional Shaped Stage (Columns 6-12, aligned to page right margin) */
+.sp-hero-stage-wrap {
+  grid-column: 6 / span 7;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-hero-bg-plate {
+  position: absolute;
+  inset: 0;
+  background-color: var(--surface);
+  clip-path: polygon(56px 0, 100% 0, 100% 100%, 0 100%, 0 56px);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.sp-hero-bg-plate img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.32;
+  filter: grayscale(20%) contrast(1.06);
+  display: block;
+}
+
+.sp-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(8, 9, 8, 0.52);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sp-hero-stage-inner {
+  position: relative;
+  z-index: 5;
+  padding: 36px 28px 28px 36px;
+}
+
+/* True-size UI Fragment [data-ui] */
+.sp-ui-fragment {
+  background-color: #0c100e;
+  border: 1px solid #222b26;
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: var(--step-small);
+  line-height: 1.45;
+  overflow: hidden;
+}
+
+/* --- ACT 2: SHOWCASE ("One control, blown up" + Real Video) --- */
+.sp-showcase {
+  position: relative;
+  background-color: var(--surface);
+  overflow: hidden;
+  padding-top: 104px;
+  padding-bottom: 104px;
+  transition: background-color 320ms var(--ease-out);
+}
+
+.sp-showcase[data-mode="vision"] {
+  background-color: #0e1613;
+}
+
+.sp-showcase[data-mode="b3"] {
+  background-color: #121614;
+}
+
+.sp-h2 {
+  font-size: var(--step-h2);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.sp-section-lead {
+  font-size: var(--step-body);
+  line-height: 1.6;
+  color: var(--body-ink);
+  max-width: 44ch;
+  margin: 16px 0 0 0;
+}
+
+/* --- ACT 3: THE PEAK — 24H CALL & RESPONSE + LIVE STAGE --- */
+.sp-routine-act {
+  position: relative;
+  padding-top: 128px;
+  padding-bottom: 120px;
+}
+
+.sp-routine-step-btn {
+  width: 100%;
+  text-align: left;
+  background-color: var(--surface);
+  color: var(--ink);
+  padding: 12px 20px;
+  max-height: 82px;
+  border-radius: var(--radius-page);
+  border: 0;
+  cursor: pointer;
+  font-size: var(--step-body);
+  transition: background-color 200ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.sp-routine-step-btn[aria-selected="true"] {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* --- ACT 4: STAGGERED FRAGMENT CELLS (Features 3x2 Checkerboard) --- */
+.sp-features {
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+
+.sp-stagger-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 48px;
+}
+
+.sp-cell {
+  background-color: var(--surface);
+  border-radius: var(--radius-page);
+  min-height: 410px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+}
+
+.sp-cell-copy {
+  padding: 28px;
+}
+
+.sp-cell-title {
+  font-size: var(--step-body);
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 10px 0;
+  letter-spacing: -0.015em;
+}
+
+.sp-cell-desc {
+  font-size: var(--step-body);
+  line-height: 1.55;
+  color: var(--body-ink);
+  margin: 0;
+  max-width: 38ch;
+}
+
+.sp-cell-dock {
+  padding-left: 24px;
+  padding-top: 12px;
+}
+
+.sp-cell-dock-top {
+  padding-left: 24px;
+  padding-bottom: 12px;
+}
+
+/* --- ACT 5: STATS — FIGURE SET BY A SLIDER --- */
+.sp-stats {
+  background-color: var(--surface);
+  padding-top: 104px;
+  padding-bottom: 104px;
+}
+
+.sp-giant-figure {
+  font-size: var(--step-giant);
+  font-weight: 600;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.sp-giant-unit {
+  font-size: var(--step-h2);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  margin-left: 16px;
+}
+
+/* --- ACT 6: PRICING — THE PRICE, VERY LARGE + SECURITY --- */
+.sp-pricing {
+  padding-top: 120px;
+  padding-bottom: 112px;
+}
+
+.sp-price-numerals {
+  font-size: var(--step-giant);
+  font-weight: 600;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sp-price-currency {
+  font-size: var(--step-h2);
+  line-height: 1;
+  color: var(--accent);
+  align-self: flex-start;
+  margin-top: 0.12em;
+}
+
+.sp-price-period {
+  font-size: var(--step-body);
+  font-weight: 400;
+  color: var(--body-ink);
+  letter-spacing: -0.01em;
+}
+
+/* --- ACT 7: FAQ — ACCORDION OF FILLED TILES --- */
+.sp-faq {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+.sp-faq-sticky {
+  position: relative;
+}
+
+.sp-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sp-faq-tile {
+  background-color: var(--surface);
+  border-radius: var(--radius-page);
+  color: var(--ink);
+  transition: background-color 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.sp-faq-tile[open] {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.sp-faq-summary {
+  list-style: none;
+  min-height: 72px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: var(--step-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.sp-faq-summary::-webkit-details-marker {
+  display: none;
+}
+
+.sp-faq-plus {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sp-faq-plus::before,
+.sp-faq-plus::after {
+  content: '';
+  position: absolute;
+  background-color: currentColor;
+  transition: transform 200ms var(--ease-out);
+}
+
+.sp-faq-plus::before {
+  top: 6.5px;
+  left: 0;
+  width: 16px;
+  height: 3px;
+}
+
+.sp-faq-plus::after {
+  top: 0;
+  left: 6.5px;
+  width: 3px;
+  height: 16px;
+}
+
+.sp-faq-tile[open] .sp-faq-plus::after {
+  transform: rotate(90deg);
+}
+
+.sp-faq-answer {
+  padding: 0 24px 24px 24px;
+  font-size: var(--step-body);
+  line-height: 1.58;
+  max-width: 54ch;
+  color: #062519;
+}
+
+/* --- ACT 8: CTA — THE ACTION TILE (3 Tiles) --- */
+.sp-cta-board {
+  padding-top: 88px;
+  padding-bottom: 40px;
+}
+
+.sp-cta-row {
+  display: grid;
+  grid-template-columns: 2fr 8fr 2fr;
+  gap: 12px;
+  min-height: 340px;
+}
+
+.sp-cta-flank {
+  background-color: var(--surface);
+  border-radius: var(--radius-page);
+  overflow: hidden;
+  position: relative;
+}
+
+.sp-cta-flank img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sp-cta-center {
+  background-color: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--radius-page);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* --- FOOTER — A SINGLE QUIET LINE --- */
+.sp-footer-void {
+  padding-top: 96px;
+  padding-bottom: 32px;
+}
+
+.sp-footer-line {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: 24px;
+  font-size: var(--step-small);
+  color: var(--body-ink);
+}
+
+.sp-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.sp-footer-link {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--step-small);
+  transition: color 160ms var(--ease-out);
+}
+
+.sp-footer-link:hover {
+  color: var(--accent);
+}
+
+/* --- RESPONSIVE PHONE COMPOSITION (< 960px) --- */
+@media (max-width: 959px) {
+  .sp-home {
+    --pad-x: 18px;
+  }
+
+  .sp-nav-links {
+    display: none;
+  }
+
+  .sp-grid-12 {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .sp-hero {
+    padding-top: 24px;
+    padding-bottom: 64px;
+  }
+
+  .sp-hero-copy {
+    padding-top: 0;
+  }
+
+  .sp-hero-stage-wrap {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .sp-hero-bg-plate {
+    clip-path: polygon(36px 0, 100% 0, 100% 100%, 0 100%, 0 36px);
+  }
+
+  .sp-hero-stage-inner {
+    padding: 20px 14px 18px 14px;
+  }
+
+  .sp-showcase,
+  .sp-routine-act,
+  .sp-features,
+  .sp-stats,
+  .sp-pricing,
+  .sp-faq {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .sp-stagger-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .sp-cell {
+    min-height: auto;
+  }
+
+  .sp-cell-copy {
+    padding: 20px;
+  }
+
+  .sp-cell-dock,
+  .sp-cell-dock-top {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .sp-giant-unit {
+    display: block;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .sp-price-period {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .sp-faq-sticky {
+    position: static;
+    margin-bottom: 16px;
+  }
+
+  .sp-cta-board {
+    padding-top: 56px;
+  }
+
+  .sp-cta-row {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .sp-cta-center {
+    padding: 24px 20px;
+  }
+
+  .sp-cta-flank {
+    height: 120px;
+  }
+
+  .sp-footer-void {
+    padding-top: 64px;
+  }
+
+  .sp-footer-line {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sp-footer-links {
+    justify-content: flex-start;
+    gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-line > span,
+  .sp-shutter,
+  .sp-shutter > img,
+  .sp-shutter > video,
+  [data-sc-in] {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    clip-path: none !important;
+  }
+}
