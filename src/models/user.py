@@ -37,6 +37,7 @@ class User(db.Model):
 
     secondary_name = db.Column(db.String(150), nullable=True)
     secondary_whatsapp = db.Column(db.String(30), unique=True, nullable=True)
+    cpf = db.Column(db.String(20), nullable=True)
 
 
     def __repr__(self):
@@ -68,6 +69,7 @@ class User(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'last_login': self.last_login.isoformat() if self.last_login else None,
             'profile_image_url': self.profile_image_url,
+            'cpf': self.cpf,
             'subscription_plan': self.subscription_plan,
             'subscription_valid_until': self.subscription_valid_until.isoformat() if self.subscription_valid_until else None
         }

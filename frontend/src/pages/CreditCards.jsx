@@ -521,6 +521,8 @@ const carregarFaturas = async (listaDeCartoes) => {
                   </SelectContent>
                 </Select>
 
+                <ConnectBankButton onSuccess={loadCartoes} label="+ Conectar Automático (Open Finance)" className="h-9" />
+
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                   <DialogTrigger asChild>
                     <Button className="bg-cyan-600 hover:bg-cyan-700 text-white border-none shadow-lg shadow-cyan-900/20 h-9">

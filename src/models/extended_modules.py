@@ -15,11 +15,13 @@ class CreditCard(db.Model):
     closing_day = db.Column(db.Integer, nullable=False)  # Dia do fechamento (1-31)
     due_day = db.Column(db.Integer, nullable=False)      # Dia do vencimento (1-31)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     card_number = db.Column(db.String(20))
-    last_digits = db.Column(db.String(4))  # <<< ADICIONE ESTA LINHA
-    pluggy_item_id = db.Column(db.String(100), nullable=True)       ### <<< NOVO (ID da Conexão Geral)
-    pluggy_credit_card_id = db.Column(db.String(100), nullable=True) ### <<< NOVO (ID desse cartão específico)
+    last_digits = db.Column(db.String(4))
+    pluggy_item_id = db.Column(db.String(100), nullable=True)
+    pluggy_credit_card_id = db.Column(db.String(100), nullable=True)
+    klavi_link_id = db.Column(db.String(100), nullable=True)
+    klavi_card_id = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     transactions = db.relationship("CreditCardTransaction", backref="credit_card", lazy=True)
 
 
@@ -35,6 +37,8 @@ class CreditCard(db.Model):
             'is_active': self.is_active,
             'last_digits': self.last_digits,
             'is_pluggy_connected': bool(self.pluggy_item_id), ### <<< NOVO (Para o front saber se é automático)
+            'is_connected': bool(self.klavi_card_id or self.pluggy_item_id),
+            'is_klavi_connected': bool(self.klavi_card_id),
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
@@ -55,6 +59,7 @@ class CreditCardTransaction(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     pluggy_transaction_id = db.Column(db.String(150), unique=True, nullable=True) ### <<< NOVO (ID Único da transação)
+    klavi_transaction_id = db.Column(db.String(150), unique=True, nullable=True)
 
     
     def to_dict(self):
@@ -72,6 +77,7 @@ class CreditCardTransaction(db.Model):
             'current_installment': self.current_installment,
             'is_recurring': self.is_recurring,
             'pluggy_transaction_id': self.pluggy_transaction_id, ### <<< NOVO
+            'klavi_transaction_id': self.klavi_transaction_id,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
@@ -274,6 +280,11 @@ class BankAccount(db.Model):
     current_balance = db.Column(db.Float, default=0.0)
     
     is_active = db.Column(db.Boolean, default=True)
+    klavi_link_id = db.Column(db.String(100), nullable=True)
+    klavi_account_id = db.Column(db.String(100), nullable=True)
+
+
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -284,6 +295,8 @@ class BankAccount(db.Model):
             'account_number': self.account_number,
             'balance': self.current_balance, # O front recebe o saldo ATUAL
             'observations': self.observations,
+            'is_connected': bool(self.klavi_account_id),
+            'klavi_account_id': self.klavi_account_id,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

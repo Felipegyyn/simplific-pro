@@ -592,7 +592,7 @@ const AdvisorFeatures = ({ user, onLogout }) => {
               icon={Link2}
               color="bg-emerald-600"
               title="Open Finance — Sincronização Bancária"
-              description="Conecte seus cartões de crédito via Open Finance (Pluggy). O sistema importa automaticamente as transações, categoriza com IA e organiza por fatura — sem precisar lançar nada manualmente."
+              description="Conecte seus cartões de crédito via Open Finance (Klavi). O sistema importa automaticamente as transações, categoriza com IA e organiza por fatura — sem precisar lançar nada manualmente."
               badge="Em breve"
               commands={[
                 'Conecta meu Nubank no sistema',

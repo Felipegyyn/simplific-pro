@@ -12,6 +12,7 @@ import { Landmark, Plus, Trash2, Wallet, Filter, Edit } from 'lucide-react'; // 
 import { cn } from "@/lib/utils";
 import apiService from '../services/api';
 import styles from './BankAccounts.module.css';
+import ConnectBankButton from '@/components/ConnectBankButton';
 
 const BANCOS_BRASIL = [
   { code: '260', name: 'Nubank' },
@@ -206,6 +207,8 @@ const BankAccounts = ({ user, onLogout }) => {
               </div>
             </PopoverContent>
           </Popover>
+
+          <ConnectBankButton onSuccess={loadAccounts} label="+ Conectar Banco / Cartão" />
 
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>

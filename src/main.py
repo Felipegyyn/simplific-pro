@@ -6,6 +6,7 @@ load_dotenv()
 
 from src.routes.marketing_routes import marketing_bp
 from src.routes.pluggy_routes import pluggy_bp
+from src.routes.klavi_routes import klavi_bp
 import cloudinary
 import cloudinary.uploader
 cloudinary.config(
@@ -113,7 +114,7 @@ def debug_response_info(response):
 app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'simplific_pro_secret_key_2025')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') or f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
 
 # ▼▼▼ ADICIONE ESTAS LINHAS AQUI ▼▼▼
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -156,6 +157,7 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(marketing_bp, url_prefix='/api/marketing') # <--- Adicione isto
 app.register_blueprint(contacts_bp, url_prefix='/api/contacts')
 app.register_blueprint(pluggy_bp, url_prefix='/api/pluggy')
+app.register_blueprint(klavi_bp, url_prefix='/api/klavi')
 
 # Registro dos blueprints Empresariais
 app.register_blueprint(business_bp, url_prefix='/api')
@@ -322,10 +324,37 @@ with app.app_context():
     try:
         print("--- [DB FIX] Verificando colunas de assinatura... ---")
         # Tenta adicionar as colunas. Se já existirem, o banco ignora ou dá erro que tratamos.
-        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_id VARCHAR(100);"))
-        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_valid_until TIMESTAMP;"))
-        db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(50);"))
+        pass # Tratado na lista abaixo
+
+
         db.session.commit()
+        # Garante colunas da Klavi (Open Finance)
+        klavi_columns = [
+            ("users", "subscription_id", "VARCHAR(100)"),
+            ("users", "subscription_valid_until", "TIMESTAMP"),
+            ("users", "subscription_plan", "VARCHAR(50)"),
+            ("users", "cpf", "VARCHAR(20)"),
+            ("bank_accounts", "klavi_account_id", "VARCHAR(100)"),
+            ("bank_accounts", "klavi_link_id", "VARCHAR(100)"),
+            ("credit_cards", "klavi_link_id", "VARCHAR(100)"),
+            ("credit_cards", "klavi_card_id", "VARCHAR(100)"),
+            ("credit_card_transactions", "klavi_transaction_id", "VARCHAR(150)"),
+            ("transactions", "klavi_transaction_id", "VARCHAR(150)"),
+            ("transactions", "is_loan_installment", "BOOLEAN DEFAULT FALSE"),
+            ("transactions", "contract_id", "VARCHAR(100)"),
+        ]
+        for tbl, col, col_type in klavi_columns:
+            try:
+                db.session.execute(text(f"ALTER TABLE {tbl} ADD COLUMN IF NOT EXISTS {col} {col_type};"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                try:
+                    db.session.execute(text(f"ALTER TABLE {tbl} ADD COLUMN {col} {col_type};"))
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+
         print("--- [DB FIX] Colunas garantidas com sucesso! ---")
     except Exception as e:
         db.session.rollback()

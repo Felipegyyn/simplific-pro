@@ -82,6 +82,9 @@ class Transaction(db.Model):
         confirmed_at = db.Column(db.DateTime)
         planning_id = db.Column(db.Integer, db.ForeignKey('planning.id'), nullable=True)
         receipt_image_url = db.Column(db.String(255), nullable=True) # URL do comprovante (Cloudinary)
+        klavi_transaction_id = db.Column(db.String(150), unique=True, nullable=True)
+        is_loan_installment = db.Column(db.Boolean, default=False)
+        contract_id = db.Column(db.String(100), nullable=True)
 
         bank_account_id = db.Column(db.Integer, db.ForeignKey('bank_accounts.id'), nullable=True)
         bank_account = db.relationship('BankAccount', backref='transactions', lazy=True)
@@ -108,7 +111,10 @@ class Transaction(db.Model):
                 'parent_transaction_id': self.parent_transaction_id,
                 'bank_account_id': self.bank_account_id,
                 'created_at': self.created_at.isoformat() if self.created_at else None,
-                'confirmed_at': self.confirmed_at.isoformat() if self.confirmed_at else None
+                'confirmed_at': self.confirmed_at.isoformat() if self.confirmed_at else None,
+                'klavi_transaction_id': self.klavi_transaction_id,
+                'is_loan_installment': self.is_loan_installment,
+                'contract_id': self.contract_id
 
             }
 
@@ -123,7 +129,8 @@ class Transaction(db.Model):
                 'status': 'confirmada' if self.status == 'confirmada' else 'pendente',
                 'bank_account_id': self.bank_account_id,
                 'bank_name': self.bank_account.bank_name if self.bank_account else None,
-                'account_label': f"{self.bank_account.bank_name} - {self.bank_account.account_number}" if self.bank_account else None
+                'account_label': f"{self.bank_account.bank_name} - {self.bank_account.account_number}" if self.bank_account else None,
+                'is_loan_installment': self.is_loan_installment
             }
 
 
