@@ -9,8 +9,22 @@ import {
   CheckCircle2, Landmark, CreditCard as CardIcon, 
   Calendar, Clock, Video, Target, ExternalLink,
   Wallet, Sparkles, Building2, ChevronDown, ChevronUp,
-  X, Filter, Flame, Info
+  X, Filter, Flame, Info, ShieldCheck, Lock, Plus, ArrowRight, Loader2, CreditCard
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import apiService from '../../services/api';
+import { toast } from 'sonner';
 import styles from './VisionVisuals.module.css';
 
 // Formata valores em Real Brasileiro (BRL)
@@ -967,6 +981,352 @@ export const VisionWebCards = ({ data }) => {
 };
 
 // ==============================================================================
+// 8. WIDGET INTERATIVO OPEN FINANCE (VisionOpenFinanceWidget — design-taste-frontend)
+// ==============================================================================
+export const VisionOpenFinanceWidget = ({ data }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [popupWindow, setPopupWindow] = useState(null);
+  const [currentData, setCurrentData] = useState(data || {});
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  useEffect(() => {
+    if (data) {
+      setCurrentData(data);
+      if (data.user_cpf_masked) {
+        setCpf(data.user_cpf_masked);
+      }
+    }
+  }, [data]);
+
+  // Monitora o fechamento do popup da Klavi
+  useEffect(() => {
+    if (!popupWindow) return;
+
+    const interval = setInterval(async () => {
+      if (popupWindow.closed) {
+        clearInterval(interval);
+        setPopupWindow(null);
+        setLoading(true);
+        setStatusMessage('Finalizando sincronização e importando extratos...');
+
+        try {
+          const statusRes = await apiService.get('/api/klavi/status');
+          if (statusRes) {
+            setCurrentData(prev => ({
+              ...prev,
+              has_connections: (statusRes.accounts?.length > 0 || statusRes.cards?.length > 0),
+              accounts: statusRes.accounts || [],
+              cards: statusRes.cards || [],
+              total_institutions: (statusRes.accounts?.length || 0) + (statusRes.cards?.length || 0)
+            }));
+            setSuccessMessage('Instituição bancária conectada com sucesso! Transações e saldos sincronizados.');
+            toast.success('Instituição conectada com sucesso via Klavi Open Finance!');
+          }
+          setIsModalOpen(false);
+        } catch (e) {
+          console.error("Erro ao validar sincronização no Vision:", e);
+        } finally {
+          setLoading(false);
+          setStatusMessage('');
+        }
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [popupWindow]);
+
+  const handleStartConnection = async () => {
+    setLoading(true);
+    setStatusMessage('Iniciando ambiente seguro Klavi...');
+
+    try {
+      const currentUrl = window.location.href.split('?')[0];
+      const redirectURL = `${currentUrl}?klavi_status=success`;
+
+      const response = await apiService.post('/api/klavi/create-link', {
+        redirectURL,
+        cpf: cpf ? cpf.replace(/\D/g, '') : null
+      });
+
+      const linkURL = response?.linkURL || response?.data?.linkURL;
+      if (!linkURL) {
+        throw new Error('URL da sessão Klavi não retornada.');
+      }
+
+      setStatusMessage('Abrindo ambiente seguro do Open Finance...');
+      const width = 580;
+      const height = 740;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const popup = window.open(
+        linkURL,
+        'KlaviOpenFinanceConnect',
+        `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,status=no`
+      );
+
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        window.location.href = linkURL;
+      } else {
+        setPopupWindow(popup);
+        setStatusMessage('Aguardando autorização no seu banco...');
+      }
+    } catch (err) {
+      console.error('Erro ao conectar Open Finance:', err);
+      toast.error('Não foi possível iniciar o Open Finance. Tente novamente.');
+      setLoading(false);
+      setStatusMessage('');
+    }
+  };
+
+  const hasConnections = currentData.has_connections && 
+    ((currentData.accounts && currentData.accounts.length > 0) || (currentData.cards && currentData.cards.length > 0));
+
+  return (
+    <div className={styles.openFinanceCard}>
+      {/* 1. Header com conformidade BACEN */}
+      <div className={styles.openFinanceHeader}>
+        <div className={styles.openFinanceHeaderLeft}>
+          <div className={styles.openFinanceIconBadge}>
+            <Landmark size={18} />
+          </div>
+          <div className={styles.openFinanceTitleGroup}>
+            <span className={styles.openFinanceTitle}>Open Finance Brasil</span>
+            <span className={styles.openFinanceSubtitle}>Regulado pelo BACEN • Klavi</span>
+          </div>
+        </div>
+
+        <div className={`${styles.openFinanceStatusBadge} ${hasConnections ? styles.statusConnected : ''}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${hasConnections ? 'bg-emerald-500' : 'bg-zinc-400'}`}></span>
+          <span>{hasConnections ? `${currentData.total_institutions || currentData.accounts?.length || 1} Conexão Ativa` : 'Pronto para conectar'}</span>
+        </div>
+      </div>
+
+      {/* 2. Banner de Sucesso pós-conexão */}
+      {successMessage && (
+        <div className="flex items-center gap-2 p-2.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-medium animate-fadeIn">
+          <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {/* 3. Estado: JÁ POSSUI INSTITUIÇÕES CONECTADAS */}
+      {hasConnections ? (
+        <div className="flex flex-col gap-3">
+          <div className="text-xs text-zinc-600 dark:text-zinc-400">
+            Sua conta está sincronizada diretamente com as instituições abaixo. Transações e faturas são atualizadas automaticamente:
+          </div>
+
+          <div className={styles.connectedInstitutionsList}>
+            {/* Contas Correntes Conectadas */}
+            {currentData.accounts?.map((acc, idx) => (
+              <div key={`acc-${idx}`} className={styles.connectedInstitutionRow}>
+                <div className={styles.institutionInfoLeft}>
+                  <div className={styles.institutionIconBox}>
+                    <Building2 size={15} />
+                  </div>
+                  <div className={styles.institutionTexts}>
+                    <span className={styles.institutionName}>{acc.name}</span>
+                    <span className={styles.institutionMeta}>Conta {acc.account_type} • {acc.bank_name}</span>
+                  </div>
+                </div>
+                <div className={styles.institutionValuesRight}>
+                  <span className={styles.institutionMainValue}>{formatBRL(acc.balance)}</span>
+                  <span className={styles.institutionSyncLabel}>● Sincronizado</span>
+                </div>
+              </div>
+            ))}
+
+            {/* Cartões de Crédito Conectados */}
+            {currentData.cards?.map((card, idx) => (
+              <div key={`card-${idx}`} className={styles.connectedInstitutionRow}>
+                <div className={styles.institutionInfoLeft}>
+                  <div className={styles.institutionIconBox}>
+                    <CreditCard size={15} />
+                  </div>
+                  <div className={styles.institutionTexts}>
+                    <span className={styles.institutionName}>{card.name}</span>
+                    <span className={styles.institutionMeta}>Bandeira {card.brand} • Venc. dia {card.due_day}</span>
+                  </div>
+                </div>
+                <div className={styles.institutionValuesRight}>
+                  <span className={styles.institutionMainValue}>Fatura: {formatBRL(card.invoice_current)}</span>
+                  <span className="text-[10px] text-zinc-500 font-mono">Disp: {formatBRL(card.limit_available)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className={styles.openFinanceSecondaryBtn}
+            >
+              <Plus size={14} />
+              <span>Conectar Outro Banco / Cartão</span>
+            </button>
+            <span className="text-[11px] text-zinc-400 font-mono">Klavi Advanced Whitelabel</span>
+          </div>
+        </div>
+      ) : (
+        /* 4. Estado: NENHUMA CONEXÃO AINDA */
+        <div className="flex flex-col gap-3.5">
+          <div className={styles.openFinanceFeatures}>
+            <div className={styles.openFinanceFeatureItem}>
+              <div className={styles.featureIconWrap}>
+                <Building2 size={16} />
+              </div>
+              <div className={styles.featureTexts}>
+                <span className={styles.featureTitle}>Conta Corrente & Saldos</span>
+                <span className={styles.featureDesc}>Importação contínua de extratos com categorização automática.</span>
+              </div>
+            </div>
+
+            <div className={styles.openFinanceFeatureItem}>
+              <div className={styles.featureIconWrap}>
+                <CreditCard size={16} />
+              </div>
+              <div className={styles.featureTexts}>
+                <span className={styles.featureTitle}>Cartões de Crédito</span>
+                <span className={styles.featureDesc}>Leitura de limites, faturas abertas e lançamentos detalhados.</span>
+              </div>
+            </div>
+
+            <div className={styles.openFinanceFeatureItem}>
+              <div className={styles.featureIconWrap}>
+                <Calendar size={16} />
+              </div>
+              <div className={styles.featureTexts}>
+                <span className={styles.featureTitle}>Empréstimos & Parcelas</span>
+                <span className={styles.featureDesc}>Parcelas futuras agendadas como pendentes na sua agenda.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Barra de conformidade e segurança */}
+          <div className={styles.openFinanceTrustBar}>
+            <div className={styles.trustBadges}>
+              <span className={styles.trustBadgeItem}>
+                <ShieldCheck size={13} className="text-emerald-500" />
+                <span>Criptografia TLS 1.3</span>
+              </span>
+              <span className={styles.trustBadgeItem}>
+                <Lock size={12} className="text-zinc-500" />
+                <span>Apenas Leitura (Sem movimentação)</span>
+              </span>
+            </div>
+            <span className="text-[10px] text-zinc-400 font-medium">Resolução Conjunta nº 1 BACEN</span>
+          </div>
+
+          {/* Botão de Conexão Principal */}
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className={styles.openFinanceActionBtn}
+          >
+            <span>Conectar Banco ou Cartão via Open Finance</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+      )}
+
+      {/* 5. Modal Interativo de Conexão (Radix UI Dialog) */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[480px] bg-white dark:bg-[#0c0d0e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 p-6">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                <Landmark size={18} />
+              </div>
+              <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 font-mono text-[10px]">
+                Open Finance Oficial
+              </Badge>
+            </div>
+            <DialogTitle className="text-lg font-bold">
+              Conectar Instituição Bancária
+            </DialogTitle>
+            <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400">
+              Ambiente seguro regulamentado pelo Banco Central do Brasil. Seus dados financeiros são lidos com total sigilo e privacidade.
+            </DialogDescription>
+          </DialogHeader>
+
+          {loading ? (
+            <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
+              <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+              <div className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                {statusMessage}
+              </div>
+              <p className="text-xs text-zinc-500 max-w-xs">
+                Autorize o compartilhamento na janela aberta do seu banco. Ao concluir, o Simplific Pro sincronizará seus dados automaticamente.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 space-y-2">
+                <div className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                  <ShieldCheck size={15} className="text-emerald-500" />
+                  O que o Simplific Pro fará com essa conexão:
+                </div>
+                <ul className="list-disc pl-4 space-y-1 text-zinc-500 dark:text-zinc-400">
+                  <li>Consultar saldos e extratos da sua conta para controle financeiro.</li>
+                  <li>Importar despesas do cartão de crédito com categorização automática.</li>
+                  <li>Lançar parcelas futuras de empréstimos como contas pendentes.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="of-cpf-vision" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  CPF do titular (opcional — agiliza a localização da sua conta):
+                </Label>
+                <Input
+                  id="of-cpf-vision"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  onChange={(e) => setCpf(e.target.value)}
+                  className="h-9 text-xs font-mono bg-zinc-50 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-700"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsModalOpen(false)}
+              disabled={loading}
+              className="text-xs h-9"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleStartConnection}
+              disabled={loading}
+              className="text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="mr-1.5 animate-spin" />
+                  Conectando...
+                </>
+              ) : (
+                'Iniciar Conexão Segura'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+// ==============================================================================
 // DISPATCHER PRINCIPAL (VisionVisualRenderer)
 // ==============================================================================
 export const VisionVisualRenderer = ({ visuals }) => {
@@ -990,6 +1350,8 @@ export const VisionVisualRenderer = ({ visuals }) => {
             return <VisionAssetCard key={idx} data={vis.data} />;
           case 'web_cards':
             return <VisionWebCards key={idx} data={vis.data} />;
+          case 'open_finance':
+            return <VisionOpenFinanceWidget key={idx} data={vis.data} />;
           default:
             return null;
         }

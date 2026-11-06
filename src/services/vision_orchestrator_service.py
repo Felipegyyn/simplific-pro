@@ -361,6 +361,87 @@ def coletar_cotacao_ativo(query_ou_ticker, ticker_sugerido=None):
         return None
 
 
+def coletar_status_open_finance(user_id):
+    """Coleta o status e dados das conexões Open Finance (Klavi) ativas do usuário."""
+    try:
+        from src.models.user import User
+        usuario = User.query.get(user_id)
+        
+        contas = BankAccount.query.filter(
+            BankAccount.user_id == user_id,
+            BankAccount.klavi_link_id.isnot(None)
+        ).all()
+
+        cartoes = CreditCard.query.filter(
+            CreditCard.user_id == user_id,
+            CreditCard.klavi_link_id.isnot(None)
+        ).all()
+
+        contas_list = [
+            {
+                "id": c.id,
+                "name": c.name or c.bank_name or "Conta Bancária",
+                "bank_name": c.bank_name or "Banco Conectado",
+                "account_type": c.account_type or "corrente",
+                "balance": float(c.balance or 0),
+                "last_sync": c.updated_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'updated_at', None) else "Hoje"
+            }
+            for c in contas
+        ]
+
+        cartoes_list = []
+        for c in cartoes:
+            fatura_aberta = Fatura.query.filter_by(cartao_id=c.id, status='em_aberto').first()
+            fatura_val = float(fatura_aberta.valor_total) if fatura_aberta else 0.0
+            limite = float(c.limit or 0)
+            disp = float(c.available_limit) if c.available_limit is not None else max(0.0, limite - fatura_val)
+            cartoes_list.append({
+                "id": c.id,
+                "name": c.name or "Cartão de Crédito",
+                "brand": c.brand or "Cartão",
+                "limit_total": limite,
+                "invoice_current": fatura_val,
+                "limit_available": disp,
+                "due_day": c.due_day or 10,
+                "last_sync": c.updated_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'updated_at', None) else "Hoje"
+            })
+
+        tem_conexoes = len(contas_list) > 0 or len(cartoes_list) > 0
+        instituicoes_unicas = set([c["bank_name"] for c in contas_list] + [c["brand"] for c in cartoes_list])
+
+        user_cpf = getattr(usuario, 'cpf', None) if usuario else None
+        cpf_mascarado = None
+        if user_cpf:
+            clean = ''.join(filter(str.isdigit, str(user_cpf)))
+            if len(clean) == 11:
+                cpf_mascarado = f"***.{clean[3:6]}.{clean[6:9]}-**"
+
+        return {
+            "has_connections": tem_conexoes,
+            "total_institutions": len(instituicoes_unicas),
+            "accounts": contas_list,
+            "cards": cartoes_list,
+            "user_cpf_masked": cpf_mascarado,
+            "provider": "Klavi Open Finance",
+            "regulated_by": "Banco Central do Brasil (BACEN)",
+            "security": {
+                "read_only": True,
+                "encryption": "TLS 1.3 / AES-256",
+                "regulation": "Resolução Conjunta nº 1 / BACEN"
+            }
+        }
+    except Exception as e:
+        print(f"Erro ao coletar status do Open Finance no Vision: {e}")
+        return {
+            "has_connections": False,
+            "total_institutions": 0,
+            "accounts": [],
+            "cards": [],
+            "provider": "Klavi Open Finance",
+            "regulated_by": "Banco Central do Brasil (BACEN)"
+        }
+
+
 # ==============================================================================
 # ORQUESTRADOR PRINCIPAL DO VISION
 # ==============================================================================
@@ -497,6 +578,25 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
         cartoes = coletar_dados_cartoes(user_id)
         if cartoes and not any(v['type'] == 'credit_cards' for v in visuals):
             visuals.append({"type": "credit_cards", "data": cartoes})
+
+    # --- Se perguntou ou solicitou Conexão Bancária / Open Finance ---
+    palavras_open_finance = [
+        'open finance', 'conectar banco', 'conectar conta', 'conectar cartao', 'conectar cartão',
+        'sincronizar banco', 'sincronizar conta', 'importar extrato', 'conectar nubank',
+        'conectar itau', 'conectar itaú', 'conectar bradesco', 'conectar santander',
+        'conectar inter', 'conectar c6', 'banco automatico', 'banco automático',
+        'klavi', 'bancos conectados', 'minhas conexões', 'minhas conexoes',
+        'sincronização bancária', 'sincronizacao bancaria', 'vincular banco', 'vincular conta'
+    ]
+    if any(k in texto_busca for k in palavras_open_finance):
+        of_data = coletar_status_open_finance(user_id)
+        if of_data and not any(v['type'] == 'open_finance' for v in visuals):
+            visuals.append({"type": "open_finance", "data": of_data})
+            if not resposta_final or len(resposta_final.strip()) < 15 or "não entendi" in resposta_final.lower():
+                if of_data.get("has_connections"):
+                    resposta_final = "Aqui está o status das suas conexões bancárias via **Open Finance (Klavi)**. Seus dados de contas, cartões e lançamentos são sincronizados e categorizados automaticamente."
+                else:
+                    resposta_final = "Com o **Open Finance regulamentado pelo Banco Central (BACEN)**, você conecta suas contas e cartões com segurança criptografada de ponta a ponta e permissão somente leitura. Seus saldos, extratos, faturas e parcelas de empréstimos são sincronizados e categorizados automaticamente aqui no Simplific Pro."
 
     # --- Se consultou a Agenda ou cancelou evento (Mostra agenda atualizada) ---
     if not any(v.get('type') == 'schedule' for v in visuals):

@@ -1644,3 +1644,385 @@
     justify-content: flex-end;
   }
 }
+
+
+/* ==============================================================================
+   8. WIDGET INTERATIVO OPEN FINANCE (VisionOpenFinanceWidget — design-taste-frontend)
+   ============================================================================== */
+.openFinanceCard {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+:global(.dark) .openFinanceCard {
+  background: #0d1117;
+  border-color: #1f2937;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+}
+
+.openFinanceHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+:global(.dark) .openFinanceHeader {
+  border-bottom-color: #1e293b;
+}
+
+.openFinanceHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.openFinanceIconBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:global(.dark) .openFinanceIconBadge {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.openFinanceTitleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.openFinanceTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+:global(.dark) .openFinanceTitle {
+  color: #f1f5f9;
+}
+
+.openFinanceSubtitle {
+  font-size: 0.6875rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+:global(.dark) .openFinanceSubtitle {
+  color: #94a3b8;
+}
+
+.openFinanceStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+:global(.dark) .openFinanceStatusBadge {
+  background: #1e293b;
+  color: #cbd5e1;
+}
+
+.statusConnected {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #059669 !important;
+}
+
+:global(.dark) .statusConnected {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+}
+
+/* Lista de Recursos / Benefícios */
+.openFinanceFeatures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.openFinanceFeatureItem {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+:global(.dark) .openFinanceFeatureItem {
+  background: #161b22;
+  border-color: #21262d;
+}
+
+.featureIconWrap {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.featureTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.featureTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+:global(.dark) .featureTitle {
+  color: #e2e8f0;
+}
+
+.featureDesc {
+  font-size: 0.6875rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+:global(.dark) .featureDesc {
+  color: #8b949e;
+}
+
+/* Barra de Confiança e BACEN */
+.openFinanceTrustBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.375rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  font-size: 0.6875rem;
+  color: #475569;
+}
+
+:global(.dark) .openFinanceTrustBar {
+  background: #161b22;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+.trustBadges {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.trustBadgeItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+/* Botões de Ação */
+.openFinanceActionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: #0f172a;
+  border: 1px solid #0f172a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:global(.dark) .openFinanceActionBtn {
+  background: #10b981;
+  border-color: #10b981;
+  color: #0b0e14;
+}
+
+.openFinanceActionBtn:hover {
+  background: #1e293b;
+}
+
+:global(.dark) .openFinanceActionBtn:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+.openFinanceSecondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: transparent;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+:global(.dark) .openFinanceSecondaryBtn {
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+.openFinanceSecondaryBtn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+:global(.dark) .openFinanceSecondaryBtn:hover {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+/* Lista de Instituições Conectadas */
+.connectedInstitutionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.connectedInstitutionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: border-color 0.15s ease;
+}
+
+:global(.dark) .connectedInstitutionRow {
+  background: #161b22;
+  border-color: #21262d;
+}
+
+.institutionInfoLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.institutionIconBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 0.375rem;
+  background: #e2e8f0;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+:global(.dark) .institutionIconBox {
+  background: #21262d;
+  color: #8b949e;
+}
+
+.institutionTexts {
+  display: flex;
+  flex-direction: column;
+}
+
+.institutionName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+:global(.dark) .institutionName {
+  color: #f1f5f9;
+}
+
+.institutionMeta {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+:global(.dark) .institutionMeta {
+  color: #8b949e;
+}
+
+.institutionValuesRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.institutionMainValue {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-family: monospace;
+}
+
+:global(.dark) .institutionMainValue {
+  color: #f1f5f9;
+}
+
+.institutionSyncLabel {
+  font-size: 0.625rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+/* Modal e Estados de Conexão */
+.openFinanceConnectingPulse {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #065f46;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+:global(.dark) .openFinanceConnectingPulse {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+}

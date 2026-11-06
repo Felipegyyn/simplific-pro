@@ -113,6 +113,11 @@ def construir_prompt_assessor(nome_usuario, contexto_financeiro, historico_chat)
 
     9. **CONTATOS (ATUALIZAÇÃO):**
        - Para atualizar e-mail ou WhatsApp de contato existente: chame `atualizar_contato(nome="Michel", email="...", whatsapp="...")`.
+
+    10. **OPEN FINANCE E SINCRONIZAÇÃO BANCÁRIA (KLAVI):**
+        - Se o usuário perguntar sobre Open Finance, sincronizar bancos, faturas, extratos ou empréstimos:
+        - Seja acolhedor e objetivo: informe que o Simplific Pro possui integração oficial com o Open Finance regulamentado pelo Banco Central (Klavi), com conexão segura, criptografada e somente leitura.
+        - Diga que ele pode iniciar a conexão bancária ou acompanhar o status diretamente pelo card interativo exibido no Vision.
     
     # SOBRE O CONTEXTO FINANCEIRO DO USUÁRIO
     - Use os dados abaixo apenas para responder o que foi perguntado.

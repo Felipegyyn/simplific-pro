@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { 
   ArrowUp, Plus, Sun, Moon, RotateCcw, 
-  Terminal, Sparkles, Check, FileText, ExternalLink
+  Terminal, Sparkles, Check, FileText, ExternalLink,
+  Landmark
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import SimplificMascot from '../components/SimplificMascot';
@@ -187,6 +188,10 @@ const Vision = ({ user, onLogout }) => {
       label: '🚀 Seja Pro', 
       isPro: true, 
       action: () => navigate('/planos') 
+    },
+    { 
+      label: '🏦 Conectar banco (Open Finance)', 
+      prompt: 'Quero sincronizar meus bancos e cartões via Open Finance' 
     },
     { 
       label: '📊 Balanço e gastos deste mês', 
@@ -396,6 +401,18 @@ const Vision = ({ user, onLogout }) => {
                 disabled={isLoading}
               >
                 <Plus size={18} />
+              </button>
+
+              {/* Botão de Atalho Open Finance */}
+              <button 
+                type="button" 
+                className={styles.openFinanceToolButton}
+                title="Conectar bancos e cartões via Open Finance (Klavi)"
+                onClick={() => handleSendMessage('Quero sincronizar meus bancos e cartões via Open Finance')}
+                disabled={isLoading}
+              >
+                <Landmark size={14} />
+                <span className="hidden sm:inline">Open Finance</span>
               </button>
 
               {/* Pílula de modo/ferramenta (ex: >_ Computer / Vision) */}
