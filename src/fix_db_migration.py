@@ -85,7 +85,20 @@ def fix_alembic_version():
                     conn.execute(sa.text("DELETE FROM alembic_version"))
                     conn.commit()
                     print("[SUCCESS] Tabela alembic_version limpa com sucesso.")
-                    
+
+        # Limpeza definitiva de dados importados do PicPay / Klavi desautorizados
+        try:
+            with engine.begin() as cleanup_conn:
+                cleanup_conn.execute(sa.text("DELETE FROM transactions WHERE klavi_transaction_id IS NOT NULL;"))
+                cleanup_conn.execute(sa.text("DELETE FROM credit_card_transactions WHERE klavi_transaction_id IS NOT NULL;"))
+                cleanup_conn.execute(sa.text("DELETE FROM faturas WHERE cartao_id IN (SELECT id FROM credit_cards WHERE klavi_card_id IS NOT NULL);"))
+                cleanup_conn.execute(sa.text("DELETE FROM credit_cards WHERE klavi_card_id IS NOT NULL;"))
+                cleanup_conn.execute(sa.text("DELETE FROM bank_accounts WHERE klavi_account_id IS NOT NULL;"))
+                cleanup_conn.execute(sa.text("UPDATE users SET cpf = NULL WHERE email = 'felipegyyn@gmail.com';"))
+                print("[CLEANUP] Dados do PicPay e Klavi expurgados com sucesso na inicializacao.")
+        except Exception as c_err:
+            print(f"[WARN] Aviso ao expurgar dados do PicPay: {c_err}")
+
     except Exception as e:
         print(f"[WARN] Aviso durante a verificacao automatica de alembic_version: {e}")
 
