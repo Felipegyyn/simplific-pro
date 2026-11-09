@@ -884,16 +884,25 @@ class KlaviService:
         try:
             print(f"[LIMPEZA] [KLAVI] Iniciando limpeza total de dados Open Finance para user_id={user_id}...")
             
-            # 1. Busca IDs dos cartões e contas da Klavi
+            # 1. Busca IDs dos cartões e contas da Klavi ou PicPay
             klavi_cards = CreditCard.query.filter(
                 CreditCard.user_id == user_id,
-                (CreditCard.klavi_card_id.isnot(None) | CreditCard.klavi_link_id.isnot(None))
+                (
+                    CreditCard.klavi_card_id.isnot(None) |
+                    CreditCard.klavi_link_id.isnot(None) |
+                    CreditCard.brand.ilike("%PicPay%") |
+                    CreditCard.name.ilike("%PicPay%")
+                )
             ).all()
             card_ids = [c.id for c in klavi_cards]
 
             klavi_accounts = BankAccount.query.filter(
                 BankAccount.user_id == user_id,
-                (BankAccount.klavi_account_id.isnot(None) | BankAccount.klavi_link_id.isnot(None))
+                (
+                    BankAccount.klavi_account_id.isnot(None) |
+                    BankAccount.klavi_link_id.isnot(None) |
+                    BankAccount.bank_name.ilike("%PicPay%")
+                )
             ).all()
             account_ids = [a.id for a in klavi_accounts]
 

@@ -293,21 +293,6 @@ def get_klavi_status():
         CreditCard.klavi_card_id != None
     ).all()
 
-    # Auto-recuperação: Se não há contas salvas, tenta sincronizar dos consentimentos da Klavi
-    if len(connected_accounts) == 0 and getattr(user, 'cpf', None):
-        try:
-            if klavi_service.sync_all_user_data(user_id, tax_id=user.cpf):
-                connected_accounts = BankAccount.query.filter(
-                    BankAccount.user_id == user_id,
-                    BankAccount.klavi_account_id != None
-                ).all()
-                connected_cards = CreditCard.query.filter(
-                    CreditCard.user_id == user_id,
-                    CreditCard.klavi_card_id != None
-                ).all()
-        except Exception as e:
-            print(f"[AVISO] [KLAVI STATUS] Falha na auto-sincronização: {e}")
-
     return jsonify({
         "status": "success",
         "has_cpf": bool(getattr(user, 'cpf', None)),
