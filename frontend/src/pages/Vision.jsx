@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { 
   ArrowUp, Plus, Sun, Moon, RotateCcw, 
-  Terminal, Sparkles, Check, FileText, ExternalLink,
+  Sparkles, Check, FileText, ExternalLink,
   Landmark
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
@@ -24,7 +24,6 @@ const Vision = ({ user, onLogout }) => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Processando...');
-  const [selectedMode, setSelectedMode] = useState('Computer'); // '>_ Computer'
 
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -185,33 +184,24 @@ const Vision = ({ user, onLogout }) => {
   // Sugestões de pílulas inspiradas no Pierre + Finanças
   const suggestionPills = [
     { 
-      label: '🚀 Seja Pro', 
-      isPro: true, 
-      action: () => navigate('/planos') 
-    },
-    { 
-      label: '🏦 Conectar banco (Open Finance)', 
-      prompt: 'Quero sincronizar meus bancos e cartões via Open Finance' 
-    },
-    { 
-      label: '📊 Balanço e gastos deste mês', 
+      label: 'Balanço e gastos deste mês', 
       prompt: 'Como estão minhas finanças e meus gastos este mês?' 
     },
     { 
-      label: '💳 Status dos cartões e fatura', 
+      label: 'Status dos cartões e fatura', 
       prompt: 'Como está a fatura e o limite dos meus cartões de crédito?' 
     },
     { 
-      label: '🎯 Progresso das metas', 
+      label: 'Progresso das metas', 
       prompt: 'Como está o andamento das minhas metas financeiras?' 
     },
     { 
-      label: '📅 Agenda e reuniões', 
+      label: 'Agenda e reuniões', 
       prompt: 'Quais são meus próximos compromissos e reuniões na agenda?' 
     },
     { 
-      label: '🏨 Pesquisar hotéis em Gramado', 
-      prompt: 'Pesquise opções de hotéis em Gramado com diárias e fotos' 
+      label: 'Pesquisar', 
+      prompt: 'Quero fazer uma pesquisa na internet' 
     }
   ];
 
@@ -292,7 +282,7 @@ const Vision = ({ user, onLogout }) => {
 
                       {/* Renderizador de Gráficos e Widgets Explicativos */}
                       {msg.visuals && msg.visuals.length > 0 && (
-                        <VisionVisualRenderer visuals={msg.visuals} />
+                        <VisionVisualRenderer visuals={msg.visuals} onSendMessage={handleSendMessage} />
                       )}
                     </div>
                   ) : (
@@ -415,16 +405,7 @@ const Vision = ({ user, onLogout }) => {
                 <span className="hidden sm:inline">Open Finance</span>
               </button>
 
-              {/* Pílula de modo/ferramenta (ex: >_ Computer / Vision) */}
-              <button 
-                type="button"
-                className={styles.modeBadge}
-                title="Modo de análise inteligente"
-                onClick={() => setSelectedMode(prev => prev === 'Computer' ? 'Vision' : 'Computer')}
-              >
-                <Terminal size={12} />
-                <span>{selectedMode}</span>
-              </button>
+
             </div>
 
             {/* Botão de envio (seta para cima) */}

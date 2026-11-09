@@ -9,7 +9,7 @@ import {
   CheckCircle2, Landmark, CreditCard as CardIcon, 
   Calendar, Clock, Video, Target, ExternalLink,
   Wallet, Sparkles, Building2, ChevronDown, ChevronUp,
-  X, Filter, Flame, Info, ShieldCheck, Lock, Plus, ArrowRight, Loader2, CreditCard
+  X, Filter, Flame, Info, ShieldCheck, Lock, Plus, ArrowRight, Loader2, CreditCard, Search, Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -1329,7 +1329,90 @@ export const VisionOpenFinanceWidget = ({ data }) => {
 // ==============================================================================
 // DISPATCHER PRINCIPAL (VisionVisualRenderer)
 // ==============================================================================
-export const VisionVisualRenderer = ({ visuals }) => {
+// ==============================================================================
+// 9. WIDGET INTERATIVO DE PESQUISA (VisionSearchWidget — design-taste-frontend)
+// ==============================================================================
+export const VisionSearchWidget = ({ data, onSendMessage }) => {
+  const [query, setQuery] = useState('');
+
+  const suggestions = data?.suggestions || [
+    'Preço de passagens aéreas',
+    'Cotação do dólar e Selic hoje',
+    'Notícias de economia e mercado',
+    'Melhores notebooks para trabalho',
+    'Opções de hotéis e viagens'
+  ];
+
+  const handleSearch = (searchTerm) => {
+    const finalTerm = (searchTerm || query).trim();
+    if (!finalTerm) return;
+    if (onSendMessage) {
+      onSendMessage(`Pesquise na internet: ${finalTerm}`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  return (
+    <div className={styles.searchInteractiveCard}>
+      <div className={styles.searchInteractiveHeader}>
+        <div className={styles.searchIconBadge}>
+          <Search size={16} />
+        </div>
+        <div className={styles.searchTitleGroup}>
+          <span className={styles.searchTitle}>Pesquisa na Web em Tempo Real</span>
+          <span className={styles.searchSubtitle}>Busque cotações, produtos, notícias, passagens ou hotéis</span>
+        </div>
+      </div>
+
+      <div className={styles.searchInputRow}>
+        <div className={styles.searchInputWrapper}>
+          <Search size={15} className="text-zinc-400 flex-shrink-0 ml-3" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Digite o que deseja pesquisar..."
+            className={styles.searchInnerInput}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => handleSearch()}
+          disabled={!query.trim()}
+          className={styles.searchSubmitBtn}
+        >
+          <span>Buscar</span>
+          <ArrowRight size={14} />
+        </button>
+      </div>
+
+      <div className={styles.searchChipsRow}>
+        <span className={styles.searchChipsLabel}>Sugestões rápidas:</span>
+        <div className={styles.searchChipsList}>
+          {suggestions.map((item, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSearch(item)}
+              className={styles.searchChip}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const VisionVisualRenderer = ({ visuals, onSendMessage }) => {
   if (!visuals || !Array.isArray(visuals) || visuals.length === 0) return null;
 
   return (
@@ -1352,6 +1435,9 @@ export const VisionVisualRenderer = ({ visuals }) => {
             return <VisionWebCards key={idx} data={vis.data} />;
           case 'open_finance':
             return <VisionOpenFinanceWidget key={idx} data={vis.data} />;
+          case 'search_interactive':
+          case 'search_prompt':
+            return <VisionSearchWidget key={idx} data={vis.data} onSendMessage={onSendMessage} />;
           default:
             return null;
         }

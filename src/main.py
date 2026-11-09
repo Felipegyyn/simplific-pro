@@ -351,6 +351,8 @@ with app.app_context():
             ("transactions", "klavi_transaction_id", "VARCHAR(150)"),
             ("transactions", "is_loan_installment", "BOOLEAN DEFAULT FALSE"),
             ("transactions", "contract_id", "VARCHAR(100)"),
+            ("goals", "priority", "VARCHAR(20) DEFAULT 'média'"),
+            ("goals", "image_url", "TEXT"),
         ]
         for tbl, col, col_type in klavi_columns:
             try:

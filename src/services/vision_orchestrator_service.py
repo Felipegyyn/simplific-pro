@@ -563,6 +563,43 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
             "data": cards_pesquisa
         })
 
+    # 3.1. Interatividade de Pesquisa na Web (Vision Search Interativo)
+    msg_limpa = mensagem_usuario.strip().lower()
+    intent_pesquisa_generica = (
+        msg_limpa in ['pesquisar', 'pesquisa', 'pesquisa na web', 'pesquisar na web', 'pesquisar na internet', 'fazer uma pesquisa', 'quero pesquisar', 'quero fazer uma pesquisa', 'quero fazer uma pesquisa na internet', 'buscar na internet'] or
+        bool(re.match(r'^(?:quero\s+)?(?:fazer\s+uma\s+)?pesquis(?:ar|a)(?:\s+na\s+internet|\s+na\s+web)?\.?$', msg_limpa))
+    )
+
+    if intent_pesquisa_generica:
+        resposta_final = "O que você gostaria de pesquisar na web? Você pode buscar informações em tempo real sobre preços, produtos, notícias, passagens, hospedagens, investimentos ou qualquer outro assunto:"
+        if not any(v.get('type') == 'search_interactive' for v in visuals):
+            visuals.append({
+                "type": "search_interactive",
+                "data": {
+                    "suggestions": [
+                        "Preço de passagens aéreas",
+                        "Cotação do dólar e Selic hoje",
+                        "Notícias de economia e mercado",
+                        "Melhores notebooks para trabalho",
+                        "Opções de hotéis e viagens"
+                    ]
+                }
+            })
+    else:
+        # Se o usuário enviou uma busca com termo específico (ex: "pesquise na internet: passagens para sp", "pesquisar notebooks")
+        if not any(v.get('type') == 'web_cards' for v in visuals):
+            match_pesquisa = re.search(r'(?i)^(?:pesquisar|pesquise|buscar|busque|procurar|procure)(?:\s+na\s+internet|\s+na\s+web)?(?:\s*:\s*|\s+(?:sobre\s+)?)(.+)$', mensagem_usuario.strip())
+            if match_pesquisa:
+                termo = match_pesquisa.group(1).strip()
+                if termo.lower() not in ['algo', 'na internet', 'na web', 'aqui', 'uma coisa']:
+                    from src.services.search_service import realizar_pesquisa_web, obter_ultimos_cards_pesquisa
+                    realizar_pesquisa_web(termo, user_id=user_id)
+                    cards = obter_ultimos_cards_pesquisa(user_id)
+                    if cards:
+                        visuals.append({"type": "web_cards", "data": cards})
+                    if not resposta_final or len(resposta_final.strip()) < 15 or "não entendi" in resposta_final.lower():
+                        resposta_final = f"Encontrei as principais informações e opções na web sobre **{termo}**:"
+
     # 4. Decisão contextual baseada nas ações executadas ou palavras da mensagem
     tipos_acoes = [a.get('type') for a in acoes_a_executar]
     texto_busca = (mensagem_usuario + " " + resposta_final).lower()
