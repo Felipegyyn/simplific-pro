@@ -229,9 +229,11 @@ def listar_faturas():
         CreditCard, Fatura.cartao_id == CreditCard.id
     ).filter(Fatura.user_id == user_id)
 
-    # 3. Filtro de Status
-    if status_filter and status_filter in ['aberta', 'paga']:
-        query = query.filter(Fatura.status == status_filter)
+    # 3. Filtro de Status (suporta 'aberta' e legados 'em_aberto')
+    if status_filter == 'aberta':
+        query = query.filter(Fatura.status.in_(['aberta', 'em_aberto']))
+    elif status_filter == 'paga':
+        query = query.filter(Fatura.status == 'paga')
 
     # 4. Executa a query base para buscar todas as faturas do usuário
     faturas_e_cartoes = query.order_by(Fatura.ano.desc(), Fatura.mes.desc()).all()

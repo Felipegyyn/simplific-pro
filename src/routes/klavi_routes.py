@@ -157,6 +157,22 @@ def handle_events_webhook():
                         except Exception as req_err:
                             print(f"[AVISO] [KLAVI] Erro ao disparar coleta para {institution_code}: {req_err}")
 
+            # 3. Trata evento de CONSENTIMENTO REVOGADO OU CANCELADO (ex: no app do banco)
+            elif event_type in ["consent_revoked", "consent_cancelled", "consent_rejected"]:
+                personal_tax_id = payload.get("personalTaxId") or payload.get("taxId")
+                user_id = external_info.get("user_id")
+                if not user_id and personal_tax_id:
+                    u_match = User.query.filter_by(cpf=personal_tax_id).first()
+                    if u_match:
+                        user_id = u_match.id
+
+                print(f"[REVOGAÇÃO] [KLAVI EVENTO] Consentimento revogado pelo usuário (user_id={user_id}, CPF={personal_tax_id})")
+                if user_id:
+                    try:
+                        klavi_service.clean_all_user_data(user_id)
+                    except Exception as clean_err:
+                        print(f"[AVISO] [KLAVI REVOGAÇÃO] Erro ao limpar dados revogados: {clean_err}")
+
         return jsonify({"status": "success", "message": "Event processed"}), 200
 
     except Exception as e:
@@ -301,4 +317,33 @@ def get_klavi_status():
         "accounts": [acc.to_dict() for acc in connected_accounts],
         "cards": [card.to_dict() for card in connected_cards]
     }), 200
+
+
+# =============================================================================
+# 5. LIMPEZA TOTAL DE DADOS E DESCONEXÃO (REVOGAÇÃO LOCAL)
+# =============================================================================
+@klavi_bp.route('/clean-data', methods=['POST'])
+@klavi_bp.route('/disconnect-all', methods=['POST'])
+@jwt_required()
+def clean_open_finance_data():
+    """
+    Remove todos os dados (contas, cartões, faturas, extratos e compras)
+    importados via Klavi Open Finance para o usuário logado.
+    """
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    try:
+        results = klavi_service.clean_all_user_data(user_id)
+        return jsonify({
+            "status": "success",
+            "message": "Todos os dados importados do Open Finance foram removidos com sucesso.",
+            "details": results
+        }), 200
+    except Exception as e:
+        print(f"[ERRO] [ROTA KLAVI LIMPEZA] Falha ao limpar dados: {e}")
+        return jsonify({"error": str(e)}), 500
+
 

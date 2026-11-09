@@ -7,7 +7,8 @@ import {
   ArrowUpRight, 
   CheckCircle2, 
   Loader2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -28,22 +29,26 @@ import { toast } from 'sonner';
 const ConnectBankButton = ({ onSuccess, className = '', label = '+ Conectar Open Finance' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [cpf, setCpf] = useState('');
   const [popupWindow, setPopupWindow] = useState(null);
+  const [statusData, setStatusData] = useState(null);
 
-  // 1. Carrega dados prévios do usuário (se já tiver CPF)
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const res = await apiService.get('/api/klavi/status');
-        if (res && res.cpf) {
-          setCpf(res.cpf);
-        }
-      } catch (err) {
-        // Silencioso se não carregado
+  const checkUserStatus = async () => {
+    try {
+      const res = await apiService.get('/api/klavi/status');
+      setStatusData(res);
+      if (res && res.cpf) {
+        setCpf(res.cpf);
       }
-    };
+    } catch (err) {
+      // Silencioso se não carregado
+    }
+  };
+
+  // 1. Carrega dados prévios do usuário
+  useEffect(() => {
     checkUserStatus();
 
     // 2. Se a tela recarregou com retorno de sucesso do Klavi
@@ -56,6 +61,30 @@ const ConnectBankButton = ({ onSuccess, className = '', label = '+ Conectar Open
       if (onSuccess) onSuccess();
     }
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      checkUserStatus();
+    }
+  }, [isOpen]);
+
+  const handleCleanData = async () => {
+    if (!window.confirm("Deseja realmente desconectar e remover todas as contas, cartões e lançamentos importados pelo Open Finance?")) {
+      return;
+    }
+    setCleaning(true);
+    try {
+      await apiService.post('/api/klavi/clean-data');
+      toast.success("Dados do Open Finance removidos com sucesso!");
+      setStatusData(null);
+      setIsOpen(false);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      toast.error("Erro ao limpar dados do Open Finance.");
+    } finally {
+      setCleaning(false);
+    }
+  };
 
   // Monitora o fechamento da janela de popup
   useEffect(() => {
@@ -246,6 +275,25 @@ const ConnectBankButton = ({ onSuccess, className = '', label = '+ Conectar Open
               Criptografia ponta a ponta. O Simplific Pro <strong>não tem acesso às suas senhas</strong> de banco.
             </span>
           </div>
+
+          {/* PAINEL DE CONEXÕES ATIVAS / DESCONECTAR */}
+          {statusData && (statusData.total_connected_accounts > 0 || statusData.total_connected_cards > 0) && (
+            <div className="p-3 rounded-lg bg-rose-950/20 border border-rose-800/40 flex items-center justify-between gap-2">
+              <div className="text-xs text-rose-300">
+                <span className="font-semibold">Conexões ativas:</span> {statusData.total_connected_accounts} conta(s), {statusData.total_connected_cards} cartão(ões).
+              </div>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={handleCleanData}
+                disabled={cleaning || loading}
+                className="h-7 text-xs bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5"
+              >
+                {cleaning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                Desconectar & Limpar Dados
+              </Button>
+            </div>
+          )}
 
           <DialogFooter className="mt-4 gap-2 sm:gap-0">
             <Button

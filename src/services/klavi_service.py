@@ -11,6 +11,7 @@ import os
 import requests
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
+from sqlalchemy import func
 from src.models.db import db
 from src.models.user import User
 from src.models.financial import Transaction, Category
@@ -354,85 +355,112 @@ class KlaviService:
                     account_number=full_account or "000000",
                     initial_balance=available_balance,
                     current_balance=available_balance,
+                    is_active=True,
                     klavi_link_id=link_id,
                     klavi_account_id=account_id_klavi,
                     observations="Sincronizado automaticamente via Klavi Open Finance"
                 )
                 db.session.add(bank_account)
-                db.session.flush()
-                print(f"[NOVO] [KLAVI] Nova Conta Bancária criada: {brand_name} ({full_account})")
+                db.session.commit()
+                print(f"[NOVO] [KLAVI] Nova Conta Bancária criada e comitada: {brand_name} ({full_account}) com saldo R$ {available_balance:.2f}")
             else:
                 bank_account.current_balance = available_balance
+                bank_account.is_active = True
                 bank_account.klavi_link_id = link_id
                 bank_account.klavi_account_id = account_id_klavi
-                print(f"[ATUALIZADO] [KLAVI] Saldo atualizado para {brand_name}: R$ {available_balance:.2f}")
+                db.session.commit()
+                print(f"[ATUALIZADO] [KLAVI] Saldo atualizado e comitado para {brand_name}: R$ {available_balance:.2f}")
 
             updated_accounts_count += 1
 
             # 2. Processa o Histórico de Transações do Extrato
             transactions_list = acc.get("transactionDetails") or acc.get("transactions") or []
+            batch_tx_count = 0
             for tx in transactions_list:
-                tx_id = tx.get("transactionId") or tx.get("id")
-                if not tx_id:
+                try:
+                    tx_id = tx.get("transactionId") or tx.get("id")
+                    if not tx_id:
+                        continue
+
+                    klavi_tx_key = f"klavi_{tx_id}"
+                    # Evita duplicidade
+                    existing_tx = Transaction.query.filter_by(
+                        user_id=user_id,
+                        klavi_transaction_id=klavi_tx_key
+                    ).first()
+                    if existing_tx:
+                        continue
+
+                    # Determina tipo (entrada vs saída)
+                    credit_debit = str(tx.get("creditDebitType", "")).upper()
+                    is_income = "CREDITO" in credit_debit or "CREDIT" in credit_debit
+                    tx_type = "entrada" if is_income else "saida"
+
+                    # Valor
+                    amt_data = tx.get("transactionAmount", {})
+                    if isinstance(amt_data, dict):
+                        amount_val = float(amt_data.get("amount", tx.get("amount", 0.0)))
+                    else:
+                        amount_val = float(amt_data or tx.get("amount", 0.0))
+                    amount_val = abs(amount_val)
+                    if amount_val == 0:
+                        continue
+
+                    # Data
+                    date_str = tx.get("transactionDate") or tx.get("date")
+                    tx_date = date.today()
+                    if date_str:
+                        try:
+                            tx_date = datetime.strptime(date_str[:10], "%Y-%m-%d").date()
+                        except Exception:
+                            tx_date = date.today()
+
+                    # Descrição
+                    tx_name = tx.get("transactionName") or tx.get("description") or tx.get("type") or "Lançamento Bancário"
+
+                    # Auto-categorização com suporte a IA L3 da Klavi
+                    klavi_cat = tx.get("category") or tx.get("categoryL2") or tx.get("subCategory") or tx.get("categoryName")
+                    category = self._match_or_create_category(user_id, tx_name, tx_type, klavi_cat=klavi_cat)
+
+                    new_tx = Transaction(
+                        user_id=user_id,
+                        date=tx_date,
+                        type=tx_type,
+                        category_id=category.id,
+                        format="variavel",
+                        payment_form="a_vista",
+                        installments=1,
+                        current_installment=1,
+                        description=tx_name,
+                        value=amount_val,
+                        status="confirmada",
+                        confirmed_at=datetime.utcnow(),
+                        bank_account_id=bank_account.id,
+                        klavi_transaction_id=klavi_tx_key
+                    )
+                    db.session.add(new_tx)
+                    imported_tx_count += 1
+                    batch_tx_count += 1
+
+                    if batch_tx_count >= 50:
+                        db.session.commit()
+                        batch_tx_count = 0
+                except Exception as tx_err:
+                    db.session.rollback()
+                    print(f"[AVISO] [KLAVI] Erro ao importar transação do extrato: {tx_err}")
                     continue
 
-                klavi_tx_key = f"klavi_{tx_id}"
-                # Evita duplicidade
-                existing_tx = Transaction.query.filter_by(
-                    user_id=user_id,
-                    klavi_transaction_id=klavi_tx_key
-                ).first()
-                if existing_tx:
-                    continue
+            if batch_tx_count > 0:
+                try:
+                    db.session.commit()
+                except Exception as b_err:
+                    db.session.rollback()
+                    print(f"[AVISO] [KLAVI] Erro ao comitar lote final: {b_err}")
 
-                # Determina tipo (entrada vs saída)
-                credit_debit = str(tx.get("creditDebitType", "")).upper()
-                is_income = "CREDITO" in credit_debit or "CREDIT" in credit_debit
-                tx_type = "entrada" if is_income else "saida"
-
-                # Valor
-                amt_data = tx.get("transactionAmount", {})
-                amount_val = float(amt_data.get("amount", tx.get("amount", 0.0)))
-                amount_val = abs(amount_val)
-                if amount_val == 0:
-                    continue
-
-                # Data
-                date_str = tx.get("transactionDate") or tx.get("date")
-                tx_date = date.today()
-                if date_str:
-                    try:
-                        tx_date = datetime.strptime(date_str[:10], "%Y-%m-%d").date()
-                    except Exception:
-                        tx_date = date.today()
-
-                # Descrição
-                tx_name = tx.get("transactionName") or tx.get("description") or tx.get("type") or "Lançamento Bancário"
-
-                # Auto-categorização com suporte a IA L3 da Klavi
-                klavi_cat = tx.get("category") or tx.get("categoryL2") or tx.get("subCategory") or tx.get("categoryName")
-                category = self._match_or_create_category(user_id, tx_name, tx_type, klavi_cat=klavi_cat)
-
-                new_tx = Transaction(
-                    user_id=user_id,
-                    date=tx_date,
-                    type=tx_type,
-                    category_id=category.id,
-                    format="variavel",
-                    payment_form="a_vista",
-                    installments=1,
-                    current_installment=1,
-                    description=tx_name,
-                    value=amount_val,
-                    status="confirmada",
-                    confirmed_at=datetime.utcnow(),
-                    bank_account_id=bank_account.id,
-                    klavi_transaction_id=klavi_tx_key
-                )
-                db.session.add(new_tx)
-                imported_tx_count += 1
-
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception:
+            pass
         print(f"[OK] [KLAVI] Extrato concluído: {updated_accounts_count} contas atualizadas, {imported_tx_count} transações importadas.")
         return True
 
@@ -520,13 +548,15 @@ class KlaviService:
                     is_active=True
                 )
                 db.session.add(credit_card)
-                db.session.flush()
-                print(f"[NOVO] [KLAVI] Novo Cartão cadastrado: {card_name} (Final {last_digits})")
+                db.session.commit()
+                print(f"[NOVO] [KLAVI] Novo Cartão cadastrado e comitado: {card_name} (Final {last_digits})")
             else:
                 credit_card.limit = total_limit
                 credit_card.available_limit = avail_limit
+                credit_card.is_active = True
                 credit_card.klavi_link_id = link_id
                 credit_card.klavi_card_id = klavi_card_id
+                db.session.commit()
                 print(f"[ATUALIZADO] [KLAVI] Limites atualizados para {card_name}: Disponível R$ {avail_limit:.2f}")
 
             # 2. Processa as Faturas e Transações do Cartão (suporte a closedStatements e openStatement)
@@ -548,9 +578,15 @@ class KlaviService:
                         bill_date = date.today()
 
                 fatura = self._get_or_create_fatura(user_id, credit_card, bill_date)
-                bill_total = float(bill.get("totalAmount", bill.get("amount", 0.0)))
+                raw_bill_total = bill.get("totalAmount") or bill.get("billTotalAmount") or bill.get("amount") or 0.0
+                if isinstance(raw_bill_total, dict):
+                    bill_total = float(raw_bill_total.get("amount", 0.0))
+                else:
+                    bill_total = float(raw_bill_total or 0.0)
+
                 if bill_total > 0:
                     fatura.valor_total = bill_total
+                    db.session.commit()
 
                 # Transações da fatura específica (suporta transactionDetails e transactions)
                 bill_txs = bill.get("transactionDetails") or bill.get("transactions") or []
@@ -571,6 +607,17 @@ class KlaviService:
                 fatura = self._get_or_create_fatura(user_id, credit_card, tx_date)
                 if self._save_card_transaction(user_id, credit_card, fatura, g_tx):
                     imported_card_tx += 1
+
+            # Recalcula o valor_total de cada fatura deste cartão com base nas transações importadas
+            try:
+                card_faturas = Fatura.query.filter_by(cartao_id=credit_card.id, user_id=user_id).all()
+                for fat in card_faturas:
+                    sum_val = db.session.query(func.coalesce(func.sum(CreditCardTransaction.value), 0.0)).filter_by(fatura_id=fat.id).scalar()
+                    if sum_val and float(sum_val) > 0:
+                        fat.valor_total = float(sum_val)
+                db.session.commit()
+            except Exception as rec_err:
+                print(f"[AVISO] [KLAVI] Erro ao recalcular faturas: {rec_err}")
 
         db.session.commit()
         print(f"[OK] [KLAVI] Cartões concluídos: {imported_card_tx} compras de cartão importadas/atualizadas.")
@@ -700,7 +747,11 @@ class KlaviService:
     # FUNÇÕES AUXILIARES DE SUPORTE
     # =========================================================================
     def _save_card_transaction(self, user_id, credit_card, fatura, tx_data):
-        """Salva uma compra no cartão de crédito evitando duplicidade."""
+        """
+        Salva uma compra no cartão de crédito:
+        1. Registra em CreditCardTransaction vinculado à Fatura (para exibição no módulo Cartões/Faturas)
+        2. Espelha na tabela Transaction (para exibição geral no módulo Lançamentos)
+        """
         tx_id = tx_data.get("transactionId") or tx_data.get("id")
         if not tx_id:
             return False
@@ -710,8 +761,6 @@ class KlaviService:
             user_id=user_id,
             klavi_transaction_id=klavi_tx_key
         ).first()
-        if existing:
-            return False
 
         raw_amt = tx_data.get("brazilianAmount") or tx_data.get("transactionAmount") or tx_data.get("amount") or 0.0
         if isinstance(raw_amt, dict):
@@ -736,20 +785,49 @@ class KlaviService:
         installments = int(tx_data.get("installments", tx_data.get("totalInstallments", 1)))
         current_inst = int(tx_data.get("currentInstallment", 1))
 
-        new_card_tx = CreditCardTransaction(
+        # 1. Salva em CreditCardTransaction (para faturas e cartões)
+        if not existing:
+            new_card_tx = CreditCardTransaction(
+                user_id=user_id,
+                credit_card_id=credit_card.id,
+                fatura_id=fatura.id if fatura else None,
+                category_id=category.id,
+                description=desc,
+                value=amount,
+                date=tx_date,
+                installments=installments,
+                current_installment=current_inst,
+                is_recurring=False,
+                klavi_transaction_id=klavi_tx_key
+            )
+            db.session.add(new_card_tx)
+
+        # 2. Espelha na tabela Transaction (para aparecer em 'Lançamentos' gerais)
+        main_tx_key = f"klavi_card_main_{tx_id}"
+        existing_main = Transaction.query.filter_by(
             user_id=user_id,
-            credit_card_id=credit_card.id,
-            fatura_id=fatura.id if fatura else None,
-            category_id=category.id,
-            description=desc,
-            value=amount,
-            date=tx_date,
-            installments=installments,
-            current_installment=current_inst,
-            is_recurring=False,
-            klavi_transaction_id=klavi_tx_key
-        )
-        db.session.add(new_card_tx)
+            klavi_transaction_id=main_tx_key
+        ).first()
+
+        if not existing_main:
+            card_desc = f"{desc} ({credit_card.name})" if credit_card else desc
+            main_tx = Transaction(
+                user_id=user_id,
+                date=tx_date,
+                type="saida",
+                category_id=category.id,
+                format="variavel",
+                payment_form="parcelado" if installments > 1 else "a_vista",
+                installments=installments,
+                current_installment=current_inst,
+                description=card_desc,
+                value=amount,
+                status="confirmada",
+                confirmed_at=datetime.utcnow(),
+                klavi_transaction_id=main_tx_key
+            )
+            db.session.add(main_tx)
+
         return True
 
     def _get_or_create_fatura(self, user_id, card, trans_date):
@@ -767,25 +845,118 @@ class KlaviService:
 
         fatura = Fatura.query.filter_by(
             cartao_id=card.id,
+            user_id=user_id,
             mes=mes_ref,
             ano=ano_ref
         ).first()
 
+        hoje = date.today()
+        is_passada = (ano_ref < hoje.year or (ano_ref == hoje.year and mes_ref < hoje.month))
+        status_esperado = "paga" if is_passada else "aberta"
+
         if not fatura:
-            hoje = date.today()
-            status_fatura = "paga" if (ano_ref < hoje.year or (ano_ref == hoje.year and mes_ref < hoje.month)) else "em_aberto"
             fatura = Fatura(
                 cartao_id=card.id,
                 user_id=user_id,
                 valor_total=0.0,
                 mes=mes_ref,
                 ano=ano_ref,
-                status=status_fatura
+                status=status_esperado
             )
             db.session.add(fatura)
-            db.session.flush()
+            db.session.commit()
+        else:
+            # Normaliza faturas antigas marcadas com 'em_aberto' para 'aberta'
+            if fatura.status == "em_aberto":
+                fatura.status = "aberta"
+                db.session.commit()
 
         return fatura
+
+    # =========================================================================
+    # 7. LIMPEZA E DESCONEXÃO DE DADOS (CLEANUP)
+    # =========================================================================
+    def clean_all_user_data(self, user_id):
+        """
+        Remove todas as contas, cartões, faturas e transações importadas via Klavi Open Finance
+        para o usuário especificado, restaurando o estado limpo do Simplific Pro.
+        """
+        try:
+            print(f"[LIMPEZA] [KLAVI] Iniciando limpeza total de dados Open Finance para user_id={user_id}...")
+            
+            # 1. Busca IDs dos cartões e contas da Klavi
+            klavi_cards = CreditCard.query.filter(
+                CreditCard.user_id == user_id,
+                (CreditCard.klavi_card_id.isnot(None) | CreditCard.klavi_link_id.isnot(None))
+            ).all()
+            card_ids = [c.id for c in klavi_cards]
+
+            klavi_accounts = BankAccount.query.filter(
+                BankAccount.user_id == user_id,
+                (BankAccount.klavi_account_id.isnot(None) | BankAccount.klavi_link_id.isnot(None))
+            ).all()
+            account_ids = [a.id for a in klavi_accounts]
+
+            # 2. Deleta CreditCardTransaction
+            deleted_card_tx = 0
+            if card_ids:
+                deleted_card_tx += CreditCardTransaction.query.filter(
+                    CreditCardTransaction.user_id == user_id,
+                    CreditCardTransaction.credit_card_id.in_(card_ids)
+                ).delete(synchronize_session=False)
+
+            deleted_card_tx += CreditCardTransaction.query.filter(
+                CreditCardTransaction.user_id == user_id,
+                CreditCardTransaction.klavi_transaction_id.isnot(None)
+            ).delete(synchronize_session=False)
+
+            # 3. Deleta Faturas dos cartões Klavi
+            deleted_faturas = 0
+            if card_ids:
+                deleted_faturas = Fatura.query.filter(
+                    Fatura.user_id == user_id,
+                    Fatura.cartao_id.in_(card_ids)
+                ).delete(synchronize_session=False)
+
+            # 4. Deleta Cartões Klavi
+            deleted_cards = len(klavi_cards)
+            for c in klavi_cards:
+                db.session.delete(c)
+
+            # 5. Deleta Transações gerais da Klavi (extrato e compras espelhadas de cartão)
+            deleted_tx = Transaction.query.filter(
+                Transaction.user_id == user_id,
+                (
+                    Transaction.klavi_transaction_id.isnot(None) |
+                    (Transaction.bank_account_id.in_(account_ids) if account_ids else False)
+                )
+            ).delete(synchronize_session=False)
+
+            # 6. Deleta Contas Bancárias Klavi
+            deleted_accounts = len(klavi_accounts)
+            for a in klavi_accounts:
+                db.session.delete(a)
+
+            # 7. Deleta eventos de agenda gerados por empréstimos Klavi
+            ScheduleEvent.query.filter(
+                ScheduleEvent.user_id == user_id,
+                ScheduleEvent.category == "Empréstimos",
+                ScheduleEvent.title.ilike("%Vencimento Empréstimo:%")
+            ).delete(synchronize_session=False)
+
+            db.session.commit()
+            print(f"[OK] [KLAVI LIMPEZA] Concluída com sucesso! Removidos: {deleted_accounts} contas, {deleted_cards} cartões, {deleted_faturas} faturas, {deleted_card_tx} compras de cartão, {deleted_tx} transações.")
+            return {
+                "deleted_accounts": deleted_accounts,
+                "deleted_cards": deleted_cards,
+                "deleted_faturas": deleted_faturas,
+                "deleted_card_transactions": deleted_card_tx,
+                "deleted_transactions": deleted_tx
+            }
+        except Exception as e:
+            db.session.rollback()
+            print(f"[ERRO] [KLAVI LIMPEZA] Falha ao limpar dados: {e}")
+            raise e
 
     def _match_or_create_category(self, user_id, description, tx_type, klavi_cat=None):
         """Mapeia inteligentemente ou encontra a melhor categoria para o lançamento."""

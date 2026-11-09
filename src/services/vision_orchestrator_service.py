@@ -369,29 +369,34 @@ def coletar_status_open_finance(user_id):
         
         contas = BankAccount.query.filter(
             BankAccount.user_id == user_id,
-            BankAccount.klavi_link_id.isnot(None)
+            BankAccount.is_active == True,
+            (BankAccount.klavi_link_id.isnot(None) | BankAccount.klavi_account_id.isnot(None))
         ).all()
 
         cartoes = CreditCard.query.filter(
             CreditCard.user_id == user_id,
-            CreditCard.klavi_link_id.isnot(None)
+            CreditCard.is_active == True,
+            (CreditCard.klavi_link_id.isnot(None) | CreditCard.klavi_card_id.isnot(None))
         ).all()
 
         contas_list = [
             {
                 "id": c.id,
-                "name": c.name or c.bank_name or "Conta Bancária",
+                "name": c.bank_name or "Conta Bancária",
                 "bank_name": c.bank_name or "Banco Conectado",
-                "account_type": c.account_type or "corrente",
-                "balance": float(c.balance or 0),
-                "last_sync": c.updated_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'updated_at', None) else "Hoje"
+                "account_type": "corrente",
+                "balance": float(c.current_balance or 0),
+                "last_sync": c.created_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'created_at', None) else "Hoje"
             }
             for c in contas
         ]
 
         cartoes_list = []
         for c in cartoes:
-            fatura_aberta = Fatura.query.filter_by(cartao_id=c.id, status='em_aberto').first()
+            fatura_aberta = Fatura.query.filter(
+                Fatura.cartao_id == c.id,
+                Fatura.status.in_(['aberta', 'em_aberto'])
+            ).first()
             fatura_val = float(fatura_aberta.valor_total) if fatura_aberta else 0.0
             limite = float(c.limit or 0)
             disp = float(c.available_limit) if c.available_limit is not None else max(0.0, limite - fatura_val)
@@ -403,7 +408,7 @@ def coletar_status_open_finance(user_id):
                 "invoice_current": fatura_val,
                 "limit_available": disp,
                 "due_day": c.due_day or 10,
-                "last_sync": c.updated_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'updated_at', None) else "Hoje"
+                "last_sync": c.created_at.strftime("%d/%m/%Y às %H:%M") if getattr(c, 'created_at', None) else "Hoje"
             })
 
         tem_conexoes = len(contas_list) > 0 or len(cartoes_list) > 0
@@ -615,6 +620,22 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
         cartoes = coletar_dados_cartoes(user_id)
         if cartoes and not any(v['type'] == 'credit_cards' for v in visuals):
             visuals.append({"type": "credit_cards", "data": cartoes})
+
+    # --- Se solicitou limpeza ou desconexão do Open Finance ---
+    palavras_limpeza_of = [
+        'desconectar picpay', 'limpar open finance', 'limpar dados do open finance',
+        'desconectar open finance', 'apagar dados importados', 'desver lançamentos',
+        'desver lancamentos', 'limpar dados open finance', 'desautorizar picpay',
+        'excluir dados open finance', 'remover conexao bancaria', 'remover conexões'
+    ]
+    if any(k in texto_busca for k in palavras_limpeza_of):
+        from src.services.klavi_service import KlaviService
+        ks = KlaviService()
+        clean_res = ks.clean_all_user_data(user_id)
+        resposta_final = f"Pronto! Todos os dados importados via Open Finance foram removidos com sucesso do Simplific Pro (removidos: {clean_res.get('deleted_accounts', 0)} contas, {clean_res.get('deleted_cards', 0)} cartões, {clean_res.get('deleted_faturas', 0)} faturas e {clean_res.get('deleted_transactions', 0)} lançamentos). Para revogar o consentimento definitivo junto ao banco, acesse o app do seu banco (ex: PicPay > Configurações > Open Finance > Revogar compartilhamento)."
+        of_data = coletar_status_open_finance(user_id)
+        if of_data:
+            visuals.append({"type": "open_finance", "data": of_data})
 
     # --- Se perguntou ou solicitou Conexão Bancária / Open Finance ---
     palavras_open_finance = [
