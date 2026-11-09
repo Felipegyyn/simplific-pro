@@ -328,6 +328,8 @@ def manage_profile():
         # Atualiza titular
         user.name = name
         user.whatsapp = whatsapp
+        if 'cpf' in data:
+            user.cpf = data.get('cpf') or None
         
         # Atualiza conta compartilhada
         user.secondary_name = secondary_name
