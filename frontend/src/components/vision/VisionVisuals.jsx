@@ -1,5 +1,5 @@
 // frontend/src/components/vision/VisionVisuals.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip,
   BarChart, Bar, XAxis, YAxis

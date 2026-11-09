@@ -155,7 +155,7 @@ class KlaviService:
 
         payload = {
             "taxId": clean_cpf,
-            "institutionId": str(institution_id),
+            "institutionCode": str(institution_id),
             "products": target_products,
             "externalInfo": {
                 "user_id": str(user_id) if user_id else ""
@@ -165,7 +165,7 @@ class KlaviService:
         if link_id:
             payload["linkId"] = str(link_id)
         if consent_ids:
-            payload["consentId"] = consent_ids if isinstance(consent_ids, list) else [str(consent_ids)]
+            payload["consentIds"] = consent_ids if isinstance(consent_ids, list) else [str(consent_ids)]
 
         try:
             response = self.session.post(url, json=payload, headers=headers, timeout=20)
@@ -193,19 +193,31 @@ class KlaviService:
             print(f"⚠️ [KLAVI] Usuário {user_id} não encontrado.")
             return False
 
-        if not isinstance(accounts_data, list):
+        if isinstance(accounts_data, dict):
+            if "accounts" in accounts_data and isinstance(accounts_data["accounts"], list):
+                accounts_data = accounts_data["accounts"]
+            elif "data" in accounts_data and isinstance(accounts_data["data"], list):
+                accounts_data = accounts_data["data"]
+            elif "items" in accounts_data and isinstance(accounts_data["items"], list):
+                accounts_data = accounts_data["items"]
+            else:
+                accounts_data = [accounts_data]
+        elif not isinstance(accounts_data, list):
             accounts_data = [accounts_data]
 
         imported_tx_count = 0
         updated_accounts_count = 0
 
         for acc in accounts_data:
-            brand_name = acc.get("brandName") or "Banco Open Finance"
-            branch_code = acc.get("branchCode") or ""
-            account_number = acc.get("number") or ""
-            check_digit = acc.get("checkDigit")
-            full_account = f"{account_number}-{check_digit}" if check_digit else account_number
-            account_id_klavi = f"{brand_name}_{branch_code}_{full_account}".replace(" ", "_")
+            if not isinstance(acc, dict):
+                continue
+
+            brand_name = acc.get("brandName") or acc.get("institutionName") or acc.get("bankName") or "Banco Open Finance"
+            branch_code = acc.get("branchCode") or acc.get("agency") or ""
+            account_number = acc.get("number") or acc.get("accountNumber") or ""
+            check_digit = acc.get("checkDigit") or acc.get("digit")
+            full_account = f"{account_number}-{check_digit}" if check_digit else str(account_number)
+            account_id_klavi = acc.get("accountId") or f"{brand_name}_{branch_code}_{full_account}".replace(" ", "_")
 
             # 1. Busca ou Cria a Conta Bancária
             bank_account = BankAccount.query.filter(
@@ -214,10 +226,23 @@ class KlaviService:
                 (BankAccount.account_number == full_account)
             ).first()
 
-            # Saldo disponível
-            balances = acc.get("balances", {})
-            available_amt_data = balances.get("availableAmount", {})
-            available_balance = float(available_amt_data.get("amount", 0.0))
+            # Saldo disponível flexível
+            balances = acc.get("balances") or {}
+            available_balance = 0.0
+            if isinstance(balances, dict):
+                avail_data = balances.get("availableAmount") or balances.get("available")
+                if isinstance(avail_data, dict):
+                    available_balance = float(avail_data.get("amount", 0.0))
+                elif isinstance(avail_data, (int, float)):
+                    available_balance = float(avail_data)
+                elif "amount" in balances:
+                    available_balance = float(balances.get("amount", 0.0))
+            elif isinstance(balances, (int, float)):
+                available_balance = float(balances)
+            elif "balance" in acc:
+                available_balance = float(acc.get("balance", 0.0))
+            elif "availableBalance" in acc:
+                available_balance = float(acc.get("availableBalance", 0.0))
 
             if not bank_account:
                 bank_account = BankAccount(
@@ -322,21 +347,38 @@ class KlaviService:
         if not user:
             return False
 
-        if not isinstance(cards_data, list):
+        if isinstance(cards_data, dict):
+            if "creditCards" in cards_data and isinstance(cards_data["creditCards"], list):
+                cards_data = cards_data["creditCards"]
+            elif "cards" in cards_data and isinstance(cards_data["cards"], list):
+                cards_data = cards_data["cards"]
+            elif "data" in cards_data and isinstance(cards_data["data"], list):
+                cards_data = cards_data["data"]
+            elif "items" in cards_data and isinstance(cards_data["items"], list):
+                cards_data = cards_data["items"]
+            else:
+                cards_data = [cards_data]
+        elif not isinstance(cards_data, list):
             cards_data = [cards_data]
 
         imported_card_tx = 0
 
         for card_item in cards_data:
-            brand_name = card_item.get("brandName") or "Cartão de Crédito"
-            card_name = card_item.get("name") or f"{brand_name} Open Finance"
-            last_digits = str(card_item.get("lastDigits") or card_item.get("number") or "0000")[-4:]
-            klavi_card_id = f"card_{brand_name}_{last_digits}".replace(" ", "_")
+            if not isinstance(card_item, dict):
+                continue
+            brand_name = card_item.get("brandName") or card_item.get("institutionName") or "Cartão de Crédito"
+            card_name = card_item.get("name") or card_item.get("cardName") or f"{brand_name} Open Finance"
+            last_digits = str(card_item.get("lastDigits") or card_item.get("number") or card_item.get("lastFourDigits") or "0000")[-4:]
+            klavi_card_id = card_item.get("cardId") or f"card_{brand_name}_{last_digits}".replace(" ", "_")
 
             # Limites
             limits_info = card_item.get("limits") or {}
-            total_limit = float(limits_info.get("creditLimit", card_item.get("limit", 2000.0)))
-            avail_limit = float(limits_info.get("availableLimit", card_item.get("availableLimit", total_limit)))
+            if isinstance(limits_info, dict):
+                total_limit = float(limits_info.get("creditLimit") or card_item.get("limit") or 2000.0)
+                avail_limit = float(limits_info.get("availableLimit") or card_item.get("availableLimit") or total_limit)
+            else:
+                total_limit = float(card_item.get("limit", 2000.0))
+                avail_limit = float(card_item.get("availableLimit", total_limit))
 
             # Dias de fechamento e vencimento (com defaults seguros se não fornecidos pelo banco)
             due_day = int(card_item.get("dueDay", 10))

@@ -81,18 +81,33 @@ def handle_events_webhook():
         events_list = data if isinstance(data, list) else [data]
 
         for item in events_list:
-            event_type = item.get("event")
+            event_type = item.get("eventName") or item.get("event") or item.get("eventType")
             payload = item.get("payload", {})
             external_info = item.get("externalInfo", {})
 
             # 1. Trata evento de CONSENTIMENTO AUTORIZADO
-            if event_type == "consent_authorised" or event_type == "link_completed":
-                personal_tax_id = payload.get("personalTaxId")
+            if event_type in ["consent_authorised", "link_completed"]:
+                personal_tax_id = payload.get("personalTaxId") or payload.get("taxId")
                 link_id = payload.get("linkId")
-                consents = payload.get("consents", [])
+                consents_raw = payload.get("consents", [])
+                
+                # Normaliza consents (pode vir como dict ou list)
+                if isinstance(consents_raw, dict):
+                    consents = [consents_raw]
+                elif isinstance(consents_raw, list):
+                    consents = consents_raw
+                else:
+                    consents = []
+
                 user_id = external_info.get("user_id")
 
-                # Se não veio no externalInfo, tenta achar o usuário pelo CPF
+                # Se não veio no externalInfo, tenta achar o usuário por email ou CPF
+                user_email = external_info.get("user_email")
+                if not user_id and user_email:
+                    user_match = User.query.filter_by(email=user_email).first()
+                    if user_match:
+                        user_id = user_match.id
+
                 if not user_id and personal_tax_id:
                     user_match = User.query.filter_by(cpf=personal_tax_id).first()
                     if user_match:
@@ -110,10 +125,11 @@ def handle_events_webhook():
                 # Dispara a solicitação dos produtos para cada consentimento autorizado
                 for c in consents:
                     consent_id = c.get("consentId")
-                    institution_code = c.get("institutionCode")
+                    institution_code = c.get("institutionCode") or c.get("institutionId")
                     consent_status = c.get("status")
 
-                    if consent_status == "AUTHORISED" and personal_tax_id and institution_code:
+                    # Se o evento é consent_authorised ou o status é AUTHORISED
+                    if personal_tax_id and institution_code and (consent_status in [None, "AUTHORISED", "authorised"] or event_type == "consent_authorised"):
                         try:
                             klavi_service.request_institution_data(
                                 tax_id=personal_tax_id,
@@ -158,11 +174,23 @@ def handle_products_webhook():
             product_data = item.get("data") or []
             external_info = item.get("externalInfo") or {}
             user_id = external_info.get("user_id")
+            user_email = external_info.get("user_email")
 
-            # Se não veio no externalInfo, tenta pegar do primeiro item de data
-            if not user_id and isinstance(product_data, list) and len(product_data) > 0:
-                first_item = product_data[0]
-                tax_id = first_item.get("taxId") or first_item.get("personalTaxId")
+            if not user_id and user_email:
+                usr_by_email = User.query.filter_by(email=user_email).first()
+                if usr_by_email:
+                    user_id = usr_by_email.id
+
+            # Se não veio no externalInfo, tenta pegar do item ou de product_data
+            if not user_id:
+                tax_id = item.get("taxId") or item.get("personalTaxId")
+                if not tax_id and isinstance(product_data, list) and len(product_data) > 0:
+                    first_item = product_data[0]
+                    if isinstance(first_item, dict):
+                        tax_id = first_item.get("taxId") or first_item.get("personalTaxId")
+                elif not tax_id and isinstance(product_data, dict):
+                    tax_id = product_data.get("taxId") or product_data.get("personalTaxId")
+
                 if tax_id:
                     user_match = User.query.filter_by(cpf=tax_id).first()
                     if user_match:
