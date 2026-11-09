@@ -174,12 +174,12 @@ def handle_products_webhook():
 
             link_id = item.get("linkId")
 
-            # 1. CONTAS CORRENTES
-            if product_name == "pf_checking_account":
+            # 1. CONTAS CORRENTES E POUPANÇA (Padrão e L3 Categorizado)
+            if product_name in ["pf_checking_account", "pf_categorized_checking_l3", "pf_categorized_savings_l3"]:
                 klavi_service.process_checking_account_data(user_id, product_data, link_id=link_id)
 
-            # 2. CARTÕES DE CRÉDITO
-            elif product_name == "pf_credit_card":
+            # 2. CARTÕES DE CRÉDITO (Padrão e L3 Categorizado)
+            elif product_name in ["pf_credit_card", "pf_categorized_creditcard_l3"]:
                 klavi_service.process_credit_card_data(user_id, product_data, link_id=link_id)
 
             # 3. EMPRÉSTIMOS E FINANCIAMENTOS

@@ -19,9 +19,9 @@ from src.models.extended import ScheduleEvent
 
 class KlaviService:
     def __init__(self):
-        self.access_key = os.getenv('KLAVI_ACCESS_KEY', 'D962E812-6007-4587-A3F6-2AD64D89AD06').strip()
-        self.secret_key = os.getenv('KLAVI_SECRET_KEY', '091892A4-ABB7-4395-B126-45C58B95C09D').strip()
-        self.base_url = os.getenv('KLAVI_BASE_URL', 'https://api-sandbox.klavi.ai').rstrip('/')
+        self.access_key = os.getenv('KLAVI_ACCESS_KEY', '9578b5fe-7a15-4e07-922b-cf583a8fb0be').strip()
+        self.secret_key = os.getenv('KLAVI_SECRET_KEY', 'a32d6ac8-efbe-4535-8a64-aec97cc1dc4c').strip()
+        self.base_url = os.getenv('KLAVI_BASE_URL', 'https://api-testing.klavi.ai').rstrip('/')
         self.frontend_url = os.getenv('FRONTEND_URL', 'https://www.simplificpro.com').rstrip('/')
         self._access_token = None
         self._token_expires_at = None
@@ -147,10 +147,10 @@ class KlaviService:
         clean_cpf = ''.join(filter(str.isdigit, str(tax_id or '')))
         
         target_products = products or [
-            "pf_checking_account",
-            "pf_credit_card",
-            "pf_loans",
-            "pf_financing"
+            "pf_categorized_checking_l3",
+            "pf_categorized_creditcard_l3",
+            "pf_categorized_savings_l3",
+            "pf_identity"
         ]
 
         payload = {
@@ -282,8 +282,9 @@ class KlaviService:
                 # Descrição
                 tx_name = tx.get("transactionName") or tx.get("description") or tx.get("type") or "Lançamento Bancário"
 
-                # Auto-categorização
-                category = self._match_or_create_category(user_id, tx_name, tx_type)
+                # Auto-categorização com suporte a IA L3 da Klavi
+                klavi_cat = tx.get("category") or tx.get("categoryL2") or tx.get("subCategory") or tx.get("categoryName")
+                category = self._match_or_create_category(user_id, tx_name, tx_type, klavi_cat=klavi_cat)
 
                 new_tx = Transaction(
                     user_id=user_id,
@@ -565,7 +566,8 @@ class KlaviService:
                 tx_date = date.today()
 
         desc = tx_data.get("description") or tx_data.get("transactionName") or "Compra no Cartão"
-        category = self._match_or_create_category(user_id, desc, "saida")
+        klavi_cat = tx_data.get("category") or tx_data.get("categoryL2") or tx_data.get("subCategory") or tx_data.get("categoryName")
+        category = self._match_or_create_category(user_id, desc, "saida", klavi_cat=klavi_cat)
 
         installments = int(tx_data.get("installments", tx_data.get("totalInstallments", 1)))
         current_inst = int(tx_data.get("currentInstallment", 1))
@@ -621,9 +623,30 @@ class KlaviService:
 
         return fatura
 
-    def _match_or_create_category(self, user_id, description, tx_type):
+    def _match_or_create_category(self, user_id, description, tx_type, klavi_cat=None):
         """Mapeia inteligentemente ou encontra a melhor categoria para o lançamento."""
-        desc_lower = description.lower()
+        # 1. Se a Klavi enviou categoria pelo modelo de IA L3, prioriza ela
+        if klavi_cat and isinstance(klavi_cat, str) and klavi_cat.strip():
+            clean_name = klavi_cat.strip()
+            cat = Category.query.filter(
+                Category.user_id == user_id,
+                Category.type == tx_type,
+                Category.name.ilike(clean_name)
+            ).first()
+            if cat:
+                return cat
+            cat = Category(
+                name=clean_name.capitalize(),
+                type=tx_type,
+                color="#10B981" if tx_type == "entrada" else "#F59E0B",
+                user_id=user_id
+            )
+            db.session.add(cat)
+            db.session.flush()
+            return cat
+
+        # 2. Heurística baseada na descrição (regras de palavras-chave)
+        desc_lower = (description or "").lower()
 
         # Dicionário de regras rápidas para Open Finance
         keyword_map = {
