@@ -60,10 +60,10 @@ class KlaviService:
             self._access_token = data.get("accessToken")
             expire_in = data.get("expireIn", 1800)
             self._token_expires_at = now + timedelta(seconds=max(expire_in - 60, 60))
-            print(f"✅ [KLAVI] Novo accessToken gerado com sucesso! Expira em {expire_in}s")
+            print(f"[OK] [KLAVI] Novo accessToken gerado com sucesso! Expira em {expire_in}s")
             return self._access_token
         except Exception as e:
-            print(f"❌ [KLAVI] Falha na autenticação: {e}")
+            print(f"[ERRO] [KLAVI] Falha na autenticação: {e}")
             raise e
 
     # =========================================================================
@@ -120,7 +120,7 @@ class KlaviService:
             response = self.session.post(url, json=payload, headers=headers, timeout=15)
             response.raise_for_status()
             data = response.json()
-            print(f"🔗 [KLAVI] Link criado para o usuário {user.email}: linkId={data.get('linkId')}")
+            print(f"[LINK] [KLAVI] Link criado para o usuário {user.email}: linkId={data.get('linkId')}")
             return {
                 "linkId": data.get("linkId"),
                 "linkURL": data.get("linkURL"),
@@ -131,7 +131,7 @@ class KlaviService:
             err_details = ""
             if hasattr(e, 'response') and e.response is not None:
                 err_details = f" | Resposta Klavi: {e.response.text}"
-            print(f"❌ [KLAVI] Erro ao criar Link Session: {e}{err_details}")
+            print(f"[ERRO] [KLAVI] Erro ao criar Link Session: {e}{err_details}")
             raise e
 
     # =========================================================================
@@ -176,14 +176,110 @@ class KlaviService:
         try:
             response = self.session.post(url, json=payload, headers=headers, timeout=20)
             response.raise_for_status()
-            print(f"📥 [KLAVI] Solicitação de dados enviada com sucesso para inst={institution_id}, taxId={clean_cpf}")
+            print(f"[RECEBIDO] [KLAVI] Solicitação de dados enviada com sucesso para inst={institution_id}, taxId={clean_cpf}")
             return response.json()
         except Exception as e:
-            print(f"❌ [KLAVI] Erro ao solicitar institution-data: {e}")
+            print(f"[ERRO] [KLAVI] Erro ao solicitar institution-data: {e}")
             # Log de erro detalhado da Klavi se disponível
             if hasattr(e, 'response') and e.response is not None:
                 print(f"   Resposta Klavi: {e.response.text}")
             raise e
+
+    # =========================================================================
+    # 3.1. BUSCA DE CONSENTIMENTOS E INGESTÃO ATIVA DE PRODUTOS
+    # =========================================================================
+    def get_user_consents(self, tax_id):
+        """Busca os consentimentos ativos do usuário na Klavi."""
+        token = self.get_access_token()
+        clean_cpf = ''.join(filter(str.isdigit, str(tax_id or '')))
+        url = f"{self.base_url}/data/v1/consents"
+        headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+        try:
+            res = self.session.get(url, params={"personalTaxId": clean_cpf}, headers=headers, timeout=15)
+            if res.status_code == 200:
+                return res.json()
+            print(f"[AVISO] [KLAVI] Busca de consentimentos retornou {res.status_code}: {res.text[:150]}")
+        except Exception as e:
+            print(f"[ERRO] [KLAVI] Erro ao buscar consentimentos para CPF {clean_cpf}: {e}")
+        return []
+
+    def fetch_and_process_product(self, user_id, tax_id, product, institution_code=None):
+        """
+        Busca o relatório de dados gerado na Klavi via GET /data/v1/personal/institution-data
+        e aciona o motor de ingestão correspondente.
+        """
+        token = self.get_access_token()
+        clean_cpf = ''.join(filter(str.isdigit, str(tax_id or '')))
+        headers = {"Authorization": f"Bearer {token}", "Accept": "application/json"}
+
+        inst_codes = [str(institution_code)] if institution_code else []
+        if not inst_codes:
+            consents = self.get_user_consents(clean_cpf)
+            for c in consents:
+                code = c.get("institutionCode")
+                if code and str(code) not in inst_codes:
+                    inst_codes.append(str(code))
+
+        if not inst_codes:
+            print(f"[AVISO] [KLAVI] Nenhuma instituição com consentimento encontrada para CPF {clean_cpf}")
+            return False
+
+        success = False
+        for inst in inst_codes:
+            url = f"{self.base_url}/data/v1/personal/institution-data"
+            params = {
+                "taxId": clean_cpf,
+                "product": product,
+                "institutionCode": str(inst)
+            }
+            try:
+                res = self.session.get(url, params=params, headers=headers, timeout=30)
+                if res.status_code != 200:
+                    print(f"[AVISO] [KLAVI] GET institution-data ({product}, inst={inst}) falhou: {res.status_code} {res.text[:150]}")
+                    continue
+
+                data = res.json()
+                print(f"[DADOS] [KLAVI] Relatório {product} recebido com sucesso para inst {inst}!")
+
+                if product in ["pf_categorized_checking_l3", "pf_checking_account", "pf_categorized_savings_l3"]:
+                    accounts = data.get("checkingAccounts") or data.get("savingsAccounts") or data.get("accounts") or []
+                    if self.process_checking_account_data(user_id, accounts):
+                        success = True
+
+                elif product in ["pf_categorized_creditcard_l3", "pf_credit_card"]:
+                    cards = data.get("creditCards") or data.get("cards") or []
+                    if self.process_credit_card_data(user_id, cards):
+                        success = True
+
+            except Exception as e:
+                print(f"[ERRO] [KLAVI] Erro ao buscar/processar {product} para inst {inst}: {e}")
+
+        return success
+
+    def sync_all_user_data(self, user_id, tax_id=None):
+        """Sincroniza todos os produtos contratados para o usuário a partir de consentimentos ativos."""
+        user = User.query.get(user_id)
+        if not user:
+            return False
+
+        clean_cpf = ''.join(filter(str.isdigit, str(tax_id or getattr(user, 'cpf', '') or '')))
+        if not clean_cpf:
+            return False
+
+        consents = self.get_user_consents(clean_cpf)
+        if not consents:
+            return False
+
+        success = False
+        for c in consents:
+            inst = c.get("institutionCode")
+            if not inst:
+                continue
+            for prod in ["pf_categorized_checking_l3", "pf_categorized_creditcard_l3"]:
+                if self.fetch_and_process_product(user_id, clean_cpf, prod, institution_code=inst):
+                    success = True
+
+        return success
 
     # =========================================================================
     # 4. MOTOR DE INGESTÃO 1: CONTAS CORRENTES (SALDOS E EXTRATO)
@@ -193,10 +289,10 @@ class KlaviService:
         Processa o produto 'pf_checking_account'.
         Atualiza o saldo bancário e registra lançamentos no extrato com categorização automática.
         """
-        print(f"🏦 [KLAVI] Processando contas correntes para User ID: {user_id}")
+        print(f"[CONTA] [KLAVI] Processando contas correntes para User ID: {user_id}")
         user = User.query.get(user_id)
         if not user:
-            print(f"⚠️ [KLAVI] Usuário {user_id} não encontrado.")
+            print(f"[AVISO] [KLAVI] Usuário {user_id} não encontrado.")
             return False
 
         if isinstance(accounts_data, dict):
@@ -264,12 +360,12 @@ class KlaviService:
                 )
                 db.session.add(bank_account)
                 db.session.flush()
-                print(f"✨ [KLAVI] Nova Conta Bancária criada: {brand_name} ({full_account})")
+                print(f"[NOVO] [KLAVI] Nova Conta Bancária criada: {brand_name} ({full_account})")
             else:
                 bank_account.current_balance = available_balance
                 bank_account.klavi_link_id = link_id
                 bank_account.klavi_account_id = account_id_klavi
-                print(f"🔄 [KLAVI] Saldo atualizado para {brand_name}: R$ {available_balance:.2f}")
+                print(f"[ATUALIZADO] [KLAVI] Saldo atualizado para {brand_name}: R$ {available_balance:.2f}")
 
             updated_accounts_count += 1
 
@@ -337,7 +433,7 @@ class KlaviService:
                 imported_tx_count += 1
 
         db.session.commit()
-        print(f"✅ [KLAVI] Extrato concluído: {updated_accounts_count} contas atualizadas, {imported_tx_count} transações importadas.")
+        print(f"[OK] [KLAVI] Extrato concluído: {updated_accounts_count} contas atualizadas, {imported_tx_count} transações importadas.")
         return True
 
     # =========================================================================
@@ -348,7 +444,7 @@ class KlaviService:
         Processa o produto 'pf_credit_card'.
         Cadastra o cartão, ajusta limites, faturas e compras com desdobramento de parcelas.
         """
-        print(f"💳 [KLAVI] Processando cartões de crédito para User ID: {user_id}")
+        print(f"[CARTAO] [KLAVI] Processando cartões de crédito para User ID: {user_id}")
         user = User.query.get(user_id)
         if not user:
             return False
@@ -372,19 +468,31 @@ class KlaviService:
         for card_item in cards_data:
             if not isinstance(card_item, dict):
                 continue
-            brand_name = card_item.get("brandName") or card_item.get("institutionName") or "Cartão de Crédito"
+            brand_name = card_item.get("brandName") or card_item.get("bacenName") or card_item.get("institutionName") or "Cartão de Crédito"
             card_name = card_item.get("name") or card_item.get("cardName") or f"{brand_name} Open Finance"
             last_digits = str(card_item.get("lastDigits") or card_item.get("number") or card_item.get("lastFourDigits") or "0000")[-4:]
             klavi_card_id = card_item.get("cardId") or f"card_{brand_name}_{last_digits}".replace(" ", "_")
 
-            # Limites
+            # Limites (suporta estrutura Klavi L3 limitAmount e availableAmount)
             limits_info = card_item.get("limits") or {}
+            total_limit = 2000.0
+            avail_limit = 2000.0
             if isinstance(limits_info, dict):
-                total_limit = float(limits_info.get("creditLimit") or card_item.get("limit") or 2000.0)
-                avail_limit = float(limits_info.get("availableLimit") or card_item.get("availableLimit") or total_limit)
-            else:
-                total_limit = float(card_item.get("limit", 2000.0))
-                avail_limit = float(card_item.get("availableLimit", total_limit))
+                lim_obj = limits_info.get("limitAmount") or limits_info.get("creditLimit")
+                if isinstance(lim_obj, dict):
+                    total_limit = float(lim_obj.get("amount", 2000.0))
+                elif lim_obj is not None:
+                    total_limit = float(lim_obj)
+                elif "limit" in card_item:
+                    total_limit = float(card_item.get("limit", 2000.0))
+
+                avail_obj = limits_info.get("availableAmount") or limits_info.get("availableLimit")
+                if isinstance(avail_obj, dict):
+                    avail_limit = float(avail_obj.get("amount", total_limit))
+                elif avail_obj is not None:
+                    avail_limit = float(avail_obj)
+                else:
+                    avail_limit = total_limit
 
             # Dias de fechamento e vencimento (com defaults seguros se não fornecidos pelo banco)
             due_day = int(card_item.get("dueDay", 10))
@@ -413,16 +521,20 @@ class KlaviService:
                 )
                 db.session.add(credit_card)
                 db.session.flush()
-                print(f"✨ [KLAVI] Novo Cartão cadastrado: {card_name} (Final {last_digits})")
+                print(f"[NOVO] [KLAVI] Novo Cartão cadastrado: {card_name} (Final {last_digits})")
             else:
                 credit_card.limit = total_limit
                 credit_card.available_limit = avail_limit
                 credit_card.klavi_link_id = link_id
                 credit_card.klavi_card_id = klavi_card_id
-                print(f"🔄 [KLAVI] Limites atualizados para {card_name}: Disponível R$ {avail_limit:.2f}")
+                print(f"[ATUALIZADO] [KLAVI] Limites atualizados para {card_name}: Disponível R$ {avail_limit:.2f}")
 
-            # 2. Processa as Faturas e Transações do Cartão
-            bills = card_item.get("bills") or card_item.get("invoices") or []
+            # 2. Processa as Faturas e Transações do Cartão (suporte a closedStatements e openStatement)
+            closed_stmts = card_item.get("closedStatements") or []
+            open_stmt = card_item.get("openStatement")
+            all_stmts = closed_stmts + ([open_stmt] if isinstance(open_stmt, dict) else [])
+
+            bills = card_item.get("bills") or card_item.get("invoices") or all_stmts
             transactions_list = card_item.get("transactions") or []
 
             # Se vier por faturas
@@ -440,8 +552,8 @@ class KlaviService:
                 if bill_total > 0:
                     fatura.valor_total = bill_total
 
-                # Transações da fatura específica
-                bill_txs = bill.get("transactions") or []
+                # Transações da fatura específica (suporta transactionDetails e transactions)
+                bill_txs = bill.get("transactionDetails") or bill.get("transactions") or []
                 for b_tx in bill_txs:
                     if self._save_card_transaction(user_id, credit_card, fatura, b_tx):
                         imported_card_tx += 1
@@ -461,7 +573,7 @@ class KlaviService:
                     imported_card_tx += 1
 
         db.session.commit()
-        print(f"✅ [KLAVI] Cartões concluídos: {imported_card_tx} compras de cartão importadas/atualizadas.")
+        print(f"[OK] [KLAVI] Cartões concluídos: {imported_card_tx} compras de cartão importadas/atualizadas.")
         return True
 
     # =========================================================================
@@ -474,7 +586,7 @@ class KlaviService:
         1. Transações com status 'pendente' (previsão de saída no fluxo de caixa)
         2. Eventos na Agenda Financeira (lembretes de vencimento)
         """
-        print(f"📑 [KLAVI] Processando empréstimos e financiamentos para User ID: {user_id}")
+        print(f"[CONTRATO] [KLAVI] Processando empréstimos e financiamentos para User ID: {user_id}")
         user = User.query.get(user_id)
         if not user:
             return False
@@ -505,7 +617,7 @@ class KlaviService:
             installments = contract.get("installments") or contract.get("balloonPayments") or []
             total_inst_count = len(installments) if installments else int(contract.get("totalNumberOfInstallments", 1))
 
-            print(f"📄 [KLAVI] Contrato {contract_number} ({brand_name}): Total R$ {total_amount:.2f}")
+            print(f"[DOC] [KLAVI] Contrato {contract_number} ({brand_name}): Total R$ {total_amount:.2f}")
 
             # Itera pelas parcelas informadas pelo Open Finance
             for idx, inst in enumerate(installments, start=1):
@@ -581,7 +693,7 @@ class KlaviService:
                         db.session.add(schedule_item)
 
         db.session.commit()
-        print(f"✅ [KLAVI] Empréstimos concluídos: {imported_installments_count} parcelas registradas.")
+        print(f"[OK] [KLAVI] Empréstimos concluídos: {imported_installments_count} parcelas registradas.")
         return True
 
     # =========================================================================
@@ -601,7 +713,11 @@ class KlaviService:
         if existing:
             return False
 
-        amount = abs(float(tx_data.get("amount", tx_data.get("transactionAmount", {}).get("amount", 0.0))))
+        raw_amt = tx_data.get("brazilianAmount") or tx_data.get("transactionAmount") or tx_data.get("amount") or 0.0
+        if isinstance(raw_amt, dict):
+            amount = abs(float(raw_amt.get("amount", 0.0)))
+        else:
+            amount = abs(float(raw_amt or 0.0))
         if amount == 0:
             return False
 

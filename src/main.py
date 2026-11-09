@@ -353,6 +353,13 @@ with app.app_context():
             ("transactions", "contract_id", "VARCHAR(100)"),
             ("goals", "priority", "VARCHAR(20) DEFAULT 'média'"),
             ("goals", "image_url", "TEXT"),
+            ("transactions", "bank_account_id", "INTEGER"),
+            ("transactions", "planning_id", "INTEGER"),
+            ("transactions", "receipt_image_url", "TEXT"),
+            ("categories", "color", "VARCHAR(20) DEFAULT '#64748B'"),
+            ("credit_card_transactions", "user_id", "INTEGER"),
+            ("credit_card_transactions", "fatura_id", "INTEGER"),
+            ("credit_card_transactions", "pluggy_transaction_id", "VARCHAR(150)"),
         ]
         for tbl, col, col_type in klavi_columns:
             try:

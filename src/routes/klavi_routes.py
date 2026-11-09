@@ -54,7 +54,7 @@ def create_link():
         }), 200
 
     except Exception as e:
-        print(f"❌ [ROTA KLAVI] Erro ao criar link session: {e}")
+        print(f"[ERRO] [ROTA KLAVI] Erro ao criar link session: {e}")
         return jsonify({"error": "Erro ao iniciar conexão Open Finance. Tente novamente."}), 500
 
 
@@ -72,7 +72,7 @@ def handle_events_webhook():
     """
     try:
         data = request.get_json()
-        print(f"📡 [WEBHOOK KLAVI EVENTOS] Recebido: {data}")
+        print(f"[WEBHOOK] [WEBHOOK KLAVI EVENTOS] Recebido: {data}")
 
         if not data:
             return jsonify({"status": "ignored", "reason": "empty body"}), 200
@@ -85,8 +85,23 @@ def handle_events_webhook():
             payload = item.get("payload", {})
             external_info = item.get("externalInfo", {})
 
-            # 1. Trata evento de CONSENTIMENTO AUTORIZADO
-            if event_type in ["consent_authorised", "link_completed"]:
+            # 1. Trata evento de PRODUTO GERADO COM SUCESSO (Klavi gera e notifica que está pronto)
+            if event_type == "product_generated_success":
+                product_name = payload.get("product") or payload.get("productName")
+                personal_tax_id = payload.get("personalTaxId") or payload.get("taxId")
+                user_id = external_info.get("user_id")
+
+                if not user_id and personal_tax_id:
+                    u_match = User.query.filter_by(cpf=personal_tax_id).first()
+                    if u_match:
+                        user_id = u_match.id
+
+                print(f"[EVENTO] [KLAVI EVENTO] Produto {product_name} pronto para ingestão do usuário {user_id} (CPF: {personal_tax_id})")
+                if user_id and personal_tax_id and product_name:
+                    klavi_service.fetch_and_process_product(user_id, personal_tax_id, product_name)
+
+            # 2. Trata evento de CONSENTIMENTO AUTORIZADO
+            elif event_type in ["consent_authorised", "link_completed"]:
                 personal_tax_id = payload.get("personalTaxId") or payload.get("taxId")
                 link_id = payload.get("linkId")
                 consents_raw = payload.get("consents", [])
@@ -120,7 +135,7 @@ def handle_events_webhook():
                         usr.cpf = personal_tax_id
                         db.session.commit()
 
-                print(f"🎉 [KLAVI EVENTO] Consentimento autorizado para user_id={user_id}, linkId={link_id}")
+                print(f"[SUCESSO] [KLAVI EVENTO] Consentimento autorizado para user_id={user_id}, linkId={link_id}")
 
                 # Dispara a solicitação dos produtos para cada consentimento autorizado
                 for c in consents:
@@ -138,14 +153,14 @@ def handle_events_webhook():
                                 consent_ids=[consent_id] if consent_id else None,
                                 user_id=user_id
                             )
-                            print(f"🚀 [KLAVI] Solicitação de dados disparada para instituição {institution_code}")
+                            print(f"[DISPARO] [KLAVI] Solicitação de dados disparada para instituição {institution_code}")
                         except Exception as req_err:
-                            print(f"⚠️ [KLAVI] Erro ao disparar coleta para {institution_code}: {req_err}")
+                            print(f"[AVISO] [KLAVI] Erro ao disparar coleta para {institution_code}: {req_err}")
 
         return jsonify({"status": "success", "message": "Event processed"}), 200
 
     except Exception as e:
-        print(f"❌ [WEBHOOK KLAVI EVENTOS] Erro ao processar evento: {e}")
+        print(f"[ERRO] [WEBHOOK KLAVI EVENTOS] Erro ao processar evento: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -162,7 +177,7 @@ def handle_products_webhook():
     """
     try:
         data = request.get_json()
-        print(f"📦 [WEBHOOK KLAVI PRODUTOS] Recebido relatório de dados.")
+        print(f"[DADOS] [WEBHOOK KLAVI PRODUTOS] Recebido relatório de dados.")
 
         if not data:
             return jsonify({"status": "ignored", "reason": "empty body"}), 200
@@ -197,7 +212,7 @@ def handle_products_webhook():
                         user_id = user_match.id
 
             if not user_id:
-                print(f"⚠️ [KLAVI PRODUTOS] Não foi possível correlacionar o usuário para o produto {product_name}.")
+                print(f"[AVISO] [KLAVI PRODUTOS] Não foi possível correlacionar o usuário para o produto {product_name}.")
                 continue
 
             link_id = item.get("linkId")
@@ -215,23 +230,37 @@ def handle_products_webhook():
                 klavi_service.process_loans_data(user_id, product_data, link_id=link_id)
 
             else:
-                print(f"ℹ️ [KLAVI PRODUTOS] Produto recebido sem handler específico: {product_name}")
+                print(f"[INFO] [KLAVI PRODUTOS] Produto recebido sem handler específico: {product_name}")
 
         return jsonify({"status": "success", "message": "Products ingested successfully"}), 200
 
     except Exception as e:
-        print(f"❌ [WEBHOOK KLAVI PRODUTOS] Erro na ingestão: {e}")
+        print(f"[ERRO] [WEBHOOK KLAVI PRODUTOS] Erro na ingestão: {e}")
         return jsonify({"error": str(e)}), 500
 
 
 # =============================================================================
 # 4. STATUS DE CONEXÕES ATIVAS
 # =============================================================================
+@klavi_bp.route('/sync-now', methods=['POST'])
+@jwt_required()
+def sync_now():
+    """Sincroniza imediatamente todas as instituições ativas do usuário na Klavi."""
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    success = klavi_service.sync_all_user_data(user_id, tax_id=getattr(user, 'cpf', None))
+    return jsonify({"status": "success" if success else "no_data"}), 200
+
+
 @klavi_bp.route('/status', methods=['GET'])
 @jwt_required()
 def get_klavi_status():
     """
     Retorna um resumo de todas as contas e cartões vinculados via Open Finance pelo usuário.
+    Se não houver contas carregadas mas o usuário tiver CPF, tenta sincronizar ativamente.
     """
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
@@ -247,6 +276,21 @@ def get_klavi_status():
         CreditCard.user_id == user_id,
         CreditCard.klavi_card_id != None
     ).all()
+
+    # Auto-recuperação: Se não há contas salvas, tenta sincronizar dos consentimentos da Klavi
+    if len(connected_accounts) == 0 and getattr(user, 'cpf', None):
+        try:
+            if klavi_service.sync_all_user_data(user_id, tax_id=user.cpf):
+                connected_accounts = BankAccount.query.filter(
+                    BankAccount.user_id == user_id,
+                    BankAccount.klavi_account_id != None
+                ).all()
+                connected_cards = CreditCard.query.filter(
+                    CreditCard.user_id == user_id,
+                    CreditCard.klavi_card_id != None
+                ).all()
+        except Exception as e:
+            print(f"[AVISO] [KLAVI STATUS] Falha na auto-sincronização: {e}")
 
     return jsonify({
         "status": "success",
