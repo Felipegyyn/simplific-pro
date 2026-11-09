@@ -953,6 +953,11 @@ class KlaviService:
                 ScheduleEvent.title.ilike("%Vencimento Empréstimo:%")
             ).delete(synchronize_session=False)
 
+            # 8. Limpa CPF do usuário para desvincular de consentimentos residuais
+            user = User.query.get(user_id)
+            if user:
+                user.cpf = None
+
             db.session.commit()
             print(f"[OK] [KLAVI LIMPEZA] Concluída com sucesso! Removidos: {deleted_accounts} contas, {deleted_cards} cartões, {deleted_faturas} faturas, {deleted_card_tx} compras de cartão, {deleted_tx} transações.")
             return {

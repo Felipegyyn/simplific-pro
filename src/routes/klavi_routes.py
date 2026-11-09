@@ -321,6 +321,8 @@ def clean_open_finance_data():
         return jsonify({"error": "User not found"}), 404
 
     try:
+        user.cpf = None
+        db.session.commit()
         results = klavi_service.clean_all_user_data(user_id)
         return jsonify({
             "status": "success",
