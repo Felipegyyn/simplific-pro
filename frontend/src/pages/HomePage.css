@@ -699,6 +699,10 @@
   color: var(--accent);
 }
 
+.sp-footer-copy {
+  text-align: right;
+}
+
 /* --- RESPONSIVE PHONE COMPOSITION (< 960px) --- */
 @media (max-width: 959px) {
   .sp-home {
@@ -709,12 +713,25 @@
     display: none;
   }
 
+  .sp-nav-inner {
+    gap: 10px;
+  }
+
+  .sp-wordmark {
+    white-space: nowrap;
+  }
+
+  .sp-nav-actions {
+    gap: 8px;
+  }
+
   .sp-nav-actions .sp-nav-link {
     display: none;
   }
 
   .sp-nav-cta {
     padding: 9px 12px;
+    white-space: nowrap;
   }
 
   .sp-mobile-toggle {
@@ -854,6 +871,10 @@
   .sp-footer-links {
     justify-content: flex-start;
     gap: 16px;
+  }
+
+  .sp-footer-copy {
+    text-align: left;
   }
 }
 

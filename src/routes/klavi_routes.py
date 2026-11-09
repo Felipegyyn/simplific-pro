@@ -36,11 +36,11 @@ def create_link():
         data = request.get_json() or {}
         redirect_url = data.get('redirectURL')
         
-        # Opcional: Se o front enviar o CPF durante o clique, já salva no user
+        # Opcional: Se o front enviar o CPF durante o clique, já salva no user (somente se tiver 11 dígitos)
         user_cpf = data.get('cpf')
         if user_cpf:
             clean_cpf = ''.join(filter(str.isdigit, str(user_cpf)))
-            if clean_cpf and getattr(user, 'cpf', None) != clean_cpf:
+            if len(clean_cpf) == 11 and getattr(user, 'cpf', None) != clean_cpf:
                 user.cpf = clean_cpf
                 db.session.commit()
 

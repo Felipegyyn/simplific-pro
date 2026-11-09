@@ -23,7 +23,7 @@ const Footer = () => {
           <Link to="/login" className="sp-footer-link">Entrar</Link>
         </nav>
 
-        <div>
+        <div className="sp-footer-copy">
           <span>© {new Date().getFullYear()} Simplific · </span>
           <Link to="/termos" className="sp-footer-link">Termos</Link>
           <span> · </span>

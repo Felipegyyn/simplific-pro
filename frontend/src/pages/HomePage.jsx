@@ -605,10 +605,7 @@ export default function HomePage() {
 
               {/* Blown-up Interactive Control + Real Video Fragment */}
               <div style={{ gridColumn: '6 / span 7' }} data-sc-in>
-                <div
-                  className="sp-ui-fragment"
-                  style={{ padding: '24px', backgroundColor: '#0b0f0d' }}
-                >
+                <div style={{ display: 'grid', gap: '16px' }}>
                   {/* Large Poster-Scale Segmented Control */}
                   <div
                     data-ui="showcase-segmented-tabs"
@@ -617,8 +614,7 @@ export default function HomePage() {
                     style={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                      gap: '8px',
-                      marginBottom: '20px'
+                      gap: '8px'
                     }}
                   >
                     {Object.values(SHOWCASE_MODES).map((mode) => {
@@ -1288,27 +1284,35 @@ export default function HomePage() {
 
                 <div
                   data-ui="security-badges"
+                  className="sp-ui-fragment"
                   style={{
                     gridColumn: '6 / span 7',
+                    padding: '18px',
+                    backgroundColor: '#0c100e',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                     gap: '10px'
                   }}
                 >
-                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
-                    <img src="/assets/logo_meta.png" alt="Meta Tech Provider" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Meta Official API</div>
-                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Canal verificado sem risco</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingBottom: '10px', borderBottom: '1px solid #1e2621' }}>
+                    <div>
+                      <div style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#f3f6f4' }}>Meta Official API</div>
+                      <div style={{ fontSize: 'var(--step-small)', color: '#a8b4ac' }}>Canal oficial verificado sem risco de bloqueio</div>
+                    </div>
+                    <span style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#10b981' }}>Verificado</span>
                   </div>
-                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
-                    <img src="/assets/logo_google.png" alt="Google Cloud" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Google Cloud</div>
-                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Isolamento e backups diários</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingBottom: '10px', borderBottom: '1px solid #1e2621' }}>
+                    <div>
+                      <div style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#f3f6f4' }}>Google Cloud Platform</div>
+                      <div style={{ fontSize: 'var(--step-small)', color: '#a8b4ac' }}>Isolamento de banco de dados e backups diários</div>
+                    </div>
+                    <span style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#10b981' }}>AES-256</span>
                   </div>
-                  <div style={{ backgroundColor: 'var(--surface-high)', padding: '18px', borderRadius: 'var(--radius-page)' }}>
-                    <img src="/assets/logo_twilio.png" alt="Twilio Security" width="90" height="28" loading="lazy" style={{ height: '24px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ fontSize: 'var(--step-small)', fontWeight: 600 }}>Criptografia TLS 1.3</div>
-                    <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)', marginTop: '2px' }}>Zero acesso à senha bancária</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <div>
+                      <div style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#f3f6f4' }}>Criptografia TLS 1.3 & LGPD</div>
+                      <div style={{ fontSize: 'var(--step-small)', color: '#a8b4ac' }}>Zero acesso à senha de movimentação bancária</div>
+                    </div>
+                    <span style={{ fontSize: 'var(--step-small)', fontWeight: 600, color: '#10b981' }}>100% Seguro</span>
                   </div>
                 </div>
               </div>
@@ -1452,26 +1456,15 @@ export default function HomePage() {
                 </form>
               </div>
 
-              {/* Right Flanking Tile: Flat Palette Surface */}
-              <div
-                className="sp-cta-flank"
-                style={{
-                  backgroundColor: 'var(--surface-high)',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <div style={{ fontSize: 'var(--step-small)', color: 'var(--muted)' }}>
-                  WhatsApp Oficial 24/7
-                </div>
-                <div style={{ fontSize: 'var(--step-h2)', fontWeight: 600, color: 'var(--accent)', letterSpacing: '-0.03em' }}>
-                  7 dias
-                </div>
-                <div style={{ fontSize: 'var(--step-small)', color: 'var(--ink)' }}>
-                  Reembolso integral garantido
-                </div>
+              {/* Right Flanking Tile: Custom Photography */}
+              <div className="sp-cta-flank">
+                <img
+                  src="/assets/landing/simplific-hero.jpg"
+                  alt="Painel Web Vision do Simplific Pro em operação"
+                  width="600"
+                  height="600"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
