@@ -56,15 +56,22 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
     # --- DECISÃO DO NOME ---
     nome_final = nome_usuario_personalizado if nome_usuario_personalizado else usuario.name
 
-    # --- PASSO 1: Montar o "Dossiê Financeiro" ---
-    resumo_planejamento = get_planning_summary_for_ai(user_id)
-    resumo_transacoes = get_financial_summary_for_ai(user_id)
-    resumo_cartoes = get_credit_card_summary_for_ai(user_id)
-    resumo_metas = get_goals_summary_for_ai(user_id)
-    resumo_investimentos = get_investments_summary_for_ai(user_id)
-    resumo_agenda = get_schedule_summary_for_ai(user_id)
-    resumo_categorias = get_categories_for_ai(user_id)
-    resumo_contatos = get_contacts_summary_for_ai(user_id)
+    # --- PASSO 1: Montar o "Dossiê Financeiro" com proteção contra falhas ---
+    def _safe_call(fn, uid):
+        try:
+            return fn(uid) or ""
+        except Exception as err:
+            print(f"⚠️ [DOSSIER] Falha não impeditiva ao coletar {fn.__name__}: {err}")
+            return ""
+
+    resumo_planejamento = _safe_call(get_planning_summary_for_ai, user_id)
+    resumo_transacoes = _safe_call(get_financial_summary_for_ai, user_id)
+    resumo_cartoes = _safe_call(get_credit_card_summary_for_ai, user_id)
+    resumo_metas = _safe_call(get_goals_summary_for_ai, user_id)
+    resumo_investimentos = _safe_call(get_investments_summary_for_ai, user_id)
+    resumo_agenda = _safe_call(get_schedule_summary_for_ai, user_id)
+    resumo_categorias = _safe_call(get_categories_for_ai, user_id)
+    resumo_contatos = _safe_call(get_contacts_summary_for_ai, user_id)
 
     # ▼▼▼ BUSCA AS MEMÓRIAS NO PINECONE ▼▼▼
     ultima_mensagem = historico_chat[-1]['content'] if historico_chat else ""

@@ -37,9 +37,19 @@ def handle_chat_message():
         print(f"⚠️ [VISION CHAT] Falha no orquestrador ({e}). Usando fallback simples...")
         session_key = f"platform_user_{user_id}"
         ai_response = tratar_nova_interacao(user_message, None, session_key, usuario)
+        fallback_visuals = []
+        if any(term in user_message.lower() for term in ['open finance', 'conectar banco', 'conectar conta', 'sincronizar banco', 'sincronizar conta', 'sincronizar meus bancos', 'cartões', 'cartao', 'klavi']):
+            try:
+                from src.services.vision_orchestrator_service import coletar_status_open_finance
+                of_data = coletar_status_open_finance(user_id)
+                if of_data:
+                    fallback_visuals.append({"type": "open_finance", "data": of_data})
+            except Exception as of_err:
+                print(f"Erro ao recuperar status Open Finance no fallback: {of_err}")
+
         return jsonify({
             "reply": ai_response,
-            "visuals": []
+            "visuals": fallback_visuals
         })
 
 

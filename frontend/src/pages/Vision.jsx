@@ -4,8 +4,21 @@ import ReactMarkdown from 'react-markdown';
 import { 
   ArrowUp, Plus, Sun, Moon, RotateCcw, 
   Sparkles, Check, FileText, ExternalLink,
-  Landmark
+  Landmark, ShieldCheck, Loader2
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { useTheme } from '../contexts/ThemeContext';
 import SimplificMascot from '../components/SimplificMascot';
 import VisionVisualRenderer from '../components/vision/VisionVisuals';
@@ -25,6 +38,13 @@ const Vision = ({ user, onLogout }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('Processando...');
 
+  // Estado do Modal de Conexão Direta Open Finance
+  const [isOpenFinanceModalOpen, setIsOpenFinanceModalOpen] = useState(false);
+  const [ofLoading, setOfLoading] = useState(false);
+  const [ofStatusMessage, setOfStatusMessage] = useState('');
+  const [ofCpf, setOfCpf] = useState(user?.cpf || '');
+  const [ofPopupWindow, setOfPopupWindow] = useState(null);
+
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -35,6 +55,113 @@ const Vision = ({ user, onLogout }) => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isLoading]);
+
+  // Carrega CPF prévio para agilizar conexão
+  useEffect(() => {
+    const fetchKlaviCpf = async () => {
+      try {
+        const res = await apiService.get('/api/klavi/status');
+        if (res?.cpf && !ofCpf) {
+          setOfCpf(res.cpf);
+        }
+      } catch (e) {
+        // Silencioso
+      }
+    };
+    fetchKlaviCpf();
+  }, []);
+
+  // Monitora o popup da Klavi quando aberto pelo botão Open Finance
+  useEffect(() => {
+    if (!ofPopupWindow) return;
+
+    const interval = setInterval(async () => {
+      if (ofPopupWindow.closed) {
+        clearInterval(interval);
+        setOfPopupWindow(null);
+        setOfLoading(true);
+        setOfStatusMessage('Finalizando sincronização e importando extratos...');
+
+        try {
+          const statusRes = await apiService.get('/api/klavi/status');
+          toast.success('Instituição bancária conectada com sucesso via Klavi Open Finance!');
+          setIsOpenFinanceModalOpen(false);
+
+          setMessages(prev => [
+            ...prev,
+            {
+              sender: 'ai',
+              text: '🎉 **Instituição conectada com sucesso!** Seus saldos, extratos e cartões foram sincronizados no Simplific Pro.',
+              visuals: [
+                {
+                  type: 'open_finance',
+                  data: {
+                    has_connections: true,
+                    total_institutions: (statusRes?.accounts?.length || 0) + (statusRes?.cards?.length || 0),
+                    accounts: statusRes?.accounts || [],
+                    cards: statusRes?.cards || [],
+                    provider: 'Klavi Open Finance',
+                    regulated_by: 'Banco Central do Brasil (BACEN)'
+                  }
+                }
+              ]
+            }
+          ]);
+        } catch (e) {
+          console.error("Erro ao validar sincronização no Vision:", e);
+        } finally {
+          setOfLoading(false);
+          setOfStatusMessage('');
+        }
+      }
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [ofPopupWindow]);
+
+  const handleStartOpenFinance = async () => {
+    setOfLoading(true);
+    setOfStatusMessage('Iniciando ambiente seguro Klavi...');
+
+    try {
+      const currentUrl = window.location.href.split('?')[0];
+      const redirectURL = `${currentUrl}?klavi_status=success`;
+
+      const response = await apiService.post('/api/klavi/create-link', {
+        redirectURL,
+        cpf: ofCpf ? ofCpf.replace(/\D/g, '') : null
+      });
+
+      const linkURL = response?.linkURL || response?.data?.linkURL;
+      if (!linkURL) {
+        throw new Error('URL da sessão Klavi não retornada.');
+      }
+
+      setOfStatusMessage('Abrindo ambiente seguro do Open Finance...');
+      const width = 580;
+      const height = 740;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const popup = window.open(
+        linkURL,
+        'KlaviOpenFinanceVision',
+        `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,status=no`
+      );
+
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        window.location.href = linkURL;
+      } else {
+        setOfPopupWindow(popup);
+        setOfStatusMessage('Aguardando autorização no seu banco...');
+      }
+    } catch (err) {
+      console.error('Erro ao conectar Open Finance:', err);
+      toast.error('Não foi possível iniciar o Open Finance. Tente novamente.');
+      setOfLoading(false);
+      setOfStatusMessage('');
+    }
+  };
 
   // Ajusta altura do textarea dinamicamente
   const handleInputChange = (e) => {
@@ -393,12 +520,12 @@ const Vision = ({ user, onLogout }) => {
                 <Plus size={18} />
               </button>
 
-              {/* Botão de Atalho Open Finance */}
+              {/* Botão de Atalho Open Finance (Abre conexão direta) */}
               <button 
                 type="button" 
                 className={styles.openFinanceToolButton}
                 title="Conectar bancos e cartões via Open Finance (Klavi)"
-                onClick={() => handleSendMessage('Quero sincronizar meus bancos e cartões via Open Finance')}
+                onClick={() => setIsOpenFinanceModalOpen(true)}
                 disabled={isLoading}
               >
                 <Landmark size={14} />
@@ -423,6 +550,94 @@ const Vision = ({ user, onLogout }) => {
 
       </div>
 
+      {/* Modal Interativo de Conexão Open Finance acionado pelo botão na barra */}
+      <Dialog open={isOpenFinanceModalOpen} onOpenChange={setIsOpenFinanceModalOpen}>
+        <DialogContent className="sm:max-w-[480px] bg-white dark:bg-[#0c0d0e] border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 p-6">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                <Landmark size={18} />
+              </div>
+              <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 font-mono text-[10px]">
+                Open Finance Oficial
+              </Badge>
+            </div>
+            <DialogTitle className="text-lg font-bold">
+              Conectar Instituição Bancária
+            </DialogTitle>
+            <DialogDescription className="text-xs text-zinc-500 dark:text-zinc-400">
+              Ambiente seguro regulamentado pelo Banco Central do Brasil. Seus dados financeiros são lidos com total sigilo e criptografia de ponta a ponta.
+            </DialogDescription>
+          </DialogHeader>
+
+          {ofLoading ? (
+            <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
+              <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+              <div className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                {ofStatusMessage}
+              </div>
+              <p className="text-xs text-zinc-500 max-w-xs">
+                Autorize o compartilhamento na janela aberta do seu banco. Ao concluir, o Simplific Pro sincronizará seus dados automaticamente.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 space-y-2">
+                <div className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                  <ShieldCheck size={15} className="text-emerald-500" />
+                  O que será sincronizado no Simplific Pro:
+                </div>
+                <ul className="list-disc pl-4 space-y-1 text-zinc-500 dark:text-zinc-400">
+                  <li>Consultar saldos e extratos da sua conta corrente com categorização automática.</li>
+                  <li>Importar despesas do cartão de crédito, faturas abertas e limites.</li>
+                  <li>Identificar parcelas de empréstimos futuros como lançamentos pendentes.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="of-cpf-direct" className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  CPF do titular (opcional — agiliza a localização da sua conta):
+                </Label>
+                <Input
+                  id="of-cpf-direct"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={ofCpf}
+                  onChange={(e) => setOfCpf(e.target.value)}
+                  className="h-9 text-xs font-mono bg-zinc-50 dark:bg-zinc-900/80 border-zinc-200 dark:border-zinc-700"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsOpenFinanceModalOpen(false)}
+              disabled={ofLoading}
+              className="text-xs h-9"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleStartOpenFinance}
+              disabled={ofLoading}
+              className="text-xs h-9 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
+            >
+              {ofLoading ? (
+                <>
+                  <Loader2 size={14} className="mr-1.5 animate-spin" />
+                  Conectando...
+                </>
+              ) : (
+                'Iniciar Conexão Segura'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

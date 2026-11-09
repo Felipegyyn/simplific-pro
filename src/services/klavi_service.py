@@ -87,19 +87,27 @@ class KlaviService:
 
         payload = {
             "email": user.email,
-            "phone": user.whatsapp or "",
             "redirectURL": final_redirect_url,
             "externalInfo": {
                 "user_id": str(user.id),
                 "user_email": user.email,
-                "user_name": user.name
+                "user_name": user.name or ""
             }
         }
+
+        # Trata o telefone se existir: Klavi exige estritamente 10 ou 11 dígitos (DDD + número brasileiro, sem 55 ou símbolos)
+        user_phone = getattr(user, 'whatsapp', None) or getattr(user, 'telefone_whatsapp', None)
+        if user_phone:
+            clean_phone = ''.join(filter(str.isdigit, str(user_phone)))
+            if len(clean_phone) in [12, 13] and clean_phone.startswith('55'):
+                clean_phone = clean_phone[2:]
+            if len(clean_phone) in [10, 11]:
+                payload["phone"] = clean_phone
 
         # Se o usuário já tiver CPF cadastrado, pré-carrega para simplificar o consentimento
         if getattr(user, 'cpf', None):
             clean_cpf = ''.join(filter(str.isdigit, str(user.cpf)))
-            if clean_cpf:
+            if len(clean_cpf) == 11:
                 payload["personalTaxId"] = clean_cpf
 
         try:
@@ -114,7 +122,10 @@ class KlaviService:
                 "expireIn": data.get("expireIn", 1800)
             }
         except Exception as e:
-            print(f"❌ [KLAVI] Erro ao criar Link Session: {e}")
+            err_details = ""
+            if hasattr(e, 'response') and e.response is not None:
+                err_details = f" | Resposta Klavi: {e.response.text}"
+            print(f"❌ [KLAVI] Erro ao criar Link Session: {e}{err_details}")
             raise e
 
     # =========================================================================
