@@ -66,21 +66,38 @@ const ConnectBankButton = ({ onSuccess, className = '', label = '+ Conectar Open
         clearInterval(interval);
         setPopupWindow(null);
         setLoading(true);
-        setStatusMessage('Finalizando sincronização...');
+        setStatusMessage('Sincronizando contas e extratos com o banco...');
 
-        try {
-          // Consulta o status para verificar os novos bancos e cartões
-          const statusRes = await apiService.get('/api/klavi/status');
-          toast.success('Conexão finalizada! Seus dados estão sendo atualizados.');
-          setIsOpen(false);
-          if (onSuccess) onSuccess(statusRes);
-          else window.location.reload();
-        } catch (e) {
-          console.error("Erro ao validar sincronização:", e);
-        } finally {
-          setLoading(false);
-          setStatusMessage('');
-        }
+        let attempts = 0;
+        const maxAttempts = 6;
+        const pollStatus = async () => {
+          attempts++;
+          try {
+            const statusRes = await apiService.get('/api/klavi/status');
+            if (statusRes && ((statusRes.accounts && statusRes.accounts.length > 0) || (statusRes.cards && statusRes.cards.length > 0))) {
+              toast.success('Instituição e extratos sincronizados com sucesso!');
+              setIsOpen(false);
+              setLoading(false);
+              setStatusMessage('');
+              if (onSuccess) onSuccess(statusRes);
+              return;
+            }
+          } catch (e) {
+            console.error("Erro ao validar sincronização:", e);
+          }
+
+          if (attempts < maxAttempts) {
+            setTimeout(pollStatus, 3000);
+          } else {
+            setLoading(false);
+            setStatusMessage('');
+            setIsOpen(false);
+            if (onSuccess) onSuccess();
+            else window.location.reload();
+          }
+        };
+
+        pollStatus();
       }
     }, 1500);
 

@@ -88,6 +88,12 @@ class KlaviService:
         payload = {
             "email": user.email,
             "redirectURL": final_redirect_url,
+            "products": [
+                "pf_categorized_checking_l3",
+                "pf_categorized_creditcard_l3",
+                "pf_categorized_savings_l3",
+                "pf_identity"
+            ],
             "externalInfo": {
                 "user_id": str(user.id),
                 "user_email": user.email,

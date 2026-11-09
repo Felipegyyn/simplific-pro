@@ -80,39 +80,57 @@ const Vision = ({ user, onLogout }) => {
         clearInterval(interval);
         setOfPopupWindow(null);
         setOfLoading(true);
-        setOfStatusMessage('Finalizando sincronização e importando extratos...');
+        setOfStatusMessage('Sincronizando contas e extratos com o banco...');
 
-        try {
-          const statusRes = await apiService.get('/api/klavi/status');
-          toast.success('Instituição bancária conectada com sucesso via Klavi Open Finance!');
-          setIsOpenFinanceModalOpen(false);
+        let attempts = 0;
+        const maxAttempts = 6;
+        const pollVisionStatus = async () => {
+          attempts++;
+          try {
+            const statusRes = await apiService.get('/api/klavi/status');
+            const hasData = (statusRes?.accounts && statusRes.accounts.length > 0) || (statusRes?.cards && statusRes.cards.length > 0);
+            if (hasData || attempts >= maxAttempts) {
+              toast.success('Instituição bancária conectada com sucesso via Klavi Open Finance!');
+              setIsOpenFinanceModalOpen(false);
+              setOfLoading(false);
+              setOfStatusMessage('');
 
-          setMessages(prev => [
-            ...prev,
-            {
-              sender: 'ai',
-              text: '🎉 **Instituição conectada com sucesso!** Seus saldos, extratos e cartões foram sincronizados no Simplific Pro.',
-              visuals: [
+              setMessages(prev => [
+                ...prev,
                 {
-                  type: 'open_finance',
-                  data: {
-                    has_connections: true,
-                    total_institutions: (statusRes?.accounts?.length || 0) + (statusRes?.cards?.length || 0),
-                    accounts: statusRes?.accounts || [],
-                    cards: statusRes?.cards || [],
-                    provider: 'Klavi Open Finance',
-                    regulated_by: 'Banco Central do Brasil (BACEN)'
-                  }
+                  sender: 'ai',
+                  text: '🎉 **Instituição conectada com sucesso!** Seus saldos, extratos e cartões foram sincronizados no Simplific Pro.',
+                  visuals: [
+                    {
+                      type: 'open_finance',
+                      data: {
+                        has_connections: true,
+                        total_institutions: (statusRes?.accounts?.length || 0) + (statusRes?.cards?.length || 0),
+                        accounts: statusRes?.accounts || [],
+                        cards: statusRes?.cards || [],
+                        provider: 'Klavi Open Finance',
+                        regulated_by: 'Banco Central do Brasil (BACEN)'
+                      }
+                    }
+                  ]
                 }
-              ]
+              ]);
+              return;
             }
-          ]);
-        } catch (e) {
-          console.error("Erro ao validar sincronização no Vision:", e);
-        } finally {
-          setOfLoading(false);
-          setOfStatusMessage('');
-        }
+          } catch (e) {
+            console.error("Erro ao validar sincronização no Vision:", e);
+          }
+
+          if (attempts < maxAttempts) {
+            setTimeout(pollVisionStatus, 3000);
+          } else {
+            setOfLoading(false);
+            setOfStatusMessage('');
+            setIsOpenFinanceModalOpen(false);
+          }
+        };
+
+        pollVisionStatus();
       }
     }, 1500);
 
