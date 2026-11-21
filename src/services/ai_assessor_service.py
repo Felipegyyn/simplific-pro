@@ -61,6 +61,11 @@ def get_ai_response(user_id, historico_chat, nome_usuario_personalizado=None):
         try:
             return fn(uid) or ""
         except Exception as err:
+            try:
+                from src.models.db import db
+                db.session.rollback()
+            except Exception:
+                pass
             print(f"⚠️ [DOSSIER] Falha não impeditiva ao coletar {fn.__name__}: {err}")
             return ""
 

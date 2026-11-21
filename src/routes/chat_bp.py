@@ -38,7 +38,7 @@ def handle_chat_message():
         session_key = f"platform_user_{user_id}"
         ai_response = tratar_nova_interacao(user_message, None, session_key, usuario)
         fallback_visuals = []
-        if any(term in user_message.lower() for term in ['open finance', 'conectar banco', 'conectar conta', 'sincronizar banco', 'sincronizar conta', 'sincronizar meus bancos', 'cartões', 'cartao', 'klavi']):
+        if any(term in user_message.lower() for term in ['open finance', 'conectar banco', 'conectar conta', 'sincronizar banco', 'sincronizar conta', 'sincronizar meus bancos', 'klavi']):
             try:
                 from src.services.vision_orchestrator_service import coletar_status_open_finance
                 of_data = coletar_status_open_finance(user_id)

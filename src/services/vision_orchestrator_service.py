@@ -15,7 +15,7 @@ from src.models.extended_modules import CreditCard, Fatura, BankAccount
 from src.services.ai_assessor_service import get_ai_response
 from src.services.whatsapp_service import user_sessions
 from src.routes.routes_whatsapp import executar_acao_simplific
-from src.services.search_service import obter_ultimos_cards_pesquisa
+from src.services.search_service import obter_ultimos_cards_pesquisa, realizar_pesquisa_web
 from src.services.investments_service import buscar_dados_ativo
 from src.services.reports_service import buscar_resumo_planejamento
 
@@ -227,7 +227,7 @@ def coletar_dados_cartoes(user_id):
         result = []
         for c in cards:
             limite = float(c.limit or 0)
-            fatura_aberta = Fatura.query.filter_by(cartao_id=c.id, status='em_aberto').first()
+            fatura_aberta = Fatura.query.filter(Fatura.cartao_id == c.id, Fatura.status.in_(['aberta', 'em_aberto'])).first()
             fatura_val = float(fatura_aberta.valor_total) if fatura_aberta else 0.0
             disp = float(c.available_limit) if c.available_limit is not None else max(0.0, limite - fatura_val)
 
@@ -473,8 +473,8 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
 
     # 1. Executa as ações acionadas pelo assistente
     recibos_gerados = []
+    resultados_acoes = []
     if acoes_a_executar:
-        resultados_acoes = []
         for acao in acoes_a_executar:
             tipo = acao.get('type')
             dados = acao.get('data', {})
@@ -597,7 +597,6 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
             if match_pesquisa:
                 termo = match_pesquisa.group(1).strip()
                 if termo.lower() not in ['algo', 'na internet', 'na web', 'aqui', 'uma coisa']:
-                    from src.services.search_service import realizar_pesquisa_web, obter_ultimos_cards_pesquisa
                     realizar_pesquisa_web(termo, user_id=user_id)
                     cards = obter_ultimos_cards_pesquisa(user_id)
                     if cards:
@@ -673,10 +672,10 @@ def processar_interacao_vision(user_id, mensagem_usuario, usuario):
                 visuals.append({"type": "schedule", "data": agenda})
 
     # --- Se perguntou por Ativo / Cotação ---
-    if 'consultar_preco_ativo' in tipos_acoes or any(k in texto_busca for k in [
+    if not intent_pesquisa_generica and ('consultar_preco_ativo' in tipos_acoes or any(k in texto_busca for k in [
         'cotação', 'cotacao', 'quanto tá', 'quanto ta', 'preço', 'preco', 
         'dolar', 'dólar', 'usd', 'euro', 'eur', 'bitcoin', 'btc', 'ações', 'acoes', 'ibov', 'ibovespa'
-    ]):
+    ])):
         ativo_param = None
         for a in acoes_a_executar:
             if a.get('type') == 'consultar_preco_ativo':
